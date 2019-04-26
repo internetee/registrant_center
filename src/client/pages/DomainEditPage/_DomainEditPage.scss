@@ -1,0 +1,28 @@
+.page--domain-edit {
+  .card {
+    margin: 0;
+  }
+  .ui.form {
+    .grouped.fields {
+      > label {
+        display: block;
+        margin-top: 20px;
+      }
+    }
+    .form-actions {
+      margin: 40px 0 0;
+    }
+  }
+  @include max-screen(768px) {
+    .ui.card {
+      > .content {
+        padding: 20px;
+      }
+    }
+  }
+  @include min-screen(1224px) {
+    .card {
+      margin-top: -40px;
+    }
+  }
+}

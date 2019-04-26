@@ -1,0 +1,12 @@
+.page--companies {
+  .ui.form.form-filter .form-filter--search {
+    .search-field {
+      .input input {
+        padding-right: 7.143em !important;
+        @include min-screen(768px) {
+          padding-right: 6.429em !important;
+        }
+      }
+    }
+  }
+}

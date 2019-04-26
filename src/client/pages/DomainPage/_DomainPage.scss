@@ -1,0 +1,19 @@
+.page--domain {
+  .ui.form {
+    .grouped.fields {
+      > label {
+        display: block;
+        margin-top: 20px;
+      }
+    }
+    .form-actions {
+      margin: 40px 0 0;
+    }
+  }
+  @include min-screen(768px) {
+    .page--header {
+      margin-bottom: 0;
+      padding-bottom: 40px;
+    }
+  }
+}

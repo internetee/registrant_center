@@ -1,0 +1,27 @@
+.user-data {
+  padding: 20px;
+  text-align: center;
+  @include gradient-gray(right);
+  h2 {
+    @include h2();
+    margin-bottom: 40px;
+  }
+  h4 {
+    @include h4();
+  }
+  &--item {
+    i {
+      display: block;
+      margin: 0 auto 20px;
+      font-size: 50px;
+      line-height: 50px;
+    }
+  }
+  @include min-screen(768px) {
+    padding: 40px 20px 140px;
+    margin-bottom: -40px;
+  }
+  @include min-screen(1224px) {
+    padding: 40px 50px 160px;
+  }
+}

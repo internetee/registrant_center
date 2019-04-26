@@ -1,0 +1,65 @@
+.quicklinks {
+  position: relative;
+  z-index: 1;
+  padding: 0 0 20px;
+  color: #fff;
+  text-align: center;
+  background: $green url("../static/html-pattern.png") no-repeat 50% 50% / 728px auto;
+  overflow: hidden;
+  a {
+    color: #fff;
+    text-decoration: underline;
+  }
+  .bills {
+    p {
+      &:first-child {
+        font-size: 20px;
+        strong {
+          display: block;
+          font-size: 40px;
+          line-height: 40px;
+          font-weight: 900;
+        }
+      }
+    }
+  }
+  .quicklinks--link {
+    display: block;
+    margin: 20px 0 5px;
+    color: #fff;
+    font-size: 18px;
+    line-height: 20px;
+    text-decoration: none;
+    i {
+      display: block;
+      height: 40px;
+      margin: 0 auto 20px;
+      transition: all .3s ease-in-out;
+    }
+    &:hover {
+      color: #fff;
+      text-decoration: underline;
+      i {
+        transform: scale(1.1)
+      }
+    }
+  }
+  @include min-screen(768px) {
+    margin-top: -20px;
+    padding: 60px 40px 40px 40px;
+    .quicklinks--link {
+      margin: 20px 0 10px;
+      font-size: 24px;
+      line-height: 30px;
+    }
+  }
+  @include min-screen(1224px) {
+    margin-top: -40px;
+    padding: 100px 50px 60px 50px;
+  }
+}
+.page {
+  &--dashboard {
+    padding-bottom: 0;
+  }
+}

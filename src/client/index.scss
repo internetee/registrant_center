@@ -1,0 +1,29 @@
+//core
+@import "./global-scss/vars";
+@import "./global-scss/mixins";
+@import "./global-scss/common";
+@import "./global-scss/page";
+@import "./global-scss/forms";
+
+//plugins
+@import "./global-scss/flatpickr";
+
+//modules
+@import "./components/modules/MessageModule/MessageModule";
+
+//components
+@import "./components/common/Loading/Loading";
+@import "./components/common/MainHeader/MainHeader";
+@import "./components/common/MainFooter/MainFooter";
+@import "./components/common/MainLayout/MainLayout";
+@import "./components/DomainList/DomainList";
+@import "./components/UserData/UserData";
+
+//pages
+@import "./pages/LoginPage/LoginPage";
+@import "./pages/CompaniesPage/CompaniesPage";
+@import "./pages/HomePage/HomePage";
+@import "./pages/DomainPage/DomainPage";
+@import "./pages/DomainEditPage/DomainEditPage";
+@import "./pages/WhoIsPage/WhoIsPage";
+@import "./pages/ErrorPage/ErrorPage";

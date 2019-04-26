@@ -1,0 +1,399 @@
+{
+  "all": {
+    "priority": 0,
+    "color": "black",
+    "et": {
+      "label": "Kõik staatused"
+    },
+    "en": {
+      "label": "All statuses"
+    },
+    "ru": {
+      "label": "All statuses"
+    }
+  },
+  "deleteCandidate": {
+    "priority": 1,
+    "color": "grey",
+    "et": {
+      "label": "Kustumas",
+      "definition": "Domeen on kustumas (kätte on jõudnud kuupäev, kui see kustub juhuslikult valitud hetkel 24 tunnise ajavahemiku jooksul)"
+    },
+    "en": {
+      "label": "Kustumas (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Kustumas (RU)",
+      "definition": ""
+    }
+  },
+  "serverForceDelete": {
+    "priority": 2,
+    "color": "brown",
+    "et": {
+      "label": "Algatatud kustutusmenetlus",
+      "definition": "Domeeni suhtes on algatatud kustutusmenetlus"
+    },
+    "en": {
+      "label": "Algatatud kustutusmenetlus (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Algatatud kustutusmenetlus (RU)",
+      "definition": ""
+    }
+  },
+  "serverHold": {
+    "priority": 3,
+    "color": "yellow",
+    "et": {
+      "label": "Nimeserveri kirjed tsoonifailist eemaldatud",
+      "definition": "Domeeni nimeserveri kirjed on tsoonifailist eemaldatud. See juhtub automaatselt kõigi aegunud domeenidega 15 päeva peale aegumist"
+    },
+    "en": {
+      "label": "Nimeserveri kirjed tsoonifailist eemaldatud (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Nimeserveri kirjed tsoonifailist eemaldatud (RU)",
+      "definition": ""
+    }
+  },
+  "pendingDeleteConfirmation": {
+    "priority": 4,
+    "color": "orange",
+    "et": {
+      "label": "Oodatakse kinnitust kustutamispäringule",
+      "definition": "Oodatakse registreerija kinnitust kustutamispäringule"
+    },
+    "en": {
+      "label": "Oodatakse kinnitust kustutamispäringule (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Oodatakse kinnitust kustutamispäringule (RU)",
+      "definition": ""
+    }
+  },
+  "pendingDelete": {
+    "priority": 5,
+    "color": "grey",
+    "et": {
+      "label": "Käib kustutamisprotsess",
+      "definition": "Käib domeeni kustutamisprotsess"
+    },
+    "en": {
+      "label": "Käib kustutamisprotsess (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Käib kustutamisprotsess (RU)",
+      "definition": ""
+    }
+  },
+  "pendingUpdate": {
+    "priority": 6,
+    "color": "blue",
+    "et": {
+      "label": "Oodatakse kinnitust registreerija vahetuse päringule",
+      "definition": "Oodatakse registreerija kinnitust registreerija vahetuse päringule"
+    },
+    "en": {
+      "label": "Oodatakse kinnitust registreerija vahetuse päringule (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Oodatakse kinnitust registreerija vahetuse päringule (RU)",
+      "definition": ""
+    }
+  },
+  "pendingRenew": {
+    "priority": 7,
+    "color": "blue",
+    "et": {
+      "label": "pendingRenew",
+      "definition": "pendingRenew"
+    },
+    "en": {
+      "label": "pendingRenew",
+      "definition": ""
+    },
+    "ru": {
+      "label": "pendingRenew",
+      "definition": ""
+    }
+  },
+  "pendingTransfer": {
+    "priority": 8,
+    "color": "blue",
+    "et": {
+      "label": "pendingTransfer",
+      "definition": "pendingTransfer"
+    },
+    "en": {
+      "label": "pendingTransfer",
+      "definition": ""
+    },
+    "ru": {
+      "label": "pendingTransfer",
+      "definition": ""
+    }
+  },
+  "pendingCreate": {
+    "priority": 9,
+    "color": "blue",
+    "et": {
+      "label": "pendingCreate",
+      "definition": "pendingCreate"
+    },
+    "en": {
+      "label": "pendingCreate",
+      "definition": ""
+    },
+    "ru": {
+      "label": "pendingCreate",
+      "definition": ""
+    }
+  },
+  "serverRenewProhibited": {
+    "priority": 10,
+    "color": "red",
+    "et": {
+      "label": "Uuendamine keelatud",
+      "definition": "Domeeni uuendamine on keelatud"
+    },
+    "en": {
+      "label": "Renew prohibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Renew prohibited (RU)",
+      "definition": ""
+    }
+  },
+  "clientRenewProhibited": {
+    "priority": 11,
+    "color": "red",
+    "et": {
+      "label": "clientRenewProhibited",
+      "definition": "clientRenewProhibited"
+    },
+    "en": {
+      "label": "clientRenewProhibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "clientRenewProhibited",
+      "definition": ""
+    }
+  },
+  "serverUpdateProhibited": {
+    "priority": 12,
+    "color": "teal",
+    "et": {
+      "label": "Andmete muutmine keelatud",
+      "definition": "Andmete muutmine on keelatud"
+    },
+    "en": {
+      "label": "Data updates prohibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Data updates prohibited (RU)",
+      "definition": ""
+    }
+  },
+  "serverRegistrantChangeProhibited": {
+    "priority": 13,
+    "color": "yellow",
+    "et": {
+      "label": "Üleandmine on keelatud",
+      "definition": "Domeeni üleandmine, s.t. registreerija vahetus, on keelatud"
+    },
+    "en": {
+      "label": "Üleandmine on keelatud (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Üleandmine on keelatud (RU)",
+      "definition": ""
+    }
+  },
+  "serverAdminChangeProhibited": {
+    "priority": 14,
+    "color": "yellow",
+    "et": {
+      "label": "Halduskontakti(de) muutmine keelatud",
+      "definition": "Domeeni halduskontakti(de) muutmine on keelatud"
+    },
+    "en": {
+      "label": "Halduskontakti(de) muutmine keelatud (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Halduskontakti(de) muutmine keelatud (RU)",
+      "definition": ""
+    }
+  },
+  "serverTechChangeProhibited": {
+    "priority": 15,
+    "color": "yellow",
+    "et": {
+      "label": "Tehniliste kontaktid(de) muutmine keelatud",
+      "definition": "Domeeni tehniliste kontaktid(de) muutmine on keelatud"
+    },
+    "en": {
+      "label": "Tehniliste kontaktid(de) muutmine keelatud (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Tehniliste kontaktid(de) muutmine keelatud (RU)",
+      "definition": ""
+    }
+  },
+  "clientUpdateProhibited": {
+    "priority": 16,
+    "color": "yellow",
+    "et": {
+      "label": "clientUpdateProhibited",
+      "definition": "clientUpdateProhibited"
+    },
+    "en": {
+      "label": "clientUpdateProhibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "clientUpdateProhibited",
+      "definition": ""
+    }
+  },
+  "serverTransferProhibited": {
+    "priority": 17,
+    "color": "violet",
+    "et": {
+      "label": "Registripidaja vahetus keelatud",
+      "definition": "Registripidaja vahetus on keelatud"
+    },
+    "en": {
+      "label": "Registrar change prohibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Registrar change prohibited (RU)",
+      "definition": ""
+    }
+  },
+  "clientTransferProhibited": {
+    "priority": 18,
+    "color": "violet",
+    "et": {
+      "label": "clientTransferProhibited",
+      "definition": "clientTransferProhibited"
+    },
+    "en": {
+      "label": "clientTransferProhibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "clientTransferProhibited",
+      "definition": ""
+    }
+  },
+  "serverDeleteProhibited": {
+    "priority": 19,
+    "color": "pink",
+    "et": {
+      "label": "Kustutamine keelatud",
+      "definition": "Kustutamine on keelatud"
+    },
+    "en": {
+      "label": "Deleting prohibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Deleting prohibited (RU)",
+      "definition": ""
+    }
+  },
+  "clientDeleteProhibited": {
+    "priority": 20,
+    "color": "pink",
+    "et": {
+      "label": "clientDeleteProhibited",
+      "definition": "clientDeleteProhibited"
+    },
+    "en": {
+      "label": "clientDeleteProhibited",
+      "definition": ""
+    },
+    "ru": {
+      "label": "clientDeleteProhibited",
+      "definition": ""
+    }
+  },
+  "expired": {
+    "priority": 21,
+    "color": "grey",
+    "et": {
+      "label": "Aegunud",
+      "definition": "Domeen on pikendamata ja viimane registratsiooniperiood on lõppenud"
+    },
+    "en": {
+      "label": "Expired",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Expired (RU)",
+      "definition": ""
+    }
+  },
+  "serverManualInzone": {
+    "priority": 22,
+    "color": "olive",
+    "et": {
+      "label": "Nimeserverid tsoonifailis",
+      "definition": "Domeeni nimeservereid hoitakse igal juhul tsoonifailis"
+    },
+    "en": {
+      "label": "Nimeserverid tsoonifailis (EN)",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Nimeserverid tsoonifailis (RU)",
+      "definition": ""
+    }
+  },
+  "inactive": {
+    "priority": 23,
+    "color": "grey",
+    "et": {
+      "label": "Mitteaktiivne",
+      "definition": "Domeeni vaikeolek, kui puuduvad teised staatused"
+    },
+    "en": {
+      "label": "Inactive",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Inactive",
+      "definition": ""
+    }
+  },
+  "ok": {
+    "priority": 24,
+    "color": "green",
+    "et": {
+      "label": "Ok",
+      "definition": "Domeeni vaikeolek, kui puuduvad teised staatused"
+    },
+    "en": {
+      "label": "Ok",
+      "definition": ""
+    },
+    "ru": {
+      "label": "Ok",
+      "definition": ""
+    }
+  }
+}

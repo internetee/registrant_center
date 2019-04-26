@@ -1,0 +1,233 @@
+{
+  "et": {
+    "global": {
+      "408": "Päring aegus. Palun proovige uuesti.",
+      "400": "Päring ebaõnnestus. Palun proovige uuesti."
+    },
+    "test": {
+      "404": "Test! Fail!",
+      "200": "Test! Success!"
+    },
+    "domain": {
+      "id": "ID",
+      "name": "Domeeni nimi",
+      "registrar": "Registripidaja",
+      "registered_at": "Registreeritud",
+      "valid_to": "Kehtiv kuni",
+      "created_at": "Loodud",
+      "updated_at": "Uuendatud",
+      "registrant": "Registreerija",
+      "tech": "Tehniline",
+      "tech_contacts": "Tehnilised kontaktid",
+      "admin": "Admin",
+      "admin_contacts": "Admin kontaktid",
+      "transfer_code": "Transfer kood",
+      "name_dirty": "name_dirty",
+      "name_puny": "name_puny",
+      "period": "Periood",
+      "period_unit": "Perioodi ühik",
+      "creator_str": "creator_str",
+      "updator_str": "updator_str",
+      "legacy_id": "legacy_id",
+      "legacy_registrar_id": "legacy_registrar_id",
+      "legacy_registrant_id": "legacy_registrant_id",
+      "outzone_at": "outzone_at",
+      "delete_at": "delete_at",
+      "registrant_verification_asked_at": "registrant_verification_asked_at",
+      "registrant_verification_token": "registrant_verification_token",
+      "pending_json": "pending_json",
+      "force_delete_at": "force_delete_at",
+      "statuses": "Staatused",
+      "locked_by_registrant_at": "locked_by_registrant_at",
+      "reserved": "Reserveeritud",
+      "status_notes": "status_notes",
+      "nameservers": "Nimeserverid"
+    },
+    "domain_list": {
+      "all_registrants": "Kõik registreerijad"
+    },
+    "domain_lock": {
+      "200": "Domeen on lukustatud",
+      "401": "Domeeni saavad lukustada ainult administratiivkontaktid",
+      "404": "Domeeni ei leitud",
+      "422": "Domeeni ei saa lukustada",
+      "500": "Tekkis viga! Proovige uuesti."
+    },
+    "domain_unlock": {
+      "200": "Domeen on avatud",
+      "401": "Domeeni saavad avada ainult administratiivkontaktid",
+      "404": "Domeeni ei leitud",
+      "422": "Domeen ei ole lukus",
+      "500": "Tekkis viga! Proovige uuesti."
+    },
+    "domain_edit": {
+      "200": "Salvestatud!",
+      "400": "Sisestatud andmed ei ole õiged.",
+      "500": "Tekkis viga! Proovige uuesti."
+    },
+    "logout": {
+      "200": "Olete välja logitud!",
+      "401": "Autoriseerimispäring ebaõnnestus.",
+      "498": "Teie sessioon on aegunud."
+    },
+    "whois": {
+      "200": "Salvestatud!",
+      "400": "Sisestatud andmed ei ole õiged.",
+      "500": "Tekkis viga! Proovige uuesti."
+    }
+  },
+  "en": {
+    "global": {
+      "408": "Päring aegus. Palun proovige uuesti.",
+      "400": "Päring ebaõnnestus. Palun proovige uuesti."
+    },
+    "test": {
+      "404": "Test! Fail!",
+      "200": "Test! Success!"
+    },
+    "domain": {
+      "id": "ID",
+      "name": "Domeeni nimi",
+      "registrar": "Registripidaja",
+      "registered_at": "Registreeritud",
+      "valid_to": "Kehtiv kuni",
+      "created_at": "Loodud",
+      "updated_at": "Uuendatud",
+      "registrant": "Registreerija",
+      "tech": "Tehniline",
+      "tech_contacts": "Tehnilised kontaktid",
+      "admin": "Admin",
+      "admin_contacts": "Admin kontaktid",
+      "transfer_code": "transfer_code",
+      "name_dirty": "name_dirty",
+      "name_puny": "name_puny",
+      "period": "Periood",
+      "period_unit": "Perioodi ühik",
+      "creator_str": "creator_str",
+      "updator_str": "updator_str",
+      "legacy_id": "legacy_id",
+      "legacy_registrar_id": "legacy_registrar_id",
+      "legacy_registrant_id": "legacy_registrant_id",
+      "outzone_at": "outzone_at",
+      "delete_at": "delete_at",
+      "registrant_verification_asked_at": "registrant_verification_asked_at",
+      "registrant_verification_token": "registrant_verification_token",
+      "pending_json": "pending_json",
+      "force_delete_at": "force_delete_at",
+      "statuses": "Staatused",
+      "locked_by_registrant_at": "locked_by_registrant_at",
+      "reserved": "Reserveeritud",
+      "status_notes": "status_notes",
+      "nameservers": "Nimeserverid"
+    },
+    "domain_list": {
+      "all_registrants": "Kõik registreerijad"
+    },
+    "domain_lock": {
+      "200": "Domain locked",
+      "401": "Only administrative contacts can manage registry locks",
+      "404": "Domain not found",
+      "422": "Domain cannot be locked",
+      "500": "Something went wrong. Try again."
+    },
+    "domain_unlock": {
+      "200": "Domain unlocked",
+      "401": "Only administrative contacts can manage registry locks",
+      "404": "Domain not found",
+      "422": "Domain is not locked",
+      "500": "Something went wrong. Try again."
+    },
+    "domain_edit": {
+      "200": "Saved!",
+      "400": "Inserted data is invalid.",
+      "500": "Something went wrong. Try again."
+    },
+    "logout": {
+      "200": "Log out successful!",
+      "401": "Unauthorized!",
+      "498": "Your session has timed out"
+    },
+    "whois": {
+      "200": "Saved!",
+      "400": "Inserted data is invalid.",
+      "500": "Something went wrong. Try again."
+    }
+  },
+  "ru": {
+    "global": {
+      "408": "Päring aegus. Palun proovige uuesti.",
+      "400": "Päring ebaõnnestus. Palun proovige uuesti."
+    },
+    "test": {
+      "404": "Test! Fail!",
+      "200": "Test! Success!"
+    },
+    "domain": {
+      "id": "ID",
+      "name": "Domeeni nimi",
+      "registrar": "Registripidaja",
+      "registered_at": "Registreeritud",
+      "valid_to": "Kehtiv kuni",
+      "created_at": "Loodud",
+      "updated_at": "Uuendatud",
+      "registrant": "Registreerija",
+      "tech": "Tehniline",
+      "tech_contacts": "Tehnilised kontaktid",
+      "admin": "Admin",
+      "admin_contacts": "Admin kontaktid",
+      "transfer_code": "transfer_code",
+      "name_dirty": "name_dirty",
+      "name_puny": "name_puny",
+      "period": "Periood",
+      "period_unit": "Perioodi ühik",
+      "creator_str": "creator_str",
+      "updator_str": "updator_str",
+      "legacy_id": "legacy_id",
+      "legacy_registrar_id": "legacy_registrar_id",
+      "legacy_registrant_id": "legacy_registrant_id",
+      "outzone_at": "outzone_at",
+      "delete_at": "delete_at",
+      "registrant_verification_asked_at": "registrant_verification_asked_at",
+      "registrant_verification_token": "registrant_verification_token",
+      "pending_json": "pending_json",
+      "force_delete_at": "force_delete_at",
+      "statuses": "Staatused",
+      "locked_by_registrant_at": "locked_by_registrant_at",
+      "reserved": "Reserveeritud",
+      "status_notes": "status_notes",
+      "nameservers": "Nimeserverid"
+    },
+    "domain_list": {
+      "all_registrants": "Kõik registreerijad"
+    },
+    "domain_lock": {
+      "200": "Domain locked",
+      "401": "Only administrative contacts can manage registry locks",
+      "404": "Domain not found",
+      "422": "Domain cannot be locked",
+      "500": "Something went wrong. Try again."
+    },
+    "domain_unlock": {
+      "200": "Domain unlocked",
+      "401": "Only administrative contacts can manage registry locks",
+      "404": "Domain not found",
+      "422": "Domain is not locked",
+      "500": "Something went wrong. Try again."
+    },
+    "domain_edit": {
+      "200": "Saved!",
+      "400": "Inserted data is invalid.",
+      "500": "Something went wrong. Try again."
+    },
+    "logout": {
+      "200": "Log out successful!",
+      "401": "Unauthorized",
+      "498": "Your session has timed out"
+    },
+    "whois": {
+      "200": "Saved!",
+      "400": "Inserted data is invalid.",
+      "500": "Something went wrong. Try again."
+    }
+  }
+}
