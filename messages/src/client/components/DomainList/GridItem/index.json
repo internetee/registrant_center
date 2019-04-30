@@ -1,0 +1,54 @@
+[
+  {
+    "id": "domains.domain.contacts.title",
+    "defaultMessage": "Kontaktid"
+  },
+  {
+    "id": "domains.domain.contacts.type",
+    "defaultMessage": "Tüüp"
+  },
+  {
+    "id": "domains.domain.contacts.name",
+    "defaultMessage": "Nimi"
+  },
+  {
+    "id": "domains.domain.contacts.email",
+    "defaultMessage": "E-post"
+  },
+  {
+    "id": "domains.domain.nameservers.title",
+    "defaultMessage": "Nimeserverid"
+  },
+  {
+    "id": "domains.domain.nameservers.hostname",
+    "defaultMessage": "Hostinimi"
+  },
+  {
+    "id": "domain.nameservers.text",
+    "defaultMessage": "Nimeserverid puuduvad"
+  },
+  {
+    "id": "domains.domain.valid_to",
+    "defaultMessage": "Kehtiv kuni <strong>{valid_to}</strong>"
+  },
+  {
+    "id": "domains.domain.outzone_at",
+    "defaultMessage": "Tsoonist eemaldatud <strong>{outzone_at}</strong>"
+  },
+  {
+    "id": "domains.domain.delete_at",
+    "defaultMessage": "Tsoonist kustutatakse <strong>{delete_at}</strong>"
+  },
+  {
+    "id": "domains.domain.registrant_verification_asked_at",
+    "defaultMessage": "Kustutamine taodeldud <strong>{registrant_verification_asked_at}</strong>"
+  },
+  {
+    "id": "domains.domain.contacts.admin",
+    "defaultMessage": "Admin"
+  },
+  {
+    "id": "domains.domain.contacts.tech",
+    "defaultMessage": "Tehniline"
+  }
+]

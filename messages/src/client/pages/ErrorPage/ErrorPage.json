@@ -1,0 +1,22 @@
+[
+  {
+    "id": "errorpage.page_title",
+    "defaultMessage": "Error | EIS Registreerijaportaal"
+  },
+  {
+    "id": "errorpage.title",
+    "defaultMessage": "Lehte ei leitud"
+  },
+  {
+    "id": "hero.link.back",
+    "defaultMessage": "Tagasi"
+  },
+  {
+    "id": "errorpage.none.message.title",
+    "defaultMessage": "Kahjuks sellisele URL-le vastavat lehte ei leitud"
+  },
+  {
+    "id": "errorpage.none.message.text",
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque, consequuntur est facere fuga illum ipsa ipsum quasi quo! Commodi consequuntur eligendi harum non ut. Architecto blanditiis dignissimos nulla placeat praesentium."
+  }
+]

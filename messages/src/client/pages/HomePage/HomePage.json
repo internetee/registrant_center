@@ -1,0 +1,30 @@
+[
+  {
+    "id": "dashboard.page_title",
+    "defaultMessage": "Töölaud | EIS Registreerijaportaal"
+  },
+  {
+    "id": "dashboard.title",
+    "defaultMessage": "<span>Hei</span>, {name}"
+  },
+  {
+    "id": "dashboard.hero.text",
+    "defaultMessage": "Tere tulemast tagasi. Viimati külastasid portaali: {lastVisit}"
+  },
+  {
+    "id": "quicklinks.companies.title",
+    "defaultMessage": "Minu ettevõtted"
+  },
+  {
+    "id": "quicklinks.companies.text",
+    "defaultMessage": "Minu kõikide ettevõtete ülevaade"
+  },
+  {
+    "id": "quicklinks.whois.title",
+    "defaultMessage": "WHOIS isikuandmed"
+  },
+  {
+    "id": "quicklinks.whois.text",
+    "defaultMessage": "Minu isikuandmete avaldamine WHOIS päringutes. Loe lähemalt <a href='https://www.internet.ee/domeenid/whois-teenuse-kasutajatingimused'>siit</a>"
+  }
+]

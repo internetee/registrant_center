@@ -2,23 +2,19 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import nock from 'nock';
 import dotenv from 'dotenv';
+import config from 'config';
 import reducer, { initialState, fetchContacts }  from './contacts';
 
-const middlewares = [thunk];
-const mockStore = configureMockStore(middlewares);
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
-dotenv.config();
-
-const { HOST, PORT } = process.env;
-console.log('HOST AND PORT', HOST, PORT);
-
 describe('Contacts action creators', () => {
-  
+  const middlewares = [thunk];
+  const mockStore = configureMockStore(middlewares);
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
+  dotenv.config();
+  const { host, port } = config.get();
   let store;
   
   beforeEach(() => {
-    dotenv.config();
+    jest.resetModules();
     store = mockStore({
       user: {
         token: {
@@ -35,7 +31,7 @@ describe('Contacts action creators', () => {
   
   it('dipatches the right actions to fetch contacts', () => {
     
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .get('/api/contacts')
       .query({ offset: 0 })
       .reply(200, mockContacts.data);
@@ -62,7 +58,7 @@ describe('Contacts action creators', () => {
   
   it('dipatches the right actions to fetch a single contact', () => {
     
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .get('/api/contacts/cfbfbb76-aed8-497a-91c1-48d82cbc4588')
       .reply(200, mockContacts.data[0]);
     

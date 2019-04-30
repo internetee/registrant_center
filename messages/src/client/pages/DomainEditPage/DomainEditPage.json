@@ -1,0 +1,74 @@
+[
+  {
+    "id": "domain.page_title",
+    "defaultMessage": "{domainName} | EIS Registreerijaportaal"
+  },
+  {
+    "id": "domain_edit.title",
+    "defaultMessage": "Kontaktide muutmine"
+  },
+  {
+    "id": "hero.link.back",
+    "defaultMessage": "Tagasi"
+  },
+  {
+    "id": "domain.registrant.name",
+    "defaultMessage": "Nimi"
+  },
+  {
+    "id": "domain.registrant.ident.code",
+    "defaultMessage": "Isikukood"
+  },
+  {
+    "id": "domain.role",
+    "defaultMessage": "Roll:"
+  },
+  {
+    "id": "domain.registrant.email",
+    "defaultMessage": "E-mail"
+  },
+  {
+    "id": "domain.registrant.phone",
+    "defaultMessage": "Telefon"
+  },
+  {
+    "id": "domain.contacts_visibility",
+    "defaultMessage": "Kontaktide nähtavus"
+  },
+  {
+    "id": "domain.contacts.save",
+    "defaultMessage": "Salvesta"
+  },
+  {
+    "id": "whois.confirm_modal.title",
+    "defaultMessage": "Kas oled kindel, et soovid kontaktandmeid muuta?"
+  },
+  {
+    "id": "whois.confirm_modal.description.title",
+    "defaultMessage": "Teie muudatused kajastuvad järgmiste domeenide puhul:"
+  },
+  {
+    "id": "whois.confirm_modal.description.roles",
+    "defaultMessage": "Roll:"
+  },
+  {
+    "id": "whois.confirm_modal.confirm",
+    "defaultMessage": "Jah"
+  },
+  {
+    "id": "whois.confirm_modal.submicancel",
+    "defaultMessage": "Ei"
+  },
+  {
+    "id": "domain.domain_not_found_title",
+    "defaultMessage": "Domeeni ei leitud | EIS Registreerijaportaal"
+  },
+  {
+    "id": "domain.none.message.title",
+    "defaultMessage": "Kahjuks sellise nimega domeeni ei leitud"
+  },
+  {
+    "id": "domain.none.message.text",
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque, consequuntur est facere fuga illum ipsa ipsum quasi quo! Commodi consequuntur eligendi harum non ut. Architecto blanditiis dignissimos nulla placeat praesentium."
+  }
+]

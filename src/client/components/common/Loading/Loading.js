@@ -4,8 +4,7 @@ import { Container, Loader } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 
-export function Loading(props) {
-  const { isLoadingUser, isLoadingDomains, isLoadingContacts } = props;
+export function Loading({ isLoadingUser, isLoadingDomains, isLoadingContacts }) {
   const Message = () => {
     if (isLoadingUser) {
       return (

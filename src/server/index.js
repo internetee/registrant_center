@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import config from 'config';
 import auth from 'http-auth';
 import express from 'express';
 import helmet from 'helmet';
@@ -24,6 +25,8 @@ import API from './routes/apiRoute';
 
 dotenv.config();
 
+console.log(config);
+
 const privateKey = fs.readFileSync('./server.key', 'utf8');
 const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
@@ -32,14 +35,13 @@ const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL,
   TOKEN_URL, AUTH_URL, JWKS_URL, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
 const logIncoming = process.env.LOG_INCOMING;
 
-const htpasswd = auth.basic({
-  realm: 'EIS Registreerijaportaal',
-  file: `${__dirname}/../../.htpasswd`
-});
-
 const app = express();
 
 if (NODE_ENV === 'development') {
+  const htpasswd = auth.basic({
+    realm: 'EIS Registreerijaportaal',
+    file: `${__dirname}/../../.htpasswd`
+  });
   app.use(auth.connect(htpasswd));
 }
 

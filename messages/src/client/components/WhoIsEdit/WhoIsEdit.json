@@ -1,0 +1,26 @@
+[
+  {
+    "id": "whois.edit.check_some",
+    "defaultMessage": "({count}/{countOf}) Osa info peidetud"
+  },
+  {
+    "id": "whois.edit.check_all",
+    "defaultMessage": "({count}/{countOf}) Kõik info nähtav"
+  },
+  {
+    "id": "whois.edit.check_none",
+    "defaultMessage": "({count}/{countOf}) Kõik info peidetud"
+  },
+  {
+    "id": "domain.role",
+    "defaultMessage": "Roll:"
+  },
+  {
+    "id": "whois.edit.name",
+    "defaultMessage": "Nimi avalik ({contactName})"
+  },
+  {
+    "id": "whois.edit.email",
+    "defaultMessage": "E-mail avalik ({contactEmail})"
+  }
+]

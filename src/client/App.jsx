@@ -7,7 +7,7 @@ import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
 import messages from './utils/messages';
-import {Helmet, Loading} from './components';
+import { Helmet, Loading, ScrollToTop } from './components';
 
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const DomainPage = lazy(() => import('./pages/DomainPage/DomainPage'));
@@ -20,7 +20,10 @@ const ErrorPage = lazy(() => import('./pages/ErrorPage/ErrorPage'));
 addLocaleData([...localeEt, ...localeEn, ...localeRu]);
 
 class App extends PureComponent {
-  
+  componentDidMount() {
+    window.scrollTo(0, 0);
+  }
+
   render() {
     const { ui, isLoading, location } = this.props;
     const { lang } = ui;
@@ -50,48 +53,50 @@ class App extends PureComponent {
               </Helmet>
             )}
           </FormattedMessage>
-          { isLoading ? (
-            <Loading/>
-          ) : (
-            <Suspense fallback={<Loading />}>
-              <Switch location={location}>
-                <Route
-                  exact
-                  path='/'
-                  component={(props) => <HomePage {...this.props} {...props} />}
-                />
-                <Route
-                  exact
-                  path='/login'
-                  render={(props) => <LoginPage {...this.props} {...props} />}
-                />
-                <Route
-                  exact
-                  path='/domain/:id'
-                  render={(props) => <DomainPage {...this.props} {...props} />}
-                />
-                <Route
-                  exact
-                  path='/domain/:id/edit'
-                  render={(props) => <DomainEditPage {...this.props} {...props} />}
-                />
-                <Route
-                  exact
-                  path='/companies'
-                  render={(props) => <CompaniesPage {...this.props} {...props} />}
-                />
-                <Route
-                  exact
-                  path='/whois'
-                  render={(props) => <WhoIsPage {...this.props} {...props} />}
-                />
-                <Route
-                  path='*'
-                  render={(props) => <ErrorPage {...this.props} {...props} />}
-                />
-              </Switch>
-            </Suspense>
-          ) }
+          <ScrollToTop location={location}>
+            { isLoading ? (
+              <Loading/>
+            ) : (
+              <Suspense fallback={<Loading />}>
+                <Switch location={location}>
+                  <Route
+                    exact
+                    path='/'
+                    component={(props) => <HomePage {...this.props} {...props} />}
+                  />
+                  <Route
+                    exact
+                    path='/login'
+                    render={(props) => <LoginPage {...this.props} {...props} />}
+                  />
+                  <Route
+                    exact
+                    path='/domain/:id'
+                    render={(props) => <DomainPage {...this.props} {...props} />}
+                  />
+                  <Route
+                    exact
+                    path='/domain/:id/edit'
+                    render={(props) => <DomainEditPage {...this.props} {...props} />}
+                  />
+                  <Route
+                    exact
+                    path='/companies'
+                    render={(props) => <CompaniesPage {...this.props} {...props} />}
+                  />
+                  <Route
+                    exact
+                    path='/whois'
+                    render={(props) => <WhoIsPage {...this.props} {...props} />}
+                  />
+                  <Route
+                    path='*'
+                    render={(props) => <ErrorPage {...this.props} {...props} />}
+                  />
+                </Switch>
+              </Suspense>
+            ) }
+          </ScrollToTop>
         </div>
       </IntlProvider>
     );

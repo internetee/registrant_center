@@ -105,8 +105,7 @@ const fetchContacts = (uuid, offset = request.offset) => (dispatch, getState) =>
       }
       return dispatch(receiveAllContacts(request.data));
     })
-    .catch((error, response) => {
-      console.log(error, response);
+    .catch(error => {
       return dispatch(invalidateContacts(error.response.status));
     });
 };

@@ -59,8 +59,6 @@ class DomainList extends Component {
     let registrants = [];
     let minValidToDate = domains[0].valid_to;
     let maxValidToDate = domains[0].valid_to;
-    let queryValidToMin = domains[0].valid_to;
-    let queryValidToMax = domains[0].valid_to;
     
     const sortedDomains = domains.map(item => {
       
@@ -69,9 +67,7 @@ class DomainList extends Component {
       item.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
       
       minValidToDate = (item.valid_to < minValidToDate) ? item.valid_to : minValidToDate;
-      queryValidToMin = (item.valid_to < queryValidToMin) ? item.valid_to : queryValidToMin;
       maxValidToDate = (item.valid_to > maxValidToDate) ? item.valid_to : maxValidToDate;
-      queryValidToMax = (item.valid_to > queryValidToMax) ? item.valid_to : queryValidToMax;
       
       if (registrants.findIndex(registrant => registrant.key === item.registrant.id) === -1) {
         registrants.push({
@@ -122,17 +118,16 @@ class DomainList extends Component {
         value: 'all',
       }, ...registrants],
       filteredDomains: sortedDomains,
+      domains: sortedDomains,
       minValidToDate: new Date(minValidToDate),
       maxValidToDate: new Date(maxValidToDate),
-      queryValidToMin: new Date(queryValidToMin),
-      queryValidToMax: new Date(queryValidToMax),
       perPage: Number(cookies.get('domains_per_page')) || 24
     });
   }
   
   toggleView = () => {
     const { cookies } = this.props;
-    const { isGrid } = this.state;
+    const { isGrid, filteredDomains } = this.state;
     cookies.set('domains_is_grid', !isGrid, { path: '/' });
     this.setState(prevState => ({
       ...prevState,
@@ -140,7 +135,9 @@ class DomainList extends Component {
       isGrid: !isGrid
     }));
     setTimeout(() => {
-      this.masonry.current.performLayout();
+      if (filteredDomains.length > 0) {
+        this.masonry.current.performLayout();
+      }
     });
   };
   
@@ -151,7 +148,7 @@ class DomainList extends Component {
   };
   
   setMinDate = (selectedDates) => {
-    this.setState({ queryValidToMin: new Date(selectedDates[0]) });
+    this.setState({ queryValidToMin: new Date(selectedDates[0]).getTime() });
   };
   
   setMaxDate = (selectedDates) => {
@@ -185,58 +182,64 @@ class DomainList extends Component {
   };
   
   handleSubmit = () => {
-    const { domains } = this.props;
-    let filteredDomains = [...domains];
-    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax } = this.state;
-    if (queryKeys.length) {
-      const query = queryKeys.toString().toLowerCase();
-      filteredDomains = filteredDomains.filter(domain => domain.name.toLowerCase().includes(query) ||
-          domain.tech_contacts.some(item => item.name.toLowerCase().includes(query)) ||
-          domain.admin_contacts.some(item => item.name.toLowerCase().includes(query)) ||
-          domain.nameservers.some(item => item.hostname.toLowerCase().includes(query) ||
-            item.ipv4.toString().toLowerCase().includes(query) ||
-            item.ipv6.toString().toLowerCase().includes(query))
-      );
+    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax, domains } = this.state;
+    if (!queryKeys.length && queryStatus === 'all' && !queryValidToMin && !queryValidToMax && queryRegistrant === 'all') {
       this.setState(prevState => ({
         ...prevState,
         activePage: 1,
-        filteredDomains
+        filteredDomains: domains,
       }));
-    } else if (queryKeys.length === 0) {
+    } else {
+      const filteredDomains = domains.filter(domain => {
+        const query = queryKeys.toString().toLowerCase();
+        if (query.length) {
+          return (domain.name.toLowerCase().includes(query) ||
+            domain.tech_contacts.some(item => item.name.toLowerCase().includes(query)) ||
+            domain.admin_contacts.some(item => item.name.toLowerCase().includes(query)) ||
+            domain.nameservers.some(item => item.hostname.toLowerCase().includes(query) ||
+              item.ipv4.toString().toLowerCase().includes(query) ||
+              item.ipv6.toString().toLowerCase().includes(query)));
+        }
+        return true;
+      }).filter(domain => {
+        if (queryStatus.length && queryStatus !== 'all') {
+          return domain.statuses.includes(queryStatus);
+        }
+        return true;
+      }).filter(domain => {
+        if (queryValidToMin && queryValidToMax) {
+          return new Date(domain.valid_to).getTime() >= queryValidToMin && new Date(domain.valid_to).getTime() <= queryValidToMax;
+        }
+        if (queryValidToMin && !queryValidToMax) {
+          return new Date(domain.valid_to).getTime() >= queryValidToMin;
+        }
+        if (!queryValidToMin && queryValidToMax) {
+          return new Date(domain.valid_to).getTime() <= queryValidToMax;
+        }
+        return true;
+      }).filter(domain => {
+        if (queryRegistrant.length && queryRegistrant !== 'all') {
+          return domain.registrant.id.includes(queryRegistrant);
+        }
+        return true;
+      });
       this.setState(prevState => ({
         ...prevState,
         activePage: 1,
-        domains
+        filteredDomains,
       }));
-    }
-    if (queryStatus.length && queryStatus !== 'all') {
-      filteredDomains = filteredDomains.filter(domain => domain.statuses.indexOf(queryStatus) > -1);
-      this.setState({ filteredDomains });
-    } else if (queryStatus === 'all') {
-      this.setState({ filteredDomains });
-    }
-    if (queryValidToMin && queryValidToMax) {
-      filteredDomains = filteredDomains.filter(domain => new Date(domain.valid_to) >= queryValidToMin && new Date(domain.valid_to) <= queryValidToMax);
-      this.setState({ filteredDomains });
-    }
-    if (queryRegistrant.length && queryRegistrant !== 'all') {
-      filteredDomains = filteredDomains.filter(domain => domain.registrant.id.indexOf(queryRegistrant) > -1);
-      this.setState({ filteredDomains });
-    } else if (queryRegistrant !== 'all') {
-      this.setState({ filteredDomains });
     }
   };
   
   handleReset = () => {
-    const { domains } = this.props;
     this.setState(prevState => ({
       ...prevState,
       queryKeys: '',
       queryStatus: 'all',
       queryRegistrant: 'all',
-      queryValidToMin: prevState.minValidToDate,
-      queryValidToMax: prevState.maxValidToDate,
-      domains,
+      queryValidToMin: null,
+      queryValidToMax: null,
+      filteredDomains: prevState.domains
     }));
   };
   
@@ -248,8 +251,6 @@ class DomainList extends Component {
       queryKeys,
       queryStatus,
       queryRegistrant,
-      queryValidToMin,
-      queryValidToMax,
       minValidToDate,
       maxValidToDate,
       filteredDomains,
@@ -276,14 +277,14 @@ class DomainList extends Component {
       dateFormat: 'd.m.Y',
       defaultDate: minValidToDate,
       minDate: minValidToDate,
-      maxDate: queryValidToMax || maxValidToDate
+      maxDate: maxValidToDate
     };
   
     const dateEndOptions = {
       locale: getLocale(lang),
       dateFormat: 'd.m.Y',
       defaultDate: maxValidToDate,
-      minDate: queryValidToMin || minValidToDate,
+      minDate: minValidToDate,
       maxDate: maxValidToDate
     };
   

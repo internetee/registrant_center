@@ -1,0 +1,18 @@
+[
+  {
+    "id": "loading.user",
+    "defaultMessage": "Laen andmeid..."
+  },
+  {
+    "id": "loading.domains",
+    "defaultMessage": "Laen domeene..."
+  },
+  {
+    "id": "loading.contacts",
+    "defaultMessage": "Laen kontakte..."
+  },
+  {
+    "id": "loading.loading",
+    "defaultMessage": "Laen..."
+  }
+]
