@@ -11,6 +11,8 @@ module.exports = {
       "jest/globals": true
   },
   "globals":{
+    "host": true,
+    "port": true,
     "window": true,
     "document": true,
     "localStorage": true,
@@ -19,21 +21,21 @@ module.exports = {
     "Blob": true,
     "navigator": true,
     //unit tests
-    "expect":true,
-    "shallow":true,
-    "render":true,
-    "mount":true,
-    "jest":true,
-    "beforeAll":true,
+    "expect": true,
+    "shallow": true,
+    "render": true,
+    "mount": true,
+    "jest": true,
+    "beforeAll": true,
     //e2e tests
-    "cy":true,
-    "Cypress":true,
+    "cy": true,
+    "Cypress": true,
     //mock file variables
-    "mockUser":true,
-    "mockDomains":true,
-    "mockContacts":true,
-    "mockMainMenu":true,
-    "mockFooterMenu":true,
+    "mockUser": true,
+    "mockDomains": true,
+    "mockContacts": true,
+    "mockMainMenu": true,
+    "mockFooterMenu": true,
   },
   "parserOptions": {
       "ecmaFeatures": {

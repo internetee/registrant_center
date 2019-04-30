@@ -133,14 +133,6 @@ const initialState = {
   data: [],
   status: null,
   fetchedAt: null,
-  updatedAt: null
-};
-
-export {
-  initialState,
-  fetchDomains,
-  lockDomain,
-  unlockDomain
 };
 
 export default function(state = initialState, action) {
@@ -185,7 +177,6 @@ export default function(state = initialState, action) {
       data: action.data,
       isLoading: action.isLoading,
       isInvalidated: action.isInvalidated,
-      updatedAt: Date.now()
     };
   
   case UNLOCK_DOMAIN_REQUEST:
@@ -201,10 +192,16 @@ export default function(state = initialState, action) {
       data: action.data,
       isLoading: action.isLoading,
       isInvalidated: action.isInvalidated,
-      updatedAt: Date.now()
     };
   
   default:
     return state;
   }
+};
+
+export {
+  initialState,
+  fetchDomains,
+  lockDomain,
+  unlockDomain
 };

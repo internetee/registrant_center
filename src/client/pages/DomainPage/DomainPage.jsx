@@ -805,12 +805,10 @@ const DomainContacts = ({ contacts }) => {
   ));
 };
 
-const mapStateToProps = (state) => {
-  return {
-    initialDomains: state.domains,
-    initialContacts: state.contacts,
-  };
-};
+const mapStateToProps = (state) => ({
+  initialDomains: state.domains,
+  initialContacts: state.contacts,
+});
 
 export default connect(
   mapStateToProps,

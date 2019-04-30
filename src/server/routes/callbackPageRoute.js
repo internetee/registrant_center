@@ -146,7 +146,7 @@ const callbackPage = async (req, res) => {
           };
           User.findOne({
             ident: userData.ident
-          }).then(user => {
+          }).then(async user => {
             if (user) {
               const today = moment(Date.now());
               const updatedAt = moment(user.updated_at);
@@ -160,7 +160,7 @@ const callbackPage = async (req, res) => {
                   getCompanies(user._id, user.ident);
                 }
                 */
-                getCompanies(user._id, user.ident);
+                await getCompanies(user._id, user.ident);
               }
               
               User.updateOne({_id: user._id}, {
@@ -181,9 +181,9 @@ const callbackPage = async (req, res) => {
                 created_at: Date.now(),
                 visited_at: Date.now()
               }).save()
-                .then(newUser => {
+                .then(async newUser => {
                   setUserSession(req, userData.ident, userData.first_name, userData.last_name);
-                  getCompanies(newUser._id, newUser.ident);
+                  await getCompanies(newUser._id, newUser.ident);
                   res.redirect('/');
                 });
             }

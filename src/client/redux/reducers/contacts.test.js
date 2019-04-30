@@ -1,20 +1,23 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import nock from 'nock';
-import dotenv from 'dotenv';
-import config from 'config';
-import reducer, { initialState, fetchContacts }  from './contacts';
+import reducer, { fetchContacts }  from './contacts';
+
+const initialState = {
+  isLoading: false,
+  isInvalidated: false,
+  data: [],
+  status: null,
+  fetchedAt: null
+};
 
 describe('Contacts action creators', () => {
   const middlewares = [thunk];
   const mockStore = configureMockStore(middlewares);
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-  dotenv.config();
-  const { host, port } = config.get();
   let store;
   
   beforeEach(() => {
-    jest.resetModules();
     store = mockStore({
       user: {
         token: {
@@ -30,7 +33,6 @@ describe('Contacts action creators', () => {
   });
   
   it('dipatches the right actions to fetch contacts', () => {
-    
     nock(`${host}:${port}`)
       .get('/api/contacts')
       .query({ offset: 0 })

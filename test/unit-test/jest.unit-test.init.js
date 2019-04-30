@@ -5,13 +5,13 @@ import Cookies from 'universal-cookie';
 import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
+import dotenv from 'dotenv';
 import './jest.polyfills';
 import user from '../mocks/user';
 import domains from '../mocks/domains';
 import contacts from '../mocks/contacts';
 import mainMenu from '../mocks/menuMain';
 import footerMenu from '../mocks/menuFooter';
-
 import messages from '../../src/client/utils/messages';
 
 // React Enzyme adapter
@@ -22,7 +22,11 @@ const document = {
   cookies: cookies.getAll()
 };
 
+dotenv.config({ path: '.env.test' });
+
 // expose common functions used in tests
+global.host = process.env.HOST;
+global.port = process.env.PORT;
 global.innerWidth = 1280;
 global.dispatchEvent(new Event('resize'));
 global.React = React;

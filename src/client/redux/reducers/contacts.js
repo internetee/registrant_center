@@ -40,17 +40,6 @@ const receiveContact = (data, state) => {
 
 const receiveContacts = (data) => {
   return {
-    type: FETCH_CONTACT_SUCCESS,
-    status: 200,
-    data,
-    isLoading: false,
-    isInvalidated: false,
-  };
-};
-
-
-const receiveAllContacts = (data) => {
-  return {
     type: FETCH_CONTACTS_SUCCESS,
     data,
     isLoading: false,
@@ -84,17 +73,18 @@ export const invalidateContact = (status) => {
 };
 
 const fetchContacts = (uuid, offset = request.offset) => (dispatch, getState) => {
-  dispatch(requestContacts());
   if (uuid) {
+    dispatch(requestContact());
     return api.fetchContacts(uuid)
       .then(res => res.data)
       .then(data => {
-        return dispatch(receiveContacts(data, getState()));
+        return dispatch(receiveContact(data, getState()));
       })
       .catch(error => {
-        return dispatch(invalidateContacts(error.response.status));
+        return dispatch(invalidateContact(error.response.status));
       });
   }
+  dispatch(requestContacts());
   return api.fetchContacts(null, offset)
     .then(res => res.data)
     .then(data => {
@@ -103,7 +93,7 @@ const fetchContacts = (uuid, offset = request.offset) => (dispatch, getState) =>
         request.offset += 200;
         return dispatch(fetchContacts(null, request.offset));
       }
-      return dispatch(receiveAllContacts(request.data));
+      return dispatch(receiveContacts(request.data));
     })
     .catch(error => {
       return dispatch(invalidateContacts(error.response.status));
@@ -131,8 +121,7 @@ const initialState = {
   isInvalidated: false,
   data: [],
   status: null,
-  fetchedAt: null,
-  updatedAt: null
+  fetchedAt: null
 };
 
 export default function(state = initialState, action) {
@@ -190,7 +179,6 @@ export default function(state = initialState, action) {
       status: action.status,
       isLoading: action.isLoading,
       isInvalidated: action.isInvalidated,
-      updatedAt: Date.now()
     };
 
   default:

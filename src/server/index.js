@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import config from 'config';
 import auth from 'http-auth';
 import express from 'express';
 import helmet from 'helmet';
@@ -24,8 +23,6 @@ import getLog from './utils/logger';
 import API from './routes/apiRoute';
 
 dotenv.config();
-
-console.log(config);
 
 const privateKey = fs.readFileSync('./server.key', 'utf8');
 const certificate = fs.readFileSync('./server.crt', 'utf8');
@@ -147,6 +144,7 @@ app.get('/api/domains/:uuid', API.getDomain);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
 app.delete('/api/domains/:uuid/registry_lock', API.deleteDomainRegistryLock);
 app.get('/api/contacts', API.getContacts);
+app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
 
 // all page rendering

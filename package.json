@@ -73,7 +73,6 @@
     "capitalize": "^2.0.0",
     "classnames": "^2.2.6",
     "compression": "^1.7.4",
-    "config": "^3.0.1",
     "connect-mongo": "^2.0.3",
     "connected-react-router": "^6.3.2",
     "cookie-parser": "^1.4.4",

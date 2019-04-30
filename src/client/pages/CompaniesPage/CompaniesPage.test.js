@@ -2,6 +2,7 @@ import React from 'react';
 import Cookies from 'universal-cookie';
 import { createBrowserHistory } from 'history';
 import {Provider} from 'react-redux';
+import thunk from 'redux-thunk';
 import {CookiesProvider} from 'react-cookie';
 import {ConnectedRouter} from 'connected-react-router';
 import {IntlProvider} from 'react-intl';
@@ -52,7 +53,8 @@ const initialState = {
 };
 
 const lang = 'et';
-const mockStore = configureStore();
+const middlewares = [thunk];
+const mockStore = configureStore(middlewares);
 let store;
 
 describe('pages/Companies', () => {

@@ -4,6 +4,7 @@ import getLog from '../utils/logger';
 const log = getLog();
 
 function renderHTML(helmet){
+  const { HOST, PORT, NODE_ENV } = process.env;
   return `
     <!doctype html>
     <html ${helmet.htmlAttributes.toString()}>
@@ -17,6 +18,9 @@ function renderHTML(helmet){
       </head>
       <body ${helmet.bodyAttributes.toString()} >
         <div id="app"></div>
+        <script>
+          window.__INIT_DATA_FROM_SERVER_RENDER__ = ${JSON.stringify({HOST, PORT, NODE_ENV})};
+        </script>
         <script src="/bundles/index.js"></script>
       </body>
     </html>

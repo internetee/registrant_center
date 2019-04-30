@@ -1,24 +1,26 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import nock from 'nock';
-import dotenv from 'dotenv';
-import reducer, { initialState, fetchDomains, lockDomain, unlockDomain } from './domains';
+import reducer, { fetchDomains, lockDomain, unlockDomain } from './domains';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
-dotenv.config();
-
-const { HOST, PORT } = process.env;
+const initialState = {
+  isLoading: false,
+  isInvalidated: false,
+  data: [],
+  status: null,
+  fetchedAt: null,
+};
 
 describe('Domains action creators', () => {
   
   let store;
   
   beforeEach(() => {
-    dotenv.config();
     store = mockStore({
       user: {
         token: {
@@ -38,7 +40,7 @@ describe('Domains action creators', () => {
   
   it('dipatches the right actions to fetch domains', () => {
     
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .get('/api/domains')
       .query({ offset: 0 })
       .reply(200, mockDomains.data);
@@ -67,7 +69,7 @@ describe('Domains action creators', () => {
 
   it('dipatches the right actions to fetch a single domain by uuid', () => {
 
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .get('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')
       .reply(200, mockDomains.data[0]);
 
@@ -96,7 +98,7 @@ describe('Domains action creators', () => {
 
   it('dipatches the right actions to lock a domain', () => {
 
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .post('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e/registry_lock')
       .reply(200, mockDomains.data[0]);
 
@@ -111,7 +113,6 @@ describe('Domains action creators', () => {
         isLoading: false,
         isInvalidated: false,
         data: mockDomains.data,
-        updatedAt: Date.now()
       }
     ];
 
@@ -126,7 +127,7 @@ describe('Domains action creators', () => {
 
   it('dipatches the right actions to unlock a domain', () => {
 
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .delete('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e/registry_lock')
       .reply(200, mockDomains.data[0]);
     
@@ -141,7 +142,6 @@ describe('Domains action creators', () => {
         isLoading: false,
         isInvalidated: false,
         data: mockDomains.data,
-        updatedAt: Date.now()
       }
     ];
     
@@ -238,14 +238,12 @@ describe('Domains reducers', () => {
         data: mockDomains.data,
         isLoading: false,
         isInvalidated: false,
-        updatedAt: Date.now(),
       })
     ).toEqual({
       status: 200,
       data: mockDomains.data,
       isLoading: false,
       isInvalidated: false,
-      updatedAt: Date.now(),
     });
     
   });
@@ -270,14 +268,12 @@ describe('Domains reducers', () => {
         data: mockDomains.data,
         isLoading: false,
         isInvalidated: false,
-        updatedAt: Date.now(),
       })
     ).toEqual({
       status: 200,
       data: mockDomains.data,
       isLoading: false,
       isInvalidated: false,
-      updatedAt: Date.now(),
     });
     
   });

@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import {PureComponent} from 'react';
 
 class ScrollToTop extends PureComponent {
   componentDidUpdate(prevProps) {

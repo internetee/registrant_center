@@ -1,21 +1,22 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import nock from 'nock';
-import dotenv from 'dotenv';
-import reducer, { initialState, fetchUser, logoutUser } from './user';
+import reducer, { fetchUser, logoutUser } from './user';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
-
-dotenv.config();
-
-const {HOST,PORT} = process.env;
+const initialState = {
+  isLoading: false,
+  isInvalidated: false,
+  data: {},
+  status: null,
+  fetchedAt: null
+};
 
 describe('User action creators', () => {
   let store;
   
   beforeEach(() => {
-    dotenv.config();
     store = mockStore({
       user: initialState
     });
@@ -26,7 +27,7 @@ describe('User action creators', () => {
   });
   
   it('dipatches the right actions to fetch user data', () => {
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .get('/api/user')
       .reply(200, mockUser.data);
   
@@ -55,7 +56,7 @@ describe('User action creators', () => {
   
   it('dipatches the right actions on fetchUser request fail', () => {
     
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .get('/api/user')
       .reply(404);
 
@@ -83,7 +84,7 @@ describe('User action creators', () => {
   
   it('dipatches the right actions to log out user', () => {
 
-    nock(`${HOST}:${PORT}`)
+    nock(`${host}:${port}`)
       .post('/api/destroy')
       .reply(200);
 

@@ -1,5 +1,6 @@
 import {Provider} from 'react-redux';
 import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
 import {CookiesProvider} from 'react-cookie';
 import {ConnectedRouter} from 'connected-react-router';
 import React from 'react';
@@ -43,7 +44,8 @@ const initialState = {
 };
 
 const lang = 'et';
-const mockStore = configureStore();
+const middlewares = [thunk];
+const mockStore = configureStore(middlewares);
 let store;
 
 describe('pages/Domain', () => {
@@ -53,12 +55,6 @@ describe('pages/Domain', () => {
   const mockMatch = {
     params: {
       id: 'domain.ee'
-    }
-  };
-  
-  const mockMatchLocked = {
-    params: {
-      id: 'lockeddomain.ee'
     }
   };
   
@@ -85,7 +81,7 @@ describe('pages/Domain', () => {
     store = mockStore(initialState);
   });
   
-  it('should call domain lock action', () => {
+  it('should render content', () => {
     const page = mount(
       <Provider store={store}>
         <CookiesProvider>
@@ -97,27 +93,6 @@ describe('pages/Domain', () => {
         </CookiesProvider>
       </Provider>
     );
-    page.find('[data-test="open-lock-modal"]').at(0).simulate('click');
-    page.find('[data-test="lock-domain"]').at(0).simulate('click');
-    expect(mockLock).toHaveBeenCalledTimes(1);
-    expect(page).toMatchSnapshot();
-  });
-  
-  it('should call domain unlock action', () => {
-    const page = mount(
-      <Provider store={store}>
-        <CookiesProvider>
-          <ConnectedRouter history={history}>
-            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={messages[lang]}>
-              <DomainPage {...props} match={mockMatchLocked} />
-            </IntlProvider>
-          </ConnectedRouter>
-        </CookiesProvider>
-      </Provider>
-    );
-    page.find('[data-test="open-unlock-modal"]').at(0).simulate('click');
-    page.find('[data-test="unlock-domain"]').at(0).simulate('click');
-    expect(mockUnlock).toHaveBeenCalledTimes(1);
     expect(page).toMatchSnapshot();
   });
 
