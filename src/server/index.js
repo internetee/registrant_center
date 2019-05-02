@@ -151,7 +151,7 @@ app.patch('/api/contacts/:uuid', API.setContact);
 app.get('/auth/callback', callbackPage);
 app.get('*', renderPageRoute);
 
-const server = https.createServer(credentials, app).listen(process.env.PORT, () => {
+const server = https.createServer(credentials, app).listen(PORT, () => {
   banner();
   if (buildErrors.length > 0) {
     server.close(() => {

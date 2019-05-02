@@ -1,10 +1,5 @@
 {
-  "baseUrl": "https://eis-client.dev4.we.ee",
-  "port": 5010,
-  "env": {
-    "HOST": "https://eis-client.dev4.we.ee",
-    "PORT": 5010
-  },
+  "baseUrl": "https://eis-client.dev4.we.ee:1234",
   "fixturesFolder":"test/e2e-test/fixtures",
   "integrationFolder":"test/e2e-test/tests",
   "pluginsFile":"test/e2e-test/plugins/index.js",
@@ -13,5 +8,6 @@
   "videosFolder":"test/e2e-test/videos",
   "viewportWidth": 1280,
   "viewportHeight": 720,
-  "videoCompression": false
+  "videoCompression": false,
+  "pageLoadTimeout": 15000
 }

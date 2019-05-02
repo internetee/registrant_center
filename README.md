@@ -35,7 +35,7 @@ npm run prod
 Saab ka jooksutada eraldi: 
 - ```npm run lint```
 - ```npm run test:unit```
-- ```npm run test:e2e```
+- ```npm run test:e2e``` - edit cypress.json baseUrl before use
 
 ##### Testide jälgimine
 ```npm run test:watch```

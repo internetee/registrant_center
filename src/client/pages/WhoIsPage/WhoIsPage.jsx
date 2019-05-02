@@ -487,7 +487,7 @@ class WhoIsPage extends Component {
                   }
                   confirmButton={
                     <Button
-                      data-test='lock-domain'
+                      data-test="change-contacts"
                       primary
                       size={uiElemSize}
                     >
@@ -500,7 +500,7 @@ class WhoIsPage extends Component {
                   }
                   cancelButton={
                     <Button
-                      data-test='close-lock-modal'
+                      data-test="close-change-contacts-modal"
                       secondary
                       size={uiElemSize}>
                       <FormattedMessage

@@ -694,7 +694,7 @@ class DomainPage extends Component {
               </Modal.Content>
             }
             confirmButton={
-              <Button data-test='lock-domain' primary size={ uiElemSize }>
+              <Button data-test='change-contacts' primary size={ uiElemSize }>
                 <FormattedMessage
                   id='whois.confirm_modal.confirm'
                   defaultMessage='Jah'
@@ -703,7 +703,7 @@ class DomainPage extends Component {
               </Button>
             }
             cancelButton={
-              <Button data-test='close-lock-modal' secondary size={ uiElemSize }>
+              <Button data-test='close-change-contacts-modal' secondary size={ uiElemSize }>
                 <FormattedMessage
                   id='whois.confirm_modal.submicancel'
                   defaultMessage='Ei'
