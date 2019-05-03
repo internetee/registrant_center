@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import { configure, shallow, render, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
@@ -5,7 +6,6 @@ import Cookies from 'universal-cookie';
 import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
-import dotenv from 'dotenv';
 import './jest.polyfills';
 import user from '../mocks/user';
 import domains from '../mocks/domains';
@@ -24,11 +24,15 @@ const document = {
 
 dotenv.config({ path: '.env.test' });
 
+const { HOST, PORT } = process.env;
+
 // expose common functions used in tests
-global.host = process.env.HOST;
-global.port = process.env.PORT;
+global.__INIT_DATA_FROM_SERVER_RENDER__ = {
+  HOST,
+  PORT,
+};
+global.apiHost = `${HOST}:${PORT}`;
 global.innerWidth = 1280;
-global.dispatchEvent(new Event('resize'));
 global.React = React;
 global.shallow = shallow;
 global.render = render;

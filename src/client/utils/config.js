@@ -1,1 +1,0 @@
-export default window.__INIT_DATA_FROM_SERVER_RENDER__ || {};

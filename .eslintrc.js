@@ -11,8 +11,8 @@ module.exports = {
       "jest/globals": true
   },
   "globals":{
-    "host": true,
-    "port": true,
+    "window": true,
+    "apiHost": true,
     "window": true,
     "document": true,
     "localStorage": true,

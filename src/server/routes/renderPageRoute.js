@@ -3,7 +3,7 @@ import getLog from '../utils/logger';
 
 const log = getLog();
 
-function renderHTML(helmet){
+function renderHTML(helmet) {
   const { HOST, PORT, NODE_ENV } = process.env;
   return `
     <!doctype html>

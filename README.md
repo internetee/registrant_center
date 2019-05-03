@@ -14,8 +14,12 @@
  - End to end/integration testing with [cypress](https://www.cypress.io/)
 
 ## Ülesseadmine
-1) Sea üles mongoDB
-2) Loo .env.example põhjal .env fail.
+- Sea üles mongoDB
+- Loo .env.example põhjal .env failid.
+- Muuda ```PORT``` erinevate keskkondade jaoks
+    - Development: ```.env.development```
+    - Production: ```.env.production```
+    - Test: ```.env.test```
 
 ## Esmane käivitamine
 ```console

@@ -29,7 +29,7 @@ const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL,
-  TOKEN_URL, AUTH_URL, JWKS_URL, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
+  TOKEN_PATH, AUTH_PATH, ISSUER_URL, JWKS_PATH, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
 const logIncoming = process.env.LOG_INCOMING;
 
 const app = express();
@@ -100,15 +100,15 @@ app.use(grant({
     'transport': 'querystring'
   },
   'openid': {
-    'authorize_url': AUTH_URL,
-    'access_url': TOKEN_URL,
+    'authorize_url': ISSUER_URL + AUTH_PATH,
+    'access_url': ISSUER_URL + TOKEN_PATH,
     'oauth': 2,
     'key': CLIENT_ID,
     'secret': CLIENT_SECRET,
     'scope': 'openid',
-    'redirect_uri': REDIRECT_URL,
+    'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
     'response_type': 'code',
-    'callback': '/auth/callback',
+    'callback': REDIRECT_URL,
     'custom_params': {
       'locale': LOCALE,
       'ui_locales': LOCALE,
@@ -122,7 +122,7 @@ const getPublicKeyPem = (publicKey) => {
   publicKeyPem.push(jwkToPem(publicKey));
 };
 
-axios.get(JWKS_URL)
+axios.get(ISSUER_URL + JWKS_PATH)
   .then(res => {
     console.log('Received public key from TARA'); // eslint-disable-line no-console
     getPublicKeyPem(res.data.keys[0]);
@@ -148,7 +148,7 @@ app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
 
 // all page rendering
-app.get('/auth/callback', callbackPage);
+app.get(REDIRECT_URL, callbackPage);
 app.get('*', renderPageRoute);
 
 const server = https.createServer(credentials, app).listen(PORT, () => {

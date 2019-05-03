@@ -1,41 +1,56 @@
-import cheerio from 'cheerio';
-import {Helmet} from 'react-helmet';
+/**
+ * @jest-environment node
+ */
+
+import nock from 'nock';
 import callbackPageRoute from './callbackPageRoute';
 
 describe('server/routes/callbackPageRoute', () => {
 
-  (function beforeAll() {
-    // to stop Helmet error where it thinks server calls are made during browser render
-    Helmet.canUseDOM = false;
-  })();
-
-  it('should render login page', async () => {
-    // convert returned markup into a cheerio dom so we can easily inspect it
-    function getResponseAsDom(res){
-      expect(res.send.mock.calls).toHaveLength(1);
-      const renderedHTML = res.send.mock.calls[0][0];
-      return cheerio.load(renderedHTML);
-    }
-
-    const mockReq = {
-      url: '/login',
-      session: {
-        regenerate: jest.fn()
-      },
-    };
+  it('should render login page', () => {
+    const { HOST, PORT, REDIRECT_URL, ISSUER_URL, TOKEN_PATH, B64_VALUE } = process.env;
+    nock(ISSUER_URL, {
+      reqheaders: {
+        'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        'Authorization': `Basic ${B64_VALUE}`
+      }
+    }).post(TOKEN_PATH, {
+      'grant_type': 'authorization_code',
+      'code': 'test_code',
+      'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
+    }).reply(200, {});
     
+    const mockReq = {
+      url: '/auth/callback',
+      session: {
+        regenerate: jest.fn(),
+        grant: {
+          state: 1337
+        },
+        user: {
+          ident: 13456,
+          first_name: 'Test',
+          last_name: 'User',
+        }
+      },
+      query: {
+        code: 1234,
+        state: 1337
+      }
+    };
+  
     const mockRes = {
       send: jest.fn(),
       sendFile: jest.fn(),
       redirect: jest.fn(),
       setHeader: jest.fn(),
       status: jest.fn(),
+      clearCookie: jest.fn(),
     };
-
-    await callbackPageRoute(mockReq, mockRes);
-
-    const $ = getResponseAsDom(mockRes);
-    expect($('#app')).toHaveLength(1);
+    
+    callbackPageRoute(mockReq, mockRes);
+    // expect(mockRes.redirect.mock.calls.length).toEqual(1);
   });
   
 });

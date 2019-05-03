@@ -33,7 +33,7 @@ describe('Contacts action creators', () => {
   });
   
   it('dipatches the right actions to fetch contacts', () => {
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .get('/api/contacts')
       .query({ offset: 0 })
       .reply(200, mockContacts.data);
@@ -60,7 +60,7 @@ describe('Contacts action creators', () => {
   
   it('dipatches the right actions to fetch a single contact', () => {
     
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .get('/api/contacts/cfbfbb76-aed8-497a-91c1-48d82cbc4588')
       .reply(200, mockContacts.data[0]);
     

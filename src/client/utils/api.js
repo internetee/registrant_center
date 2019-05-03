@@ -1,19 +1,17 @@
 import axios from 'axios';
 import https from 'https';
-import config from './config';
+import config from './clientConfig';
 
 const agent = new https.Agent({
   rejectUnauthorized: false
 });
 
 const { HOST, PORT } = config;
-
 const apiRequest = (url, method = 'GET', body) => {
   const headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
   };
-  
   const options = {
     method,
     url: `${HOST}:${PORT}${url}`,

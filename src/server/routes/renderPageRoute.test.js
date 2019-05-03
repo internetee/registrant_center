@@ -9,12 +9,6 @@ describe('server/routes/renderPageRoute', () => {
   })();
 
   it('should render login page', async () => {
-    function getResponseAsDom(res){
-      expect(res.send.mock.calls).toHaveLength(1);
-      const renderedHTML = res.send.mock.calls[0][0];
-      return cheerio.load(renderedHTML);
-    }
-
     const mockReq = {
       url: '/login',
       session: {
@@ -28,6 +22,12 @@ describe('server/routes/renderPageRoute', () => {
       setHeader: jest.fn(),
       status: jest.fn(),
     };
+    
+    function getResponseAsDom(res){
+      expect(res.send.mock.calls).toHaveLength(1);
+      const renderedHTML = res.send.mock.calls[0][0];
+      return cheerio.load(renderedHTML);
+    }
 
     await renderPageRoute(mockReq, mockRes);
 

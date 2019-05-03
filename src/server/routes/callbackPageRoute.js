@@ -9,7 +9,7 @@ import User from '../utils/UserSchema';
 
 dotenv.config();
 
-const { HOST, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL, TOKEN_URL, ISSUER_URL, AR_URL, AR_USER, AR_PASS } = process.env;
+const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL, TOKEN_PATH, ISSUER_URL, AR_URL, AR_USER, AR_PASS } = process.env;
 
 const B64_VALUE = Buffer.from((`${CLIENT_ID}:${CLIENT_SECRET}`)).toString('base64');
 
@@ -75,10 +75,10 @@ const setUserSession = (req, ident, firstName, lastName) => {
   };
 };
 
-const callbackPage = async (req, res) => {
+export default function(req, res) {
   if (req.query.error) {
-    console.log(' saadud veateade: ', req.query.error); // eslint-disable-line no-console
-    return;
+    console.log('Saadud veateade: ', req.query.error); // eslint-disable-line no-console
+    res.redirect('/login');
   }
   
   /* Võta päringu query-osast TARA poolt saadetud volituskood (authorization code) */
@@ -92,10 +92,10 @@ const callbackPage = async (req, res) => {
   const sessionState = req.session.grant.state;
   if (returnedState !== sessionState) {
     console.log('State ei ühti'); // eslint-disable-line no-console
-    return;
+    res.redirect('/login');
   }
   request({
-    uri: TOKEN_URL,
+    uri: ISSUER_URL + TOKEN_PATH,
     method: 'POST',
     headers: {
       'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
@@ -105,9 +105,9 @@ const callbackPage = async (req, res) => {
     form: {
       'grant_type': 'authorization_code',
       'code': code,
-      'redirect_uri': REDIRECT_URL,
+      'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
     }
-  }, (error, response, body) => {
+  }, async (error, response, body) => {
     const token = JSON.parse(body);
     const { id_token } = token; // eslint-disable-line camelcase
     /*
@@ -126,7 +126,7 @@ const callbackPage = async (req, res) => {
       path: '/'
     });
     
-    jwt.verify(
+    await jwt.verify(
       id_token, // Kontrollitav tõend
       publicKeyPem[0], // Allkirja avalik võti
       {
@@ -151,15 +151,6 @@ const callbackPage = async (req, res) => {
               const today = moment(Date.now());
               const updatedAt = moment(user.updated_at);
               if (today.diff(updatedAt, 'days') > 1) {
-                /*
-                let compIdent;
-                if (userData.ident === '39211101518') {
-                  compIdent = '37806280271';
-                  getCompanies(user._id, compIdent);
-                } else {
-                  getCompanies(user._id, user.ident);
-                }
-                */
                 await getCompanies(user._id, user.ident);
               }
               
@@ -193,5 +184,3 @@ const callbackPage = async (req, res) => {
     );
   });
 };
-
-export default callbackPage;

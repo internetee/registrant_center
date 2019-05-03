@@ -27,7 +27,7 @@ describe('User action creators', () => {
   });
   
   it('dipatches the right actions to fetch user data', () => {
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .get('/api/user')
       .reply(200, mockUser.data);
   
@@ -56,7 +56,7 @@ describe('User action creators', () => {
   
   it('dipatches the right actions on fetchUser request fail', () => {
     
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .get('/api/user')
       .reply(404);
 
@@ -84,7 +84,7 @@ describe('User action creators', () => {
   
   it('dipatches the right actions to log out user', () => {
 
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .post('/api/destroy')
       .reply(200);
 

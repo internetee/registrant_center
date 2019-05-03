@@ -40,7 +40,7 @@ describe('Domains action creators', () => {
   
   it('dipatches the right actions to fetch domains', () => {
     
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .get('/api/domains')
       .query({ offset: 0 })
       .reply(200, mockDomains.data);
@@ -69,7 +69,7 @@ describe('Domains action creators', () => {
 
   it('dipatches the right actions to fetch a single domain by uuid', () => {
 
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .get('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')
       .reply(200, mockDomains.data[0]);
 
@@ -98,7 +98,7 @@ describe('Domains action creators', () => {
 
   it('dipatches the right actions to lock a domain', () => {
 
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .post('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e/registry_lock')
       .reply(200, mockDomains.data[0]);
 
@@ -127,7 +127,7 @@ describe('Domains action creators', () => {
 
   it('dipatches the right actions to unlock a domain', () => {
 
-    nock(`${host}:${port}`)
+    nock(`${apiHost}`)
       .delete('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e/registry_lock')
       .reply(200, mockDomains.data[0]);
     

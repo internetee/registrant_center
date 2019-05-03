@@ -5,6 +5,8 @@ coverage
 .cache
 .idea
 .env
+.env.*
+!.env.example
 config/local.js
 test/e2e-test/videos
 test/e2e-test/screenshots
