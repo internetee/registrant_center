@@ -63,8 +63,6 @@ app.use('/', express.static(path.join(__dirname, '../static')));
 // bundles are mapped like this so dev and prod builds both work (as dev uses src/static while prod uses dist/static)
 app.use('/bundles', express.static(path.join(__dirname, '../../dist/bundles')));
 
-const buildErrors = [];
-
 // db
 const MongoStore = connectMongo(session);
 mongoose.Promise = global.Promise;
@@ -122,14 +120,15 @@ const getPublicKeyPem = (publicKey) => {
   publicKeyPem.push(jwkToPem(publicKey));
 };
 
-axios.get(ISSUER_URL + JWKS_PATH)
-  .then(res => {
+(async () => {
+  try {
+    const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
+    getPublicKeyPem(data.keys[0]);
     console.log('Received public key from TARA'); // eslint-disable-line no-console
-    getPublicKeyPem(res.data.keys[0]);
-  })
-  .catch(e => {
+  } catch(e) {
     console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
-  });
+  }
+})();
 
 export { publicKeyPem };
 
@@ -153,24 +152,18 @@ app.get('*', renderPageRoute);
 
 const server = https.createServer(credentials, app).listen(PORT, () => {
   banner();
-  if (buildErrors.length > 0) {
-    server.close(() => {
-      console.log('BUILD FAILED!', buildErrors); // eslint-disable-line no-console
-    });
-  } else {
-    // eslint-disable-next-line no-console
-    console.log(JSON.stringify({
-      'Host': HOST,
-      'Port': PORT,
-      'Environment': NODE_ENV,
-      'Commands': {
-        'rs': 'Restart server',
-        'ctrl+c': 'Stop server'
-      },
-    }, null, 2));
-    // 'ready' is a hook used by the e2e (integration) tests (see node-while)
-    server.emit('ready');
-  }
+  // eslint-disable-next-line no-console
+  console.log(JSON.stringify({
+    'Host': HOST,
+    'Port': PORT,
+    'Environment': NODE_ENV,
+    'Commands': {
+      'rs': 'Restart server',
+      'ctrl+c': 'Stop server'
+    },
+  }, null, 2));
+  // 'ready' is a hook used by the e2e (integration) tests (see node-while)
+  server.emit('ready');
 });
 
 // export server instance so we can hook into it in e2e tests etc

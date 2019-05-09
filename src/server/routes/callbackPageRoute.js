@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import request from 'request';
+import axios from 'axios';
+import qs from 'qs';
 import jwt from 'jsonwebtoken';
 import soapRequest from 'easy-soap-request';
 import moment from 'moment';
@@ -14,14 +15,15 @@ const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL, TOKEN_PATH, ISSUER_U
 const B64_VALUE = Buffer.from((`${CLIENT_ID}:${CLIENT_SECRET}`)).toString('base64');
 
 const getCompanies = async (id, ident) => {
-  const url = AR_URL;
-  const headers = {
-    'user-agent': 'sampleTest',
-    'Content-Type': 'text/xml;charset=UTF-8',
-    'soapAction': 'https://demo-ariregxmlv6.rik.ee/?wsdl',
-  };
-  const xml =
-    `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xro="http://x-road.eu/xsd/xroad.xsd" xmlns:iden="http://x-road.eu/xsd/identifiers" xmlns:prod="http://arireg.x-road.eu/producer/">
+  try {
+    const url = AR_URL;
+    const headers = {
+      'user-agent': 'sampleTest',
+      'Content-Type': 'text/xml;charset=UTF-8',
+      'soapAction': 'https://demo-ariregxmlv6.rik.ee/?wsdl',
+    };
+    const xml =
+      `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xro="http://x-road.eu/xsd/xroad.xsd" xmlns:iden="http://x-road.eu/xsd/identifiers" xmlns:prod="http://arireg.x-road.eu/producer/">
       <soapenv:Body>
         <prod:detailandmed_v1>
           <prod:keha>
@@ -38,32 +40,39 @@ const getCompanies = async (id, ident) => {
         </prod:detailandmed_v1>
       </soapenv:Body>
     </soapenv:Envelope>`;
-  const { response } = await soapRequest(url, headers, xml);
-  const { body } = response;
-  if (body.keha.leitud_ettevotjate_arv > 0) {
-    const companies = body.keha.ettevotjad.item.map(item => {
-      return {
-        'nimi': item.nimi,
-        'ariregistri_kood': item.ariregistri_kood,
-        'yldandmed': {
-          'sidevahendid': item.yldandmed.sidevahendid.item,
-          'aadressid': item.yldandmed.aadressid.item
-        }
-      };
-    });
-    User.updateOne({_id: id}, {
-      companies,
-      updated_at: Date.now(),
-    }, () => {
-      console.log('Updated user companies'); // eslint-disable-line no-console
-    });
-  } else {
-    User.updateOne({_id: id}, {
-      companies: [],
-      updated_at: Date.now(),
-    }, () => {
-      console.log('Updated user companies'); // eslint-disable-line no-console
-    });
+    const { response } = await soapRequest(url, headers, xml);
+    const { body } = response;
+    if (body) {
+      if (body.keha && body.keha.leitud_ettevotjate_arv > 0) {
+        const companies = body.keha.ettevotjad && body.keha.ettevotjad.item.map(item => {
+          return {
+            'nimi': item.nimi,
+            'ariregistri_kood': item.ariregistri_kood,
+            'yldandmed': {
+              'sidevahendid': item.yldandmed.sidevahendid.item,
+              'aadressid': item.yldandmed.aadressid.item
+            }
+          };
+        });
+        User.updateOne({_id: id}, {
+          companies,
+          updated_at: Date.now(),
+        }, () => {
+          console.log('Updated user companies'); // eslint-disable-line no-console
+        });
+      } else {
+        User.updateOne({_id: id}, {
+          companies: [],
+          updated_at: Date.now(),
+        }, () => {
+          console.log('Updated user companies'); // eslint-disable-line no-console
+        });
+      }
+    } else {
+      throw new Error('Companies Request failed');
+    }
+  } catch (e) {
+    console.log(e); // eslint-disable-line no-console
   }
 };
 
@@ -75,41 +84,40 @@ const setUserSession = (req, ident, firstName, lastName) => {
   };
 };
 
-export default function(req, res) {
-  if (req.query.error) {
-    console.log('Saadud veateade: ', req.query.error); // eslint-disable-line no-console
-    res.redirect('/login');
-  }
-  
-  /* Võta päringu query-osast TARA poolt saadetud volituskood (authorization code) */
-  const { code } = req.query;
-  
-  /*
-   Turvaelemendi state kontroll
-  */
-  console.log('Turvaelemendi state kontroll'); // eslint-disable-line no-console
-  const returnedState = req.query.state;
-  const sessionState = req.session.grant.state;
-  if (returnedState !== sessionState) {
-    console.log('State ei ühti'); // eslint-disable-line no-console
-    res.redirect('/login');
-  }
-  request({
-    uri: ISSUER_URL + TOKEN_PATH,
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
-      'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-      'Authorization': `Basic ${B64_VALUE}`
-    },
-    form: {
-      'grant_type': 'authorization_code',
-      'code': code,
-      'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
+export default async function(req, res) {
+  try {
+    if (req.query.error) {
+      throw (req.query.error);
     }
-  }, async (error, response, body) => {
-    const token = JSON.parse(body);
-    const { id_token } = token; // eslint-disable-line camelcase
+  
+    /* Võta päringu query-osast TARA poolt saadetud volituskood (authorization code) */
+    const { code } = req.query;
+  
+    /*
+     Turvaelemendi state kontroll
+    */
+    console.log('Turvaelemendi state kontroll'); // eslint-disable-line no-console
+    const returnedState = req.query.state;
+    const sessionState = req.session.grant.state;
+    if (returnedState !== sessionState) {
+      throw new Error('Request query state and session state do not match.');
+    }
+    const options = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        'Authorization': `Basic ${B64_VALUE}`
+      },
+      url: ISSUER_URL + TOKEN_PATH,
+      data: qs.stringify({
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
+      })
+    };
+    const { data } = await axios(options);
+    const { id_token } = data; // eslint-disable-line camelcase
     /*
      Identsustõendi kontrollimine. Teegi jsonwebtoken
      abil kontrollitakse allkirja, tõendi saajat (aud), tõendi
@@ -125,7 +133,7 @@ export default function(req, res) {
       sameSite: 'lax',
       path: '/'
     });
-    
+  
     await jwt.verify(
       id_token, // Kontrollitav tõend
       publicKeyPem[0], // Allkirja avalik võti
@@ -135,9 +143,7 @@ export default function(req, res) {
         clockTolerance: 10 // Kellade max lubatud erinevus
       }, (err, verifiedJwt) => {
         if (err) {
-          console.log(' ebaedukas'); // eslint-disable-line no-console
-          console.log(err); // eslint-disable-line no-console
-          res.redirect('/login');
+          throw new Error(err);
         } else {
           const userData = {
             ident: verifiedJwt.sub.replace(/\D/g,''),
@@ -153,7 +159,7 @@ export default function(req, res) {
               if (today.diff(updatedAt, 'days') > 1) {
                 await getCompanies(user._id, user.ident);
               }
-              
+            
               User.updateOne({_id: user._id}, {
                 ident: userData.ident,
                 first_name: userData.first_name,
@@ -182,5 +188,8 @@ export default function(req, res) {
         }
       }
     );
-  });
+  } catch (e) {
+    console.log(e); // eslint-disable-line no-console
+    res.redirect('/login');
+  }
 };

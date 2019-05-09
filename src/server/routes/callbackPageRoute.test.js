@@ -7,7 +7,7 @@ import callbackPageRoute from './callbackPageRoute';
 
 describe('server/routes/callbackPageRoute', () => {
 
-  it('should render login page', () => {
+  it('should render login page', async () => {
     const { HOST, PORT, REDIRECT_URL, ISSUER_URL, TOKEN_PATH, B64_VALUE } = process.env;
     nock(ISSUER_URL, {
       reqheaders: {
@@ -49,8 +49,8 @@ describe('server/routes/callbackPageRoute', () => {
       clearCookie: jest.fn(),
     };
     
-    callbackPageRoute(mockReq, mockRes);
-    // expect(mockRes.redirect.mock.calls.length).toEqual(1);
+    await callbackPageRoute(mockReq, mockRes);
+    expect(mockRes.redirect.mock.calls).toHaveLength(1);
   });
   
 });
