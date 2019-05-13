@@ -5,12 +5,12 @@ import jwt from 'jsonwebtoken';
 import soapRequest from 'easy-soap-request';
 import moment from 'moment';
 import capitalize from 'capitalize';
-import { publicKeyPem } from '../index';
+import jwkToPem from 'jwk-to-pem';
 import User from '../utils/UserSchema';
 
 dotenv.config();
 
-const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL, TOKEN_PATH, ISSUER_URL, AR_URL, AR_USER, AR_PASS } = process.env;
+const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, JWKS_PATH, REDIRECT_URL, TOKEN_PATH, ISSUER_URL, AR_URL, AR_USER, AR_PASS } = process.env;
 
 const B64_VALUE = Buffer.from((`${CLIENT_ID}:${CLIENT_SECRET}`)).toString('base64');
 
@@ -87,8 +87,25 @@ const setUserSession = (req, ident, firstName, lastName) => {
 export default async function(req, res) {
   try {
     if (req.query.error) {
-      throw (req.query.error);
+      throw new Error(req.query.error);
     }
+  
+    const publicKeyPem = [];
+  
+    const getPublicKeyPem = (publicKey) => {
+      publicKeyPem.push(jwkToPem(publicKey));
+    };
+  
+    (async () => {
+      try {
+        const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
+        console.log(data);
+        getPublicKeyPem(data.keys[0]);
+        console.log('Received public key from TARA'); // eslint-disable-line no-console
+      } catch(e) {
+        console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
+      }
+    })();
   
     /* Võta päringu query-osast TARA poolt saadetud volituskood (authorization code) */
     const { code } = req.query;
@@ -116,8 +133,8 @@ export default async function(req, res) {
         'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
       })
     };
-    const { data } = await axios(options);
-    const { id_token } = data; // eslint-disable-line camelcase
+    const { data: { id_token } } = await axios(options); // eslint-disable-line camelcase
+    
     /*
      Identsustõendi kontrollimine. Teegi jsonwebtoken
      abil kontrollitakse allkirja, tõendi saajat (aud), tõendi
@@ -133,6 +150,9 @@ export default async function(req, res) {
       sameSite: 'lax',
       path: '/'
     });
+    
+    console.log(JSON.stringify(id_token, null, 2));
+    console.log(publicKeyPem[0]);
   
     await jwt.verify(
       id_token, // Kontrollitav tõend
@@ -144,48 +164,48 @@ export default async function(req, res) {
       }, (err, verifiedJwt) => {
         if (err) {
           throw new Error(err);
-        } else {
-          const userData = {
-            ident: verifiedJwt.sub.replace(/\D/g,''),
-            first_name: capitalize.words(verifiedJwt.profile_attributes.given_name),
-            last_name: capitalize.words(verifiedJwt.profile_attributes.family_name),
-          };
-          User.findOne({
-            ident: userData.ident
-          }).then(async user => {
-            if (user) {
-              const today = moment(Date.now());
-              const updatedAt = moment(user.updated_at);
-              if (today.diff(updatedAt, 'days') > 1) {
-                await getCompanies(user._id, user.ident);
-              }
-            
-              User.updateOne({_id: user._id}, {
-                ident: userData.ident,
-                first_name: userData.first_name,
-                last_name: userData.last_name,
-                updated_at: Date.now(),
-                visited_at: Date.now()
-              }, () => {
+        }
+        console.log(verifiedJwt);
+        const userData = {
+          ident: verifiedJwt.sub.replace(/\D/g,''),
+          first_name: capitalize.words(verifiedJwt.profile_attributes.given_name),
+          last_name: capitalize.words(verifiedJwt.profile_attributes.family_name),
+        };
+        User.findOne({
+          ident: userData.ident
+        }).then(async user => {
+          if (user) {
+            const today = moment(Date.now());
+            const updatedAt = moment(user.updated_at);
+            if (today.diff(updatedAt, 'days') > 1) {
+              await getCompanies(user._id, user.ident);
+            }
+          
+            User.updateOne({_id: user._id}, {
+              ident: userData.ident,
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              updated_at: Date.now(),
+              visited_at: Date.now()
+            }, () => {
+              setUserSession(req, userData.ident, userData.first_name, userData.last_name);
+              res.redirect('/');
+            });
+          } else {
+            new User({
+              ident: userData.ident,
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              created_at: Date.now(),
+              visited_at: Date.now()
+            }).save()
+              .then(async newUser => {
                 setUserSession(req, userData.ident, userData.first_name, userData.last_name);
+                await getCompanies(newUser._id, newUser.ident);
                 res.redirect('/');
               });
-            } else {
-              new User({
-                ident: userData.ident,
-                first_name: userData.first_name,
-                last_name: userData.last_name,
-                created_at: Date.now(),
-                visited_at: Date.now()
-              }).save()
-                .then(async newUser => {
-                  setUserSession(req, userData.ident, userData.first_name, userData.last_name);
-                  await getCompanies(newUser._id, newUser.ident);
-                  res.redirect('/');
-                });
-            }
-          });
-        }
+          }
+        });
       }
     );
   } catch (e) {

@@ -7,7 +7,6 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import connectMongo from 'connect-mongo';
 import grant from 'grant-express';
-import jwkToPem from 'jwk-to-pem';
 import cookieParser from 'cookie-parser';
 import https from 'https';
 import favicon from 'serve-favicon';
@@ -15,7 +14,6 @@ import compression from 'compression';
 import path from 'path';
 import morgan from 'morgan';
 import fs from 'fs';
-import axios from 'axios';
 import callbackPage from './routes/callbackPageRoute';
 import renderPageRoute from './routes/renderPageRoute';
 import banner from './utils/banner';
@@ -29,7 +27,7 @@ const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL,
-  TOKEN_PATH, AUTH_PATH, ISSUER_URL, JWKS_PATH, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
+  TOKEN_PATH, AUTH_PATH, ISSUER_URL, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
 const logIncoming = process.env.LOG_INCOMING;
 
 const app = express();
@@ -113,24 +111,6 @@ app.use(grant({
     }
   }
 }));
-
-const publicKeyPem = [];
-
-const getPublicKeyPem = (publicKey) => {
-  publicKeyPem.push(jwkToPem(publicKey));
-};
-
-(async () => {
-  try {
-    const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
-    getPublicKeyPem(data.keys[0]);
-    console.log('Received public key from TARA'); // eslint-disable-line no-console
-  } catch(e) {
-    console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
-  }
-})();
-
-export { publicKeyPem };
 
 app.use(helmet());
 
