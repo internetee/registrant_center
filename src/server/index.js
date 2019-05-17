@@ -1,3 +1,4 @@
+import axios from 'axios';
 import dotenv from 'dotenv';
 import auth from 'http-auth';
 import express from 'express';
@@ -19,6 +20,7 @@ import renderPageRoute from './routes/renderPageRoute';
 import banner from './utils/banner';
 import getLog from './utils/logger';
 import API from './routes/apiRoute';
+import jwkToPem from 'jwk-to-pem';
 
 dotenv.config();
 
@@ -27,7 +29,7 @@ const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL,
-  TOKEN_PATH, AUTH_PATH, ISSUER_URL, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
+  TOKEN_PATH, AUTH_PATH, ISSUER_URL, JWKS_PATH, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
 const logIncoming = process.env.LOG_INCOMING;
 
 const app = express();
@@ -86,6 +88,18 @@ app.use((req, res, next) => {
   next();
 });
 
+let publicKey = '';
+
+(async () => {
+  try {
+    const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
+    console.log('Received public key from TARA'); // eslint-disable-line no-console
+    publicKey = data.keys[0]; // eslint-disable-line prefer-destructuring
+  } catch(e) {
+    console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
+  }
+})();
+
 // grant auth
 app.use(grant({
   'defaults': {
@@ -127,7 +141,7 @@ app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
 
 // all page rendering
-app.get(REDIRECT_URL, callbackPage);
+app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
 app.get('*', renderPageRoute);
 
 const server = https.createServer(credentials, app).listen(PORT, () => {

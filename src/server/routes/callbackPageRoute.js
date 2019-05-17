@@ -5,16 +5,16 @@ import jwt from 'jsonwebtoken';
 import soapRequest from 'easy-soap-request';
 import moment from 'moment';
 import capitalize from 'capitalize';
-import jwkToPem from 'jwk-to-pem';
 import User from '../utils/UserSchema';
 
 dotenv.config();
 
-const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, JWKS_PATH, REDIRECT_URL, TOKEN_PATH, ISSUER_URL, AR_URL, AR_USER, AR_PASS } = process.env;
+const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL, TOKEN_PATH, ISSUER_URL, AR_URL, AR_USER, AR_PASS } = process.env;
 
 const B64_VALUE = Buffer.from((`${CLIENT_ID}:${CLIENT_SECRET}`)).toString('base64');
 
-const getCompanies = async (id, ident) => {
+const getCompanies = async ident => {
+  let companies = [];
   try {
     const url = AR_URL;
     const headers = {
@@ -40,40 +40,23 @@ const getCompanies = async (id, ident) => {
         </prod:detailandmed_v1>
       </soapenv:Body>
     </soapenv:Envelope>`;
-    const { response } = await soapRequest(url, headers, xml);
-    const { body } = response;
-    if (body) {
-      if (body.keha && body.keha.leitud_ettevotjate_arv > 0) {
-        const companies = body.keha.ettevotjad && body.keha.ettevotjad.item.map(item => {
-          return {
-            'nimi': item.nimi,
-            'ariregistri_kood': item.ariregistri_kood,
-            'yldandmed': {
-              'sidevahendid': item.yldandmed.sidevahendid.item,
-              'aadressid': item.yldandmed.aadressid.item
-            }
-          };
-        });
-        User.updateOne({_id: id}, {
-          companies,
-          updated_at: Date.now(),
-        }, () => {
-          console.log('Updated user companies'); // eslint-disable-line no-console
-        });
-      } else {
-        User.updateOne({_id: id}, {
-          companies: [],
-          updated_at: Date.now(),
-        }, () => {
-          console.log('Updated user companies'); // eslint-disable-line no-console
-        });
-      }
-    } else {
-      throw new Error('Companies Request failed');
+    const { response: { body } } = await soapRequest(url, headers, xml);
+    if (body && body.keha && body.keha.leitud_ettevotjate_arv > 0) {
+      companies = body.keha.ettevotjad && body.keha.ettevotjad.item.map(item => {
+        return {
+          'nimi': item.nimi,
+          'ariregistri_kood': item.ariregistri_kood,
+          'yldandmed': {
+            'sidevahendid': item.yldandmed.sidevahendid.item,
+            'aadressid': item.yldandmed.aadressid.item
+          }
+        };
+      });
     }
   } catch (e) {
     console.log(e); // eslint-disable-line no-console
   }
+  return companies;
 };
 
 const setUserSession = (req, ident, firstName, lastName) => {
@@ -84,32 +67,15 @@ const setUserSession = (req, ident, firstName, lastName) => {
   };
 };
 
-export default async function(req, res) {
+export default async function(req, res, publicKey) {
   try {
     if (req.query.error) {
       throw new Error(req.query.error);
     }
-  
-    const publicKeyPem = [];
-  
-    const getPublicKeyPem = (publicKey) => {
-      publicKeyPem.push(jwkToPem(publicKey));
-    };
-  
-    (async () => {
-      try {
-        const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
-        console.log(data);
-        getPublicKeyPem(data.keys[0]);
-        console.log('Received public key from TARA'); // eslint-disable-line no-console
-      } catch(e) {
-        console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
-      }
-    })();
-  
+    
     /* Võta päringu query-osast TARA poolt saadetud volituskood (authorization code) */
     const { code } = req.query;
-  
+    
     /*
      Turvaelemendi state kontroll
     */
@@ -151,60 +117,52 @@ export default async function(req, res) {
       path: '/'
     });
     
-    console.log(JSON.stringify(id_token, null, 2));
-    console.log(publicKeyPem[0]);
-  
-    await jwt.verify(
-      id_token, // Kontrollitav tõend
-      publicKeyPem[0], // Allkirja avalik võti
+    jwt.verify(
+      id_token,
+      publicKey,
       {
-        audience: CLIENT_ID, // Tõendi saaja
-        issuer: ISSUER_URL, // Tõendi väljaandja
-        clockTolerance: 10 // Kellade max lubatud erinevus
+        audience: CLIENT_ID,
+        issuer: ISSUER_URL,
+        clockTolerance: 10
       }, (err, verifiedJwt) => {
         if (err) {
           throw new Error(err);
         }
-        console.log(verifiedJwt);
         const userData = {
           ident: verifiedJwt.sub.replace(/\D/g,''),
           first_name: capitalize.words(verifiedJwt.profile_attributes.given_name),
           last_name: capitalize.words(verifiedJwt.profile_attributes.family_name),
         };
+        
         User.findOne({
           ident: userData.ident
         }).then(async user => {
-          if (user) {
-            const today = moment(Date.now());
-            const updatedAt = moment(user.updated_at);
-            if (today.diff(updatedAt, 'days') > 1) {
-              await getCompanies(user._id, user.ident);
-            }
+          const today = moment(Date.now());
+          const updatedAt = moment((user && user.updated_at) || new Date());
+          let userObj = {
+            ident: userData.ident,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            updated_at: Date.now(),
+            visited_at: Date.now()
+          };
           
-            User.updateOne({_id: user._id}, {
-              ident: userData.ident,
-              first_name: userData.first_name,
-              last_name: userData.last_name,
-              updated_at: Date.now(),
-              visited_at: Date.now()
-            }, () => {
-              setUserSession(req, userData.ident, userData.first_name, userData.last_name);
-              res.redirect('/');
-            });
-          } else {
-            new User({
-              ident: userData.ident,
-              first_name: userData.first_name,
-              last_name: userData.last_name,
-              created_at: Date.now(),
-              visited_at: Date.now()
-            }).save()
-              .then(async newUser => {
-                setUserSession(req, userData.ident, userData.first_name, userData.last_name);
-                await getCompanies(newUser._id, newUser.ident);
-                res.redirect('/');
-              });
+          if (today.diff(updatedAt, 'days') > 1 || !user) {
+            userObj = {
+              ...userObj,
+              companies: await getCompanies(userData.ident)
+            };
           }
+          
+          if (user) {
+            await User.updateOne({_id: user._id}, userObj);
+          } else {
+            await User.create(userObj);
+          }
+          
+          setUserSession(req, userData.ident, userData.first_name, userData.last_name);
+          console.log('--- redirect ---', user);
+          res.redirect('/');
         });
       }
     );
