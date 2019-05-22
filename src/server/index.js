@@ -15,12 +15,12 @@ import compression from 'compression';
 import path from 'path';
 import morgan from 'morgan';
 import fs from 'fs';
+import jwkToPem from 'jwk-to-pem';
 import callbackPage from './routes/callbackPageRoute';
 import renderPageRoute from './routes/renderPageRoute';
 import banner from './utils/banner';
 import getLog from './utils/logger';
 import API from './routes/apiRoute';
-import jwkToPem from 'jwk-to-pem';
 
 dotenv.config();
 
