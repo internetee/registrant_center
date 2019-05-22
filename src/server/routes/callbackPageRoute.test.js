@@ -22,12 +22,12 @@ const publicKey = '-----BEGIN RSA PUBLIC KEY-----\n' +
   'Cp0qPBesmcVzCVl0VBhUPPwSH9R8O0PF0Q7B73Cg/nKzgzBsUkVCtyUCAwEAAQ==\n' +
   '-----END RSA PUBLIC KEY-----';
 
+let mockReq = {};
+let mockRes = {};
+
 describe('server/routes/callbackPageRoute', () => {
-  let mockReq = {};
-  let mockRes = {};
-  
+
   beforeEach(() => {
-    
     mockReq = {
       url: '/auth/callback',
       session: {
@@ -41,7 +41,7 @@ describe('server/routes/callbackPageRoute', () => {
         state: 1337
       }
     };
-    
+
     mockRes = {
       send: jest.fn(),
       sendFile: jest.fn(),
@@ -50,7 +50,7 @@ describe('server/routes/callbackPageRoute', () => {
       status: jest.fn(),
       clearCookie: jest.fn(),
     };
-    
+
     nock(ISSUER_URL).get(JWKS_PATH).reply(200, {
       keys: [{
         'kty': 'RSA',
@@ -60,7 +60,7 @@ describe('server/routes/callbackPageRoute', () => {
         'n': 'pLp-6hqyZKnzWh-g8ENNyUCO3pwB3dyzQFli8Erh__d8T7ej65Wj32872t4WcXcfDBIFjUyy9jyXUPr1rMw-EkcRhvh8jSgfsMwI-ed4SDpGt9WFi5kGaZ9pRss57m5j0RCgMqWDX3pG4cZ5RYJ1qIWw7QgF1MKyMr0si97y-wCzbv6ZiLPIhSmDXR4duYLTMK75ZAR9fCWz4GNdV5VMZISX91VcVilwxwclShEkit5gBfTet-m4IxUqWphUo3oDOq65Ltj0NxxwStHPXeek4r0jJY7RqGtcMYR2Gz65HpZhU-UmI1f86HxML91jLxryd2kfpVBS4eqxoCc7ptWKjQ'
       }]
     });
-  
+
     nock(ISSUER_URL, {
       reqheaders: {
         'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
@@ -73,7 +73,7 @@ describe('server/routes/callbackPageRoute', () => {
       expires_in: 600,
       id_token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3RhcmEtdGVzdC5yaWEuZWUiLCJhdWQiOiJlaXNfY2xpZW50X2RldiIsInN1YiI6IkVFNjAwMDEwMTkwMDAiLCJwcm9maWxlX2F0dHJpYnV0ZXMiOnsiZGF0ZV9vZl9iaXJ0aCI6IjIwMDAtMDEtMDEiLCJmYW1pbHlfbmFtZSI6IlJFR0lTVFJBTlQiLCJnaXZlbl9uYW1lIjoiVEVTVCJ9fQ.W9Syc_RASvAKqsS5JaPpoEi2ZzJGtQnc0RBiuIFypwwZHdutkLOx1dTdvwgb3SwfuYw5g7PsYe9OU0lcoUalinR5rtukKGwmhMPw_WD_1dyDvref3QeGVrmZhQ4GT_34XbiOFIj57wUjSJWTiToOGfI6MCKRfgrkTRITsBAVL53zPHW_1RNcZ_4Ladj6Hpc67NduNXqstNbFEB_xp3-fTeB94StXSjxRo50SCuZfm6V6dmmj2jqGqf8TTzOJ7dN3y231VDK7VBgMn9-SXCKgTFZcKcP_TFrjhUw_kURUBswk3kRDLtQEL0bPeUwaifVE9IdIWm9Qp5w7vgkpZTLGXwz-30OfPusiiNNto4ax63gbMbeyv_KWwXS7yZDU9NZtv5S4DHBu0rcEF56U7pqXhojSfCPBNqkaNKrKRz3KHnfhoDLlBbSZUiC-9RzfkyJxqypFKqm8hDWV5Vj0voPEpngz8WwJhX25Mb4Etde4ydNPGs1l3gEQLPt3WcY0-DpzQrr2T3GyxrDuKt3MTkcNkKllrSfxCBIMKmbLHsYSsoOF386f7PRNxH6YF903xnYpHFouA873cahxaMzdwd-h_G43KWlCp35IyUfjJSrYGUG69sHmSHeuCLsHvL0kX-cXIvR93J7B6I3abF3dWevJ0ClTctwAn4FdZw97cE6hSss',
     });
-  
+
     nock(AR_URL, {
       reqheaders: {
         'user-agent': 'sampleTest',
@@ -86,8 +86,15 @@ describe('server/routes/callbackPageRoute', () => {
       }
     });
   });
+
+  afterEach(() => {
+    mockReq = {};
+    mockRes = {};
+  });
+
   
   it('logs in user', async () => {
+
     jest.spyOn(User, 'findOne').mockResolvedValue({
       companies: [],
       _id: 'asd123',
@@ -99,8 +106,8 @@ describe('server/routes/callbackPageRoute', () => {
       __v: 0,
       updated_at: '2019-05-13T07:45:20.535Z'
     });
-    
-    await jest.spyOn(User, 'updateOne').mockResolvedValue({
+
+    jest.spyOn(User, 'updateOne').mockReturnValue({
       ident: '60001019000',
       first_name: 'Test',
       last_name: 'Registrant',
@@ -110,14 +117,14 @@ describe('server/routes/callbackPageRoute', () => {
 
     await callbackPage(mockReq, mockRes, publicKey);
 
-    console.log(mockRes.redirect.mock.calls);
-    await expect(mockRes.redirect.mock.calls).toHaveLength(1);
+    expect(mockRes.redirect.mock.calls).toHaveLength(1);
   });
   
   it('creates new user', async () => {
+
     jest.spyOn(User, 'findOne').mockResolvedValue(null);
 
-    await jest.spyOn(User, 'create').mockResolvedValue({
+    jest.spyOn(User, 'create').mockReturnValue({
       _id: 'asd123',
       ident: '60001019000',
       first_name: 'Test',
@@ -128,8 +135,7 @@ describe('server/routes/callbackPageRoute', () => {
 
     await callbackPage(mockReq, mockRes, publicKey);
 
-    console.log(mockRes.redirect.mock.calls);
-    await expect(mockRes.redirect.mock.calls).toHaveLength(1);
+    expect(mockRes.redirect.mock.calls).toHaveLength(1);
   });
   
 });

@@ -79,7 +79,6 @@ export default async function(req, res, publicKey) {
     /*
      Turvaelemendi state kontroll
     */
-    console.log('Turvaelemendi state kontroll'); // eslint-disable-line no-console
     const returnedState = req.query.state;
     const sessionState = req.session.grant.state;
     if (returnedState !== sessionState) {
@@ -107,7 +106,6 @@ export default async function(req, res, publicKey) {
      väljaandjat (iss) ja tõendi kehtivust (nbf ja exp).
      Vt https://www.npmjs.com/package/jsonwebtoken
     */
-    console.log('--- Identsustõendi kontrollimine:'); // eslint-disable-line no-console
     // remove the cookie
     res.clearCookie('connect.sid', {
       domain: HOST,
@@ -136,7 +134,7 @@ export default async function(req, res, publicKey) {
         
         User.findOne({
           ident: userData.ident
-        }).then(async user => {
+        }).then(user => {
           const today = moment(Date.now());
           const updatedAt = moment((user && user.updated_at) || new Date());
           let userObj = {
@@ -148,20 +146,28 @@ export default async function(req, res, publicKey) {
           };
           
           if (today.diff(updatedAt, 'days') > 1 || !user) {
-            userObj = {
-              ...userObj,
-              companies: await getCompanies(userData.ident)
-            };
+            getCompanies(userData.ident).then(companies => {
+              userObj = {
+                ...userObj,
+                companies
+              };
+            });
           }
           
           if (user) {
-            await User.updateOne({_id: user._id}, userObj);
+            User.updateOne({_id: user._id}, userObj, (error, ) => {
+              if (error) {
+                throw new Error(error);
+              }
+            });
           } else {
-            await User.create(userObj);
+            User.create(userObj, (error, ) => {
+              if (error) {
+                throw new Error(error);
+              }
+            });
           }
-          
           setUserSession(req, userData.ident, userData.first_name, userData.last_name);
-          console.log('--- redirect ---', user);
           res.redirect('/');
         });
       }
