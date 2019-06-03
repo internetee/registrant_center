@@ -7,18 +7,13 @@ import path from 'path';
 import winston, {config as winstonConfig} from 'winston';
 import callerCallsite from 'caller-callsite';
 import util from 'util';
+import FileRotateTransport from 'fast-file-rotate';
 
 import colors from './terminalColors';
 
 
-const BYTES_PER_MEGABYTE = 1024*1024;
-
 const { 
   CONSOLE_LOG_LEVEL, 
-  LOG_FILE_LOG_LEVEL, 
-  LOG_FILE_PATH, 
-  MAX_LOG_FILE_SIZE_IN_MB, 
-  MAX_LOG_FILE_COUNT 
 } = process.env;
 
 winston.addColors({
@@ -41,7 +36,7 @@ function formatLogMessage(options, context = ''){
 
 export default function getLog(context) {
   const filePath = context || path.basename(callerCallsite().getFileName());
-
+  
   return winston.createLogger({
     transports: [
 
@@ -55,17 +50,9 @@ export default function getLog(context) {
         }
       }),
 
-      new (winston.transports.File)({
-        level: LOG_FILE_LOG_LEVEL,
-        filename: LOG_FILE_PATH,
-        handleExceptions: true,
-        json: false,
-        maxsize: MAX_LOG_FILE_SIZE_IN_MB * BYTES_PER_MEGABYTE,
-        maxFiles: MAX_LOG_FILE_COUNT,
-        colorize: false,
-        formatter: (options)=>{
-          return formatLogMessage(options, filePath);
-        }
+      new FileRotateTransport({
+        fileName: `${__dirname  }/logs/%DATE%.log`,
+        dateFormat: 'YYYY-MM-DD-HH:mm',
       })
       
     ],
