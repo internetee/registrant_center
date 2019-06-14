@@ -1,3 +1,33 @@
 language: node_js
 node_js:
   - '8'
+services: mongodb
+
+before_script:
+  - sleep 15
+  - mongo EIS_Client --eval 'db.createUser({user:"travis",pwd:"pass",roles:["readWrite"]});'
+
+env:
+  - HOST=https://localhost
+  - PORT=1234
+  - API_HOST=https://testrant.internet.ee
+  - PUBLIC_API_HOST=https://www.internet.ee
+  - PUBLIC_API_KEY=4395743059dsfksdfyds8f7334
+  - CLIENT_ID=eis_client_dev
+  - CLIENT_SECRET=secret12345
+  - ISSUER_URL=https://tara-test.ria.ee
+  - TOKEN_PATH=/oidc/token
+  - JWKS_PATH=/oidc/jwks
+  - AUTH_PATH=/oidc/authorize
+  - REDIRECT_URL=/auth/callback
+  - SESSION_SECRET=secret555555
+  - DB_NAME=EIS_Client
+  - DB_USER=travis
+  - DB_PASS=pass
+  - AR_URL=https://demo-ariregxmlv6.rik.ee
+  - AR_API_URL=http://demo-ariregxml.rik.ee:81
+  - AR_USER=user
+  - AR_PASS=pass
+  - LOG_INCOMING=true
+  - LOG_OUTGOING=true
+  - CONSOLE_LOG_LEVEL=debug
