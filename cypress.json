@@ -1,5 +1,5 @@
 {
-  "baseUrl": "https://eis-client.dev4.we.ee:1234",
+  "baseUrl": "https://localhost:5000",
   "fixturesFolder":"test/e2e-test/fixtures",
   "integrationFolder":"test/e2e-test/tests",
   "pluginsFile":"test/e2e-test/plugins/index.js",
