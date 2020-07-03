@@ -6,7 +6,7 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 
-const { HOST, PORT } = config;
+const { HOST } = config;
 const apiRequest = (url, method = 'GET', body) => {
   const headers = {
     'Accept': 'application/json',
@@ -14,7 +14,7 @@ const apiRequest = (url, method = 'GET', body) => {
   };
   const options = {
     method,
-    url: `${HOST}${url}`,
+    url: HOST + url,
     headers,
     data: body,
     httpsAgent: agent,

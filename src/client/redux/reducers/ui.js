@@ -124,7 +124,7 @@ export default function(state = initialState, action) {
   }
   
   switch (action.type) {
-    
+  
   case TOGGLE_MAIN_MENU:
     return {
       ...state,

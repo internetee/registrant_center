@@ -10,7 +10,7 @@ import localeRu from 'react-intl/locale-data/ru';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import { createMemoryHistory } from 'history';
 import DomainPage from './DomainPage';
-import messages from '../../utils/messages';
+import messages from '../../utils/messages.json';
 
 addLocaleData([...localeEt, ...localeEn, ...localeRu]);
 

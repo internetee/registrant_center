@@ -9,7 +9,7 @@ import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
 import HomePage from './HomePage';
-import messages from '../../utils/messages';
+import messages from '../../utils/messages.json';
 
 addLocaleData([...localeEt, ...localeEn, ...localeRu]);
 

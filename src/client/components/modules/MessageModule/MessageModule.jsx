@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Message, Container, Icon } from 'semantic-ui-react';
-import staticMessages from '../../../utils/staticMessages';
+import staticMessages from '../../../utils/staticMessages.json';
 
 /**
  * @return {null}

@@ -7,7 +7,7 @@ import thunk from 'redux-thunk';
 import configureStore from 'redux-mock-store';
 import { IntlProvider } from 'react-intl';
 import DomainEditPage from './DomainEditPage';
-import messages from '../../utils/messages';
+import messages from '../../utils/messages.json';
 
 const history = createBrowserHistory();
 

@@ -4,9 +4,9 @@ import { FormattedMessage} from 'react-intl';
 import { CSVLink } from 'react-csv';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
-import staticMessages from '../../utils/staticMessages';
+import domainStatuses from '../../utils/domainStatuses.json';
+import staticMessages from '../../utils/staticMessages.json';
 import vfs from '../../utils/vfs_fonts';
-import domainStatuses from '../../utils/domainStatuses';
 
 pdfMake.vfs = vfs;
 pdfMake.fonts = {

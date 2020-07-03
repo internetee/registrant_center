@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import 'moment/locale/et';
 import 'moment/locale/ru';
-import domainStatuses from '../../../utils/domainStatuses';
+import domainStatuses from '../../../utils/domainStatuses.json';
 
 class DomainListItem extends Component {
 

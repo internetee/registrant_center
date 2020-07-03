@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Container, Loader } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
@@ -49,23 +48,11 @@ export function Loading({ isLoadingUser, isLoadingDomains, isLoadingContacts }) 
   );
 }
 
-Loading.propTypes = {
-  isLoadingUser: PropTypes.bool,
-  isLoadingDomains: PropTypes.bool,
-  isLoadingContacts: PropTypes.bool,
-};
-
-Loading.defaultProps = {
-  isLoadingUser: false,
-  isLoadingDomains: false,
-  isLoadingContacts: false,
-};
-
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ contacts, domains, user }) => {
   return {
-    isLoadingUser: state.user.isLoading,
-    isLoadingDomains: state.domains.isLoading,
-    isLoadingContacts: state.contacts.isLoading,
+    isLoadingContacts: contacts && contacts.isLoading,
+    isLoadingDomains: domains && domains.isLoading,
+    isLoading: user && user.isLoading,
   };
 };
 

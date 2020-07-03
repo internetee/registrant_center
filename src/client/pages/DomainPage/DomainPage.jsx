@@ -1,18 +1,19 @@
+/* eslint-disable camelcase */
 import React, {Component} from 'react';
 import { FormattedMessage} from 'react-intl';
-import {Popup, Button, Form, Icon, Label, Container, Table, Modal, Confirm, List} from 'semantic-ui-react';
+import {Popup, Button, Form, Icon, Label, Container, Table, Modal, Confirm} from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import {Helmet, Loading, WhoIsEdit, MessageModule, PageMessage, MainLayout} from '../../components';
-import domainStatuses from '../../utils/domainStatuses';
+import { Helmet, Loading, WhoIsEdit, MessageModule, PageMessage, MainLayout, WhoIsConfirmDialog } from '../../components';
+import domainStatuses from '../../utils/domainStatuses.json';
 import * as domainsActions from '../../redux/reducers/domains';
 import * as contactsActions from '../../redux/reducers/contacts';
 import Helpers from '../../utils/helpers';
-import staticMessages from '../../utils/staticMessages';
 
 class DomainPage extends Component {
   
   state = {
+    isDirty: false,
     isLocked: null,
     isLockable: null,
     isLoading: true,
@@ -22,11 +23,10 @@ class DomainPage extends Component {
     tableCellWidth: '4',
     domain: null,
     contacts: [],
-    userContacts: [],
+    userContacts: {},
     message: null,
     errors: {},
     changedDomains: [],
-    changedContacts: []
   };
   
   componentDidMount() {
@@ -52,42 +52,28 @@ class DomainPage extends Component {
   }
   
   handleWhoIsChange = (data) => {
-    const { initialContacts } = this.props;
-    const { changedContacts, contacts } = this.state;
-    const newContacts = contacts.slice();
-    const initialContactsData = initialContacts.data;
-    const editedContacts = changedContacts.slice();
-    data.forEach(contact => {
-      const contactIndex = contacts.findIndex(item => item.id === contact.id);
-      const initialContact = initialContactsData.find(item => item.id === contact.id);
-      const editedContactIndex = editedContacts.findIndex(item => item.id === contact.id);
-      newContacts[contactIndex] = contact;
-      if ([...contact.disclosed_attributes].sort().toString() !== [...initialContact.disclosed_attributes].sort().toString()) {
-        if (editedContactIndex > -1) {
-          editedContacts[editedContactIndex] = contact;
-        } else {
-          editedContacts.push(contact);
-        }
-      } else if (editedContactIndex > -1) {
-        editedContacts.splice(editedContactIndex, 1);
-      }
-    });
     this.setState(prevState => ({
       ...prevState,
-      contacts: newContacts,
-      changedContacts: editedContacts
+      userContacts: Object.entries(data).reduce((acc, [id, { disclosed_attributes }]) => ({
+        ...acc,
+        [id]: {
+          ...prevState.userContacts[id],
+          disclosed_attributes
+        }
+      }), {}),
+      isDirty: true
     }));
   };
   
   handleWhoIsSubmit = async () => {
-    const { user, setContacts, initialContacts } = this.props;
-    const { domain, contacts, changedContacts } = this.state;
+    const { setContacts, initialContacts } = this.props;
+    const { userContacts } = this.state;
     this.setState(prevState => ({
       ...prevState,
       isLoading: true,
       isSubmitConfirmModalOpen: false
     }));
-    await Promise.all(changedContacts.map(contact => {
+    await Promise.all(Object.values(userContacts).map(contact => {
       const form = {
         disclosed_attributes: [...contact.disclosed_attributes]
       };
@@ -95,11 +81,8 @@ class DomainPage extends Component {
     }));
     this.setState(prevState => ({
       ...prevState,
+      isDirty: false,
       isLoading: false,
-      contacts: Helpers.getDomainContacts(domain, contacts),
-      userContacts: Helpers.getUserContacts(user, domain, contacts),
-      changedDomains: [],
-      changedContacts: [],
       message: {
         code: initialContacts.status,
         type: 'whois',
@@ -109,22 +92,10 @@ class DomainPage extends Component {
   
   
   toggleSubmitConfirmModal = () => {
-    const { initialDomains } = this.props;
-    const { domain, contacts, changedContacts, isSubmitConfirmModalOpen } = this.state;
-    if (isSubmitConfirmModalOpen) {
-      this.setState(prevState => ({
-        ...prevState,
-        isSubmitConfirmModalOpen: false,
-        contacts: Helpers.getDomainContacts(domain, contacts),
-        changedDomains: [],
-      }));
-    } else {
-      this.setState(prevState => ({
-        ...prevState,
-        isSubmitConfirmModalOpen: true,
-        changedDomains: Helpers.getChangedUserContactsByDomain(initialDomains.data, contacts, changedContacts)
-      }));
-    }
+    this.setState(prevState => ({
+      ...prevState,
+      isSubmitConfirmModalOpen: !prevState.isSubmitConfirmModalOpen,
+    }));
   };
   
   toggleSetLockModal = () => {
@@ -210,32 +181,16 @@ class DomainPage extends Component {
   };
   
   render() {
-    const Roles = ({ roles }) => {
-      return ([...roles].map((role, i) => {
-        const { ui: { lang } } = this.props;
-        const { domain } = staticMessages[lang];
-        if (i === roles.size - 1) {
-          return domain[role];
-        }
-        if (i === roles.size - 2) {
-          return `${domain[role]} & `;
-        }
-        return `${domain[role]}, `;
-      }));
-    };
-    const { domain, setLockModalOpen, deleteLockModalOpen, tableCellWidth, contacts, changedContacts, changedDomains,
+    const { isDirty, domain, setLockModalOpen, deleteLockModalOpen, tableCellWidth, contacts,
       userContacts, isLoading, isLocked, isLockable, isSubmitConfirmModalOpen, message } = this.state;
-    const { ui, match, user, history } = this.props;
+    const { initialDomains, ui, match, user, history } = this.props;
     const { uiElemSize, lang } = ui;
-    const canUserLockDomain = userContacts.some(item => item.roles.has('registrant') || item.roles.has('admin'));
+    const canUserLockDomain = Object.values(userContacts).some(item => item.roles.has('registrant') || item.roles.has('admin'));
     if (isLoading && !domain) {
       return <Loading/>;
     }
     if (domain) {
-      console.log(domain);
       const registrantContacts = contacts.find(item => item.roles.has('registrant'));
-      const adminContacts = contacts.filter(item => item.roles.has('admin'));
-      const techContacts = contacts.filter(item => item.roles.has('tech'));
       return (
         <MainLayout ui={ui} user={user}>
           <FormattedMessage
@@ -396,13 +351,6 @@ class DomainPage extends Component {
                           </Table.HeaderCell>
                           <Table.HeaderCell>
                             <FormattedMessage
-                              id='domain.contact.id'
-                              defaultMessage='ID'
-                              tagName='strong'
-                            />
-                          </Table.HeaderCell>
-                          <Table.HeaderCell>
-                            <FormattedMessage
                               id='domain.contact.email'
                               defaultMessage='E-mail'
                               tagName='strong'
@@ -411,8 +359,8 @@ class DomainPage extends Component {
                         </Table.Row>
                       </Table.Header>
                       <Table.Body>
-                        <DomainContacts contacts={ techContacts } />
-                        <DomainContacts contacts={ adminContacts } />
+                        <DomainContacts type="tech" contacts={ domain.tech_contacts } />
+                        <DomainContacts type="admin" contacts={ domain.admin_contacts } />
                       </Table.Body>
                     </Table>
                   </Container>
@@ -476,11 +424,11 @@ class DomainPage extends Component {
                               tagName='strong'
                             />
                           </Table.Cell>
-		          <Table.Cell>
-		            {domain.registrar && domain.registrar.website ? (
-			       <a href={ domain.registrar.website.indexOf('http') > -1 ? domain.registrar.website : `//${domain.registrar.website}` } target='_blank' rel='noopener noreferrer'>{ domain.registrar.website }</a>
-			    ) : '-'}
-		          </Table.Cell>
+                          <Table.Cell>
+                            {domain.registrar && domain.registrar.website ? (
+                              <a href={ domain.registrar.website.indexOf('http') > -1 ? domain.registrar.website : `//${domain.registrar.website}` } target='_blank' rel='noopener noreferrer'>{ domain.registrar.website }</a>
+                            ) : '-'}
+                          </Table.Cell>
                         </Table.Row>
                       </Table.Body>
                     </Table>
@@ -555,7 +503,7 @@ class DomainPage extends Component {
                     <Form onSubmit={this.toggleSubmitConfirmModal}>
                       <WhoIsEdit user={user} contacts={userContacts} lang={lang} handleWhoIsChange={this.handleWhoIsChange} />
                       <div className='form-actions'>
-                        <Button type='submit' primary size={ uiElemSize } disabled={changedContacts.length === 0}>
+                        <Button type='submit' primary size={ uiElemSize } disabled={!isDirty}>
                           <FormattedMessage
                             id='domain.whois_privacy.save'
                             defaultMessage='Salvesta'
@@ -655,67 +603,12 @@ class DomainPage extends Component {
               </Button>
             }
           />
-          <Confirm
-            size='large'
-            open={isSubmitConfirmModalOpen}
-            closeOnEscape
-            onConfirm={this.handleWhoIsSubmit}
+          <WhoIsConfirmDialog
+            changedDomains={Helpers.getChangedUserContactsByDomain(initialDomains.data, contacts)}
             onCancel={this.toggleSubmitConfirmModal}
-            header={
-              <Modal.Header>
-                <FormattedMessage
-                  id='whois.confirm_modal.title'
-                  defaultMessage='Kas oled kindel, et soovid kontaktandmeid muuta?'
-                  tagName='h2'
-                />
-              </Modal.Header>
-            }
-            content={
-              <Modal.Content className='center'>
-                <FormattedMessage
-                  id='whois.confirm_modal.description.title'
-                  defaultMessage='Teie muudatused kajastuvad järgmiste domeenide puhul:'
-                  tagName='h3'
-                />
-                <List divided relaxed size='small' className='changed-domains-list'>
-                  { changedDomains.map(item => (
-                    <List.Item key={Math.random()}>
-                      <List.Content>
-                        <List.Header as='a' href={`/domain/${encodeURIComponent(item.name)}`} target='_blank'>
-                          { item.name }
-                        </List.Header>
-                        <List.Description>
-                          <FormattedMessage
-                            id='whois.confirm_modal.description.roles'
-                            defaultMessage='Roll: '
-                            tagName='strong'
-                          />
-                          <Roles roles={item.roles} />
-                        </List.Description>
-                      </List.Content>
-                    </List.Item>
-                  ))}
-                </List>
-              </Modal.Content>
-            }
-            confirmButton={
-              <Button data-test='change-contacts' primary size={ uiElemSize }>
-                <FormattedMessage
-                  id='whois.confirm_modal.confirm'
-                  defaultMessage='Jah'
-                  tagName='span'
-                />
-              </Button>
-            }
-            cancelButton={
-              <Button data-test='close-change-contacts-modal' secondary size={ uiElemSize }>
-                <FormattedMessage
-                  id='whois.confirm_modal.submicancel'
-                  defaultMessage='Ei'
-                  tagName='span'
-                />
-              </Button>
-            }
+            onConfirm={this.handleWhoIsSubmit}
+            open={isSubmitConfirmModalOpen}
+            ui={ui}
           />
         </MainLayout>
       );
@@ -782,19 +675,18 @@ const DomainStatuses = ({ statuses, lang }) => {
   ));
 };
 
-const DomainContacts = ({ contacts }) => {
-  console.log(contacts);
+const DomainContacts = ({ type, contacts }) => {
   return contacts.map(item => (
     <Table.Row key={ item.id }>
       <Table.Cell width='3'>
-        { item.roles.has('admin') && (
+        {type === 'admin' && (
           <FormattedMessage
             id='domain.contact.admin'
             defaultMessage='Admin'
             tagName='strong'
           />
         )}
-        {item.roles.has('tech') ? (
+        {type ==='tech' ? (
           <FormattedMessage
             id='domain.contact.tech'
             defaultMessage='Tehniline'
@@ -803,7 +695,6 @@ const DomainContacts = ({ contacts }) => {
         ) : ('') }
       </Table.Cell>
       <Table.Cell>{ item.name }</Table.Cell>
-      <Table.Cell>{ item.code }</Table.Cell>
       <Table.Cell>
         <a href={`mailto:${item.email}` }>{item.email}</a>
       </Table.Cell>

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
-import messages from './utils/messages';
+import messages from './utils/messages.json';
 import { Helmet, Loading, ScrollToTop } from './components';
 
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));

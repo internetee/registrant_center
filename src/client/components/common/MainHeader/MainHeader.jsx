@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import PropTypes, {instanceOf} from 'prop-types';
 import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import {Button, Container, Icon} from 'semantic-ui-react';
 import {FormattedHTMLMessage, FormattedMessage} from 'react-intl';
-import {Cookies, withCookies} from 'react-cookie';
+import {withCookies} from 'react-cookie';
 import classNames from 'classnames';
 import MainMenu from '../MainMenu/MainMenu';
 import * as uiActions from '../../../redux/reducers/ui';
@@ -67,7 +66,7 @@ class MainHeader extends Component {
   
   render() {
     const { ui, user, toggleMainMenu, closeMainMenu } = this.props;
-    const { lang, menus: { main } = []} = ui;
+    const { lang, menus: { main }} = ui;
     const { isCookiesAccepted, isHeaderFixed } = this.state;
     return (
       <React.Fragment>
@@ -146,7 +145,7 @@ const Logo = () => {
   );
 };
 
-const PortalMenu = ({items, lang}) => {
+const PortalMenu = ({items = [], lang}) => {
   const menu = items.filter(item => {
     const includedItems = [2133844,2223713,2142515];
     return (!item.hidden && item.language.code === lang && includedItems.includes(item.node.id));
@@ -206,14 +205,6 @@ const UserMenu = ({ user, handleLogout }) => {
     );
   }
   return null;
-};
-
-MainHeader.propTypes = {
-  setLang: PropTypes.func.isRequired,
-  logoutUser: PropTypes.func.isRequired,
-  toggleMainMenu: PropTypes.func.isRequired,
-  closeMainMenu: PropTypes.func.isRequired,
-  cookies: instanceOf(Cookies).isRequired
 };
 
 export default withCookies(connect(null, { ...uiActions, ...userActions })(MainHeader));

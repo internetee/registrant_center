@@ -16,12 +16,14 @@
     },
     "tech_contacts": [
       {
+        "email": "tech@tech.ee",
         "name": "Test Tech",
         "id": "700829af-4bdd-4c5f-8389-f6568e2ba4ad"
       }
     ],
     "admin_contacts": [
       {
+        "email": "admin@admin.ee",
         "name": "Test Admin",
         "id": "528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7"
       }

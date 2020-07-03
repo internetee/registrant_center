@@ -7,7 +7,7 @@ import {CookiesProvider} from 'react-cookie';
 import {ConnectedRouter} from 'connected-react-router';
 import {IntlProvider} from 'react-intl';
 import configureStore from 'redux-mock-store';
-import messages from '../../utils/messages';
+import messages from '../../utils/messages.json';
 import CompaniesPage from './CompaniesPage';
 
 const history = createBrowserHistory();

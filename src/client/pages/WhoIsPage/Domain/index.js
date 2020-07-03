@@ -22,7 +22,7 @@ class Domain extends Component {
   render() {
     const { isOpen } = this.state;
     const { user, domain, contacts, lang, handleWhoIsChange } = this.props;
-    const userContacts = Helpers.getUserContacts(user, domain, contacts);
+    const userContacts = Helpers.getUserContacts(user, domain, Object.values(contacts));
     return (
       <Table.Row key={domain.id} verticalAlign='top'>
         <Table.Cell width={6}>

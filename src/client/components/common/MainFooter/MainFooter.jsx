@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 class MainFooter extends React.PureComponent {
   render() {
     const { ui } = this.props;
-    const { lang, menus: { footer } = []} = ui;
+    const { lang, menus: { footer = [] } = []} = ui;
     const menu = footer.reduce((acc, item) => {
       if (item.language.code === lang) {
         const body = item.text.body.split('href="/').join('href="https://www.internet.ee/');

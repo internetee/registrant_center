@@ -11,9 +11,9 @@ import classNames from 'classnames';
 import { withCookies, Cookies } from 'react-cookie';
 import DomainGridItem from './GridItem';
 import DomainListItem from './ListItem';
-import domainStatuses from '../../utils/domainStatuses';
-import staticMessages from '../../utils/staticMessages';
-import {PageMessage} from '../index';
+import PageMessage from '../PageMessage/PageMessage';
+import domainStatuses from '../../utils/domainStatuses.json';
+import staticMessages from '../../utils/staticMessages.json';
 
 const masonryOptions = {
   initLayout: true,
@@ -57,72 +57,73 @@ class DomainList extends Component {
     
     let statuses = [];
     let registrants = [];
-    let minValidToDate = domains[0].valid_to;
-    let maxValidToDate = domains[0].valid_to;
+    if (domains.length) {
+      let minValidToDate = domains[0].valid_to;
+      let maxValidToDate = domains[0].valid_to;
+  
+      const sortedDomains = domains.map(item => {
     
-    const sortedDomains = domains.map(item => {
-      
-      statuses = [...new Set([...statuses, ...item.statuses])];
-      
-      item.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
-      
-      minValidToDate = (item.valid_to < minValidToDate) ? item.valid_to : minValidToDate;
-      maxValidToDate = (item.valid_to > maxValidToDate) ? item.valid_to : maxValidToDate;
-      
-      if (registrants.findIndex(registrant => registrant.key === item.registrant.id) === -1) {
-        registrants.push({
-          key: item.registrant.id,
-          text: item.registrant.name,
-          value: item.registrant.id,
-        });
-      }
-      
-      return item;
-      
-    });
+        statuses = [...new Set([...statuses, ...item.statuses])];
     
-    statuses.forEach((item, i) => {
-      let statusColor = 'grey';
-      let statusLabel = 'undefined';
-      if (domainStatuses[item]) {
-        statusColor = domainStatuses[item].color;
-        statusLabel = domainStatuses[item][lang].label;
-      }
-      statuses.splice(i, 1, {
-        key: statusLabel,
-        text: statusLabel,
-        value: item,
-        label: { color: statusColor, empty: true, circular: true }
+        item.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
+    
+        minValidToDate = (item.valid_to < minValidToDate) ? item.valid_to : minValidToDate;
+        maxValidToDate = (item.valid_to > maxValidToDate) ? item.valid_to : maxValidToDate;
+    
+        if (registrants.findIndex(registrant => registrant.key === item.registrant.id) === -1) {
+          registrants.push({
+            key: item.registrant.id,
+            text: item.registrant.name,
+            value: item.registrant.id,
+          });
+        }
+    
+        return item;
+    
       });
-    });
-    
-    statuses.sort((a, b) => domainStatuses[a.value].priority - domainStatuses[b.value].priority);
-    
-    registrants = registrants.filter((obj, index) => registrants.map(registrant => registrant.key).indexOf(obj.key) === index);
-    
-    this.setState({
-      isGrid: cookies.get('domains_is_grid') ? JSON.parse(cookies.get('domains_is_grid')) : true,
-      statuses: [{
-        key: 0,
-        text: domainStatuses.all[lang].label,
-        value: 'all',
-        label: {
-          color: domainStatuses.all.color,
-          empty: true,
-          circular: true
-        },
-      }, ...statuses],
-      registrants: [{
-        key: 0,
-        text: staticMessages[lang].domain_list.all_registrants,
-        value: 'all',
-      }, ...registrants],
-      filteredDomains: sortedDomains,
-      domains: sortedDomains,
-      minValidToDate: new Date(minValidToDate),
-      maxValidToDate: new Date(maxValidToDate),
-      perPage: Number(cookies.get('domains_per_page')) || 24
-    });
+      statuses.forEach((item, i) => {
+        let statusColor = 'grey';
+        let statusLabel = 'undefined';
+        if (domainStatuses[item]) {
+          statusColor = domainStatuses[item].color;
+          statusLabel = domainStatuses[item][lang].label;
+        }
+        statuses.splice(i, 1, {
+          key: statusLabel,
+          text: statusLabel,
+          value: item,
+          label: { color: statusColor, empty: true, circular: true }
+        });
+      });
+  
+      statuses.sort((a, b) => domainStatuses[a.value].priority - domainStatuses[b.value].priority);
+  
+      registrants = registrants.filter((obj, index) => registrants.map(registrant => registrant.key).indexOf(obj.key) === index);
+  
+      this.setState({
+        isGrid: cookies.get('domains_is_grid') ? JSON.parse(cookies.get('domains_is_grid')) : true,
+        statuses: [{
+          key: 0,
+          text: domainStatuses.all[lang].label,
+          value: 'all',
+          label: {
+            color: domainStatuses.all.color,
+            empty: true,
+            circular: true
+          },
+        }, ...statuses],
+        registrants: [{
+          key: 0,
+          text: staticMessages[lang].domain_list.all_registrants,
+          value: 'all',
+        }, ...registrants],
+        filteredDomains: sortedDomains,
+        domains: sortedDomains,
+        minValidToDate: new Date(minValidToDate),
+        maxValidToDate: new Date(maxValidToDate),
+        perPage: Number(cookies.get('domains_per_page')) || 24
+      });
+    }
   }
   
   toggleView = () => {
@@ -244,7 +245,7 @@ class DomainList extends Component {
   };
   
   render() {
-    const { lang, contacts, domains } = this.props;
+    const { lang, domains } = this.props;
     const {
       isGrid,
       isAdvSearchOpen,
@@ -396,7 +397,7 @@ class DomainList extends Component {
                       enableResizableChildren
                     >
                       { paginatedDomains[activePage - 1].map(domain => (
-                        <DomainGridItem key={domain.id} domain={domain} contacts={contacts} lang={lang} />
+                        <DomainGridItem key={domain.id} domain={domain} lang={lang} />
                       ))}
                     </Masonry>
                   </div>

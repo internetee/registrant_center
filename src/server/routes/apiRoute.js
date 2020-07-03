@@ -165,7 +165,6 @@ export default {
       } else {
         response = await apiRequest(`${API_HOST}/api/v1/registrant/contacts?offset=${offset}`, token);
       }
-      console.log(response);
       res.status(response.status).json(response.data);
     } else {
       res.status(498).json({});

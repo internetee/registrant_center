@@ -12,7 +12,7 @@ import domains from '../mocks/domains';
 import contacts from '../mocks/contacts';
 import mainMenu from '../mocks/menuMain';
 import footerMenu from '../mocks/menuFooter';
-import messages from '../../src/client/utils/messages';
+import messages from '../../src/client/utils/messages.json';
 
 // React Enzyme adapter
 configure({ adapter: new Adapter() });
@@ -24,14 +24,13 @@ const document = {
 
 dotenv.config({ path: '.env.test' });
 
-const { HOST, PORT } = process.env;
+const { HOST } = process.env;
 
 // expose common functions used in tests
 global.__INIT_DATA_FROM_SERVER_RENDER__ = {
   HOST,
-  PORT,
 };
-global.apiHost = `${HOST}:${PORT}`;
+global.apiHost = HOST;
 global.innerWidth = 1280;
 global.React = React;
 global.shallow = shallow;

@@ -1,15 +1,14 @@
+/* eslint-disable camelcase */
 import React, {Component} from 'react';
-import PropTypes, {instanceOf} from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import {Button, Form, Icon, Container, Table, Input, Pagination, Dropdown, Confirm, Modal, List} from 'semantic-ui-react';
+import {Button, Form, Icon, Container, Table, Input, Pagination, Dropdown} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {Cookies, withCookies} from 'react-cookie';
+import {withCookies} from 'react-cookie';
 import MediaQuery from 'react-responsive';
-import {Helmet, MainLayout, MessageModule, PageMessage} from '../../components';
+import {Helmet, MainLayout, MessageModule, PageMessage, WhoIsConfirmDialog} from '../../components';
 import Domain from './Domain';
 import Helpers from '../../utils/helpers';
 import * as contactsActions from '../../redux/reducers/contacts';
-import staticMessages from '../../utils/staticMessages';
 
 const perPageOptions = [
   { key: 6, text: '6', value: 6 },
@@ -20,16 +19,15 @@ const perPageOptions = [
 class WhoIsPage extends Component {
 
   state = {
+    isDirty: false,
     isLoading: false,
     isSubmitConfirmModalOpen: false,
     perPage: 12,
     activePage: 1,
     queryKeys: null,
-    contacts: [],
+    contacts: {},
     domains: [],
     message: null,
-    changedDomains: null,
-    changedContacts: [],
   };
 
   componentDidMount() {
@@ -37,7 +35,10 @@ class WhoIsPage extends Component {
     this.setState(prevState => ({
       ...prevState,
       perPage: Number(cookies.get('whois_per_page')) || 12,
-      contacts: initialContacts.data,
+      contacts: initialContacts.data.reduce((acc, contact) => ({
+        ...acc,
+        [contact.id]: contact
+      }), {}),
       domains: initialDomains,
     }));
   }
@@ -81,10 +82,11 @@ class WhoIsPage extends Component {
       ...prevState,
       queryKeys: '',
       activePage: 1,
+      contacts: initialContacts.data.reduce((acc, contact) => ({
+        ...acc,
+        [contact.id]: contact
+      }), {}),
       domains: initialDomains,
-      contacts: initialContacts.data,
-      changedContacts: [],
-      changedDomains: []
     }));
   };
   
@@ -117,62 +119,44 @@ class WhoIsPage extends Component {
   };
   
   handleWhoIsChange = (data) => {
-    const { initialContacts } = this.props;
-    const { contacts, changedContacts } = this.state;
-    
-    const newContacts = [...contacts];
-    const editedContacts = [...changedContacts];
-    data.forEach(contact => {
-      const contactIndex = contacts.findIndex(item => item.id === contact.id);
-      const initialContact = initialContacts.data.find(item => item.id === contact.id);
-      const changedContactIndex = editedContacts.findIndex(item => item.id === contact.id);
-      newContacts[contactIndex] = contact;
-      if ([...contact.disclosed_attributes].sort().toString() !== [...initialContact.disclosed_attributes].sort().toString()) {
-        if (changedContactIndex > -1) {
-          editedContacts[changedContactIndex] = contact;
-        } else {
-          editedContacts.push(contact);
-        }
-      } else if (changedContactIndex > -1) {
-        editedContacts.splice(changedContactIndex, 1);
-      }
-    });
-    
     this.setState(prevState => ({
       ...prevState,
-      contacts: newContacts,
-      changedContacts: editedContacts
+      contacts: Object.entries(prevState.contacts).reduce((acc, [id, contact]) => {
+        if (data[id]) {
+          return {
+            ...acc,
+            [id]: {
+              ...contact,
+              disclosed_attributes: data[id].disclosed_attributes,
+              changed: true
+            }
+          };
+        }
+        return {
+          ...acc,
+          [id]: contact
+        };
+      }, {}),
+      isDirty: true
     }));
   };
   
   toggleSubmitConfirmModal = () => {
-    const { initialContacts } = this.props;
-    const { domains, contacts, changedContacts, isSubmitConfirmModalOpen } = this.state;
-    if (isSubmitConfirmModalOpen) {
-      this.setState(prevState => ({
-        ...prevState,
-        isSubmitConfirmModalOpen: false,
-        contacts: initialContacts.data,
-        changedDomains: null,
-      }));
-    } else {
-      this.setState(prevState => ({
-        ...prevState,
-        isSubmitConfirmModalOpen: true,
-        changedDomains: Helpers.getChangedUserContactsByDomain(domains, contacts, changedContacts)
-      }));
-    }
+    this.setState(prevState => ({
+      ...prevState,
+      isSubmitConfirmModalOpen: !prevState.isSubmitConfirmModalOpen,
+    }));
   };
   
-  handleSubmit = async () => {
-    const { initialContacts, setContacts } = this.props;
-    const { changedContacts } = this.state;
+  handleWhoIsSubmit = async () => {
+    const { setContacts, initialContacts } = this.props;
+    const { contacts } = this.state;
     this.setState(prevState => ({
       ...prevState,
       isLoading: true,
       isSubmitConfirmModalOpen: false
     }));
-    await Promise.all(changedContacts.map(contact => {
+    await Promise.all(Object.values(contacts).filter(contact => contact.changed).map(contact => {
       const form = {
         disclosed_attributes: [...contact.disclosed_attributes]
       };
@@ -180,9 +164,8 @@ class WhoIsPage extends Component {
     }));
     this.setState(prevState => ({
       ...prevState,
+      isDirty: false,
       isLoading: false,
-      changedDomains: null,
-      changedContacts: [],
       message: {
         code: initialContacts.status,
         type: 'whois',
@@ -191,22 +174,9 @@ class WhoIsPage extends Component {
   };
   
   render() {
-    const Roles = (item) => {
-      return ([...item.roles].map((role, i) => {
-        const { ui: { lang } } = this.props;
-        const { domain } = staticMessages[lang];
-        if (i === item.roles.size - 1) {
-          return domain[role];
-        }
-        if (i === item.roles.size - 2) {
-          return `${domain[role]} & `;
-        }
-        return `${domain[role]}, `;
-      }));
-    };
     const { ui, user, initialDomains, history } = this.props;
-    const { domains, queryKeys, perPage, activePage, contacts, isLoading, message, changedDomains, changedContacts, isSubmitConfirmModalOpen } = this.state;
     const { uiElemSize, lang } = ui;
+    const { domains, isDirty, queryKeys, perPage, activePage, contacts, isLoading, message, isSubmitConfirmModalOpen } = this.state;
     const paginatedDomains = [];
     const copied = [...domains];
     const numOfChild = Math.ceil(copied.length / perPage);
@@ -283,7 +253,8 @@ class WhoIsPage extends Component {
                           <Button
                             type='submit'
                             form='whois-page-form'
-                            primary disabled={isLoading || changedContacts.length === 0}
+                            primary
+                            disabled={isLoading || !isDirty}
                             loading={isLoading}
                             size={uiElemSize}
                           >
@@ -328,7 +299,8 @@ class WhoIsPage extends Component {
                                 <Button
                                   type='submit'
                                   form='whois-page-form'
-                                  primary disabled={isLoading || changedContacts.length === 0}
+                                  primary
+                                  disabled={isLoading || !isDirty}
                                   loading={isLoading}
                                   size={uiElemSize}
                                 >
@@ -349,7 +321,7 @@ class WhoIsPage extends Component {
                                 type='submit'
                                 form='whois-page-form'
                                 primary
-                                disabled={isLoading || changedContacts.length === 0}
+                                disabled={isLoading || !isDirty}
                                 loading={isLoading}
                                 size={uiElemSize}
                               >
@@ -441,77 +413,13 @@ class WhoIsPage extends Component {
                   )}
                 />
               )}
-              { changedDomains && (
-                <Confirm
-                  size='large'
-                  open={isSubmitConfirmModalOpen}
-                  closeOnEscape
-                  onConfirm={this.handleSubmit}
-                  onCancel={this.toggleSubmitConfirmModal}
-                  header={
-                    <Modal.Header>
-                      <FormattedMessage
-                        id='whois.confirm_modal.title'
-                        defaultMessage='Kas oled kindel, et soovid kontaktandmeid muuta?'
-                        tagName='h2'
-                      />
-                    </Modal.Header>
-                  }
-                  content={
-                    <Modal.Content className='center'>
-                      <FormattedMessage
-                        id='whois.confirm_modal.description.title'
-                        defaultMessage='Teie muudatused kajastuvad järgmiste domeenide puhul:'
-                        tagName='h3'
-                      />
-                      <List divided relaxed size='small' className='changed-domains-list'>
-                        { changedDomains.map(item => (
-                          <List.Item key={Math.random()}>
-                            <List.Content>
-                              <List.Header as='a' href={`/domain/${encodeURIComponent(item.name)}`} target='_blank'>
-                                { item.name }
-                              </List.Header>
-                              <List.Description>
-                                <FormattedMessage
-                                  id='whois.confirm_modal.description.roles'
-                                  defaultMessage='Roll: '
-                                  tagName='strong'
-                                />
-                                <Roles roles={item.roles} />
-                              </List.Description>
-                            </List.Content>
-                          </List.Item>
-                        ))}
-                      </List>
-                    </Modal.Content>
-                  }
-                  confirmButton={
-                    <Button
-                      data-test="change-contacts"
-                      primary
-                      size={uiElemSize}
-                    >
-                      <FormattedMessage
-                        id='whois.confirm_modal.confirm'
-                        defaultMessage='Jah'
-                        tagName='span'
-                      />
-                    </Button>
-                  }
-                  cancelButton={
-                    <Button
-                      data-test="close-change-contacts-modal"
-                      secondary
-                      size={uiElemSize}>
-                      <FormattedMessage
-                        id='whois.confirm_modal.submicancel'
-                        defaultMessage='Ei'
-                        tagName='span'
-                      />
-                    </Button>
-                  }
-                />
-              )}
+              <WhoIsConfirmDialog
+                changedDomains={Helpers.getChangedUserContactsByDomain(domains, Object.values(contacts))}
+                onCancel={this.toggleSubmitConfirmModal}
+                onConfirm={this.handleWhoIsSubmit}
+                open={isSubmitConfirmModalOpen}
+                ui={ui}
+              />
             </React.Fragment>
           ) : (
             <PageMessage
@@ -530,15 +438,6 @@ class WhoIsPage extends Component {
     );
   }
 }
-
-WhoIsPage.propTypes = {
-  cookies: instanceOf(Cookies),
-  setContacts: PropTypes.func.isRequired
-};
-
-WhoIsPage.defaultProps = {
-  cookies: null,
-};
 
 const mapStateToProps = (state) => {
   return {

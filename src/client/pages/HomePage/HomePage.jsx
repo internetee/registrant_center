@@ -77,7 +77,7 @@ class HomePage extends PureComponent {
               </Grid.Row>
             </Grid>
           </div>
-          <DomainList domains={domains} contacts={contacts} lang={lang} />
+          <DomainList domains={domains} lang={lang} />
           <UserData contacts={contacts} domains={domains} lang={lang} />
         </div>
       </MainLayout>

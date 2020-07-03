@@ -6,6 +6,7 @@ export {default as UserData} from './UserData/UserData';
 export {default as WhoIsEdit} from './WhoIsEdit/WhoIsEdit';
 export {default as MessageModule} from './modules/MessageModule/MessageModule';
 export {default as PageMessage} from './PageMessage/PageMessage';
+export {default as WhoIsConfirmDialog} from './WhoIsConfirmDialog/WhoIsConfirmDialog';
 
 
 // pass through common 3rd party components to also cut down on import boilerplate

@@ -1,13 +1,21 @@
+/* eslint-disable camelcase */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedHTMLMessage, FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
-import staticMessages from '../../utils/staticMessages';
+import staticMessages from '../../utils/staticMessages.json';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
-  const totalCount = contacts.reduce((cnt) => cnt + 2, 0);
-  const isCheckedAll = contacts.reduce((cnt, el) => cnt + el.disclosed_attributes.size, 0) === totalCount;
-  const checkedCount = contacts.reduce((cnt, el) => cnt + el.disclosed_attributes.size, 0);
+  const contactsList = Object.values(contacts);
+  const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce((acc, { disclosed_attributes }) => ({
+    checkedCount: acc.checkedCount + disclosed_attributes.size,
+    isCheckedAll: acc.isCheckedAll + disclosed_attributes.size === acc.totalCount + 2,
+    totalCount: acc.totalCount + 2,
+  }), {
+    checkedCount: 0,
+    isCheckedAll: false,
+    totalCount: 0,
+  });
+  
   const indeterminate = checkedCount > 0 && checkedCount < totalCount;
   
   const CheckAllLabel = () => {
@@ -51,20 +59,24 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
   };
   
   const onChange = (checked, ids, type) => {
-    const changedContacts = [...contacts];
-    changedContacts.forEach(item => {
-      if (ids.includes(item.id)) {
+    const changedContacts = ids.reduce((acc, id) => {
+      const { disclosed_attributes } = contacts[id];
+      const attributes = new Set(disclosed_attributes);
+      type.forEach(attr => {
         if (checked) {
-          type.forEach(attr => {
-            item.disclosed_attributes.add(attr);
-          });
+          attributes.add(attr);
         } else {
-          type.forEach(attr => {
-            item.disclosed_attributes.delete(attr);
-          });
+          attributes.delete(attr);
         }
-      }
-    });
+      });
+      return {
+        ...acc,
+        [id]: {
+          disclosed_attributes: attributes
+        }
+      };
+      
+    }, {});
     handleWhoIsChange(changedContacts);
   };
   
@@ -90,12 +102,12 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
             checked={isCheckedAll}
             indeterminate={indeterminate}
             label={<CheckAllLabel />}
-            onChange={(e, elem) => onChange(elem.checked,[...new Set(contacts.map(item => item.id))],['name', 'email'])}
+            onChange={(e, elem) => onChange(elem.checked,[...new Set(contactsList.map(item => item.id))],['name', 'email'])}
           />
         </Form.Field>
       )}
       <Form.Group grouped className={ isOpen ? 'adv-field-group u-visible' : 'adv-field-group' }>
-        { contacts.map(item => (
+        { contactsList.map(item => (
           <React.Fragment key={item.id}>
             <label htmlFor={item.id}>
               <FormattedHTMLMessage
@@ -117,7 +129,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
                   defaultMessage="Nimi avalik ({ contactName })"
                   tagName="label"
                   values={{
-                    contactName: item.name
+                    contactName: item.initialName
                   }}
                 />}
                 onChange={(e, elem) => onChange(elem.checked,[item.id],['name'])}
@@ -133,7 +145,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
                   defaultMessage="E-mail avalik ({ contactEmail })"
                   tagName="label"
                   values={{
-                    contactEmail: item.email
+                    contactEmail: item.initialEmail
                   }}
                 />}
                 onChange={(e, elem) => onChange(elem.checked,[item.id],['email'])}
@@ -145,15 +157,5 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
     </React.Fragment>
   );
 }
-
-WhoIsEdit.propTypes = {
-  isOpen: PropTypes.bool,
-  checkAll: PropTypes.bool,
-};
-
-WhoIsEdit.defaultProps = {
-  isOpen: null,
-  checkAll: null,
-};
 
 export default WhoIsEdit;

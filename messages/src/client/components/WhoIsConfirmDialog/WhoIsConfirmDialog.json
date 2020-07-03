@@ -1,0 +1,22 @@
+[
+  {
+    "id": "whois.confirm_modal.title",
+    "defaultMessage": "Kas oled kindel, et soovid kontaktandmeid muuta?"
+  },
+  {
+    "id": "whois.confirm_modal.description.title",
+    "defaultMessage": "Teie muudatused kajastuvad järgmiste domeenide puhul:"
+  },
+  {
+    "id": "whois.confirm_modal.description.roles",
+    "defaultMessage": "Roll:"
+  },
+  {
+    "id": "whois.confirm_modal.confirm",
+    "defaultMessage": "Jah"
+  },
+  {
+    "id": "whois.confirm_modal.submicancel",
+    "defaultMessage": "Ei"
+  }
+]
