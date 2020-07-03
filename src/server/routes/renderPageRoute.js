@@ -19,7 +19,7 @@ function renderHTML(helmet) {
       <body ${helmet.bodyAttributes.toString()} >
         <div id="app"></div>
         <script>
-          window.__INIT_DATA_FROM_SERVER_RENDER__ = ${JSON.stringify({HOST, PORT, NODE_ENV})};
+          window.__INIT_DATA_FROM_SERVER_RENDER__ = ${JSON.stringify({HOST, NODE_ENV})};
         </script>
         <script src="/bundles/index.js"></script>
       </body>

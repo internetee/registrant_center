@@ -44,15 +44,17 @@ class DomainGridItem extends Component {
               <Link to={`/domain/${encodeURIComponent(domain.name)}`} className='link'>
                 <h2>{ domain.name }</h2>
               </Link>
-              <p>
-                <a
-                  href={ domain.registrar.website.indexOf('http') > -1 ? domain.registrar.website : `http://${domain.registrar.website}` }
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  { domain.registrar.name }
-                </a>
-              </p>
+	      <p>
+	          {domain.registrar && domain.registrar.website ? (
+		  <a
+		    href={ domain.registrar.website.indexOf('http') > -1 ? domain.registrar.website : `http://${domain.registrar.website}` }
+		    target='_blank'
+		    rel='noopener noreferrer'
+		  >
+		  { domain.registrar.name }
+	        </a>
+	        ) : '-'}
+	      </p>
               <Label.Group className='statuses' size='large'>
                 { domain.statuses.map((status,i) => (
                   <Label key={status} circular basic color={domainStatuses[status].color} title={domainStatuses[status][lang].definition} className={ classNames({ 'hidden': !showStatuses && i > 0 }) }>

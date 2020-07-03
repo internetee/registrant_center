@@ -1,5 +1,6 @@
 export default {
   getDomainContacts: (domain, contacts) => {
+    console.log(domain, contacts);
     return contacts.reduce((acc, item) => {
       const roles = new Set();
       if (item.id === domain.registrant.id) {

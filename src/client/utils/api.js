@@ -14,7 +14,7 @@ const apiRequest = (url, method = 'GET', body) => {
   };
   const options = {
     method,
-    url: `${HOST}:${PORT}${url}`,
+    url: `${HOST}${url}`,
     headers,
     data: body,
     httpsAgent: agent,
@@ -32,7 +32,7 @@ export default {
   fetchMenu: (type) => {
     return axios({
       method: 'GET',
-      url: `${HOST}:${PORT}/api/menu/${type}`,
+      url: `${HOST}/api/menu/${type}`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export default {
   fetchUser: () => {
     return axios({
       method: 'GET',
-      url: `${HOST}:${PORT}/api/user`,
+      url: `${HOST}/api/user`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default {
   destroyUser: () => {
     return axios({
       method: 'POST',
-      url: `${HOST}:${PORT}/api/destroy`,
+      url: `${HOST}/api/destroy`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

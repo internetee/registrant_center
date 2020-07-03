@@ -95,7 +95,9 @@ export default async function(req, res, publicKey) {
       data: qs.stringify({
         'grant_type': 'authorization_code',
         'code': code,
-        'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
+//        'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
+        'redirect_uri': `${HOST}${REDIRECT_URL}`,
+//        'redirect_uri': `${HOST}/registrant${REDIRECT_URL}`,
       })
     };
     const { data: { id_token } } = await axios(options); // eslint-disable-line camelcase

@@ -69,6 +69,14 @@ mongoose.Promise = global.Promise;
 
 mongoose.connect(`mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASS)}@localhost:27017/${encodeURIComponent(DB_NAME)}`, { useNewUrlParser: true });
 
+//console.log(`mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASS)}@localhost:27017/?authSource=${encodeURIComponent(DB_NAME)}`);
+//mongoose.connect(`mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASS)}@localhost:27017/?authSource=${encodeURIComponent(DB_NAME)}`, { useNewUrlParser: true });
+
+//mongoose.connect(`mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASS)}@localhost:27017/?authSource=${encodeURIComponent(DB_NAME)}`, { useNewUrlParser: true }).catch(error => {
+//	console.log(`mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASS)}@localhost:27017/?authSource=${encodeURIComponent(DB_NAME)}`);
+//	console.log(error);
+//});
+
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   saveUninitialized: false,
@@ -104,7 +112,7 @@ let publicKey = '';
 app.use(grant({
   'defaults': {
     'protocol': 'https',
-    'host': `${HOST}:${PORT}`,
+    'host': `${HOST}`,
     'state': true,
     'callback': '/auth/callback',
     'transport': 'querystring'
@@ -116,7 +124,7 @@ app.use(grant({
     'key': CLIENT_ID,
     'secret': CLIENT_SECRET,
     'scope': 'openid',
-    'redirect_uri': `${HOST}:${PORT}${REDIRECT_URL}`,
+    'redirect_uri': `${HOST}${REDIRECT_URL}`,
     'response_type': 'code',
     'callback': REDIRECT_URL,
     'custom_params': {

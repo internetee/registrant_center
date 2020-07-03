@@ -232,6 +232,7 @@ class DomainPage extends Component {
       return <Loading/>;
     }
     if (domain) {
+      console.log(domain);
       const registrantContacts = contacts.find(item => item.roles.has('registrant'));
       const adminContacts = contacts.filter(item => item.roles.has('admin'));
       const techContacts = contacts.filter(item => item.roles.has('tech'));
@@ -475,7 +476,11 @@ class DomainPage extends Component {
                               tagName='strong'
                             />
                           </Table.Cell>
-                          <Table.Cell><a href={ domain.registrar.website.indexOf('http') > -1 ? domain.registrar.website : `//${domain.registrar.website}` } target='_blank' rel='noopener noreferrer'>{ domain.registrar.website }</a></Table.Cell>
+		          <Table.Cell>
+		            {domain.registrar && domain.registrar.website ? (
+			       <a href={ domain.registrar.website.indexOf('http') > -1 ? domain.registrar.website : `//${domain.registrar.website}` } target='_blank' rel='noopener noreferrer'>{ domain.registrar.website }</a>
+			    ) : '-'}
+		          </Table.Cell>
                         </Table.Row>
                       </Table.Body>
                     </Table>
@@ -778,6 +783,7 @@ const DomainStatuses = ({ statuses, lang }) => {
 };
 
 const DomainContacts = ({ contacts }) => {
+  console.log(contacts);
   return contacts.map(item => (
     <Table.Row key={ item.id }>
       <Table.Cell width='3'>
