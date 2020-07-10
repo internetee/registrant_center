@@ -5,7 +5,7 @@ import {Button, Form, Icon, Container, Table, Input, Pagination, Dropdown} from 
 import {connect} from 'react-redux';
 import {withCookies} from 'react-cookie';
 import MediaQuery from 'react-responsive';
-import {Helmet, MainLayout, MessageModule, PageMessage, WhoIsConfirmDialog} from '../../components';
+import { Helmet, Loading, MainLayout, MessageModule, PageMessage, WhoIsConfirmDialog } from '../../components';
 import Domain from './Domain';
 import Helpers from '../../utils/helpers';
 import * as contactsActions from '../../redux/reducers/contacts';
@@ -20,7 +20,7 @@ class WhoIsPage extends Component {
 
   state = {
     isDirty: false,
-    isLoading: false,
+    isLoading: true,
     isSubmitConfirmModalOpen: false,
     perPage: 12,
     activePage: 1,
@@ -31,16 +31,20 @@ class WhoIsPage extends Component {
   };
 
   componentDidMount() {
-    const { initialContacts, initialDomains, cookies } = this.props;
-    this.setState(prevState => ({
-      ...prevState,
-      perPage: Number(cookies.get('whois_per_page')) || 12,
-      contacts: initialContacts.data.reduce((acc, contact) => ({
-        ...acc,
-        [contact.id]: contact
-      }), {}),
-      domains: initialDomains,
-    }));
+    const { fetchContacts, initialDomains, cookies } = this.props;
+    (async () => {
+      const contacts = initialDomains.reduce((acc, { admin_contacts, tech_contacts }) => [
+        ...new Set([...acc, ...[...admin_contacts.map(({ id }) => id), ...tech_contacts.map(({ id }) => id)]])
+      ], []);
+      const res = await Promise.all(contacts.map(id => fetchContacts(id)));
+      this.setState(prevState => ({
+        ...prevState,
+        perPage: Number(cookies.get('whois_per_page')) || 12,
+        contacts: res.data,
+        domains: initialDomains,
+        isLoading: false,
+      }));
+    })();
   }
 
   handlePageChange = (e, { activePage }) => {
@@ -183,7 +187,7 @@ class WhoIsPage extends Component {
     for (let i = 0; i < numOfChild; i += 1) {
       paginatedDomains.push(copied.splice(0, perPage));
     }
-    
+    console.log({ initialDomains, contacts });
     return (
       <MainLayout ui={ui} user={user}>
         <FormattedMessage
@@ -213,7 +217,7 @@ class WhoIsPage extends Component {
         </div>
         { !isLoading && message && <MessageModule message={message} lang={lang} /> }
         <div className='page page--whois'>
-          { initialDomains && contacts ? (
+          { initialDomains ? (
             <React.Fragment>
               <div className='page--header'>
                 <Container>
@@ -270,7 +274,22 @@ class WhoIsPage extends Component {
                   </Form>
                 </Container>
               </div>
-              { domains.length ? (
+              { isLoading || !domains.length  ? (
+                <React.Fragment>
+                  {isLoading && <Loading/>}
+                  {!isLoading && !domains.length && (
+                    <PageMessage
+                      headerContent={(
+                        <FormattedMessage
+                          id="whois.search.message.title"
+                          defaultMessage="Otsingule vastavaid domeene ei leitud"
+                          tagName="span"
+                        />
+                      )}
+                    />
+                  )}
+                </React.Fragment>
+              ) : (
                 <div className="page--content">
                   <Container>
                     <Form onSubmit={this.toggleSubmitConfirmModal} id='whois-page-form'>
@@ -402,16 +421,6 @@ class WhoIsPage extends Component {
                     </Container>
                   </div>
                 </div>
-              ) : (
-                <PageMessage
-                  headerContent={(
-                    <FormattedMessage
-                      id="whois.search.message.title"
-                      defaultMessage="Otsingule vastavaid domeene ei leitud"
-                      tagName="span"
-                    />
-                  )}
-                />
               )}
               <WhoIsConfirmDialog
                 changedDomains={Helpers.getChangedUserContactsByDomain(domains, Object.values(contacts))}

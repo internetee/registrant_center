@@ -24,6 +24,10 @@
     "defaultMessage": "Salvesta"
   },
   {
+    "id": "whois.search.message.title",
+    "defaultMessage": "Otsingule vastavaid domeene ei leitud"
+  },
+  {
     "id": "whois.domain",
     "defaultMessage": "Domeen"
   },
@@ -42,10 +46,6 @@
   {
     "id": "pagination.per_page",
     "defaultMessage": "Tulemusi lehel"
-  },
-  {
-    "id": "whois.search.message.title",
-    "defaultMessage": "Otsingule vastavaid domeene ei leitud"
   },
   {
     "id": "whois.none.message.title",

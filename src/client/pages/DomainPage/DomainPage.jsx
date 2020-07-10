@@ -30,19 +30,24 @@ class DomainPage extends Component {
   };
   
   componentDidMount() {
-    const { user, initialDomains, initialContacts, match } = this.props;
+    const { fetchContacts, initialDomains, initialContacts, match, user } = this.props;
     const domain = initialDomains.data.find(item => item.name.indexOf(match.params.id) > -1);
     if (domain) {
-      const statuses = domain.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
-      this.setState(prevState => ({
-        ...prevState,
-        isLocked: domain.locked_by_registrant_at && ['serverUpdateProhibited', 'serverDeleteProhibited', 'serverTransferProhibited'].every(r => statuses.includes(r)),
-        isLoading: false,
-        isLockable: ['pendingDelete', 'serverHold'].every(status => statuses.indexOf(status) < 0),
-        domain,
-        contacts: Helpers.getDomainContacts(domain, initialContacts.data),
-        userContacts: Helpers.getUserContacts(user, domain, initialContacts.data)
-      }));
+      (async () => {
+        const { admin_contacts, registrant, tech_contacts } = domain;
+        const res = await Promise.all([...new Set([...admin_contacts, registrant, ...tech_contacts].map(({ id }) => id))].map(id => fetchContacts(id)));
+        const contacts = res[0].ids.map(id => res[0].data[id]);
+        const statuses = domain.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
+        this.setState(prevState => ({
+          ...prevState,
+          isLocked: domain.locked_by_registrant_at && ['serverUpdateProhibited', 'serverDeleteProhibited', 'serverTransferProhibited'].every(r => statuses.includes(r)),
+          isLoading: false,
+          isLockable: ['pendingDelete', 'serverHold'].every(status => statuses.indexOf(status) < 0),
+          domain,
+          contacts: Helpers.getDomainContacts(domain, contacts),
+          userContacts: Helpers.getUserContacts(user, domain, contacts)
+        }));
+      })();
     }
     this.setState(prevState => ({
       ...prevState,
@@ -50,7 +55,7 @@ class DomainPage extends Component {
       errors: initialContacts.errors
     }));
   }
-  
+
   handleWhoIsChange = (data) => {
     this.setState(prevState => ({
       ...prevState,

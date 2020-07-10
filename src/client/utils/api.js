@@ -23,7 +23,7 @@ const apiRequest = (url, method = 'GET', body) => {
         return true;
       }
       return status >= 200 && status < 300;
-    }
+    },
   };
   return axios(options);
 };

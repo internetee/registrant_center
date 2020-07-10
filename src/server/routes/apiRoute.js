@@ -11,6 +11,7 @@ const isSessionValid = req => {
 };
 
 
+
 const apiRequest = (url, token, method = 'GET', body) => {
 
   if (!token) {
@@ -34,7 +35,8 @@ const apiRequest = (url, token, method = 'GET', body) => {
         return true;
       }
       return status >= 200 && status < 300;
-    }
+    },
+    timeout: 10000,
   };
 
   return axios(options);
@@ -52,7 +54,8 @@ export default {
           token: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-          }
+          },
+          timeout: 10000,
         });
         return res.status(200).json(response.data);
       }
@@ -64,7 +67,8 @@ export default {
           token: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-          }
+          },
+          timeout: 10000,
         });
         const response = await Promise.all(texts.data.map(async text => {
           const textRes = await axios({
@@ -109,7 +113,8 @@ export default {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          data: userData
+          data: userData,
+          timeout: 10000,
         });
         req.session.token = response.data;
       }
@@ -148,6 +153,7 @@ export default {
       } else {
         response = await apiRequest(`${API_HOST}/api/v1/registrant/domains?offset=${offset}`, token);
       }
+      console.log(response);
       res.status(response.status).json(response.data);
     } else {
       res.status(498).json({});

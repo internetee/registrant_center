@@ -9,7 +9,7 @@ import {Helmet, DomainList, UserData, MainLayout} from '../../components';
 class HomePage extends PureComponent {
   
   render() {
-    const { ui, domains, contacts, user } = this.props;
+    const { ui, domains, user } = this.props;
     const { lang } = ui;
     moment.locale(lang);
     return (
@@ -78,7 +78,7 @@ class HomePage extends PureComponent {
             </Grid>
           </div>
           <DomainList domains={domains} lang={lang} />
-          <UserData contacts={contacts} domains={domains} lang={lang} />
+          <UserData lang={lang} />
         </div>
       </MainLayout>
     );
@@ -88,7 +88,6 @@ class HomePage extends PureComponent {
 const mapStateToProps = (state) => {
   return {
     domains: state.domains.data,
-    contacts: state.contacts.data,
   };
 };
 

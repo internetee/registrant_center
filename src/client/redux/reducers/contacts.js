@@ -32,7 +32,8 @@ const receiveContact = (data, state) => {
   return {
     type: FETCH_CONTACT_SUCCESS,
     status: 200,
-    data: state.contacts.data.map(item => (item.id === data.id) ? {...item, ...data} : item),
+    data: { ...state.contacts.data, [data.id]: data },
+    ids: state.contacts.ids.includes(data.id) ? state.contacts.ids : [...state.contacts.ids, data.id],
     isLoading: false,
     isInvalidated: false,
   };
@@ -41,7 +42,11 @@ const receiveContact = (data, state) => {
 const receiveContacts = (data) => {
   return {
     type: FETCH_CONTACTS_SUCCESS,
-    data,
+    data: data.reduce((acc, item) => ({
+      ...acc,
+      [item.id]: item
+    }), {}),
+    ids: data.map(item => item.id),
     isLoading: false,
     isInvalidated: false,
     status: 200,
@@ -119,7 +124,8 @@ const setContacts = (uuid, form) => (dispatch, getState) => {
 const initialState = {
   isLoading: false,
   isInvalidated: false,
-  data: [],
+  data: {},
+  ids: [],
   status: null,
   fetchedAt: null
 };
@@ -149,6 +155,7 @@ export default function(state = initialState, action) {
     return {
       ...state,
       data: action.data,
+      ids: action.ids,
       errors: false,
       status: action.status,
       isLoading: action.isLoading,
@@ -175,6 +182,7 @@ export default function(state = initialState, action) {
     return {
       ...state,
       data: action.data,
+      ids: action.ids,
       errors: false,
       status: action.status,
       isLoading: action.isLoading,

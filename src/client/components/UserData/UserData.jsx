@@ -1,12 +1,15 @@
+/* eslint-disable camelcase */
 import React, { Component } from 'react';
 import { Button, Grid, Icon, Container } from 'semantic-ui-react';
 import { FormattedMessage} from 'react-intl';
-import { CSVLink } from 'react-csv';
+import { CSVDownload } from 'react-csv';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { connect } from 'react-redux';
 import domainStatuses from '../../utils/domainStatuses.json';
 import staticMessages from '../../utils/staticMessages.json';
 import vfs from '../../utils/vfs_fonts';
+import * as contactsActions from '../../redux/reducers/contacts';
 
 pdfMake.vfs = vfs;
 pdfMake.fonts = {
@@ -18,33 +21,28 @@ pdfMake.fonts = {
   }
 };
 
-export default class UserData extends Component {
+class UserData extends Component {
 
   state = {
-    domains: [],
     perPage: 200,
     activePage: 0,
     isLoadingPDF: false,
-    isLoadingCSV: false
+    isLoadingCSV: false,
+    userCSV: null
   };
   
-  componentDidMount() {
-    const { domains } = this.props;
-    this.setState(prevState => ({
-      ...prevState,
-      domains
-    }));
-  }
-  
-  savePDF = () => {
+  savePDF = async () => {
     this.setState(prevState => (
       {
         ...prevState,
         isLoadingPDF: true
       }
     ));
-    const { lang, contacts } = this.props;
-    const { domains } = this.state;
+    const { domains, fetchContacts, lang } = this.props;
+    const contacts = domains.reduce((acc, { admin_contacts, tech_contacts }) => [
+      ...new Set([...acc, ...[...admin_contacts.map(({ id }) => id), ...tech_contacts.map(({ id }) => id)]])
+    ], []);
+    const res = await Promise.all(contacts.map(id => fetchContacts(id)));
     const labels = staticMessages[lang].domain;
     
     const paginatedDomains = [];
@@ -145,11 +143,9 @@ export default class UserData extends Component {
                 {text: labels.reserved, bold: true}, item.reserved] : [],
             ];
             const domainNameservers = item.nameservers ? item.nameservers.map(server => [server.hostname, server.ipv4.toString(), server.ipv6.toString()]) : [];
-            const registrantContacts = item.registrant.id && (
-              contacts.filter(contact => contact.id === item.registrant.id).map(contact => [{ text: labels.registrant, bold: true }, contact.name, contact.email])
-            );
+            const registrantContacts = item.registrant && [{ text: labels.registrant, bold: true }, item.registrant.name, '-'];
             const techContacts = item.tech_contacts ? item.tech_contacts.map(contact => {
-              const techContact = contacts.find(e => e.id === contact.id);
+              const techContact = res.data[contact.id];
               return [
                 { text: labels.tech, bold: true },
                 contact.name,
@@ -157,7 +153,7 @@ export default class UserData extends Component {
               ];
             }) : ['', '', ''];
             const adminContacts = item.admin_contacts ? item.admin_contacts.map(contact => {
-              const adminContact = contacts.find(e => e.id === contact.id);
+              const adminContact = res.data[contact.id];
               return [
                 { text: labels.admin, bold: true },
                 contact.name,
@@ -269,11 +265,16 @@ export default class UserData extends Component {
     ));
   };
   
-  render() {
-    const { lang, contacts } = this.props;
-    const { domains, isLoadingPDF } = this.state;
+  handleCsvData = async () => {
+    const { domains, fetchContacts, lang } = this.props;
     const labels = staticMessages[lang].domain;
+    this.setState({ isLoadingCSV: true });
+    const contacts = domains.reduce((acc, { admin_contacts, tech_contacts }) => [
+      ...new Set([...acc, ...[...admin_contacts.map(({ id }) => id), ...tech_contacts.map(({ id }) => id)]])
+    ], []);
+    const res = await Promise.all(contacts.map(id => fetchContacts(id)));
     const userCSV = domains.map(item => {
+      const registrant = res.data[item.registrant.id];
       return {
         [labels.name]: item.name ? item.name : '',
         [labels.transfer_code]: item.transfer_code ? item.transfer_code : '',
@@ -289,21 +290,24 @@ export default class UserData extends Component {
         [labels.registrant_verification_token]: item.registrant_verification_token ? item.registrant_verification_token : '',
         [labels.registrant_verification_asked_at]: item.registrant_verification_asked_at ? moment(item.registrant_verification_asked_at).format('DD.MM.Y HH:mm') : '',
         [labels.locked_by_registrant_at]: item.locked_by_registrant_at ? moment(item.locked_by_registrant_at).format('DD.MM.Y HH:mm') : '',
-        [labels.registrant]: item.registrant ? (
-          contacts.filter(a => a.id === item.registrant.id).map(b => `${b.name} ( ${b.email} )`).join('\n')
-        ) : (''),
+        [labels.registrant]: item.registrant ? registrant.name : (''),
         [labels.tech_contacts]: item.tech_contacts ? (
-          item.tech_contacts.map(contact => contacts.filter(a => a.id === contact.id).map(b => `${b.name} ( ${b.email} )`)).join('\n')
-        ) : (''),
+          item.tech_contacts.map(contact => `${res.data[contact.id].name} ( ${res.data[contact.id].email} )`)).join('\n') : (''),
         [labels.admin_contacts]: item.admin_contacts ? (
-          item.admin_contacts.map(contact => contacts.filter(a => a.id === contact.id).map(b => `${b.name} ( ${b.email} )`)).join('\n')
-        ) : (''),
+          item.admin_contacts.map(contact => `${res.data[contact.id].name} ( ${res.data[contact.id].email} )`)).join('\n') : (''),
         [labels.nameservers]: item.nameservers ? item.nameservers.map(server => [server.hostname, server.ipv4.join(', '), server.ipv6.join(', ')]).join('\n') : '',
         [labels.statuses]: item.statuses ? item.statuses.map(status => domainStatuses[status][lang].label).join('\n') : '',
         [labels.reserved]: item.reserved ? item.reserved : '',
       };
     });
-    
+    await this.setState({
+      userCSV,
+      isLoadingCSV: false,
+    });
+  };
+  
+  render() {
+    const { isLoadingCSV, isLoadingPDF, userCSV } = this.state;
     return (
       <div className='user-data'>
         <Container>
@@ -316,7 +320,13 @@ export default class UserData extends Component {
                   tagName='h3'
                 />
                 <Button.Group>
-                  <Button secondary size='large' animated='fade' as={CSVLink} data={userCSV} filename='eis_andmed.csv'>
+                  <Button
+                    secondary
+                    size='large'
+                    animated='fade'
+                    onClick={this.handleCsvData}
+                    loading={isLoadingCSV}
+                  >
                     <Button.Content visible><Icon name='table' />CSV</Button.Content>
                     <Button.Content hidden>
                       <Icon name='download' />
@@ -330,6 +340,9 @@ export default class UserData extends Component {
                     </Button.Content>
                   </Button>
                 </Button.Group>
+                {userCSV && (
+                  <CSVDownload data={userCSV} filename='eis_andmed.csv' />
+                )}
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -338,3 +351,14 @@ export default class UserData extends Component {
     );
   }
 }
+
+
+const mapStateToProps = (state) => {
+  return {
+    domains: state.domains.data,
+  };
+};
+
+export default connect(mapStateToProps, {
+  ...contactsActions,
+})(UserData);

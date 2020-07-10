@@ -13,7 +13,6 @@ import '../../semantic/dist/semantic.min.css';
 import './index.scss';
 import {fetchMenu, getDeviceType} from './redux/reducers/ui';
 import {fetchUserIfNeeded, logoutUser} from './redux/reducers/user';
-import {fetchContacts} from './redux/reducers/contacts';
 import {fetchDomains} from './redux/reducers/domains';
 import App from './App';
 
@@ -62,7 +61,7 @@ export default class Index extends Component {
           fetchUserIfNeeded()
         ).then(() => {
           if (getState().user.status === 200) {
-            return Promise.all([dispatch(fetchContacts()), dispatch(fetchDomains())]);
+            return Promise.resolve(dispatch(fetchDomains()));
           }
           return dispatch(logoutUser());
         }).catch(e =>
