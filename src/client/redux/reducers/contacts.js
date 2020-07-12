@@ -6,91 +6,74 @@ import {
   FETCH_CONTACTS_REQUEST,
   FETCH_CONTACTS_SUCCESS,
   FETCH_CONTACTS_FAILURE,
+  UPDATE_CONTACT_REQUEST,
+  UPDATE_CONTACT_SUCCESS,
+  UPDATE_CONTACT_FAILURE,
   LOGOUT_USER
 } from '../actions';
 
 const request = {
   data: [],
-  offset: 0,
+  offset: 0
 };
 
-const requestContacts = () => {
-  return {
-    type: FETCH_CONTACTS_REQUEST,
-    isLoading: true
-  };
-};
 
-const requestContact = () => {
-  return {
-    type: FETCH_CONTACT_REQUEST,
-    isLoading: true
-  };
-};
+const requestContact = () => ({
+  type: FETCH_CONTACT_REQUEST,
+});
 
-const receiveContact = (data, state) => {
-  return {
-    type: FETCH_CONTACT_SUCCESS,
-    status: 200,
-    data: { ...state.contacts.data, [data.id]: data },
-    ids: state.contacts.ids.includes(data.id) ? state.contacts.ids : [...state.contacts.ids, data.id],
-    isLoading: false,
-    isInvalidated: false,
-  };
-};
+const receiveContact = payload => ({
+  type: FETCH_CONTACT_SUCCESS,
+  payload
+});
 
-const receiveContacts = (data) => {
-  return {
-    type: FETCH_CONTACTS_SUCCESS,
-    data: data.reduce((acc, item) => ({
-      ...acc,
-      [item.id]: item
-    }), {}),
-    ids: data.map(item => item.id),
-    isLoading: false,
-    isInvalidated: false,
-    status: 200,
-  };
-};
+const requestContacts = () => ({
+  type: FETCH_CONTACTS_REQUEST,
+});
 
-const errorContact = (error) => {
-  return {
-    type: FETCH_CONTACT_FAILURE,
-    isInvalidated: true,
-    isLoading: false,
-    status: error.status,
-    errors: error.errors
-  };
-};
+const receiveContacts = payload => ({
+  type: FETCH_CONTACTS_SUCCESS,
+  payload
+});
 
-export const invalidateContacts = (status) => {
-  return {
-    type: FETCH_CONTACTS_FAILURE,
-    status
-  };
-};
+const requestContactUpdate = () => ({
+  type: UPDATE_CONTACT_REQUEST,
+});
 
-export const invalidateContact = (status) => {
-  return {
-    type: FETCH_CONTACT_FAILURE,
-    status
-  };
-};
+const receiveContactUpdate = payload => ({
+  type: UPDATE_CONTACT_SUCCESS,
+  payload
+});
 
-const fetchContacts = (uuid, offset = request.offset) => (dispatch, getState) => {
+const failContactUpdate = payload => ({
+  type: UPDATE_CONTACT_FAILURE,
+  payload
+});
+
+const invalidateContacts = () => ({
+  type: FETCH_CONTACTS_FAILURE,
+});
+
+const invalidateContact = () => ({
+  type: FETCH_CONTACT_FAILURE,
+});
+
+const fetchContacts = (uuid, offset = request.offset) => dispatch => {
   if (uuid) {
     dispatch(requestContact());
-    return api.fetchContacts(uuid)
+    return api
+      .fetchContacts(uuid)
       .then(res => res.data)
       .then(data => {
-        return dispatch(receiveContact(data, getState()));
+        return dispatch(receiveContact(data));
       })
-      .catch(error => {
-        return dispatch(invalidateContact(error.response.status));
+      .catch(() => {
+        return dispatch(invalidateContact());
       });
   }
   dispatch(requestContacts());
-  return api.fetchContacts(null, offset)
+  return api
+    .fetchContacts(null, offset)
     .then(res => res.data)
     .then(data => {
       request.data = request.data.concat(data);
@@ -100,102 +83,129 @@ const fetchContacts = (uuid, offset = request.offset) => (dispatch, getState) =>
       }
       return dispatch(receiveContacts(request.data));
     })
-    .catch(error => {
-      return dispatch(invalidateContacts(error.response.status));
+    .catch(() => {
+      return dispatch(invalidateContacts());
     });
 };
 
-const setContacts = (uuid, form) => (dispatch, getState) => {
-  dispatch(requestContact());
-  return api.setContacts(uuid, form)
+const updateContact = (uuid, form) => dispatch => {
+  dispatch(requestContactUpdate());
+  return api
+    .updateContact(uuid, form)
     .then(res => {
       if (res.data.errors) {
-        return dispatch(errorContact({
-          ...res.data,
-          status: res.status
-        }));
+        return dispatch(
+          failContactUpdate({
+            ...res.data,
+            code: res.status,
+            type: 'whois',
+          })
+        );
       }
-      return dispatch(receiveContact(res.data, getState()));
-    }).catch(error => {
-      return dispatch(invalidateContact(error.response.status));
+      return dispatch(receiveContactUpdate(res.data));
+    })
+    .catch(error => {
+      return dispatch(failContactUpdate({
+        code: error.response.status,
+        type: 'whois',
+      }));
     });
 };
 
 const initialState = {
   isLoading: false,
-  isInvalidated: false,
   data: {},
   ids: [],
-  status: null,
-  fetchedAt: null
+  fetchedAt: null,
+  message: null,
 };
 
-export default function(state = initialState, action) {
-  switch (action.type) {
-  
+export default function(state = initialState, { payload, type }) {
+  switch (type) {
   case LOGOUT_USER:
     return initialState;
-  
+
   case FETCH_CONTACTS_FAILURE:
     return {
       ...state,
-      status: action.status,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
-      errors: action.errors
+      isLoading: false,
     };
-  
+
   case FETCH_CONTACTS_REQUEST:
     return {
       ...state,
-      isLoading: action.isLoading
+      isLoading: true
     };
-  
+
   case FETCH_CONTACTS_SUCCESS:
     return {
       ...state,
-      data: action.data,
-      ids: action.ids,
-      errors: false,
-      status: action.status,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
-      fetchedAt: Date.now(),
+      data: payload.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.id]: item
+        }),
+        {}
+      ),
+      ids: payload.map(item => item.id),
+      message: null,
+      isLoading: false,
+      fetchedAt: Date.now()
     };
-  
+
   case FETCH_CONTACT_FAILURE:
     return {
       ...state,
-      status: action.status,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
-      errors: action.errors
+      isLoading: false,
+      message: payload
     };
 
   case FETCH_CONTACT_REQUEST:
     return {
       ...state,
-      isLoading: action.isLoading
+      isLoading: true
     };
 
   case FETCH_CONTACT_SUCCESS:
     return {
       ...state,
-      data: action.data,
-      ids: action.ids,
-      errors: false,
-      status: action.status,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
+      data: { ...state.data, [payload.id]: payload },
+      ids: state.ids.includes(payload.id)
+        ? state.ids
+        : [...state.ids, payload.id],
+      message: null,
+      isLoading: false,
+      fetchedAt: Date.now()
+    };
+
+  case UPDATE_CONTACT_REQUEST:
+    return {
+      ...state,
+      isLoading: true
+    };
+
+  case UPDATE_CONTACT_SUCCESS:
+    return {
+      ...state,
+      data: { ...state.data, [payload.id]: payload },
+      message: {
+        type: 'whois',
+        code: 200
+      },
+      isLoading: false,
+      fetchedAt: Date.now()
+    };
+
+  case UPDATE_CONTACT_FAILURE:
+    return {
+      ...state,
+      isLoading: false,
+      message: payload
     };
 
   default:
     return state;
   }
-};
+}
 
-export {
-  initialState,
-  fetchContacts,
-  setContacts
-};
+export { initialState, fetchContacts, updateContact };

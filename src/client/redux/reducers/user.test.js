@@ -15,22 +15,22 @@ const initialState = {
 
 describe('User action creators', () => {
   let store;
-  
+
   beforeEach(() => {
     store = mockStore({
       user: initialState
     });
   });
-  
+
   afterEach(() => {
     nock.cleanAll();
   });
-  
+
   it('dipatches the right actions to fetch user data', () => {
     nock(`${apiHost}`)
       .get('/api/user')
       .reply(200, mockUser.data);
-  
+
     const expectedActions = [
       {
         type: 'FETCH_USER_REQUEST',
@@ -41,21 +41,16 @@ describe('User action creators', () => {
         status: 200,
         data: mockUser.data,
         isLoading: false,
-        isInvalidated: false,
-      },
+        isInvalidated: false
+      }
     ];
-    
-    return (
-      store
-        .dispatch(fetchUser())
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        })
-    );
+
+    return store.dispatch(fetchUser()).then(() => {
+      expect(store.getActions()).toEqual(expectedActions);
+    });
   });
-  
+
   it('dipatches the right actions on fetchUser request fail', () => {
-    
     nock(`${apiHost}`)
       .get('/api/user')
       .reply(404);
@@ -72,46 +67,37 @@ describe('User action creators', () => {
         isInvalidated: true
       }
     ];
-    
-    return (
-      store
-        .dispatch(fetchUser())
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        })
-    );
-  });
-  
-  it('dipatches the right actions to log out user', () => {
 
+    return store.dispatch(fetchUser()).then(() => {
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  it('dipatches the right actions to log out user', () => {
     nock(`${apiHost}`)
       .post('/api/destroy')
       .reply(200);
 
-    const expectedActions = [{
-      'type': 'LOGOUT_USER',
-      'status': 200
-    },
-    {
-      'payload': {
-        'args': ['/login'],
-        'method': 'push'
+    const expectedActions = [
+      {
+        type: 'LOGOUT_USER',
+        status: 200
       },
-      'type': '@@router/CALL_HISTORY_METHOD'
-    }];
-    return (
-      store
-        .dispatch(logoutUser())
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        })
-    );
+      {
+        payload: {
+          args: ['/login'],
+          method: 'push'
+        },
+        type: '@@router/CALL_HISTORY_METHOD'
+      }
+    ];
+    return store.dispatch(logoutUser()).then(() => {
+      expect(store.getActions()).toEqual(expectedActions);
+    });
   });
-  
 });
 
 describe('User reducers', () => {
-  
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toEqual({
       isLoading: false,
@@ -121,7 +107,7 @@ describe('User reducers', () => {
       fetchedAt: null
     });
   });
-  
+
   it('should handle FETCH_USER_REQUEST', () => {
     expect(
       reducer([], {
@@ -132,7 +118,7 @@ describe('User reducers', () => {
       isLoading: true
     });
   });
-  
+
   it('should handle FETCH_USER_SUCCESS', () => {
     Date.now = jest.fn(() => 1482363367071);
     expect(
@@ -141,7 +127,7 @@ describe('User reducers', () => {
         status: 200,
         data: mockUser.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       })
     ).toEqual({
       status: 200,
@@ -151,7 +137,7 @@ describe('User reducers', () => {
       fetchedAt: Date.now()
     });
   });
-  
+
   it('should handle LOGOUT_USER', () => {
     expect(
       reducer([], {
@@ -164,5 +150,4 @@ describe('User reducers', () => {
       status: 200
     });
   });
-  
 });

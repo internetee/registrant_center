@@ -1,13 +1,13 @@
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {CookiesProvider} from 'react-cookie';
-import {ConnectedRouter} from 'connected-react-router';
+import { CookiesProvider } from 'react-cookie';
+import { ConnectedRouter } from 'connected-react-router';
 import React from 'react';
 import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
-import {IntlProvider, addLocaleData} from 'react-intl';
+import { IntlProvider, addLocaleData } from 'react-intl';
 import { createMemoryHistory } from 'history';
 import DomainPage from './DomainPage';
 import messages from '../../utils/messages.json';
@@ -22,12 +22,12 @@ const initialState = {
   ui: {
     uiElemSize: 'big',
     mainMenu: {
-      isOpen: false,
+      isOpen: false
     },
     lang: 'et',
     menus: {
       main: mockMainMenu,
-      footer: mockFooterMenu,
+      footer: mockFooterMenu
     }
   },
   user: mockUser,
@@ -57,36 +57,41 @@ describe('pages/Domain', () => {
       id: 'domain.ee'
     }
   };
-  
+
   const props = {
     ui: {
       lang: 'et',
       uiElemSize: 'big',
       menus: {
         main: mockMainMenu,
-        footer: mockFooterMenu,
+        footer: mockFooterMenu
       }
     },
     user: mockUser.data,
     initialDomains: mockDomains,
     initialContacts: mockContacts,
-    setContacts: mockAction,
+    updateContact: mockAction,
     match: mockMatch,
     history,
     lockDomain: mockLock,
     unlockDomain: mockUnlock
   };
-  
+
   beforeEach(() => {
     store = mockStore(initialState);
   });
-  
+
   it('should render content', () => {
     const page = mount(
       <Provider store={store}>
         <CookiesProvider>
           <ConnectedRouter history={history}>
-            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={messages[lang]}>
+            <IntlProvider
+              key={lang}
+              defaultLocale="et"
+              locale={lang}
+              messages={messages[lang]}
+            >
               <DomainPage {...props} />
             </IntlProvider>
           </ConnectedRouter>
@@ -95,5 +100,4 @@ describe('pages/Domain', () => {
     );
     expect(page).toMatchSnapshot();
   });
-
 });

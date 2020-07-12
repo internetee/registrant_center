@@ -9,8 +9,8 @@ const agent = new https.Agent({
 const { HOST } = config;
 const apiRequest = (url, method = 'GET', body) => {
   const headers = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
   };
   const options = {
     method,
@@ -18,27 +18,27 @@ const apiRequest = (url, method = 'GET', body) => {
     headers,
     data: body,
     httpsAgent: agent,
-    validateStatus: (status) => {
+    validateStatus: status => {
       if (body) {
         return true;
       }
       return status >= 200 && status < 300;
-    },
+    }
   };
   return axios(options);
 };
 
 export default {
-  fetchMenu: (type) => {
+  fetchMenu: type => {
     return axios({
       method: 'GET',
       url: `${HOST}/api/menu/${type}`,
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
       },
       httpsAgent: agent,
-      credentials: 'include',
+      credentials: 'include'
     });
   },
   fetchUser: () => {
@@ -46,11 +46,11 @@ export default {
       method: 'GET',
       url: `${HOST}/api/user`,
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
       },
       httpsAgent: agent,
-      credentials: 'include',
+      credentials: 'include'
     });
   },
 
@@ -59,11 +59,11 @@ export default {
       method: 'POST',
       url: `${HOST}/api/destroy`,
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
       },
       httpsAgent: agent,
-      credentials: 'include',
+      credentials: 'include'
     });
   },
 
@@ -73,24 +73,23 @@ export default {
     }
     return apiRequest(`/api/domains?offset=${offset}`);
   },
-  
+
   fetchContacts: (uuid = false, offset) => {
     if (uuid) {
       return apiRequest(`/api/contacts/${uuid}`);
     }
     return apiRequest(`/api/contacts?offset=${offset}`);
   },
-  
-  setContacts: (uuid, form) => {
+
+  updateContact: (uuid, form) => {
     return apiRequest(`/api/contacts/${uuid}`, 'PATCH', JSON.stringify(form));
   },
-  
-  setDomainRegistryLock: (uuid) => {
+
+  setDomainRegistryLock: uuid => {
     return apiRequest(`/api/domains/${uuid}/registry_lock`, 'POST');
   },
-  
-  deleteDomainRegistryLock: (uuid) => {
-    return apiRequest(`/api/domains/${uuid}/registry_lock`, 'DELETE');
-  },
 
+  deleteDomainRegistryLock: uuid => {
+    return apiRequest(`/api/domains/${uuid}/registry_lock`, 'DELETE');
+  }
 };

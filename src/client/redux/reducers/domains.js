@@ -1,94 +1,129 @@
+/* eslint-disable camelcase */
 import api from '../../utils/api';
-import {FETCH_DOMAINS_REQUEST, FETCH_DOMAINS_SUCCESS, FETCH_DOMAINS_FAILURE, LOCK_DOMAIN_REQUEST, LOCK_DOMAIN_SUCCESS, UNLOCK_DOMAIN_REQUEST, UNLOCK_DOMAIN_SUCCESS, LOGOUT_USER} from '../actions';
+import {
+  FETCH_DOMAIN_REQUEST,
+  FETCH_DOMAIN_SUCCESS,
+  FETCH_DOMAIN_FAILURE,
+  FETCH_DOMAINS_REQUEST,
+  FETCH_DOMAINS_SUCCESS,
+  FETCH_DOMAINS_FAILURE,
+  LOCK_DOMAIN_REQUEST,
+  LOCK_DOMAIN_SUCCESS,
+  LOCK_DOMAIN_FAILURE,
+  UNLOCK_DOMAIN_REQUEST,
+  UNLOCK_DOMAIN_SUCCESS,
+  UNLOCK_DOMAIN_FAILURE,
+  LOGOUT_USER
+} from '../actions';
+import { fetchContacts } from './contacts';
+import domainStatuses from '../../utils/domainStatuses.json';
 
 const request = {
   data: [],
-  offset: 0,
+  offset: 0
 };
 
-const requestDomains = () => {
+const parseDomain = (domain) => {
+  const { admin_contacts, registrant, tech_contacts } = domain;
+  const statuses = domain.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
+  const contacts = [
+    ...admin_contacts && admin_contacts.map(item => ({ ...item, roles: ['admin'] })),
+    ...tech_contacts && tech_contacts.map(item => ({ ...item, roles: ['tech'] })),
+    ...registrant && [{
+      ...registrant,
+      roles: ['registrant']
+    }]
+  ].flat();
   return {
-    type: FETCH_DOMAINS_REQUEST,
-    isLoading: true
+    ...domain,
+    isLocked: domain.locked_by_registrant_at && ['serverUpdateProhibited', 'serverDeleteProhibited', 'serverTransferProhibited'].every(r => statuses.includes(r)),
+    contacts: contacts.reduce((acc, { id, roles, ...rest }) => ({
+      ...acc,
+      [id]: {
+        ...rest,
+        id,
+        roles: acc[id] ? [...acc[id].roles, ...roles] : roles
+      }
+    }), {})
   };
 };
 
-const receiveDomain = (data, state) => {
-  return {
-    type: FETCH_DOMAINS_SUCCESS,
-    status: 200,
-    data: state.domains.data.map(item => (item.id === data.id) ? data : item),
-    isLoading: false,
-    isInvalidated: false,
-  };
+const requestDomain = () => ({
+  type: FETCH_DOMAIN_REQUEST,
+});
+
+const receiveDomain = payload => ({
+  type: FETCH_DOMAIN_SUCCESS,
+  payload
+});
+
+const failDomain = () => ({
+  type: FETCH_DOMAIN_FAILURE,
+});
+
+const requestDomains = () => ({
+  type: FETCH_DOMAINS_REQUEST,
+});
+
+const receiveDomains = payload => ({
+  type: FETCH_DOMAINS_SUCCESS,
+  payload
+});
+
+const failDomains = () => ({
+  type: FETCH_DOMAINS_FAILURE,
+});
+
+const requestDomainLock = () => ({
+  type: LOCK_DOMAIN_REQUEST,
+});
+
+const receiveDomainLock = payload => ({
+  type: LOCK_DOMAIN_SUCCESS,
+  payload
+});
+
+const failDomainLock = payload => ({
+  type: LOCK_DOMAIN_FAILURE,
+  payload
+});
+
+const requestDomainUnlock = () => ({
+  type: UNLOCK_DOMAIN_REQUEST,
+  isLoading: true
+});
+
+const receiveDomainUnlock = payload => ({
+  type: UNLOCK_DOMAIN_SUCCESS,
+  payload
+});
+
+const failDomainUnlock = payload => ({
+  type: UNLOCK_DOMAIN_FAILURE,
+  payload
+});
+
+const fetchDomain = uuid => dispatch => {
+  dispatch(requestDomain());
+  return api
+    .fetchDomains(uuid)
+    .then(res => res.data)
+    .then(async data => {
+      const domain = parseDomain(data);
+      await Promise.all(Object.keys(domain.contacts).map(id => dispatch(fetchContacts(id))));
+      return dispatch(receiveDomain(domain));
+    })
+    .catch(() => {
+      return dispatch(failDomain());
+    });
 };
 
-const receiveAllDomains = (data) => {
-  return {
-    type: FETCH_DOMAINS_SUCCESS,
-    status: 200,
-    data,
-    isLoading: false,
-    isInvalidated: false,
-  };
-};
-
-const requestDomainLock = () => {
-  return {
-    type: LOCK_DOMAIN_REQUEST,
-    isLoading: true
-  };
-};
-
-const receiveDomainLock = (data, state) => {
-  return {
-    type: LOCK_DOMAIN_SUCCESS,
-    status: 200,
-    isLoading: false,
-    isInvalidated: false,
-    data: state.domains.data.map(item => (item.id === data.id) ? data : item)
-  };
-};
-
-const requestDomainUnlock = () => {
-  return {
-    type: UNLOCK_DOMAIN_REQUEST,
-    isLoading: true
-  };
-};
-
-const receiveDomainUnlock = (data, state) => {
-  return {
-    type: UNLOCK_DOMAIN_SUCCESS,
-    status: 200,
-    isLoading: false,
-    isInvalidated: false,
-    data: state.domains.data.map(item => (item.id === data.id) ? data : item)
-  };
-};
-
-const invalidateRequest = (status) => {
-  return {
-    type: FETCH_DOMAINS_FAILURE,
-    status,
-    isLoading: false,
-    isInvalidated: true
-  };
-};
-
-const fetchDomains = (uuid, offset = request.offset) => (dispatch, getState) => {
+const fetchDomains = (offset = request.offset) => (
+  dispatch,
+) => {
   dispatch(requestDomains());
-  if (uuid) {
-    return api.fetchDomains(uuid)
-      .then(res => res.data)
-      .then(data => {
-        return dispatch(receiveDomain(data, getState()));
-      })
-      .catch(error => {
-        return dispatch(invalidateRequest(error.response.status));
-      });
-  }
-  return api.fetchDomains(null, offset)
+  return api
+    .fetchDomains(null, offset)
     .then(res => res.data)
     .then(data => {
       request.data = request.data.concat(data);
@@ -96,112 +131,165 @@ const fetchDomains = (uuid, offset = request.offset) => (dispatch, getState) => 
         request.offset += 200;
         return dispatch(fetchDomains(null, request.offset));
       }
-      return dispatch(receiveAllDomains(request.data));
+      return dispatch(receiveDomains(request.data));
     })
-    .catch(error => {
-      dispatch(invalidateRequest(error.response.status));
+    .catch(() => {
+      dispatch(failDomains());
     });
 };
 
-const lockDomain = (uuid) => (dispatch, getState) => {
+const lockDomain = uuid => dispatch => {
   dispatch(requestDomainLock());
-  return api.setDomainRegistryLock(uuid)
+  return api
+    .setDomainRegistryLock(uuid)
     .then(res => res.data)
     .then(data => {
-      return dispatch(receiveDomainLock(data, getState()));
+      return dispatch(receiveDomainLock(data));
     })
     .catch(error => {
-      return dispatch(invalidateRequest(error.response.status));
+      return dispatch(failDomainLock({
+        code: error.response.status
+      }));
     });
 };
 
-const unlockDomain = (uuid) => (dispatch, getState) => {
+const unlockDomain = uuid => dispatch => {
   dispatch(requestDomainUnlock());
-  return api.deleteDomainRegistryLock(uuid)
+  return api
+    .deleteDomainRegistryLock(uuid)
     .then(res => res.data)
     .then(data => {
-      return dispatch(receiveDomainUnlock(data, getState()));
+      return dispatch(receiveDomainUnlock(data));
     })
     .catch(error => {
-      return dispatch(invalidateRequest(error.response.status));
+      return dispatch(failDomainUnlock({
+        code: error.response.status
+      }));
     });
 };
 
 const initialState = {
   isLoading: false,
-  isInvalidated: false,
-  data: [],
-  status: null,
-  fetchedAt: null,
+  data: {},
+  ids: [],
+  message: null,
 };
 
-export default function(state = initialState, action) {
-  switch (action.type) {
+export default function(state = initialState, { payload, type }) {
+  switch (type) {
   case LOGOUT_USER:
     return initialState;
-    
-  case FETCH_DOMAINS_FAILURE:
+
+  case FETCH_DOMAIN_REQUEST:
     return {
       ...state,
-      status: action.status,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated
+      isLoading: true
     };
-    
+
+  case FETCH_DOMAIN_SUCCESS:
+    return {
+      ...state,
+      data: { ...state.data, [payload.name]: payload },
+      ids: state.ids.includes(payload.name)
+        ? state.ids
+        : [...state.ids, payload.name],
+      isLoading: false,
+    };
+
+  case FETCH_DOMAIN_FAILURE:
+    return {
+      ...state,
+      isLoading: false,
+    };
+
   case FETCH_DOMAINS_REQUEST:
     return {
       ...state,
-      isLoading: action.isLoading
+      isLoading: true
     };
-  
+
   case FETCH_DOMAINS_SUCCESS:
     return {
       ...state,
-      data: action.data,
-      status: action.status,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
-      fetchedAt: Date.now()
+      data: payload.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.name]: parseDomain(item)
+        }),
+        {}
+      ),
+      ids: payload.map(item => item.name),
+      isLoading: false,
     };
-  
+
+  case FETCH_DOMAINS_FAILURE:
+    return {
+      ...state,
+      isLoading: false,
+    };
+
   case LOCK_DOMAIN_REQUEST:
     return {
       ...state,
-      isLoading: action.isLoading
+      isLoading: true
     };
-  
+
   case LOCK_DOMAIN_SUCCESS:
     return {
       ...state,
-      status: action.status,
-      data: action.data,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
+      data: {
+        ...state.data,
+        [payload.name]: parseDomain(payload)
+      },
+      isLoading: false,
+      message: {
+        code: 200,
+        type: 'domain_lock'
+      }
     };
-  
+
+  case LOCK_DOMAIN_FAILURE:
+    return {
+      ...state,
+      isLoading: false,
+      message: {
+        ...payload,
+        type: 'domain_lock'
+      }
+    };
+
   case UNLOCK_DOMAIN_REQUEST:
     return {
       ...state,
-      isLoading: action.isLoading
+      isLoading: true
     };
-  
+
   case UNLOCK_DOMAIN_SUCCESS:
     return {
       ...state,
-      status: action.status,
-      data: action.data,
-      isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
+      data: {
+        ...state.data,
+        [payload.id]: parseDomain(payload)
+      },
+      message: {
+        code: 200,
+        type: 'domain_unlock'
+      }
     };
-  
+
+  case UNLOCK_DOMAIN_FAILURE:
+    return {
+      ...state,
+      isLoading: false,
+      message: {
+        ...payload,
+        type: 'domain_unlock'
+      }
+    };
+
   default:
     return state;
   }
-};
+}
 
-export {
-  initialState,
-  fetchDomains,
-  lockDomain,
-  unlockDomain
-};
+export { initialState, fetchDomain, fetchDomains, lockDomain, unlockDomain };

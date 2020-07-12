@@ -28,8 +28,21 @@ const privateKey = fs.readFileSync('./server.key', 'utf8');
 const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
-const { HOST, PORT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL,
-  TOKEN_PATH, AUTH_PATH, ISSUER_URL, JWKS_PATH, DB_NAME, DB_USER, DB_PASS, NODE_ENV } = process.env;
+const {
+  HOST,
+  PORT,
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URL,
+  TOKEN_PATH,
+  AUTH_PATH,
+  ISSUER_URL,
+  JWKS_PATH,
+  DB_NAME,
+  DB_USER,
+  DB_PASS,
+  NODE_ENV
+} = process.env;
 const logIncoming = process.env.LOG_INCOMING;
 
 const app = express();
@@ -49,9 +62,13 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // logging
-if(logIncoming){
+if (logIncoming) {
   const incomingLog = getLog('INCOMING');
-  app.use(morgan('short', { stream: { write: message => incomingLog.info(message.trim()) }}));
+  app.use(
+    morgan('short', {
+      stream: { write: message => incomingLog.info(message.trim()) }
+    })
+  );
 }
 
 // compression
@@ -67,7 +84,12 @@ app.use('/bundles', express.static(path.join(__dirname, '../../dist/bundles')));
 const MongoStore = connectMongo(session);
 mongoose.Promise = global.Promise;
 
-mongoose.connect(`mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASS)}@localhost:27017/${encodeURIComponent(DB_NAME)}`, { useNewUrlParser: true });
+mongoose.connect(
+  `mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(
+    DB_PASS
+  )}@localhost:27017/${encodeURIComponent(DB_NAME)}`,
+  { useNewUrlParser: true }
+);
 
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
@@ -76,7 +98,7 @@ const sessionMiddleware = session({
   store: new MongoStore({ mongooseConnection: mongoose.connection }),
   cookie: {
     maxAge: 7200000
-  },
+  }
 });
 
 app.use(sessionMiddleware);
@@ -95,35 +117,37 @@ let publicKey = '';
     const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
     console.log('Received public key from TARA'); // eslint-disable-line no-console
     publicKey = data.keys[0]; // eslint-disable-line prefer-destructuring
-  } catch(e) {
+  } catch (e) {
     console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
   }
 })();
 
 // grant auth
-app.use(grant({
-  'defaults': {
-    'protocol': 'https',
-    'host': HOST,
-    'state': true,
-    'callback': '/auth/callback',
-    'transport': 'querystring'
-  },
-  'openid': {
-    'authorize_url': ISSUER_URL + AUTH_PATH,
-    'access_url': ISSUER_URL + TOKEN_PATH,
-    'oauth': 2,
-    'key': CLIENT_ID,
-    'secret': CLIENT_SECRET,
-    'scope': 'openid',
-    'redirect_uri': `${HOST}${REDIRECT_URL}`,
-    'response_type': 'code',
-    'callback': REDIRECT_URL,
-    'custom_params': {
-      'ui_locales': LOCALE,
+app.use(
+  grant({
+    defaults: {
+      protocol: 'https',
+      host: HOST,
+      state: true,
+      callback: '/auth/callback',
+      transport: 'querystring'
+    },
+    openid: {
+      authorize_url: ISSUER_URL + AUTH_PATH,
+      access_url: ISSUER_URL + TOKEN_PATH,
+      oauth: 2,
+      key: CLIENT_ID,
+      secret: CLIENT_SECRET,
+      scope: 'openid',
+      redirect_uri: `${HOST}${REDIRECT_URL}`,
+      response_type: 'code',
+      callback: REDIRECT_URL,
+      custom_params: {
+        ui_locales: LOCALE
+      }
     }
-  }
-}));
+  })
+);
 
 app.use(helmet());
 
@@ -131,6 +155,7 @@ app.use(helmet());
 app.get('/api/menu/:type', API.getMenu);
 app.get('/api/user', API.getUser);
 app.post('/api/destroy', API.destroyUser);
+app.all('/api/*', API.checkAuth);
 app.get('/api/domains', API.getDomains);
 app.get('/api/domains/:uuid', API.getDomain);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
@@ -140,21 +165,29 @@ app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
 
 // all page rendering
-app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
+app.get(REDIRECT_URL, (req, res) =>
+  callbackPage(req, res, jwkToPem(publicKey).trim())
+);
 app.get('*', renderPageRoute);
 
 const server = https.createServer(credentials, app).listen(PORT, () => {
   banner();
   // eslint-disable-next-line no-console
-  console.log(JSON.stringify({
-    'Host': HOST,
-    'Port': PORT,
-    'Environment': NODE_ENV,
-    'Commands': {
-      'rs': 'Restart server',
-      'ctrl+c': 'Stop server'
-    },
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        Host: HOST,
+        Port: PORT,
+        Environment: NODE_ENV,
+        Commands: {
+          rs: 'Restart server',
+          'ctrl+c': 'Stop server'
+        }
+      },
+      null,
+      2
+    )
+  );
   // 'ready' is a hook used by the e2e (integration) tests (see node-while)
   server.emit('ready');
 });

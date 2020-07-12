@@ -23,27 +23,27 @@ const props = {
     uiElemSize: 'big',
     menus: {
       main: mockMainMenu,
-      footer: mockFooterMenu,
+      footer: mockFooterMenu
     }
   },
   user: mockUser.data,
   initialDomains: mockDomains.data,
   initialContacts: mockContacts,
-  setContacts: mockAction,
+  updateContact: mockAction,
   match: mockMatch,
-  history,
+  history
 };
 
 const initialState = {
   ui: {
     uiElemSize: 'big',
     mainMenu: {
-      isOpen: false,
+      isOpen: false
     },
     lang: 'et',
     menus: {
       main: mockMainMenu,
-      footer: mockFooterMenu,
+      footer: mockFooterMenu
     }
   },
   user: mockUser,
@@ -68,13 +68,18 @@ describe('pages/DomainEdit', () => {
   beforeEach(() => {
     store = mockStore(initialState);
   });
-  
+
   it('should render content', () => {
     const page = mount(
       <Provider store={store}>
         <CookiesProvider>
           <ConnectedRouter history={history}>
-            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={messages[lang]}>
+            <IntlProvider
+              key={lang}
+              defaultLocale="et"
+              locale={lang}
+              messages={messages[lang]}
+            >
               <DomainEditPage {...props} />
             </IntlProvider>
           </ConnectedRouter>
@@ -83,5 +88,4 @@ describe('pages/DomainEdit', () => {
     );
     expect(page).toMatchSnapshot();
   });
-
 });

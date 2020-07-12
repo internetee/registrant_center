@@ -7,7 +7,8 @@ const TOGGLE_MAIN_MENU = 'TOGGLE_MAIN_MENU';
 const CLOSE_MAIN_MENU = 'CLOSE_MAIN_MENU';
 const GET_DEVICE_TYPE = 'GET_DEVICE_TYPE';
 
-const fetchMenuAction = (menu, type) => `FETCH_MENU_${menu.toUpperCase()}_${type.toUpperCase()}`;
+const fetchMenuAction = (menu, type) =>
+  `FETCH_MENU_${menu.toUpperCase()}_${type.toUpperCase()}`;
 
 const getUiElementSize = width => {
   const isMobile = width < 480;
@@ -30,13 +31,13 @@ const setLang = lang => dispatch => {
   });
 };
 
-const requestMenu = (menu) => (dispatch, getState) => {
+const requestMenu = menu => (dispatch, getState) => {
   dispatch({
     type: fetchMenuAction(menu, 'request'),
     status: null,
     isLoading: true,
     isInvalidated: false,
-    menus: getState().ui.menus,
+    menus: getState().ui.menus
   });
 };
 
@@ -46,10 +47,10 @@ const receiveMenu = (menu, data) => (dispatch, getState) => {
     status: 200,
     menus: {
       ...getState().ui.menus,
-      [menu]: data,
+      [menu]: data
     },
     isLoading: false,
-    isInvalidated: false,
+    isInvalidated: false
   });
 };
 
@@ -65,7 +66,8 @@ const invalidateMenuRequest = (menu, status) => {
 
 const fetchMenu = menu => dispatch => {
   dispatch(requestMenu(menu));
-  return api.fetchMenu(menu)
+  return api
+    .fetchMenu(menu)
     .then(res => res.data)
     .then(async data => {
       dispatch(receiveMenu(menu, data));
@@ -93,7 +95,7 @@ const closeMainMenu = () => dispatch => {
   });
 };
 
-const getDeviceType = (width) => (dispatch) => {
+const getDeviceType = width => dispatch => {
   dispatch({
     type: GET_DEVICE_TYPE,
     uiElemSize: getUiElementSize(width)
@@ -110,49 +112,47 @@ const initialState = {
 };
 
 export default function(state = initialState, action) {
-  
   if (action.type && action.type.startsWith('FETCH_MENU')) {
     return {
       ...state,
       status: action.status,
       menus: {
-        ...action.menus,
+        ...action.menus
       },
       isLoading: action.isLoading,
-      isInvalidated: action.isInvalidated,
+      isInvalidated: action.isInvalidated
     };
   }
-  
+
   switch (action.type) {
-  
-  case TOGGLE_MAIN_MENU:
-    return {
-      ...state,
-      mainMenu: action.mainMenu
-    };
-  
-  case CLOSE_MAIN_MENU:
-    return {
-      ...state,
-      mainMenu: action.mainMenu
-    };
-  
-  case GET_DEVICE_TYPE:
-    return {
-      ...state,
-      uiElemSize: action.uiElemSize
-    };
-  
-  case SET_LANG:
-    return {
-      ...state,
-      lang: action.lang
-    };
-    
-  default:
-    return state;
+    case TOGGLE_MAIN_MENU:
+      return {
+        ...state,
+        mainMenu: action.mainMenu
+      };
+
+    case CLOSE_MAIN_MENU:
+      return {
+        ...state,
+        mainMenu: action.mainMenu
+      };
+
+    case GET_DEVICE_TYPE:
+      return {
+        ...state,
+        uiElemSize: action.uiElemSize
+      };
+
+    case SET_LANG:
+      return {
+        ...state,
+        lang: action.lang
+      };
+
+    default:
+      return state;
   }
-};
+}
 
 export {
   initialState,

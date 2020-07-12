@@ -13,13 +13,12 @@ const initialState = {
   isInvalidated: false,
   data: [],
   status: null,
-  fetchedAt: null,
+  fetchedAt: null
 };
 
 describe('Domains action creators', () => {
-  
   let store;
-  
+
   beforeEach(() => {
     store = mockStore({
       user: {
@@ -29,17 +28,16 @@ describe('Domains action creators', () => {
       },
       domains: {
         ...initialState,
-        data: mockDomains.data,
+        data: mockDomains.data
       }
     });
   });
-  
+
   afterEach(() => {
     nock.cleanAll();
   });
-  
+
   it('dipatches the right actions to fetch domains', () => {
-    
     nock(`${apiHost}`)
       .get('/api/domains')
       .query({ offset: 0 })
@@ -55,20 +53,15 @@ describe('Domains action creators', () => {
         status: 200,
         data: mockDomains.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       }
     ];
-    return (
-      store
-        .dispatch(fetchDomains())
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        })
-    );
+    return store.dispatch(fetchDomains()).then(() => {
+      expect(store.getActions()).toEqual(expectedActions);
+    });
   });
 
   it('dipatches the right actions to fetch a single domain by uuid', () => {
-
     nock(`${apiHost}`)
       .get('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')
       .reply(200, mockDomains.data[0]);
@@ -83,21 +76,18 @@ describe('Domains action creators', () => {
         status: 200,
         data: mockDomains.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       }
     ];
 
-    return (
-      store
-        .dispatch(fetchDomains('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e'))
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        })
-    );
+    return store
+      .dispatch(fetchDomains('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e'))
+      .then(() => {
+        expect(store.getActions()).toEqual(expectedActions);
+      });
   });
 
   it('dipatches the right actions to lock a domain', () => {
-
     nock(`${apiHost}`)
       .post('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e/registry_lock')
       .reply(200, mockDomains.data[0]);
@@ -112,25 +102,22 @@ describe('Domains action creators', () => {
         status: 200,
         isLoading: false,
         isInvalidated: false,
-        data: mockDomains.data,
+        data: mockDomains.data
       }
     ];
 
-    return (
-      store
-        .dispatch(lockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e'))
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        })
-    );
+    return store
+      .dispatch(lockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e'))
+      .then(() => {
+        expect(store.getActions()).toEqual(expectedActions);
+      });
   });
 
   it('dipatches the right actions to unlock a domain', () => {
-
     nock(`${apiHost}`)
       .delete('/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e/registry_lock')
       .reply(200, mockDomains.data[0]);
-    
+
     const expectedActions = [
       {
         type: 'UNLOCK_DOMAIN_REQUEST',
@@ -141,27 +128,23 @@ describe('Domains action creators', () => {
         status: 200,
         isLoading: false,
         isInvalidated: false,
-        data: mockDomains.data,
+        data: mockDomains.data
       }
     ];
-    
-    return (
-      store
-        .dispatch(unlockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e'))
-        .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
-        })
-    );
+
+    return store
+      .dispatch(unlockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e'))
+      .then(() => {
+        expect(store.getActions()).toEqual(expectedActions);
+      });
   });
-  
 });
 
 describe('Domains reducers', () => {
-  
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toEqual(initialState);
   });
-  
+
   it('should handle LOGOUT_USER', () => {
     expect(
       reducer([], {
@@ -170,7 +153,7 @@ describe('Domains reducers', () => {
       })
     ).toEqual(initialState);
   });
-  
+
   it('should handle FETCH_DOMAINS_REQUEST', () => {
     expect(
       reducer([], {
@@ -181,7 +164,7 @@ describe('Domains reducers', () => {
       isLoading: true
     });
   });
-  
+
   it('should handle FETCH_DOMAINS_FAILURE', () => {
     expect(
       reducer([], {
@@ -196,18 +179,17 @@ describe('Domains reducers', () => {
       isInvalidated: true
     });
   });
-  
+
   it('should handle FETCH_DOMAINS_SUCCESS', () => {
-    
     Date.now = jest.fn(() => 1482363367071);
-    
+
     expect(
       reducer([], {
         type: 'FETCH_DOMAINS_SUCCESS',
         status: 200,
         data: mockDomains.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       })
     ).toEqual({
       status: 200,
@@ -217,7 +199,7 @@ describe('Domains reducers', () => {
       fetchedAt: Date.now()
     });
   });
-  
+
   it('should handle LOCK_DOMAIN_REQUEST', () => {
     expect(
       reducer([], {
@@ -228,26 +210,24 @@ describe('Domains reducers', () => {
       isLoading: true
     });
   });
-  
+
   it('should handle LOCK_DOMAIN_SUCCESS', () => {
-    
     expect(
       reducer([], {
         type: 'LOCK_DOMAIN_SUCCESS',
         status: 200,
         data: mockDomains.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       })
     ).toEqual({
       status: 200,
       data: mockDomains.data,
       isLoading: false,
-      isInvalidated: false,
+      isInvalidated: false
     });
-    
   });
-  
+
   it('should handle UNLOCK_DOMAIN_REQUEST', () => {
     expect(
       reducer([], {
@@ -258,24 +238,21 @@ describe('Domains reducers', () => {
       isLoading: true
     });
   });
-  
+
   it('should handle UNLOCK_DOMAIN_SUCCESS', () => {
-    
     expect(
       reducer([], {
         type: 'UNLOCK_DOMAIN_SUCCESS',
         status: 200,
         data: mockDomains.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       })
     ).toEqual({
       status: 200,
       data: mockDomains.data,
       isLoading: false,
-      isInvalidated: false,
+      isInvalidated: false
     });
-    
   });
-  
 });

@@ -1,7 +1,7 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import nock from 'nock';
-import reducer, { fetchContacts }  from './contacts';
+import reducer, { fetchContacts } from './contacts';
 
 const initialState = {
   isLoading: false,
@@ -16,7 +16,7 @@ describe('Contacts action creators', () => {
   const mockStore = configureMockStore(middlewares);
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
   let store;
-  
+
   beforeEach(() => {
     store = mockStore({
       user: {
@@ -27,17 +27,17 @@ describe('Contacts action creators', () => {
       contacts: initialState
     });
   });
-  
+
   afterEach(() => {
     nock.cleanAll();
   });
-  
+
   it('dipatches the right actions to fetch contacts', () => {
     nock(`${apiHost}`)
       .get('/api/contacts')
       .query({ offset: 0 })
       .reply(200, mockContacts.data);
-    
+
     const expectedActions = [
       {
         type: 'FETCH_CONTACTS_REQUEST',
@@ -48,22 +48,19 @@ describe('Contacts action creators', () => {
         status: 200,
         data: mockContacts.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       }
     ];
-    return store
-      .dispatch(fetchContacts())
-      .then(() => {
-        expect(store.getActions()).toEqual(expectedActions);
-      });
+    return store.dispatch(fetchContacts()).then(() => {
+      expect(store.getActions()).toEqual(expectedActions);
+    });
   });
-  
+
   it('dipatches the right actions to fetch a single contact', () => {
-    
     nock(`${apiHost}`)
       .get('/api/contacts/cfbfbb76-aed8-497a-91c1-48d82cbc4588')
       .reply(200, mockContacts.data[0]);
-    
+
     const expectedActions = [
       {
         type: 'FETCH_CONTACT_REQUEST',
@@ -74,7 +71,7 @@ describe('Contacts action creators', () => {
         status: 200,
         data: mockContacts.data,
         isLoading: false,
-        isInvalidated: false,
+        isInvalidated: false
       }
     ];
     store = mockStore({
@@ -94,16 +91,13 @@ describe('Contacts action creators', () => {
         expect(store.getActions()).toEqual(expectedActions);
       });
   });
-  
 });
 
-
 describe('Contacts reducers', () => {
-  
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toEqual(initialState);
   });
-  
+
   it('should handle LOGOUT_USER', () => {
     expect(
       reducer([], {
@@ -112,7 +106,7 @@ describe('Contacts reducers', () => {
       })
     ).toEqual(initialState);
   });
-  
+
   it('should handle FETCH_CONTACTS_REQUEST', () => {
     expect(
       reducer([], {
@@ -123,7 +117,7 @@ describe('Contacts reducers', () => {
       isLoading: true
     });
   });
-  
+
   it('should handle FETCH_CONTACTS_FAILURE', () => {
     expect(
       reducer([], {
@@ -140,11 +134,10 @@ describe('Contacts reducers', () => {
       errors: 'TEST'
     });
   });
-  
+
   it('should handle FETCH_CONTACTS_SUCCESS', () => {
-    
     Date.now = jest.fn(() => 1482363367071);
-    
+
     expect(
       reducer([], {
         type: 'FETCH_CONTACTS_SUCCESS',
@@ -152,7 +145,7 @@ describe('Contacts reducers', () => {
         data: mockContacts.data,
         isLoading: false,
         errors: false,
-        isInvalidated: false,
+        isInvalidated: false
       })
     ).toEqual({
       status: 200,
@@ -163,5 +156,4 @@ describe('Contacts reducers', () => {
       fetchedAt: Date.now()
     });
   });
-  
 });

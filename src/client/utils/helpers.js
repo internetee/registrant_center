@@ -1,6 +1,6 @@
 export default {
-  getDomainContacts: (domain, contacts) => {
-    return contacts.reduce((acc, item) => {
+  getDomainContacts: (domain = {}, contacts = {}) => {
+    return Object.values(contacts).reduce((acc, item) => {
       const roles = new Set();
       if (item.id === domain.registrant.id) {
         roles.add('registrant');
@@ -30,59 +30,36 @@ export default {
       return acc;
     }, []);
   },
-  getUserContacts: (user, domain, contacts) => {
-    return contacts.reduce((acc, item) => {
-      if (item.ident.code === user.ident && item.ident.type !== 'org') {
-        const roles = new Set();
-        if (item.id === domain.registrant.id) {
-          roles.add('registrant');
-        }
-        domain.tech_contacts.forEach(contact => {
-          if (contact.id === item.id) {
-            roles.add('tech');
-          }
-        });
-        domain.admin_contacts.forEach(contact => {
-          if (contact.id === item.id) {
-            roles.add('admin');
-          }
-        });
-        if (roles.size > 0) {
-          return {
-            [item.id]: {
-              id: item.id,
-              initialEmail: item.email,
-              initialName: item.email,
-              name: item.name,
-              code: item.code,
-              ident: item.ident,
-              email: item.email,
-              phone: item.phone,
-              roles,
-              disclosed_attributes: new Set(item.disclosed_attributes)
-            }
-          };
-        }
+  getUserContacts: (user = {}, domain = {}, contacts = {}) => {
+    const userContacts = Object.values(contacts).filter(item => item.ident.code === user.ident && item.ident.type !== 'org');
+    console.log(domain);
+    return userContacts.reduce((acc, contact) => ({
+      ...acc,
+      [contact.id]: {
+        ...contact,
+        ...domain.contacts[contact.id],
+        initialName: contact.email,
+        initialEmail: contact.email,
+        disclosed_attributes: new Set(contact.disclosed_attributes)
       }
-      return acc;
-    }, {});
+    }), {});
   },
-  getChangedUserContactsByDomain: (domains, contacts) => {
-    return domains.reduce((acc, item) => {
+  getChangedUserContactsByDomain: (domains = {}, contacts = {}) => {
+    return Object.values(domains).reduce((acc, item) => {
       const changedDomain = {
         name: item.name,
         roles: new Set()
       };
-      if (contacts.find(({ id }) => id === item.registrant.id)) {
+      if (contacts[item.registrant.id]) {
         changedDomain.roles.add('registrant');
       }
-      item.tech_contacts.forEach(contact => {
-        if (contacts.find(({ id }) => id === contact.id)) {
+      item.tech_contacts.forEach(({ id }) => {
+        if (contacts[id]) {
           changedDomain.roles.add('tech');
         }
       });
-      item.admin_contacts.forEach(contact => {
-        if (contacts.find(({ id }) => id === contact.id)) {
+      item.admin_contacts.forEach(({ id }) => {
+        if (contacts[id]) {
           changedDomain.roles.add('admin');
         }
       });

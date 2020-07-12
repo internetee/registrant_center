@@ -87,7 +87,7 @@ class HomePage extends PureComponent {
 
 const mapStateToProps = (state) => {
   return {
-    domains: state.domains.data,
+    domains: Object.values(state.domains.data),
   };
 };
 

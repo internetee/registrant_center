@@ -1,9 +1,13 @@
 import { Button, Confirm, List, Modal } from 'semantic-ui-react';
 import { FormattedMessage } from 'react-intl';
 import React from 'react';
+import { connect } from 'react-redux';
 import staticMessages from '../../utils/staticMessages.json';
+import * as contactsActions from '../../redux/reducers/contacts';
+import Helpers from '../../utils/helpers';
 
-export default function WhoIsConfirmDialog({ changedDomains, onConfirm, onCancel, open, ui }) {
+function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }) {
+  const changedDomains = Helpers.getChangedUserContactsByDomain(domains, contacts);
   const { uiElemSize, lang } = ui;
   const Roles = (item) => {
     return ([...item.roles].map((role, i) => {
@@ -90,3 +94,17 @@ export default function WhoIsConfirmDialog({ changedDomains, onConfirm, onCancel
     />
   );
 }
+
+const mapStateToProps = (state) => {
+  return {
+    domains: state.domains.data,
+    ui: state.ui,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  {
+    ...contactsActions,
+  }
+)(WhoIsConfirmDialog);

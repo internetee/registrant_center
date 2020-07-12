@@ -7,81 +7,87 @@ dotenv.config();
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
 
 const isSessionValid = req => {
-  return !!req.session.token && (new Date(req.session.token.expires_at).getTime() > new Date().getTime());
+  return (
+    !!req.session.token &&
+    new Date(req.session.token.expires_at).getTime() > new Date().getTime()
+  );
 };
 
-
-
-const apiRequest = (url, token, method = 'GET', body) => {
-
-  if (!token) {
-    console.log('Access token not found'); // eslint-disable-line no-console
-  }
-
-  const headers = {
-    'Accept': 'application/json',
+const publicAPI = axios.create({
+  baseURL: PUBLIC_API_HOST,
+  timeout: 10000,
+  method: 'GET',
+  headers: {
+    Accept: 'application/json',
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  };
+    'X-API-TOKEN': PUBLIC_API_KEY
+  }
+});
 
-  const options = {
-    method,
-    url,
-    mode: 'cors',
-    headers,
-    data: body,
-    validateStatus: (status) => {
-      if (body) {
-        return true;
-      }
-      return status >= 200 && status < 300;
+const API = session => {
+  return axios.create({
+    baseURL: API_HOST,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...(session.token && {
+        Authorization: `Bearer ${session.token.access_token}`
+      })
     },
-    timeout: 10000,
-  };
+    mode: 'cors',
+    timeout: 10000
+  });
+};
 
-  return axios(options);
+const handleResponse = async (apiReq, res) => {
+  try {
+    const { data, status } = await apiReq();
+    console.log('__----', status, '-----');
+    return res.status(status).json(data);
+  } catch (e) {
+    if (e.response) {
+      console.log('----', e.response.status, '-----');
+      return res.status(e.response.status).json({});
+    }
+    return res.status(408).json({});
+  }
 };
 
 export default {
+  checkAuth: (req, res, next) => {
+    if (isSessionValid(req)) {
+      return next();
+    }
+    return res.status(401).json({});
+  },
   getMenu: async (req, res) => {
     const { type } = req.params;
     try {
       if (type === 'main') {
-        const response = await axios({
-          method: 'GET',
-          url: `${PUBLIC_API_HOST}/admin/api/pages?q.page.hidden=false&per_page=250&api_token=${PUBLIC_API_KEY}`,
-          mode: 'cors',
-          token: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          timeout: 10000,
-        });
-        return res.status(200).json(response.data);
+        const { data, status } = await publicAPI.get(
+          '/admin/api/pages?q.page.hidden=false&per_page=250'
+        );
+        return res.status(status).json(data);
       }
       if (type === 'footer') {
-        const texts = await axios({
-          method: 'GET',
-          url: `${PUBLIC_API_HOST}/admin/api/texts?api_token=${PUBLIC_API_KEY}&q.content.name.$in=footer-links-1,footer-links-2,footer-links-3&parent_type=page`,
-          mode: 'cors',
-          token: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          timeout: 10000,
-        });
-        const response = await Promise.all(texts.data.map(async text => {
-          const textRes = await axios({
-            method: 'GET',
-            url: `${text.content.url}?api_token=${PUBLIC_API_KEY}`,
-            mode: 'cors',
-            token: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            }
-          });
-          return textRes.data;
-        }));
+        const texts = await publicAPI.get(
+          '/admin/api/texts?q.content.name.$in=footer-links-1,footer-links-2,footer-links-3&parent_type=page'
+        );
+        const response = await Promise.all(
+          texts.data.map(async text => {
+            const textRes = await axios({
+              method: 'GET',
+              url: `${text.content.url}`,
+              mode: 'cors',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': PUBLIC_API_KEY
+              }
+            });
+            return textRes.data;
+          })
+        );
         return res.status(200).json(response);
       }
       return res.status(500).json({
@@ -93,30 +99,24 @@ export default {
       });
     }
   },
-  
-  getUser: async (req, res) => {
-    if (typeof req.session.user === 'undefined') {
+
+  getUser: async ({ session }, res) => {
+    if (typeof session.user === 'undefined') {
       return res.status(400).json({
         error: 'Invalid user'
       });
     }
 
-    const user = await User.findOne({ ident: req.session.user.ident });
-    if(user) {
-      if (!req.session.token) {
-        const userData = req.session.user;
-        const response = await axios({
-          method: 'POST',
-          url: `${API_HOST}/api/v1/registrant/auth/eid`,
-          mode: 'cors',
-          token: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          data: userData,
-          timeout: 10000,
-        });
-        req.session.token = response.data;
+    const user = await User.findOne({ ident: session.user.ident });
+    if (user) {
+      if (!session.token) {
+        const userData = session.user;
+        const response = await API(session).post(
+          '/api/v1/registrant/auth/eid',
+          userData
+        );
+        // eslint-disable-next-line no-param-reassign
+        session.token = response.data;
       }
       return res.status(200).json(user);
     }
@@ -131,84 +131,63 @@ export default {
     });
   },
 
-  getDomain: async (req, res) => {
-    if (isSessionValid(req)) {
-      const { uuid } = req.params;
-      const token = req.session.token.access_token;
-      const { status, data } = await apiRequest(`${API_HOST}/api/v1/registrant/domains/${uuid}`, token);
-      res.status(status).json(data);
-    } else {
-      res.status(498).json({});
-    }
+  getDomain: async ({ params, session }, res) => {
+    const { uuid } = params;
+    const { data, status } = await API(session).get(
+      `/api/v1/registrant/domains/${uuid}`
+    );
+    return res.status(status).json(data);
   },
-  
-  getDomains: async (req, res) => {
-    if (isSessionValid(req)) {
-      const { uuid } = req.params;
-      const token = req.session.token.access_token;
-      const { offset } = req.query;
-      let response;
-      if (uuid) {
-        response = await apiRequest(`${API_HOST}/api/v1/registrant/domains/${uuid}`, token);
-      } else {
-        response = await apiRequest(`${API_HOST}/api/v1/registrant/domains?offset=${offset}`, token);
-      }
-      console.log(response);
-      res.status(response.status).json(response.data);
-    } else {
-      res.status(498).json({});
-    }
+
+  getDomains: async ({ query, params, session }, res) => {
+    const { uuid } = params;
+    const { offset } = query;
+    return handleResponse(
+      () =>
+        API(session, res).get(
+          `/api/v1/registrant/domains${uuid ? `/${uuid}` : `?offset=${offset}`}`
+        ),
+      res
+    );
   },
-  
-  getContacts: async (req, res) => {
-    if (isSessionValid(req)) {
-      const { uuid } = req.params;
-      const token = req.session.token.access_token;
-      const { offset } = req.query;
-      let response;
-      if (uuid) {
-        response = await apiRequest(`${API_HOST}/api/v1/registrant/contacts/${uuid}`, token);
-      } else {
-        response = await apiRequest(`${API_HOST}/api/v1/registrant/contacts?offset=${offset}`, token);
-      }
-      res.status(response.status).json(response.data);
-    } else {
-      res.status(498).json({});
-    }
+
+  getContacts: async ({ query, params, session }, res) => {
+    const { uuid } = params;
+    const { offset } = query;
+    return handleResponse(
+      () =>
+        API(session, res).get(
+          `/api/v1/registrant/contacts${
+            uuid ? `/${uuid}` : `?offset=${offset}`
+          }`
+        ),
+      res
+    );
   },
-  
-  setContact: async (req, res) => {
-    if (isSessionValid(req)) {
-      const { uuid } = req.params;
-      const token = req.session.token.access_token;
-      const { body } = req;
-      const { status, data } = await apiRequest(`${API_HOST}/api/v1/registrant/contacts/${uuid}`, token, 'PATCH', JSON.stringify(body));
-      res.status(status).json(data);
-    } else {
-      res.status(498).json({});
-    }
+
+  setContact: async ({ body, params, session }, res) => {
+    const { uuid } = params;
+    return handleResponse(
+      () => API(session).patch(`/api/v1/registrant/contacts/${uuid}`, body),
+      res
+    );
   },
-  
-  setDomainRegistryLock: async (req, res) => {
-    if (isSessionValid(req)) {
-      const { uuid } = req.params;
-      const token = req.session.token.access_token;
-      const { status, data } = await apiRequest(`${API_HOST}/api/v1/registrant/domains/${uuid}/registry_lock`, token, 'POST');
-      res.status(status).json(data);
-    } else {
-      res.status(498).json({});
-    }
+
+  setDomainRegistryLock: async ({ params, session }, res) => {
+    const { uuid } = params;
+    return handleResponse(
+      () =>
+        API(session).post(`/api/v1/registrant/domains/${uuid}/registry_lock`),
+      res
+    );
   },
-  
-  deleteDomainRegistryLock: async (req, res) => {
-    if (isSessionValid(req)) {
-      const { uuid } = req.params;
-      const token = req.session.token.access_token;
-      const { status, data } = await apiRequest(`${API_HOST}/api/v1/registrant/domains/${uuid}/registry_lock`, token, 'DELETE');
-      res.status(status).json(data);
-    } else {
-      res.status(498).json({});
-    }
-  },
-  
+
+  deleteDomainRegistryLock: async ({ params, session }, res) => {
+    const { uuid } = params;
+    return handleResponse(
+      () =>
+        API(session).delete(`/api/v1/registrant/domains/${uuid}/registry_lock`),
+      res
+    );
+  }
 };

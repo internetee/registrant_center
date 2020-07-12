@@ -6,12 +6,13 @@ import user from './user';
 import domains from './domains';
 import contacts from './contacts';
 
-export default (history) => withReduxStateSync(
-  combineReducers({
-    router: connectRouter(history),
-    ui,
-    user,
-    domains,
-    contacts,
-  })
-);
+export default history =>
+  withReduxStateSync(
+    combineReducers({
+      router: connectRouter(history),
+      ui,
+      user,
+      domains,
+      contacts
+    })
+  );

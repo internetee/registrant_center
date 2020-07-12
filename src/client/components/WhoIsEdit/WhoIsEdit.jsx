@@ -2,10 +2,11 @@
 import React from 'react';
 import { FormattedHTMLMessage, FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
-import staticMessages from '../../utils/staticMessages.json';
+import { Roles } from '..';
 
-function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
+function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
   const contactsList = Object.values(contacts);
+  console.log(contactsList);
   const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce((acc, { disclosed_attributes }) => ({
     checkedCount: acc.checkedCount + disclosed_attributes.size,
     isCheckedAll: acc.isCheckedAll + disclosed_attributes.size === acc.totalCount + 2,
@@ -17,7 +18,31 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
   });
   
   const indeterminate = checkedCount > 0 && checkedCount < totalCount;
-  
+
+  const handleChange = (checked, ids, type) => {
+    const changedContacts = ids.reduce((acc, id) => {
+      const { disclosed_attributes } = contacts[id];
+      const attributes = new Set(disclosed_attributes);
+      type.forEach(attr => {
+        if (checked) {
+          attributes.add(attr);
+        } else {
+          attributes.delete(attr);
+        }
+      });
+      return {
+        ...acc,
+        [id]: {
+          ...contacts[id],
+          disclosed_attributes: attributes
+        }
+      };
+      
+    }, {});
+    onChange(changedContacts);
+  };
+
+
   const CheckAllLabel = () => {
     if (indeterminate) {
       return (
@@ -58,41 +83,6 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
     );
   };
   
-  const onChange = (checked, ids, type) => {
-    const changedContacts = ids.reduce((acc, id) => {
-      const { disclosed_attributes } = contacts[id];
-      const attributes = new Set(disclosed_attributes);
-      type.forEach(attr => {
-        if (checked) {
-          attributes.add(attr);
-        } else {
-          attributes.delete(attr);
-        }
-      });
-      return {
-        ...acc,
-        [id]: {
-          disclosed_attributes: attributes
-        }
-      };
-      
-    }, {});
-    handleWhoIsChange(changedContacts);
-  };
-  
-  const Roles = ({ roles }) => {
-    return [...roles].map((role, i) => {
-      const { domain } = staticMessages[lang];
-      if (i === roles.size - 1) {
-        return domain[role];
-      }
-      if (i === roles.size - 2) {
-        return `${domain[role]} & `;
-      }
-      return `${domain[role]}, `;
-    });
-  };
-  
   return (
     <React.Fragment>
       { checkAll && (
@@ -102,7 +92,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
             checked={isCheckedAll}
             indeterminate={indeterminate}
             label={<CheckAllLabel />}
-            onChange={(e, elem) => onChange(elem.checked,[...new Set(contactsList.map(item => item.id))],['name', 'email'])}
+            onChange={(e, elem) => handleChange(elem.checked, Object.keys(contacts),['name', 'email'])}
           />
         </Form.Field>
       )}
@@ -116,7 +106,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
                 tagName="strong"
               />
               <strong>
-                <Roles roles={item.roles} />
+                <Roles lang={lang} roles={item.roles} />
               </strong>
             </label>
             <Form.Field>
@@ -132,7 +122,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
                     contactName: item.initialName
                   }}
                 />}
-                onChange={(e, elem) => onChange(elem.checked,[item.id],['name'])}
+                onChange={(e, elem) => handleChange(elem.checked,[item.id],['name'])}
               />
             </Form.Field>
             <Form.Field>
@@ -148,7 +138,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, handleWhoIsChange }) {
                     contactEmail: item.initialEmail
                   }}
                 />}
-                onChange={(e, elem) => onChange(elem.checked,[item.id],['email'])}
+                onChange={(e, elem) => handleChange(elem.checked,[item.id],['email'])}
               />
             </Form.Field>
           </React.Fragment>

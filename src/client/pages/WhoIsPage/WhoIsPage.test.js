@@ -12,7 +12,7 @@ const props = {
     uiElemSize: 'big',
     menus: {
       main: mockMainMenu,
-      footer: mockFooterMenu,
+      footer: mockFooterMenu
     }
   },
   user: mockUser.data,
@@ -20,7 +20,7 @@ const props = {
   initialContacts: mockContacts,
   history,
   cookies,
-  setContacts: mockAction
+  updateContact: mockAction
 };
 
 describe('pages/WhoIs', () => {
@@ -28,5 +28,4 @@ describe('pages/WhoIs', () => {
     const page = shallow(<WhoIsPage {...props} />);
     expect(page).toMatchSnapshot();
   });
-  
 });
