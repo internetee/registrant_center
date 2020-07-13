@@ -23,33 +23,48 @@ const request = {
   offset: 0
 };
 
-const parseDomain = (domain) => {
+const parseDomain = domain => {
   const { admin_contacts, registrant, tech_contacts } = domain;
-  const statuses = domain.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
+  const statuses = domain.statuses.sort(
+    (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
+  );
   const contacts = [
-    ...admin_contacts && admin_contacts.map(item => ({ ...item, roles: ['admin'] })),
-    ...tech_contacts && tech_contacts.map(item => ({ ...item, roles: ['tech'] })),
-    ...registrant && [{
-      ...registrant,
-      roles: ['registrant']
-    }]
+    ...(admin_contacts &&
+      admin_contacts.map(item => ({ ...item, roles: ['admin'] }))),
+    ...(tech_contacts &&
+      tech_contacts.map(item => ({ ...item, roles: ['tech'] }))),
+    ...(registrant && [
+      {
+        ...registrant,
+        roles: ['registrant']
+      }
+    ])
   ].flat();
   return {
     ...domain,
-    isLocked: domain.locked_by_registrant_at && ['serverUpdateProhibited', 'serverDeleteProhibited', 'serverTransferProhibited'].every(r => statuses.includes(r)),
-    contacts: contacts.reduce((acc, { id, roles, ...rest }) => ({
-      ...acc,
-      [id]: {
-        ...rest,
-        id,
-        roles: acc[id] ? [...acc[id].roles, ...roles] : roles
-      }
-    }), {})
+    isLocked:
+      domain.locked_by_registrant_at &&
+      [
+        'serverUpdateProhibited',
+        'serverDeleteProhibited',
+        'serverTransferProhibited'
+      ].every(r => statuses.includes(r)),
+    contacts: contacts.reduce(
+      (acc, { id, roles, ...rest }) => ({
+        ...acc,
+        [id]: {
+          ...rest,
+          id,
+          roles: acc[id] ? [...acc[id].roles, ...roles] : roles
+        }
+      }),
+      {}
+    )
   };
 };
 
 const requestDomain = () => ({
-  type: FETCH_DOMAIN_REQUEST,
+  type: FETCH_DOMAIN_REQUEST
 });
 
 const receiveDomain = payload => ({
@@ -58,11 +73,11 @@ const receiveDomain = payload => ({
 });
 
 const failDomain = () => ({
-  type: FETCH_DOMAIN_FAILURE,
+  type: FETCH_DOMAIN_FAILURE
 });
 
 const requestDomains = () => ({
-  type: FETCH_DOMAINS_REQUEST,
+  type: FETCH_DOMAINS_REQUEST
 });
 
 const receiveDomains = payload => ({
@@ -71,11 +86,11 @@ const receiveDomains = payload => ({
 });
 
 const failDomains = () => ({
-  type: FETCH_DOMAINS_FAILURE,
+  type: FETCH_DOMAINS_FAILURE
 });
 
 const requestDomainLock = () => ({
-  type: LOCK_DOMAIN_REQUEST,
+  type: LOCK_DOMAIN_REQUEST
 });
 
 const receiveDomainLock = payload => ({
@@ -110,7 +125,9 @@ const fetchDomain = uuid => dispatch => {
     .then(res => res.data)
     .then(async data => {
       const domain = parseDomain(data);
-      await Promise.all(Object.keys(domain.contacts).map(id => dispatch(fetchContacts(id))));
+      await Promise.all(
+        Object.keys(domain.contacts).map(id => dispatch(fetchContacts(id)))
+      );
       return dispatch(receiveDomain(domain));
     })
     .catch(() => {
@@ -118,9 +135,7 @@ const fetchDomain = uuid => dispatch => {
     });
 };
 
-const fetchDomains = (offset = request.offset) => (
-  dispatch,
-) => {
+const fetchDomains = (offset = request.offset) => dispatch => {
   dispatch(requestDomains());
   return api
     .fetchDomains(null, offset)
@@ -147,9 +162,11 @@ const lockDomain = uuid => dispatch => {
       return dispatch(receiveDomainLock(data));
     })
     .catch(error => {
-      return dispatch(failDomainLock({
-        code: error.response.status
-      }));
+      return dispatch(
+        failDomainLock({
+          code: error.response.status
+        })
+      );
     });
 };
 
@@ -162,9 +179,11 @@ const unlockDomain = uuid => dispatch => {
       return dispatch(receiveDomainUnlock(data));
     })
     .catch(error => {
-      return dispatch(failDomainUnlock({
-        code: error.response.status
-      }));
+      return dispatch(
+        failDomainUnlock({
+          code: error.response.status
+        })
+      );
     });
 };
 
@@ -172,123 +191,123 @@ const initialState = {
   isLoading: false,
   data: {},
   ids: [],
-  message: null,
+  message: null
 };
 
 export default function(state = initialState, { payload, type }) {
   switch (type) {
-  case LOGOUT_USER:
-    return initialState;
+    case LOGOUT_USER:
+      return initialState;
 
-  case FETCH_DOMAIN_REQUEST:
-    return {
-      ...state,
-      isLoading: true
-    };
+    case FETCH_DOMAIN_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
 
-  case FETCH_DOMAIN_SUCCESS:
-    return {
-      ...state,
-      data: { ...state.data, [payload.name]: payload },
-      ids: state.ids.includes(payload.name)
-        ? state.ids
-        : [...state.ids, payload.name],
-      isLoading: false,
-    };
+    case FETCH_DOMAIN_SUCCESS:
+      return {
+        ...state,
+        data: { ...state.data, [payload.id]: payload },
+        ids: state.ids.includes(payload.id)
+          ? state.ids
+          : [...state.ids, payload.id],
+        isLoading: false
+      };
 
-  case FETCH_DOMAIN_FAILURE:
-    return {
-      ...state,
-      isLoading: false,
-    };
+    case FETCH_DOMAIN_FAILURE:
+      return {
+        ...state,
+        isLoading: false
+      };
 
-  case FETCH_DOMAINS_REQUEST:
-    return {
-      ...state,
-      isLoading: true
-    };
+    case FETCH_DOMAINS_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
 
-  case FETCH_DOMAINS_SUCCESS:
-    return {
-      ...state,
-      data: payload.reduce(
-        (acc, item) => ({
-          ...acc,
-          [item.name]: parseDomain(item)
-        }),
-        {}
-      ),
-      ids: payload.map(item => item.name),
-      isLoading: false,
-    };
+    case FETCH_DOMAINS_SUCCESS:
+      return {
+        ...state,
+        data: payload.reduce(
+          (acc, item) => ({
+            ...acc,
+            [item.id]: parseDomain(item)
+          }),
+          {}
+        ),
+        ids: payload.map(item => item.id),
+        isLoading: false
+      };
 
-  case FETCH_DOMAINS_FAILURE:
-    return {
-      ...state,
-      isLoading: false,
-    };
+    case FETCH_DOMAINS_FAILURE:
+      return {
+        ...state,
+        isLoading: false
+      };
 
-  case LOCK_DOMAIN_REQUEST:
-    return {
-      ...state,
-      isLoading: true
-    };
+    case LOCK_DOMAIN_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
 
-  case LOCK_DOMAIN_SUCCESS:
-    return {
-      ...state,
-      data: {
-        ...state.data,
-        [payload.name]: parseDomain(payload)
-      },
-      isLoading: false,
-      message: {
-        code: 200,
-        type: 'domain_lock'
-      }
-    };
+    case LOCK_DOMAIN_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [payload.id]: parseDomain(payload)
+        },
+        isLoading: false,
+        message: {
+          code: 200,
+          type: 'domain_lock'
+        }
+      };
 
-  case LOCK_DOMAIN_FAILURE:
-    return {
-      ...state,
-      isLoading: false,
-      message: {
-        ...payload,
-        type: 'domain_lock'
-      }
-    };
+    case LOCK_DOMAIN_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        message: {
+          ...payload,
+          type: 'domain_lock'
+        }
+      };
 
-  case UNLOCK_DOMAIN_REQUEST:
-    return {
-      ...state,
-      isLoading: true
-    };
+    case UNLOCK_DOMAIN_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
 
-  case UNLOCK_DOMAIN_SUCCESS:
-    return {
-      ...state,
-      data: {
-        ...state.data,
-        [payload.id]: parseDomain(payload)
-      },
-      message: {
-        code: 200,
-        type: 'domain_unlock'
-      }
-    };
+    case UNLOCK_DOMAIN_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [payload.id]: parseDomain(payload)
+        },
+        message: {
+          code: 200,
+          type: 'domain_unlock'
+        }
+      };
 
-  case UNLOCK_DOMAIN_FAILURE:
-    return {
-      ...state,
-      isLoading: false,
-      message: {
-        ...payload,
-        type: 'domain_unlock'
-      }
-    };
+    case UNLOCK_DOMAIN_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        message: {
+          ...payload,
+          type: 'domain_unlock'
+        }
+      };
 
-  default:
-    return state;
+    default:
+      return state;
   }
 }
 

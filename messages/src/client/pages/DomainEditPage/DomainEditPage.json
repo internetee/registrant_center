@@ -1,15 +1,27 @@
 [
   {
+    "id": "domain.domain_not_found_title",
+    "defaultMessage": "Domeeni ei leitud | EIS Registreerijaportaal"
+  },
+  {
+    "id": "hero.link.back",
+    "defaultMessage": "Tagasi"
+  },
+  {
+    "id": "domain.none.message.title",
+    "defaultMessage": "Kahjuks sellise nimega domeeni ei leitud"
+  },
+  {
+    "id": "domain.none.message.text",
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque, consequuntur est facere fuga illum ipsa ipsum quasi quo! Commodi consequuntur eligendi harum non ut. Architecto blanditiis dignissimos nulla placeat praesentium."
+  },
+  {
     "id": "domain.page_title",
     "defaultMessage": "{domainName} | EIS Registreerijaportaal"
   },
   {
     "id": "domain_edit.title",
     "defaultMessage": "Kontaktide muutmine"
-  },
-  {
-    "id": "hero.link.back",
-    "defaultMessage": "Tagasi"
   },
   {
     "id": "domain.registrant.name",
@@ -38,17 +50,5 @@
   {
     "id": "domain.contacts.save",
     "defaultMessage": "Salvesta"
-  },
-  {
-    "id": "domain.domain_not_found_title",
-    "defaultMessage": "Domeeni ei leitud | EIS Registreerijaportaal"
-  },
-  {
-    "id": "domain.none.message.title",
-    "defaultMessage": "Kahjuks sellise nimega domeeni ei leitud"
-  },
-  {
-    "id": "domain.none.message.text",
-    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque, consequuntur est facere fuga illum ipsa ipsum quasi quo! Commodi consequuntur eligendi harum non ut. Architecto blanditiis dignissimos nulla placeat praesentium."
   }
 ]

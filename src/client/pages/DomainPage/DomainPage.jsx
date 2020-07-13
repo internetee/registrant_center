@@ -35,16 +35,14 @@ const DomainPage = ({
   const { isLocked } = domain || {};
 
   useEffect(() => {
-    if (domain) {
-      (async () => {
-        await fetchDomain(domain.id);
-        setIsLoading(false);
-      })();
-    }
-  }, []);
+    (async () => {
+      await fetchDomain(match.params.id);
+      setIsLoading(false);
+    })();
+  }, [match]);
   
   useEffect(() => {
-    if (domain && !isLoading) {
+    if (domain) {
       const statuses = domain.statuses.sort((a, b) => domainStatuses[a].priority - domainStatuses[b].priority);
       const userContact = Helpers.getUserContacts(user, domain, contacts);
       if (Object.keys(userContact).length) {
@@ -199,7 +197,7 @@ const DomainPage = ({
         <div className='page--header'>
           <Container textAlign='center'>
             <div className="page--header--actions">
-              <Button data-test='link-domain-edit' as={Link} primary size={ uiElemSize } to={`/domain/${domain.name}/edit`} content='Muuda kontakte'/>
+              <Button data-test='link-domain-edit' as={Link} primary size={ uiElemSize } to={`/domain/${domain.id}/edit`} content='Muuda kontakte'/>
               { isLockable && (
                 <Button
                   data-test={isLocked ? 'open-unlock-modal' : 'open-lock-modal'}

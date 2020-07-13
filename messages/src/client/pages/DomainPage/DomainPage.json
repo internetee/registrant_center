@@ -1,11 +1,23 @@
 [
   {
-    "id": "domain.page_title",
-    "defaultMessage": "{domainName} | EIS Registreerijaportaal"
+    "id": "domain.domain_not_found_title",
+    "defaultMessage": "Domeeni ei leitud | EIS Registreerijaportaal"
   },
   {
     "id": "hero.link.back",
     "defaultMessage": "Tagasi"
+  },
+  {
+    "id": "domain.none.message.title",
+    "defaultMessage": "Kahjuks sellise nimega domeeni ei leitud"
+  },
+  {
+    "id": "domain.none.message.text",
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque, consequuntur est facere fuga illum ipsa ipsum quasi quo! Commodi consequuntur eligendi harum non ut. Architecto blanditiis dignissimos nulla placeat praesentium."
+  },
+  {
+    "id": "domain.page_title",
+    "defaultMessage": "{domainName} | EIS Registreerijaportaal"
   },
   {
     "id": "domain.unlock",
@@ -58,6 +70,10 @@
   {
     "id": "domain.contact.email",
     "defaultMessage": "E-mail"
+  },
+  {
+    "id": "domain.contact.phone",
+    "defaultMessage": "Telefon"
   },
   {
     "id": "domain.statuses",
@@ -116,8 +132,16 @@
     "defaultMessage": "Salvesta"
   },
   {
+    "id": "domain.unlock.title",
+    "defaultMessage": "Kas oled kindel, et soovid domeeni vabastada?"
+  },
+  {
     "id": "domain.lock.title",
     "defaultMessage": "Kas oled kindel, et soovid domeeni lukustada?"
+  },
+  {
+    "id": "domain.unlock.description",
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque dicta earum harum, inventore itaque maiores nemo nobis porro quasi rem repellendus repudiandae saepe sequi voluptas voluptates? Deleniti facere illum suscipit."
   },
   {
     "id": "domain.lock.description",
@@ -130,34 +154,6 @@
   {
     "id": "domain.lock.no",
     "defaultMessage": "Ei"
-  },
-  {
-    "id": "domain.unlock.title",
-    "defaultMessage": "Kas oled kindel, et soovid domeeni vabastada?"
-  },
-  {
-    "id": "domain.unlock.description",
-    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque dicta earum harum, inventore itaque maiores nemo nobis porro quasi rem repellendus repudiandae saepe sequi voluptas voluptates? Deleniti facere illum suscipit."
-  },
-  {
-    "id": "domain.unlock.yes",
-    "defaultMessage": "Jah"
-  },
-  {
-    "id": "domain.unlock.no",
-    "defaultMessage": "Ei"
-  },
-  {
-    "id": "domain.domain_not_found_title",
-    "defaultMessage": "Domeeni ei leitud | EIS Registreerijaportaal"
-  },
-  {
-    "id": "domain.none.message.title",
-    "defaultMessage": "Kahjuks sellise nimega domeeni ei leitud"
-  },
-  {
-    "id": "domain.none.message.text",
-    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque, consequuntur est facere fuga illum ipsa ipsum quasi quo! Commodi consequuntur eligendi harum non ut. Architecto blanditiis dignissimos nulla placeat praesentium."
   },
   {
     "id": "domain.contact.admin",

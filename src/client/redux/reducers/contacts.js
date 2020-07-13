@@ -17,9 +17,8 @@ const request = {
   offset: 0
 };
 
-
 const requestContact = () => ({
-  type: FETCH_CONTACT_REQUEST,
+  type: FETCH_CONTACT_REQUEST
 });
 
 const receiveContact = payload => ({
@@ -28,7 +27,7 @@ const receiveContact = payload => ({
 });
 
 const requestContacts = () => ({
-  type: FETCH_CONTACTS_REQUEST,
+  type: FETCH_CONTACTS_REQUEST
 });
 
 const receiveContacts = payload => ({
@@ -37,7 +36,7 @@ const receiveContacts = payload => ({
 });
 
 const requestContactUpdate = () => ({
-  type: UPDATE_CONTACT_REQUEST,
+  type: UPDATE_CONTACT_REQUEST
 });
 
 const receiveContactUpdate = payload => ({
@@ -51,11 +50,11 @@ const failContactUpdate = payload => ({
 });
 
 const invalidateContacts = () => ({
-  type: FETCH_CONTACTS_FAILURE,
+  type: FETCH_CONTACTS_FAILURE
 });
 
 const invalidateContact = () => ({
-  type: FETCH_CONTACT_FAILURE,
+  type: FETCH_CONTACT_FAILURE
 });
 
 const fetchContacts = (uuid, offset = request.offset) => dispatch => {
@@ -98,17 +97,19 @@ const updateContact = (uuid, form) => dispatch => {
           failContactUpdate({
             ...res.data,
             code: res.status,
-            type: 'whois',
+            type: 'whois'
           })
         );
       }
       return dispatch(receiveContactUpdate(res.data));
     })
     .catch(error => {
-      return dispatch(failContactUpdate({
-        code: error.response.status,
-        type: 'whois',
-      }));
+      return dispatch(
+        failContactUpdate({
+          code: error.response.status,
+          type: 'whois'
+        })
+      );
     });
 };
 
@@ -117,94 +118,94 @@ const initialState = {
   data: {},
   ids: [],
   fetchedAt: null,
-  message: null,
+  message: null
 };
 
 export default function(state = initialState, { payload, type }) {
   switch (type) {
-  case LOGOUT_USER:
-    return initialState;
+    case LOGOUT_USER:
+      return initialState;
 
-  case FETCH_CONTACTS_FAILURE:
-    return {
-      ...state,
-      isLoading: false,
-    };
+    case FETCH_CONTACTS_FAILURE:
+      return {
+        ...state,
+        isLoading: false
+      };
 
-  case FETCH_CONTACTS_REQUEST:
-    return {
-      ...state,
-      isLoading: true
-    };
+    case FETCH_CONTACTS_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
 
-  case FETCH_CONTACTS_SUCCESS:
-    return {
-      ...state,
-      data: payload.reduce(
-        (acc, item) => ({
-          ...acc,
-          [item.id]: item
-        }),
-        {}
-      ),
-      ids: payload.map(item => item.id),
-      message: null,
-      isLoading: false,
-      fetchedAt: Date.now()
-    };
+    case FETCH_CONTACTS_SUCCESS:
+      return {
+        ...state,
+        data: payload.reduce(
+          (acc, item) => ({
+            ...acc,
+            [item.id]: item
+          }),
+          {}
+        ),
+        ids: payload.map(item => item.id),
+        message: null,
+        isLoading: false,
+        fetchedAt: Date.now()
+      };
 
-  case FETCH_CONTACT_FAILURE:
-    return {
-      ...state,
-      isLoading: false,
-      message: payload
-    };
+    case FETCH_CONTACT_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        message: payload
+      };
 
-  case FETCH_CONTACT_REQUEST:
-    return {
-      ...state,
-      isLoading: true
-    };
+    case FETCH_CONTACT_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
 
-  case FETCH_CONTACT_SUCCESS:
-    return {
-      ...state,
-      data: { ...state.data, [payload.id]: payload },
-      ids: state.ids.includes(payload.id)
-        ? state.ids
-        : [...state.ids, payload.id],
-      message: null,
-      isLoading: false,
-      fetchedAt: Date.now()
-    };
+    case FETCH_CONTACT_SUCCESS:
+      return {
+        ...state,
+        data: { ...state.data, [payload.id]: payload },
+        ids: state.ids.includes(payload.id)
+          ? state.ids
+          : [...state.ids, payload.id],
+        message: null,
+        isLoading: false,
+        fetchedAt: Date.now()
+      };
 
-  case UPDATE_CONTACT_REQUEST:
-    return {
-      ...state,
-      isLoading: true
-    };
+    case UPDATE_CONTACT_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      };
 
-  case UPDATE_CONTACT_SUCCESS:
-    return {
-      ...state,
-      data: { ...state.data, [payload.id]: payload },
-      message: {
-        type: 'whois',
-        code: 200
-      },
-      isLoading: false,
-      fetchedAt: Date.now()
-    };
+    case UPDATE_CONTACT_SUCCESS:
+      return {
+        ...state,
+        data: { ...state.data, [payload.id]: payload },
+        message: {
+          type: 'whois',
+          code: 200
+        },
+        isLoading: false,
+        fetchedAt: Date.now()
+      };
 
-  case UPDATE_CONTACT_FAILURE:
-    return {
-      ...state,
-      isLoading: false,
-      message: payload
-    };
+    case UPDATE_CONTACT_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        message: payload
+      };
 
-  default:
-    return state;
+    default:
+      return state;
   }
 }
 

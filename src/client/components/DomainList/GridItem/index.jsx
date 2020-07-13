@@ -40,7 +40,7 @@ class DomainGridItem extends Component {
         <article className={classNames('domains-grid--item', { 'is-open': isOpen })}>
           <div className='container'>
             <div className='content'>
-              <Link to={`/domain/${encodeURIComponent(domain.name)}`} className='link'>
+              <Link to={`/domain/${domain.id}`} className='link'>
                 <h2>{domain.name}</h2>
               </Link>
               <p>

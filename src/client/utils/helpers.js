@@ -31,18 +31,26 @@ export default {
     }, []);
   },
   getUserContacts: (user = {}, domain = {}, contacts = {}) => {
-    const userContacts = Object.values(contacts).filter(item => item.ident.code === user.ident && item.ident.type !== 'org');
-    console.log(domain);
-    return userContacts.reduce((acc, contact) => ({
-      ...acc,
-      [contact.id]: {
-        ...contact,
-        ...domain.contacts[contact.id],
-        initialName: contact.email,
-        initialEmail: contact.email,
-        disclosed_attributes: new Set(contact.disclosed_attributes)
-      }
-    }), {});
+    const userContacts = Object.values(contacts).filter(
+      item =>
+        item.ident.code === user.ident &&
+        item.ident.type !== 'org' &&
+        domain.contacts[item.id]
+    );
+    console.log({ domain, userContacts });
+    return userContacts.reduce(
+      (acc, contact) => ({
+        ...acc,
+        [contact.id]: {
+          ...contact,
+          ...domain.contacts[contact.id],
+          initialName: contact.email,
+          initialEmail: contact.email,
+          disclosed_attributes: new Set(contact.disclosed_attributes)
+        }
+      }),
+      {}
+    );
   },
   getChangedUserContactsByDomain: (domains = {}, contacts = {}) => {
     return Object.values(domains).reduce((acc, item) => {

@@ -28,7 +28,7 @@ class DomainListItem extends Component {
     return (
       <Table.Row key={ domain.id }>
         <Table.Cell>
-          <Link to={`/domain/${encodeURIComponent(domain.name)}`}>{ domain.name }</Link>
+          <Link to={`/domain/${domain.id}`}>{domain.name}</Link>
         </Table.Cell>
         <Table.Cell>
           <a href={ domain.registrar.website.indexOf('http') > -1 ? domain.registrar.website : `//${domain.registrar.website}`} target='_blank' rel='noopener noreferrer'>{ domain.registrar.name }</a>
