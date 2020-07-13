@@ -9,7 +9,7 @@ import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
 import HomePage from './HomePage';
-import messages from '../../utils/messages.json';
+import translations from '../../translations';
 
 addLocaleData([...localeEt, ...localeEn, ...localeRu]);
 
@@ -68,7 +68,7 @@ describe('pages/Home', () => {
       <Provider store={store}>
         <CookiesProvider>
           <ConnectedRouter history={history}>
-            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={messages[lang]}>
+            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={translations[lang]}>
               <HomePage {...props} />
             </IntlProvider>
           </ConnectedRouter>

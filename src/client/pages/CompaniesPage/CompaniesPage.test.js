@@ -7,7 +7,7 @@ import {CookiesProvider} from 'react-cookie';
 import {ConnectedRouter} from 'connected-react-router';
 import {IntlProvider} from 'react-intl';
 import configureStore from 'redux-mock-store';
-import messages from '../../utils/messages.json';
+import translations from '../../translations';
 import CompaniesPage from './CompaniesPage';
 
 const history = createBrowserHistory();
@@ -67,7 +67,7 @@ describe('pages/Companies', () => {
       <Provider store={store}>
         <CookiesProvider>
           <ConnectedRouter history={history}>
-            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={messages[lang]}>
+            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={translations[lang]}>
               <CompaniesPage {...props} />
             </IntlProvider>
           </ConnectedRouter>

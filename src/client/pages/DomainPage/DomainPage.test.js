@@ -10,7 +10,7 @@ import localeRu from 'react-intl/locale-data/ru';
 import { IntlProvider, addLocaleData } from 'react-intl';
 import { createMemoryHistory } from 'history';
 import DomainPage from './DomainPage';
-import messages from '../../utils/messages.json';
+import translations from '../../translations';
 
 addLocaleData([...localeEt, ...localeEn, ...localeRu]);
 
@@ -90,7 +90,7 @@ describe('pages/Domain', () => {
               key={lang}
               defaultLocale="et"
               locale={lang}
-              messages={messages[lang]}
+              messages={translations[lang]}
             >
               <DomainPage {...props} />
             </IntlProvider>

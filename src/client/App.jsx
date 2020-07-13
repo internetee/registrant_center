@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import localeEt from 'react-intl/locale-data/et';
 import localeEn from 'react-intl/locale-data/en';
 import localeRu from 'react-intl/locale-data/ru';
-import messages from './utils/messages.json';
+import translations from './translations';
 import { Helmet, Loading, ScrollToTop } from './components';
 
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
@@ -29,7 +29,7 @@ class App extends PureComponent {
     const { lang } = ui;
     const isMenuOpen = ui.mainMenu.isOpen;
     return (
-      <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={messages[lang]}>
+      <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={translations[lang]}>
         <div className={ classNames({ 'app-wrapper': true, 'u-menu-open': isMenuOpen }) }>
           <FormattedMessage
             id="app.page_title"

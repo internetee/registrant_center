@@ -7,7 +7,7 @@ import thunk from 'redux-thunk';
 import configureStore from 'redux-mock-store';
 import { IntlProvider } from 'react-intl';
 import DomainEditPage from './DomainEditPage';
-import messages from '../../utils/messages.json';
+import translations from '../../translations';
 
 const history = createBrowserHistory();
 
@@ -78,7 +78,7 @@ describe('pages/DomainEdit', () => {
               key={lang}
               defaultLocale="et"
               locale={lang}
-              messages={messages[lang]}
+              messages={translations[lang]}
             >
               <DomainEditPage {...props} />
             </IntlProvider>
