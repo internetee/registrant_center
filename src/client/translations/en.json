@@ -122,8 +122,8 @@
   "whois.confirm_modal.description.roles": "Role:",
   "whois.confirmModal.description.title": "Your changes also apply to these domains:",
   "whois.confirmModal.title": "Are you sure you want to change your contact information?",
-  "whois.content.text": "",
-  "whois.content.title": "",
+  "whois.content.text": "Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia\nodio sem nec elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Integer\nposuere erat a ante venenatis dapibus posuere velit aliquet.",
+  "whois.content.title": "Dapibus Ullamcorper Mollis Bibendum",
   "whois.domain": "Domain",
   "whois.domain.detailInfo": "Detailed info",
   "whois.edit.checkAll": "({count}/{countOf}) All information visible",
@@ -134,7 +134,6 @@
   "whois.none.message.title": "You currently don't own any domain",
   "whois.page_title": "WHOIS Privacy Settings | EIS Registreerijaportaal",
   "whois.publicInfo": "Info public",
-  "whois.save": "Save",
   "whois.search.message.title": "No matching domains found",
   "whois.title": "WHOIS Privacy Settings"
 }
