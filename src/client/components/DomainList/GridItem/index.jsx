@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
-import { FormattedHTMLMessage, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Icon, Label, Table, Transition } from 'semantic-ui-react';
 import moment from 'moment';
 import 'moment/locale/et';
@@ -70,7 +70,6 @@ class DomainGridItem extends Component {
                   <h5>
                     <FormattedMessage
                       id='domains.domain.contacts.title'
-                      defaultMessage='Kontaktid'
                     />
                   </h5>
                   <div className="table-wrap">
@@ -80,21 +79,18 @@ class DomainGridItem extends Component {
                           <Table.HeaderCell>
                             <FormattedMessage
                               id='domains.domain.contacts.type'
-                              defaultMessage='Tüüp'
                               tagName='strong'
                             />
                           </Table.HeaderCell>
                           <Table.HeaderCell>
                             <FormattedMessage
                               id='domains.domain.contacts.name'
-                              defaultMessage='Nimi'
                               tagName='strong'
                             />
                           </Table.HeaderCell>
                           <Table.HeaderCell>
                             <FormattedMessage
                               id='domains.domain.contacts.email'
-                              defaultMessage='E-post'
                               tagName='strong'
                             />
                           </Table.HeaderCell>
@@ -109,7 +105,6 @@ class DomainGridItem extends Component {
                   <h5>
                     <FormattedMessage
                       id='domains.domain.nameservers.title'
-                      defaultMessage='Nimeserverid'
                     />
                   </h5>
                   {domain.nameservers.length ? (
@@ -120,7 +115,6 @@ class DomainGridItem extends Component {
                             <Table.HeaderCell>
                               <FormattedMessage
                                 id='domains.domain.nameservers.hostname'
-                                defaultMessage='Hostinimi'
                                 tagName='strong'
                               />
                             </Table.HeaderCell>
@@ -136,7 +130,6 @@ class DomainGridItem extends Component {
                   ) : (
                     <FormattedMessage
                       id='domain.nameservers.text'
-                      defaultMessage='Nimeserverid puuduvad'
                       tagName='p'
                     />
                   )}
@@ -144,41 +137,41 @@ class DomainGridItem extends Component {
               </Transition>
               <div className='data'>
                 {domain.valid_to && (
-                  <FormattedHTMLMessage
-                    id='domains.domain.valid_to'
-                    defaultMessage='Kehtiv kuni <strong>{valid_to}</strong>'
+                  <FormattedMessage
+                    id="domains.domain.validTo"
                     tagName='p'
                     values={{
+                      strong: text => <strong>{text}</strong>,
                       valid_to: moment(domain.valid_to).format('DD.MM.Y HH:mm')
                     }}
                   />
                 )}
                 {domain.outzone_at && (
-                  <FormattedHTMLMessage
-                    id='domains.domain.outzone_at'
-                    defaultMessage='Tsoonist eemaldatud <strong>{outzone_at}</strong>'
+                  <FormattedMessage
+                    id="domains.domain.outzoneAt"
                     tagName='p'
                     values={{
+                      strong: text => <strong>{text}</strong>,
                       outzone_at: moment(domain.outzone_at).format('DD.MM.Y HH:mm')
                     }}
                   />
                 )}
                 {domain.delete_at && (
-                  <FormattedHTMLMessage
-                    id='domains.domain.delete_at'
-                    defaultMessage='Tsoonist kustutatakse <strong>{delete_at}</strong>'
+                  <FormattedMessage
+                    id="domains.domain.deleteAt"
                     tagName='p'
                     values={{
+                      strong: text => <strong>{text}</strong>,
                       delete_at: moment(domain.delete_at).format('DD.MM.Y HH:mm')
                     }}
                   />
                 )}
                 {domain.registrant_verification_asked_at && (
-                  <FormattedHTMLMessage
-                    id='domains.domain.registrant_verification_asked_at'
-                    defaultMessage='Kustutamine taodeldud <strong>{registrant_verification_asked_at}</strong>'
+                  <FormattedMessage
+                    id="domains.domain.registrantVerificationAskedAt"
                     tagName='p'
                     values={{
+                      strong: text => <strong>{text}</strong>,
                       registrant_verification_asked_at: moment(domain.registrant_verification_asked_at).format('DD.MM.Y HH:mm')
                     }}
                   />

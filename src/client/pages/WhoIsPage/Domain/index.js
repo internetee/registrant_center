@@ -7,7 +7,6 @@ import { WhoIsEdit } from '../../../components';
 
 export default function Domain({ name, contacts, lang, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  console.log(contacts);
   return (
     <Table.Row verticalAlign="top">
       <Table.Cell width={6}>
@@ -26,11 +25,7 @@ export default function Domain({ name, contacts, lang, onChange }) {
       </Table.Cell>
       <Table.Cell textAlign="right" singleLine width={2}>
         <button type="button" onClick={() => setIsOpen(!isOpen)}>
-          <FormattedMessage
-            id="whois.button.detail_info"
-            defaultMessage="Detailne info"
-            tagName="span"
-          />
+          <FormattedMessage id="whois.domain.detailInfo" />
           <Icon
             className={classNames({ 'vertically flipped': isOpen })}
             name="angle down"

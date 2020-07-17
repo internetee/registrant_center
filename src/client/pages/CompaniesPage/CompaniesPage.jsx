@@ -139,31 +139,7 @@ class CompaniesPage extends Component {
       ));
     }
     return (
-      <MainLayout ui={ui} user={user}>
-        <FormattedMessage
-          id="companies.page_title"
-          defaultMessage='Ettevõtted | EIS Registreerijaportaal'
-        >
-          {title => (
-            <Helmet>
-              <title>{title}</title>
-            </Helmet>
-          )}
-        </FormattedMessage>
-        <div className='main-hero'>
-          <FormattedMessage
-            id='companies.title'
-            defaultMessage='Minu ettevõtted'
-            tagName='h1'
-          />
-          <button type='button' className='back-link' onClick={history.goBack}><Icon name='arrow left' />
-            <FormattedMessage
-              id='hero.link.back'
-              defaultMessage='Tagasi'
-              tagName='span'
-            />
-          </button>
-        </div>
+      <MainLayout hasBackButton titleKey="companies.title" ui={ui} user={user}>
         <div className='page page--companies'>
           { initialCompanies.length ? (
             <React.Fragment>
@@ -193,29 +169,21 @@ class CompaniesPage extends Component {
                           <Table.HeaderCell>
                             <FormattedMessage
                               id='companies.name'
-                              defaultMessage='Nimi'
-                              tagName='span'
                             />
                           </Table.HeaderCell>
                           <Table.HeaderCell>
                             <FormattedMessage
-                              id='companies.register_code'
-                              defaultMessage='Registrikood'
-                              tagName='span'
+                              id='companies.registerCode'
                             />
                           </Table.HeaderCell>
                           <Table.HeaderCell>
                             <FormattedMessage
                               id='companies.contacts'
-                              defaultMessage='Kontaktid'
-                              tagName='span'
                             />
                           </Table.HeaderCell>
                           <Table.HeaderCell>
                             <FormattedMessage
                               id='companies.addresses'
-                              defaultMessage='Aadressid'
-                              tagName='span'
                             />
                           </Table.HeaderCell>
                         </Table.Row>
@@ -239,7 +207,6 @@ class CompaniesPage extends Component {
                               <Icon name='arrow left' />
                               <FormattedMessage
                                 id='pagination.previous'
-                                defaultMessage='Eelmised'
                                 tagName='span'
                               />
                             </React.Fragment>),
@@ -251,7 +218,6 @@ class CompaniesPage extends Component {
                             <React.Fragment>
                               <FormattedMessage
                                 id='pagination.next'
-                                defaultMessage='Järgmised'
                                 tagName='span'
                               />
                               <Icon name='arrow right' />
@@ -263,8 +229,7 @@ class CompaniesPage extends Component {
                       <Form>
                         <Form.Field inline>
                           <FormattedMessage
-                            id='pagination.per_page'
-                            defaultMessage='Tulemusi lehel'
+                            id='pagination.perPage'
                             tagName='label'
                           />
                           <Dropdown selection options={perPageOptions} value={perPage} onChange={this.handleItemsPerPage} />
@@ -278,14 +243,12 @@ class CompaniesPage extends Component {
                   headerContent={(
                     <FormattedMessage
                       id="companies.search.message.title"
-                      defaultMessage="Otsingule vastavaid ettevõtteid ei leitud"
                       tagName="span"
                     />
                   )}
                 >
                   <FormattedMessage
-                    id="companies.search.message.text"
-                    defaultMessage="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet assumenda blanditiis delectus dicta molestias, mollitia officia pariatur porro quis, repellat repudiandae sapiente sequi, voluptatem? Adipisci eveniet explicabo quibusdam tempora ut!"
+                    id="companies.search.message.content"
                     tagName="p"
                   />
                 </PageMessage>
@@ -296,15 +259,13 @@ class CompaniesPage extends Component {
               headerContent={(
                 <FormattedMessage
                   id="companies.none.message.title"
-                  defaultMessage="Äriregistri andmetel Teile ühtegi ettevõtet ei kuulu"
                   tagName="span"
                 />
               )}
               icon="frown outline"
             >
               <FormattedMessage
-                id="companies.none.message.text"
-                defaultMessage="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet assumenda blanditiis delectus dicta molestias, mollitia officia pariatur porro quis, repellat repudiandae sapiente sequi, voluptatem? Adipisci eveniet explicabo quibusdam tempora ut!"
+                id="companies.none.message.content"
                 tagName="p"
               />
             </PageMessage>

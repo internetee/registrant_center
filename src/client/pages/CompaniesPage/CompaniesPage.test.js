@@ -1,11 +1,11 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
 import { createBrowserHistory } from 'history';
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
-import {CookiesProvider} from 'react-cookie';
-import {ConnectedRouter} from 'connected-react-router';
-import {IntlProvider} from 'react-intl';
+import { CookiesProvider } from 'react-cookie';
+import { ConnectedRouter } from 'connected-react-router';
+import { IntlProvider } from 'react-intl';
 import configureStore from 'redux-mock-store';
 import translations from '../../translations';
 import CompaniesPage from './CompaniesPage';
@@ -18,7 +18,7 @@ const props = {
     lang: 'et',
     menus: {
       main: mockMainMenu,
-      footer: mockFooterMenu,
+      footer: mockFooterMenu
     }
   },
   user: mockUser,
@@ -31,12 +31,12 @@ const initialState = {
   ui: {
     uiElemSize: 'big',
     mainMenu: {
-      isOpen: false,
+      isOpen: false
     },
     lang: 'et',
     menus: {
       main: mockMainMenu,
-      footer: mockFooterMenu,
+      footer: mockFooterMenu
     }
   },
   user: mockUser,
@@ -61,13 +61,18 @@ describe('pages/Companies', () => {
   beforeEach(() => {
     store = mockStore(initialState);
   });
-  
+
   it('should render content', () => {
     const page = mount(
       <Provider store={store}>
         <CookiesProvider>
           <ConnectedRouter history={history}>
-            <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={translations[lang]}>
+            <IntlProvider
+              key={lang}
+              defaultLocale="et"
+              locale={lang}
+              messages={translations[lang]}
+            >
               <CompaniesPage {...props} />
             </IntlProvider>
           </ConnectedRouter>

@@ -42,11 +42,9 @@ const API = session => {
 const handleResponse = async (apiReq, res) => {
   try {
     const { data, status } = await apiReq();
-    console.log('__----', status, '-----');
     return res.status(status).json(data);
   } catch (e) {
     if (e.response) {
-      console.log('----', e.response.status, '-----');
       return res.status(e.response.status).json({});
     }
     return res.status(408).json({});

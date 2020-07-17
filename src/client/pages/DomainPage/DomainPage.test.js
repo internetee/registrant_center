@@ -4,15 +4,10 @@ import thunk from 'redux-thunk';
 import { CookiesProvider } from 'react-cookie';
 import { ConnectedRouter } from 'connected-react-router';
 import React from 'react';
-import localeEt from 'react-intl/locale-data/et';
-import localeEn from 'react-intl/locale-data/en';
-import localeRu from 'react-intl/locale-data/ru';
-import { IntlProvider, addLocaleData } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import { createMemoryHistory } from 'history';
 import DomainPage from './DomainPage';
 import translations from '../../translations';
-
-addLocaleData([...localeEt, ...localeEn, ...localeRu]);
 
 const history = createMemoryHistory('/');
 history.location.key = 'test';

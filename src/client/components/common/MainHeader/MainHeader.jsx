@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import {Button, Container, Icon} from 'semantic-ui-react';
-import {FormattedHTMLMessage, FormattedMessage} from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 import {withCookies} from 'react-cookie';
 import classNames from 'classnames';
 import MainMenu from '../MainMenu/MainMenu';
@@ -74,17 +74,22 @@ class MainHeader extends Component {
           <div className='cookie-notice'>
             <Container>
               <div className='content'>
-                <FormattedHTMLMessage
-                  id='cookie_notice.content'
-                  defaultMessage='See veebileht kasutab küpsiseid. Klikkides meie veebilehel nõustute küpsiste kasutamisega. Rohkem infot küpsiste kasutamise ja põhimõtete kohta meie veebilehel leiate <a href="https://internet.ee/eis/kupsised-internet-ee-lehel">SIIT</a>.'
+                <FormattedMessage
+                  id="cookieNotice.content"
                   tagName='p'
+                  values={{
+                    a: linkText => (
+                      <a href="https://internet.ee/eis/kupsised-internet-ee-lehel" rel="noreferrer" target="_blank">
+                        {linkText}
+                      </a>
+                    ),
+                  }}
                 />
               </div>
               <div className='actions'>
                 <Button type='button' primary onClick={this.handleCookies}>
                   <FormattedMessage
-                    id='cookie_notice.close'
-                    defaultMessage='Sulge'
+                    id='cookieNotice.close'
                   />
                 </Button>
               </div>
@@ -157,7 +162,6 @@ const PortalMenu = ({items = [], lang}) => {
       <a href='https://internet.ee'>
         <FormattedMessage
           id='header.public_portal'
-          defaultMessage='Avalik portaal'
         />
       </a>
       { menu.map(item => (
@@ -197,8 +201,7 @@ const UserMenu = ({ user, handleLogout }) => {
         */}
         <button type='button' className='log-out' onClick={() => handleLogout()}>
           <FormattedMessage
-            id='header.log_out'
-            defaultMessage='Logi välja'
+            id='header.logOut'
           />
         </button>
       </nav>

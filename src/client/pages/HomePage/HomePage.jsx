@@ -1,44 +1,29 @@
 import React from 'react';
-import { FormattedHTMLMessage, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import {Helmet, DomainList, UserData, MainLayout} from '../../components';
+import {DomainList, UserData, MainLayout} from '../../components';
 
 const HomePage = ({ domains, ui, user }) => {
   const { lang } = ui;
   moment.locale(lang);
   return (
-    <MainLayout ui={ui} user={user}>
-      <FormattedMessage
-        id="dashboard.page_title"
-        defaultMessage='Töölaud | EIS Registreerijaportaal'
-      >
-        {title => (
-          <Helmet>
-            <title>{title}</title>
-          </Helmet>
-        )}
-      </FormattedMessage>
-      <div className="main-hero">
-        <FormattedHTMLMessage
-          id="dashboard.title"
-          defaultMessage='<span>Hei</span>, {name}'
-          tagName="h1"
-          values={{
-            name: `${user.first_name} ${user.last_name}`
-          }}
-        />
-        <FormattedMessage
-          id="dashboard.hero.text"
-          defaultMessage="Tere tulemast tagasi. Viimati külastasid portaali: { lastVisit }"
-          tagName="p"
-          values={{
-            lastVisit: moment(user.visited_at).format('D.MM.YYYY HH:mm')
-          }}
-        />
-      </div>
+    <MainLayout
+      heroKey="dashboard.hero.text"
+      heroValues={{
+        lastVisit: moment(user.visited_at).format('D.MM.YYYY HH:mm')
+      }}
+      htmlTitleKey="dashboard.htmlTitle"
+      titleKey="dashboard.title"
+      titleValues={{
+        name: `${user.first_name} ${user.last_name}`,
+        span: text => <span>{text}</span>
+      }}
+      ui={ui}
+      user={user}
+    >
       <div className='page page--dashboard'>
         <div className="quicklinks">
           <Grid textAlign='center'>
@@ -48,12 +33,10 @@ const HomePage = ({ domains, ui, user }) => {
                   <Icon name="building" size='large'/>
                   <FormattedMessage
                     id="quicklinks.companies.title"
-                    defaultMessage="Minu ettevõtted"
                   />
                 </Link>
-                <FormattedHTMLMessage
+                <FormattedMessage
                   id="quicklinks.companies.text"
-                  defaultMessage="Minu kõikide ettevõtete ülevaade"
                   tagName="p"
                 />
               </Grid.Column>
@@ -62,12 +45,17 @@ const HomePage = ({ domains, ui, user }) => {
                   <Icon name="user secret" size='large'/>
                   <FormattedMessage
                     id="quicklinks.whois.title"
-                    defaultMessage="WHOIS isikuandmed"
                   />
                 </Link>
-                <FormattedHTMLMessage
-                  id="quicklinks.whois.text"
-                  defaultMessage="Minu isikuandmete avaldamine WHOIS päringutes. Loe lähemalt <a href='https://www.internet.ee/domeenid/whois-teenuse-kasutajatingimused'>siit</a>"
+                <FormattedMessage
+                  id="quicklinks.whois.content"
+                  values={{
+                    a: linkText => (
+                      <a href="https://www.internet.ee/domeenid/whois-teenuse-kasutajatingimused" rel="noreferrer" target="_blank">
+                        {linkText}
+                      </a>
+                    ),
+                  }}
                   tagName="p"
                 />
               </Grid.Column>

@@ -5,7 +5,7 @@ import {Button, Form, Icon, Container, Table, Input, Pagination, Dropdown} from 
 import {connect} from 'react-redux';
 import {withCookies} from 'react-cookie';
 import MediaQuery from 'react-responsive';
-import { Helmet, Loading, MainLayout, MessageModule, PageMessage, WhoIsConfirmDialog } from '../../components';
+import { Loading, MainLayout, MessageModule, PageMessage, WhoIsConfirmDialog } from '../../components';
 import Domain from './Domain';
 import * as contactsActions from '../../redux/reducers/contacts';
 import Helpers from '../../utils/helpers';
@@ -16,7 +16,7 @@ const perPageOptions = [
   { key: 24, text: '24', value: 24 },
 ];
 
-const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDomains, message, ui, updateContact, user }) => {
+const WhoIsPage = ({ cookies, fetchContacts, initialContacts, initialDomains, message, ui, updateContact, user }) => {
   const [isDirty, setIsDirty] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
@@ -119,32 +119,7 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
   };
 
   return (
-    <MainLayout ui={ui} user={user}>
-      <FormattedMessage
-        id="whois.page_title"
-        defaultMessage='WHOIS Privaatsusseaded | EIS Registreerijaportaal'
-      >
-        {title => (
-          <Helmet>
-            <title>{title}</title>
-          </Helmet>
-        )}
-      </FormattedMessage>
-      <div className='main-hero'>
-        <FormattedMessage
-          id='whois.title'
-          defaultMessage='WHOIS Privaatsusseaded'
-          tagName='h1'
-        />
-        <button type='button' className='back-link' onClick={history.goBack}>
-          <Icon name='arrow left' />
-          <FormattedMessage
-            id='hero.link.back'
-            defaultMessage='Tagasi'
-            tagName='span'
-          />
-        </button>
-      </div>
+    <MainLayout hasBackButton titleKey="whois.title" ui={ui} user={user}>
       { !isLoading && message && <MessageModule message={message} lang={lang} /> }
       <div className='page page--whois'>
         { initialDomains ? (
@@ -154,14 +129,10 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                 <div className="page--header--text">
                   <FormattedMessage
                     id='whois.content.title'
-                    defaultMessage='Dapibus Ullamcorper Mollis Bibendum'
                     tagName='h2'
                   />
                   <FormattedMessage
                     id='whois.content.text'
-                    defaultMessage='Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia
-                      odio sem nec elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Integer
-                      posuere erat a ante venenatis dapibus posuere velit aliquet.'
                     tagName='p'
                   />
                 </div>
@@ -193,9 +164,7 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                           size={uiElemSize}
                         >
                           <FormattedMessage
-                            id='whois.save'
-                            defaultMessage='Salvesta'
-                            tagName='span'
+                            id='actions.save'
                           />
                         </Button>
                       </MediaQuery>
@@ -212,7 +181,6 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                     headerContent={(
                       <FormattedMessage
                         id="whois.search.message.title"
-                        defaultMessage="Otsingule vastavaid domeene ei leitud"
                         tagName="span"
                       />
                     )}
@@ -230,13 +198,11 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                             <Table.HeaderCell>
                               <FormattedMessage
                                 id='whois.domain'
-                                defaultMessage='Domeen'
                               />
                             </Table.HeaderCell>
                             <Table.HeaderCell>
                               <FormattedMessage
-                                id='whois.public_info'
-                                defaultMessage='Info avalik'
+                                id='whois.publicInfo'
                               />
                             </Table.HeaderCell>
                             <Table.HeaderCell />
@@ -254,9 +220,7 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                                 size={uiElemSize}
                               >
                                 <FormattedMessage
-                                  id='whois.save'
-                                  defaultMessage='Salvesta'
-                                  tagName='span'
+                                  id='actions.save'
                                 />
                               </Button>
                             </Table.HeaderCell>
@@ -275,9 +239,7 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                               size={uiElemSize}
                             >
                               <FormattedMessage
-                                id='whois.save'
-                                defaultMessage='Salvesta'
-                                tagName='span'
+                                id='actions.save'
                               />
                             </Button>
                           </Table.Cell>
@@ -315,8 +277,6 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                             <Icon name='arrow left' />
                             <FormattedMessage
                               id='pagination.previous'
-                              defaultMessage='Eelmised'
-                              tagName='span'
                             />
                           </React.Fragment>),
                         icon: true,
@@ -327,8 +287,6 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                           <React.Fragment>
                             <FormattedMessage
                               id='pagination.next'
-                              defaultMessage='Järgmised'
-                              tagName='span'
                             />
                             <Icon name='arrow right' />
                           </React.Fragment>),
@@ -339,8 +297,7 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
                     <Form>
                       <Form.Field inline>
                         <FormattedMessage
-                          id='pagination.per_page'
-                          defaultMessage='Tulemusi lehel'
+                          id='pagination.perPage'
                           tagName='label'
                         />
                         <Dropdown
@@ -367,8 +324,6 @@ const WhoIsPage = ({ cookies, fetchContacts, history, initialContacts, initialDo
             headerContent={(
               <FormattedMessage
                 id="whois.none.message.title"
-                defaultMessage="Teile ei kuulu hetkel ühtegi domeeni"
-                tagName="span"
               />
             )}
             icon="frown outline"

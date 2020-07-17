@@ -26,15 +26,13 @@ class MainFooter extends React.PureComponent {
             <div className="address">
               <FormattedMessage
                 id="footer.eis"
-                defaultMessage="Eesti interneti Sihtasutus"
                 tagName="h3"
               />
               <p>
                 <a href="https://goo.gl/maps/1FiwD8m5B8y" target="_self">Paldiski mnt 80, 10617 Tallinn</a>
               </p>
               <FormattedMessage
-                id="footer.eis.register_code"
-                defaultMessage="Registrikood: 90010019"
+                id="footer.eis.registerCode"
                 tagName="p"
               />
             </div>
@@ -52,8 +50,7 @@ class MainFooter extends React.PureComponent {
           </nav>
           <nav className="menu-social">
             <FormattedMessage
-              id="footer.social_media"
-              defaultMessage="Sotsiaalmeedia"
+              id="footer.socialMedia"
               tagName="h3"
             />
             <ul>

@@ -315,8 +315,7 @@ class UserData extends Component {
             <Grid.Row centered columns='1'>
               <Grid.Column textAlign='center'>
                 <FormattedMessage
-                  id='userdata.title'
-                  defaultMessage='Minu andmete allalaadimine'
+                  id='userData.title'
                   tagName='h3'
                 />
                 <Button.Group>

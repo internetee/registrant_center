@@ -1,11 +1,8 @@
 import React, {lazy, PureComponent, Suspense} from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
-import {IntlProvider, addLocaleData, FormattedMessage} from 'react-intl';
+import {IntlProvider, FormattedMessage} from 'react-intl';
 import classNames from 'classnames';
-import localeEt from 'react-intl/locale-data/et';
-import localeEn from 'react-intl/locale-data/en';
-import localeRu from 'react-intl/locale-data/ru';
 import translations from './translations';
 import { Helmet, Loading, ScrollToTop } from './components';
 
@@ -16,8 +13,6 @@ const CompaniesPage = lazy(() => import('./pages/CompaniesPage/CompaniesPage'));
 const WhoIsPage = lazy(() => import('./pages/WhoIsPage/WhoIsPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage/ErrorPage'));
-
-addLocaleData([...localeEt, ...localeEn, ...localeRu]);
 
 class App extends PureComponent {
   componentDidMount() {
@@ -32,8 +27,7 @@ class App extends PureComponent {
       <IntlProvider key={lang} defaultLocale='et' locale={lang} messages={translations[lang]}>
         <div className={ classNames({ 'app-wrapper': true, 'u-menu-open': isMenuOpen }) }>
           <FormattedMessage
-            id="app.page_title"
-            defaultMessage='EIS Registreerijaportaal'
+            id="app.title"
           >
             {title => (
               <Helmet>

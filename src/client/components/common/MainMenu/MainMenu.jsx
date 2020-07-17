@@ -61,7 +61,6 @@ class MainMenu extends Component {
                 <Link to='/' onClick={() => closeMainMenu()}>
                   <FormattedMessage
                     id='menu.main.dashboard'
-                    defaultMessage='Töölaud'
                   />
                 </Link>
               </li>

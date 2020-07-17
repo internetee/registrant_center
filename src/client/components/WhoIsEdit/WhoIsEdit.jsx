@@ -1,12 +1,11 @@
 /* eslint-disable camelcase */
 import React from 'react';
-import { FormattedHTMLMessage, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
 import { Roles } from '..';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
   const contactsList = Object.values(contacts);
-  console.log(contactsList);
   const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce((acc, { disclosed_attributes }) => ({
     checkedCount: acc.checkedCount + disclosed_attributes.size,
     isCheckedAll: acc.isCheckedAll + disclosed_attributes.size === acc.totalCount + 2,
@@ -47,8 +46,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
     if (indeterminate) {
       return (
         <FormattedMessage
-          id="whois.edit.check_some"
-          defaultMessage="({ count }/{ countOf }) Osa info peidetud"
+          id="whois.edit.checkSome"
           tagName="label"
           values={{
             count: checkedCount,
@@ -60,8 +58,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
     if (isCheckedAll) {
       return (
         <FormattedMessage
-          id="whois.edit.check_all"
-          defaultMessage="({ count }/{ countOf }) Kõik info nähtav"
+          id="whois.edit.checkAll"
           tagName="label"
           values={{
             count: checkedCount,
@@ -72,8 +69,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
     }
     return (
       <FormattedMessage
-        id="whois.edit.check_none"
-        defaultMessage="({ count }/{ countOf }) Kõik info peidetud"
+        id="whois.edit.checkNone"
         tagName="label"
         values={{
           count: checkedCount,
@@ -100,9 +96,8 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
         { contactsList.map(item => (
           <React.Fragment key={item.id}>
             <label htmlFor={item.id}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="domain.role"
-                defaultMessage="Roll: "
                 tagName="strong"
               />
               <strong>
@@ -116,7 +111,6 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
                 value={item.name}
                 label={<FormattedMessage
                   id="whois.edit.name"
-                  defaultMessage="Nimi avalik ({ contactName })"
                   tagName="label"
                   values={{
                     contactName: item.initialName
@@ -132,7 +126,6 @@ function WhoIsEdit({ contacts, isOpen, checkAll, lang, onChange }) {
                 value={item.email}
                 label={<FormattedMessage
                   id="whois.edit.email"
-                  defaultMessage="E-mail avalik ({ contactEmail })"
                   tagName="label"
                   values={{
                     contactEmail: item.initialEmail

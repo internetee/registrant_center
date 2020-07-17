@@ -37,7 +37,6 @@ export default {
         item.ident.type !== 'org' &&
         domain.contacts[item.id]
     );
-    console.log({ domain, userContacts });
     return userContacts.reduce(
       (acc, contact) => ({
         ...acc,

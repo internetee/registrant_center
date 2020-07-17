@@ -4,7 +4,7 @@ import { FormattedMessage} from 'react-intl';
 import {Popup, Button, Form, Icon, Label, Container, Table, Modal, Confirm} from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Helmet, Loading, WhoIsEdit, MessageModule, PageMessage, MainLayout, WhoIsConfirmDialog } from '../../components';
+import { Loading, WhoIsEdit, MessageModule, PageMessage, MainLayout, WhoIsConfirmDialog } from '../../components';
 import domainStatuses from '../../utils/domainStatuses.json';
 import * as domainsActions from '../../redux/reducers/domains';
 import * as contactsActions from '../../redux/reducers/contacts';
@@ -13,7 +13,6 @@ import Helpers from '../../utils/helpers';
 const DomainPage = ({
   domain,
   fetchDomain,
-  history,
   contacts,
   lockDomain,
   match,
@@ -126,40 +125,18 @@ const DomainPage = ({
 
   if (!domain) {
     return (
-      <MainLayout ui={ui} user={user}>
-        <FormattedMessage
-          id="domain.domain_not_found_title"
-          defaultMessage='Domeeni ei leitud | EIS Registreerijaportaal'
-        >
-          {title => (
-            <Helmet>
-              <title>{title}</title>
-            </Helmet>
-          )}
-        </FormattedMessage>
-        <div className='main-hero'>
-          <h1>{ match.params.id }</h1>
-          <button type='button' className='back-link' onClick={history.goBack}>
-            <Icon name='arrow left'/>
-            <FormattedMessage
-              id='hero.link.back'
-              defaultMessage='Tagasi'
-            />
-          </button>
-        </div>
+      <MainLayout hasBackButton titleKey="domain.404.title" ui={ui} user={user}>
         <PageMessage
           headerContent={(
             <FormattedMessage
-              id="domain.none.message.title"
-              defaultMessage="Kahjuks sellise nimega domeeni ei leitud"
+              id="domain.404.message.title"
               tagName="span"
             />
           )}
           icon="frown outline"
         >
           <FormattedMessage
-            id='domain.none.message.text'
-            defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque, consequuntur est facere fuga illum ipsa ipsum quasi quo! Commodi consequuntur eligendi harum non ut. Architecto blanditiis dignissimos nulla placeat praesentium.'
+            id='domain.404.message.content'
             tagName='p'
           />
         </PageMessage>
@@ -168,30 +145,7 @@ const DomainPage = ({
   }
   
   return (
-    <MainLayout ui={ui} user={user}>
-      <FormattedMessage
-        id="domain.page_title"
-        defaultMessage='{domainName} | EIS Registreerijaportaal'
-        values={{
-          domainName: domain.name
-        }}
-      >
-        {title => (
-          <Helmet>
-            <title>{title}</title>
-          </Helmet>
-        )}
-      </FormattedMessage>
-      <div className='main-hero'>
-        <h1>{ domain.name }</h1>
-        <button type='button' className='back-link' onClick={ history.goBack }>
-          <Icon name='arrow left' />
-          <FormattedMessage
-            id='hero.link.back'
-            defaultMessage='Tagasi'
-          />
-        </button>
-      </div>
+    <MainLayout ui={ui} user={user} hasBackButton title={domain.name}>
       { !isSaving && message && <MessageModule message={message} lang={lang} /> }
       <div className='page page--domain'>
         <div className='page--header'>
@@ -210,12 +164,10 @@ const DomainPage = ({
                   { isLocked ? (
                     <FormattedMessage
                       id='domain.unlock'
-                      defaultMessage='Vabasta'
                     />
                   ) : (
                     <FormattedMessage
                       id='domain.lock'
-                      defaultMessage='Lukusta'
                     />
                   )}
                 </Button>
@@ -229,12 +181,10 @@ const DomainPage = ({
               <h2>
                 <FormattedMessage
                   id='domain.registrant'
-                  defaultMessage='Registreerija'
                 />
                 <Popup trigger={<Icon name='question circle'/>} basic inverted>
                   <FormattedMessage
                     id='domain.registrant.tooltip'
-                    defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid animi assumenda consequatur cum dolorum eaque expedita.'
                   />
                 </Popup>
               </h2>
@@ -246,7 +196,6 @@ const DomainPage = ({
                     <Table.Cell width='4'>
                       <FormattedMessage
                         id='domain.registrant.name'
-                        defaultMessage='Nimi'
                         tagName='strong'
                       />
                     </Table.Cell>
@@ -257,7 +206,6 @@ const DomainPage = ({
                       <Table.Cell width='4'>
                         <FormattedMessage
                           id='domain.registrant.ident'
-                          defaultMessage='Isikukood'
                           tagName='strong'
                         />
                       </Table.Cell>
@@ -269,7 +217,6 @@ const DomainPage = ({
                       <Table.Cell width='4'>
                         <FormattedMessage
                           id='domain.registrant.email'
-                          defaultMessage='E-mail'
                           tagName='strong'
                         />
                       </Table.Cell>
@@ -283,7 +230,6 @@ const DomainPage = ({
                       <Table.Cell width='4'>
                         <FormattedMessage
                           id='domain.registrant.phone'
-                          defaultMessage='Telefon'
                           tagName='strong'
                         />
                       </Table.Cell>
@@ -301,12 +247,10 @@ const DomainPage = ({
               <h2>
                 <FormattedMessage
                   id='domain.contacts'
-                  defaultMessage='Kontaktid'
                 />
                 <Popup trigger={<Icon name='question circle'/>} basic inverted>
                   <FormattedMessage
                     id='domain.contacts.tooltip'
-                    defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid animi assumenda consequatur cum dolorum eaque expedita.'
                   />
                 </Popup>
               </h2>
@@ -317,28 +261,24 @@ const DomainPage = ({
                   <Table.HeaderCell>
                     <FormattedMessage
                       id='domain.contact.type'
-                      defaultMessage='Kontakti tüüp'
                       tagName='strong'
                     />
                   </Table.HeaderCell>
                   <Table.HeaderCell>
                     <FormattedMessage
                       id='domain.contact.name'
-                      defaultMessage='Nimi'
                       tagName='strong'
                     />
                   </Table.HeaderCell>
                   <Table.HeaderCell>
                     <FormattedMessage
                       id='domain.contact.email'
-                      defaultMessage='E-mail'
                       tagName='strong'
                     />
                   </Table.HeaderCell>
                   <Table.HeaderCell>
                     <FormattedMessage
                       id='domain.contact.phone'
-                      defaultMessage='Telefon'
                       tagName='strong'
                     />
                   </Table.HeaderCell>
@@ -357,12 +297,10 @@ const DomainPage = ({
               <h2>
                 <FormattedMessage
                   id='domain.statuses'
-                  defaultMessage='Staatused'
                 />
                 <Popup trigger={<Icon name='question circle'/>} basic inverted>
                   <FormattedMessage
                     id='domain.statuses.tooltip'
-                    defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid animi assumenda consequatur cum dolorum eaque expedita.'
                   />
                 </Popup>
               </h2>
@@ -380,12 +318,10 @@ const DomainPage = ({
               <h2>
                 <FormattedMessage
                   id='domain.registrar'
-                  defaultMessage='Registripidaja'
                 />
                 <Popup trigger={<Icon name='question circle'/>} basic inverted>
                   <FormattedMessage
                     id='domain.registrar.tooltip'
-                    defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid animi assumenda consequatur cum dolorum eaque expedita.'
                   />
                 </Popup>
               </h2>
@@ -396,7 +332,6 @@ const DomainPage = ({
                   <Table.Cell width='4'>
                     <FormattedMessage
                       id='domain.registrar.name'
-                      defaultMessage='Nimi'
                       tagName='strong'
                     />
                   </Table.Cell>
@@ -406,7 +341,6 @@ const DomainPage = ({
                   <Table.Cell width='4'>
                     <FormattedMessage
                       id='domain.registrar.website'
-                      defaultMessage='Koduleht'
                       tagName='strong'
                     />
                   </Table.Cell>
@@ -426,19 +360,16 @@ const DomainPage = ({
               <h2>
                 <FormattedMessage
                   id='domain.nameservers'
-                  defaultMessage='Nimeserverid'
                 />
                 <Popup trigger={<Icon name='question circle'/>} basic inverted>
                   <FormattedMessage
                     id='domain.nameservers.tooltip'
-                    defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid animi assumenda consequatur cum dolorum eaque expedita.'
                   />
                 </Popup>
               </h2>
               { !domain.nameservers.length ? (
                 <FormattedMessage
                   id='domain.nameservers.text'
-                  defaultMessage='Nimeserverid puuduvad'
                   tagName='p'
                 />
               ) : null }
@@ -450,7 +381,6 @@ const DomainPage = ({
                     <Table.HeaderCell>
                       <FormattedMessage
                         id='domain.hostname'
-                        defaultMessage='Hostinimi'
                         tagName='strong'
                       />
                     </Table.HeaderCell>
@@ -470,19 +400,49 @@ const DomainPage = ({
             <header className='page--block--header'>
               <h2>
                 <FormattedMessage
-                  id='domain.whois_privacy'
-                  defaultMessage='WHOIS Privaatsus'
+                  id='domain.dnsSec.title'
                 />
                 <Popup trigger={<Icon name='question circle'/>} basic inverted>
                   <FormattedMessage
-                    id='domain.whois_privacy.tooltip'
-                    defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid animi assumenda consequatur cum dolorum eaque expedita.'
+                    id='domain.dnsSec.tooltip'
+                  />
+                </Popup>
+              </h2>
+              { !domain.dnssec_keys.length ? (
+                <FormattedMessage
+                  id='domain.dnsSec.noResults'
+                  tagName='p'
+                />
+              ) : null }
+            </header>
+            { domain.dnssec_keys.length ? (
+              <Table basic='very'>
+                <Table.Body>
+                  {domain.dnssec_keys.map(item => (
+                    <Table.Row key={item}>
+                      <Table.Cell>{ item }</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            ) : null }
+          </Container>
+        </div>
+        <div className='page--block'>
+          <Container text>
+            <header className='page--block--header'>
+              <h2>
+                <FormattedMessage
+                  id='domain.whoisPrivacy'
+                />
+                <Popup trigger={<Icon name='question circle'/>} basic inverted>
+                  <FormattedMessage
+                    id='domain.whoisPrivacy.tooltip'
                   />
                 </Popup>
               </h2>
               <FormattedMessage
-                id='domain.whois_privacy.text'
-                defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid animi assumenda consequatur cum dolorum eaque expedita.'
+                id='domain.whoisPrivacy.text'
                 tagName='p'
               />
             </header>
@@ -491,8 +451,7 @@ const DomainPage = ({
               <div className='form-actions'>
                 <Button type='submit' primary size={uiElemSize} loading={isSaving} disabled={!isDirty}>
                   <FormattedMessage
-                    id='domain.whois_privacy.save'
-                    defaultMessage='Salvesta'
+                    id='actions.save'
                     tagName='span'
                   />
                 </Button>
@@ -512,13 +471,11 @@ const DomainPage = ({
             {isLocked ? (
               <FormattedMessage
                 id='domain.unlock.title'
-                defaultMessage='Kas oled kindel, et soovid domeeni vabastada?'
                 tagName='h2'
               />
             ): (
               <FormattedMessage
                 id='domain.lock.title'
-                defaultMessage='Kas oled kindel, et soovid domeeni lukustada?'
                 tagName='h2'
               />
             )}
@@ -529,32 +486,28 @@ const DomainPage = ({
             {isLocked ? (
               <FormattedMessage
                 id='domain.unlock.description'
-                defaultMessage='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque dicta earum harum, inventore itaque maiores nemo nobis porro quasi rem repellendus repudiandae saepe sequi voluptas voluptates? Deleniti facere illum suscipit.'
                 tagName='p'
               />
             ) : (
               <FormattedMessage
                 id='domain.lock.description'
-                defaultMessage='Sellisel juhul võimalikud vaid serveri poolsed muudatused seni kuni pole lukku eemaldatud. Kõik registripidaja poolsed toimingud va domeeni pikendamine on keelatud.'
                 tagName='p'
               />
             )}
           </Modal.Content>
         }
         confirmButton={
-          <Button data-test='lock-domain' primary size={ uiElemSize }>
+          <Button data-test='lock-domain' primary size={uiElemSize}>
             <FormattedMessage
-              id='domain.lock.yes'
-              defaultMessage='Jah'
+              id='actions.confirm.yes'
               tagName='span'
             />
           </Button>
         }
         cancelButton={
-          <Button data-test='close-lock-modal' secondary size={ uiElemSize }>
+          <Button data-test='close-lock-modal' secondary size={uiElemSize}>
             <FormattedMessage
-              id='domain.lock.no'
-              defaultMessage='Ei'
+              id='actions.confirm.no'
               tagName='span'
             />
           </Button>
@@ -596,14 +549,12 @@ const DomainContacts = ({ type, contacts }) => {
         {type === 'admin' && (
           <FormattedMessage
             id='domain.contact.admin'
-            defaultMessage='Admin'
             tagName='strong'
           />
         )}
         {type ==='tech' ? (
           <FormattedMessage
             id='domain.contact.tech'
-            defaultMessage='Tehniline'
             tagName='strong'
           />
         ) : ('') }
@@ -617,13 +568,10 @@ const DomainContacts = ({ type, contacts }) => {
   ));
 };
 
-const mapStateToProps = (state, { match }) => {
-  console.log('state change', state.domains.data[match.params.id]);
-  return {
-    domain: state.domains.data[match.params.id],
-    contacts: state.contacts.data,
-  };
-};
+const mapStateToProps = (state, { match }) => ({
+  domain: state.domains.data[match.params.id],
+  contacts: state.contacts.data,
+});
 
 export default connect(
   mapStateToProps,

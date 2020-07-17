@@ -41,18 +41,13 @@ function WhoIsConfirmDialog({
       onCancel={onCancel}
       header={
         <Modal.Header>
-          <FormattedMessage
-            id="whois.confirm_modal.title"
-            defaultMessage="Kas oled kindel, et soovid kontaktandmeid muuta?"
-            tagName="h2"
-          />
+          <FormattedMessage id="whois.confirmModal.title" tagName="h2" />
         </Modal.Header>
       }
       content={
         <Modal.Content className="center">
           <FormattedMessage
-            id="whois.confirm_modal.description.title"
-            defaultMessage="Teie muudatused kajastuvad järgmiste domeenide puhul:"
+            id="whois.confirmModal.description.title"
             tagName="h3"
           />
           <List divided relaxed size="small" className="changed-domains-list">
@@ -69,7 +64,6 @@ function WhoIsConfirmDialog({
                   <List.Description>
                     <FormattedMessage
                       id="whois.confirm_modal.description.roles"
-                      defaultMessage="Roll: "
                       tagName="strong"
                     />
                     <Roles roles={item.roles} />
@@ -82,11 +76,7 @@ function WhoIsConfirmDialog({
       }
       confirmButton={
         <Button data-test="change-contacts" primary size={uiElemSize}>
-          <FormattedMessage
-            id="whois.confirm_modal.confirm"
-            defaultMessage="Jah"
-            tagName="span"
-          />
+          <FormattedMessage id="actions.confirm.yes" defaultMessage="Jah" />
         </Button>
       }
       cancelButton={
@@ -95,11 +85,7 @@ function WhoIsConfirmDialog({
           secondary
           size={uiElemSize}
         >
-          <FormattedMessage
-            id="whois.confirm_modal.submicancel"
-            defaultMessage="Ei"
-            tagName="span"
-          />
+          <FormattedMessage id="actions.confirm.no" defaultMessage="Ei" />
         </Button>
       }
     />

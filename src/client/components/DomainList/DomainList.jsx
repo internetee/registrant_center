@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes, { instanceOf } from 'prop-types';
 import MediaQuery from 'react-responsive';
-import { FormattedHTMLMessage, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Table, Button, Form, Input, Icon, Transition, Dropdown, Container, Pagination } from 'semantic-ui-react';
 import Masonry from 'react-masonry-component';
 import Flatpickr from 'react-flatpickr';
@@ -302,11 +302,11 @@ class DomainList extends Component {
         <div className='page--header'>
           <Container>
             <div className='page--header--text'>
-              <FormattedHTMLMessage
-                id='domains.title'
-                defaultMessage='Minu domeenid <span>({userTotalDomains})</span>'
+              <FormattedMessage
+                id="domains.title"
                 tagName='h2'
                 values={{
+                  span: text => <span>{text}</span>,
                   userTotalDomains: totalDomains
                 }}
               />
@@ -332,16 +332,14 @@ class DomainList extends Component {
                   <Form.Group>
                     <Form.Field width='5'>
                       <FormattedMessage
-                        id='domains.form.select_registrant'
-                        defaultMessage='Registreerija'
+                        id='domains.form.selectRegistrant'
                         tagName='label'
                       />
                       <Dropdown name='queryRegistrant' fluid selection search options={registrants} value={queryRegistrant} onChange={this.handleChange}/>
                     </Form.Field>
                     <Form.Field width='5'>
                       <FormattedMessage
-                        id='domains.form.date_range'
-                        defaultMessage='Kehtivusaeg'
+                        id='domains.form.dateRange'
                         tagName='label'
                       />
                       <Form.Group className='date-range'>
@@ -362,8 +360,7 @@ class DomainList extends Component {
                     </Form.Field>
                     <Form.Field width='6'>
                       <FormattedMessage
-                        id='domains.form.select_status'
-                        defaultMessage='Staatus'
+                        id='domains.form.selectStatus'
                         tagName='label'
                       />
                       <Dropdown name='queryStatus' fluid selection options={statuses} value={queryStatus} onChange={this.handleChange}/>
@@ -372,7 +369,6 @@ class DomainList extends Component {
                       <Button primary>
                         <FormattedMessage
                           id='domains.form.filter'
-                          defaultMessage='Filtreeri'
                           tagName='span'
                         />
                       </Button>
@@ -410,29 +406,25 @@ class DomainList extends Component {
                           <Table.Row>
                             <Table.HeaderCell>
                               <FormattedMessage
-                                id='domains.domain_name'
-                                defaultMessage='Domeeninimi'
+                                id='domains.domainName'
                                 tagName='span'
                               />
                             </Table.HeaderCell>
                             <Table.HeaderCell>
                               <FormattedMessage
                                 id='domains.registrar'
-                                defaultMessage='Registripidaja'
                                 tagName='span'
                               />
                             </Table.HeaderCell>
                             <Table.HeaderCell>
                               <FormattedMessage
                                 id='domains.status'
-                                defaultMessage='Staatus'
                                 tagName='span'
                               />
                             </Table.HeaderCell>
                             <Table.HeaderCell>
                               <FormattedMessage
-                                id='domains.valid_until'
-                                defaultMessage='Kehtiv kuni'
+                                id='domains.validUntil'
                                 tagName='span'
                               />
                             </Table.HeaderCell>
@@ -461,7 +453,6 @@ class DomainList extends Component {
                             <Icon name='arrow left' />
                             <FormattedMessage
                               id='pagination.previous'
-                              defaultMessage='Eelmised'
                               tagName='span'
                             />
                           </React.Fragment>),
@@ -473,7 +464,6 @@ class DomainList extends Component {
                           <React.Fragment>
                             <FormattedMessage
                               id='pagination.next'
-                              defaultMessage='Järgmised'
                               tagName='span'
                             />
                             <Icon name='arrow right' />
@@ -485,8 +475,7 @@ class DomainList extends Component {
                     <Form>
                       <Form.Field inline>
                         <FormattedMessage
-                          id='pagination.per_page'
-                          defaultMessage='Tulemusi lehel'
+                          id='pagination.perPage'
                           tagName='label'
                         />
                         <Dropdown selection options={perPageOptions} value={perPage} onChange={this.handleItemsPerPage} />
@@ -500,8 +489,6 @@ class DomainList extends Component {
                 headerContent={(
                   <FormattedMessage
                     id="domains.search.message.title"
-                    defaultMessage="Otsingule vastavaid domeene ei leitud"
-                    tagName="span"
                   />
                 )}
               />
@@ -512,7 +499,6 @@ class DomainList extends Component {
             headerContent={(
               <FormattedMessage
                 id="domains.none.message.title"
-                defaultMessage="Teile ei kuulu hetkel ühtegi domeeni"
                 tagName="span"
               />
             )}
