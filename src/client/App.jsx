@@ -61,7 +61,7 @@ class App extends PureComponent {
                   <Route
                     exact
                     path='/login'
-                    render={(props) => <LoginPage {...this.props} {...props} />}
+                    render={(props) => <LoginPage {...props} />}
                   />
                   <Route
                     exact

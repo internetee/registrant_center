@@ -123,7 +123,7 @@ export default function(state = initialState, action) {
     case LOGOUT_USER:
       return {
         ...initialState,
-        status: action.status
+        status: state.status
       };
     default:
       return state;

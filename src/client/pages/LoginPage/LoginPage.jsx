@@ -1,21 +1,21 @@
 import React from 'react';
 import { FormattedMessage} from 'react-intl';
-import { withRouter } from 'react-router-dom';
 import { Button, Container, Icon, Form } from 'semantic-ui-react';
+import { connect } from 'react-redux';
 import {MainLayout, MessageModule} from '../../components';
 
 class LoginPage extends React.PureComponent {
 
   render() {
-    const { user, lang, ui } = this.props;
+    const { user, ui } = this.props;
     const message = {
       code: user.status > 0 ? user.status : null,
       type: 'logout'
     };
     
     return (
-      <MainLayout heroKey="login.hero.text" titleKey="login.title" ui={ui} user={user}>
-        { message.code && <MessageModule message={message} lang={lang} /> }
+      <MainLayout heroKey="login.hero.text" titleKey="login.title" ui={ui} user={user.data}>
+        { message.code && <MessageModule message={message} lang={ui.lang} /> }
         <div className="page page--login">
           <div className='u-container'>
             <Container text textAlign='center' className='page--login--area'>
@@ -73,4 +73,15 @@ class LoginPage extends React.PureComponent {
   }
 }
 
-export default withRouter(LoginPage);
+const mapStateToProps = (state) => {
+  return {
+    ui: state.ui,
+    user: state.user,
+    location: state.router.location
+  };
+};
+
+export default connect(
+  mapStateToProps
+)(LoginPage);
+

@@ -104,23 +104,29 @@ export default {
         error: 'Invalid user'
       });
     }
-
-    const user = await User.findOne({ ident: session.user.ident });
-    if (user) {
-      if (!session.token) {
-        const userData = session.user;
-        const response = await API(session).post(
-          '/api/v1/registrant/auth/eid',
-          userData
-        );
-        // eslint-disable-next-line no-param-reassign
-        session.token = response.data;
+    try {
+      const user = await User.findOne({ ident: session.user.ident });
+      if (user) {
+        if (!session.token) {
+          const userData = session.user;
+          const response = await API(session).post(
+            '/api/v1/registrant/auth/eid',
+            userData
+          );
+          // eslint-disable-next-line no-param-reassign
+          session.token = response.data;
+        }
+        return res.status(200).json(user);
       }
-      return res.status(200).json(user);
+      return res.status(404).json({
+        error: 'User not found'
+      });
+    } catch (e) {
+      if (e.response.status) {
+        return res.status(e.response.status).json({});
+      }
+      return res.status(408).json({});
     }
-    return res.status(404).json({
-      error: 'User not found'
-    });
   },
 
   destroyUser: async (req, res) => {
