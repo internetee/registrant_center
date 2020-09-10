@@ -120,7 +120,7 @@ const WhoIsPage = ({ cookies, fetchContacts, initialContacts, initialDomains, me
 
   return (
     <MainLayout hasBackButton titleKey="whois.title" ui={ui} user={user}>
-      { !isLoading && message && <MessageModule message={message} lang={lang} /> }
+      { !isLoading && message && <MessageModule message={message} /> }
       <div className='page page--whois'>
         { initialDomains ? (
           <React.Fragment>

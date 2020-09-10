@@ -1,8 +1,8 @@
 const contacts = {
   isLoading: false,
   isInvalidated: false,
-  data: [
-    {
+  data: {
+    'cfbfbb76-aed8-497a-91c1-48d82cbc4588': {
       id: 'cfbfbb76-aed8-497a-91c1-48d82cbc4588',
       name: 'Test Registrant',
       code: 'TEST:REGISTRANT',
@@ -22,13 +22,10 @@ const contacts = {
         country_code: null
       },
       auth_info: '16c57aa7c435b959179c7b',
-      statuses: [
-        'ok',
-        'linked'
-      ],
+      statuses: ['ok', 'linked'],
       disclosed_attributes: []
     },
-    {
+    '528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7': {
       id: '528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7',
       name: 'Test Admin',
       code: 'TEST:ADMIN',
@@ -48,13 +45,10 @@ const contacts = {
         country_code: null
       },
       auth_info: '0e81a4b9049eda45c823a9',
-      statuses: [
-        'ok',
-        'linked'
-      ],
+      statuses: ['ok', 'linked'],
       disclosed_attributes: ['email']
     },
-    {
+    '700829af-4bdd-4c5f-8389-f6568e2ba4ad': {
       id: '700829af-4bdd-4c5f-8389-f6568e2ba4ad',
       name: 'Test Tech',
       code: 'TEST:TECH',
@@ -74,12 +68,14 @@ const contacts = {
         country_code: null
       },
       auth_info: '32776bf4c1d6995e6aa657',
-      statuses: [
-        'ok',
-        'linked'
-      ],
+      statuses: ['ok', 'linked'],
       disclosed_attributes: ['email', 'name']
-    },
+    }
+  },
+  ids: [
+    'cfbfbb76-aed8-497a-91c1-48d82cbc4588',
+    '528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7',
+    '700829af-4bdd-4c5f-8389-f6568e2ba4ad'
   ],
   status: 200,
   errors: false,

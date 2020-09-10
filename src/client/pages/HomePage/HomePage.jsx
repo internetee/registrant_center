@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { bindActionCreators } from 'redux';
 import {DomainList, UserData, MainLayout} from '../../components';
+import {
+  fetchDomains as fetchDomainsAction
+} from '../../redux/reducers/domains';
 
-const HomePage = ({ domains, ui, user }) => {
+const HomePage = ({ domains, fetchDomains, ui, user }) => {
   const { lang } = ui;
   moment.locale(lang);
+
+  useEffect(() => {
+    (async () => {
+      await fetchDomains();
+    })();
+  }, [fetchDomains]);
+
   return (
     <MainLayout
       heroKey="dashboard.hero.text"
@@ -67,12 +78,17 @@ const HomePage = ({ domains, ui, user }) => {
       </div>
     </MainLayout>
   );
-}
-
-const mapStateToProps = (state) => {
-  return {
-    domains: Object.values(state.domains.data),
-  };
 };
 
-export default connect(mapStateToProps)(HomePage);
+const mapStateToProps = ({ domains, ui, user }) => ({
+  domains: Object.values(domains.data),
+  ui,
+  user: user.data,
+});
+
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  fetchDomains: fetchDomainsAction,
+}, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps())(HomePage);

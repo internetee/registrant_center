@@ -1,8 +1,8 @@
 const domains = {
   isLoading: false,
   isInvalidated: false,
-  data: [
-    {
+  data: {
+    'bd695cc9-1da8-4c39-b7ac-9a2055e0a93e': {
       id: 'bd695cc9-1da8-4c39-b7ac-9a2055e0a93e',
       name: 'domain.ee',
       registrar: {
@@ -27,7 +27,7 @@ const domains = {
         {
           name: 'Test Admin',
           id: '528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7'
-        },
+        }
       ],
       transfer_code: '1a055bd6b339b94b5ca2205f86dc325d',
       name_dirty: 'domain.ee',
@@ -45,34 +45,24 @@ const domains = {
       registrant_verification_token: null,
       pending_json: {},
       force_delete_at: null,
-      statuses: [
-        'ok'
-      ],
+      statuses: ['ok'],
       locked_by_registrant_at: null,
       reserved: false,
       status_notes: {},
       nameservers: [
         {
           hostname: 'ns2.test.ee',
-          ipv4: [
-            '127.0.0.2'
-          ],
-          ipv6: [
-            '0:0:0:0:0:0:0:2'
-          ]
+          ipv4: ['127.0.0.2'],
+          ipv6: ['0:0:0:0:0:0:0:2']
         },
         {
           hostname: 'ns1.test.ee',
-          ipv4: [
-            '127.0.0.1'
-          ],
-          ipv6: [
-            '0:0:0:0:0:0:0:1'
-          ]
+          ipv4: ['127.0.0.1'],
+          ipv6: ['0:0:0:0:0:0:0:1']
         }
       ]
     },
-    {
+    '2198affc-7479-499d-9eae-b0611ec2fb49': {
       id: '2198affc-7479-499d-9eae-b0611ec2fb49',
       name: 'lockeddomain.ee',
       registrar: {
@@ -97,7 +87,7 @@ const domains = {
         {
           name: 'Test Registrant As Admin',
           id: 'cfbfbb76-aed8-497a-91c1-48d82cbc4588'
-        },
+        }
       ],
       transfer_code: '0245c8bc6281e5383986ff97636ead6d',
       name_dirty: 'lockeddomain.ee',
@@ -126,24 +116,20 @@ const domains = {
       nameservers: [
         {
           hostname: 'ns2.we.ee',
-          ipv4: [
-            '127.0.0.2'
-          ],
-          ipv6: [
-            '0:0:0:0:0:0:0:2'
-          ]
+          ipv4: ['127.0.0.2'],
+          ipv6: ['0:0:0:0:0:0:0:2']
         },
         {
           hostname: 'ns1.we.ee',
-          ipv4: [
-            '127.0.0.1'
-          ],
-          ipv6: [
-            '0:0:0:0:0:0:0:1'
-          ]
+          ipv4: ['127.0.0.1'],
+          ipv6: ['0:0:0:0:0:0:0:1']
         }
       ]
-    },
+    }
+  },
+  ids: [
+    'bd695cc9-1da8-4c39-b7ac-9a2055e0a93e',
+    '2198affc-7479-499d-9eae-b0611ec2fb49'
   ],
   status: null,
   fetchedAt: 1542179235644

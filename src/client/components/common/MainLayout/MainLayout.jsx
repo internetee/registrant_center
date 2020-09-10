@@ -17,8 +17,6 @@ const MainLayout = ({
   title,
   titleValues,
   titleKey,
-  ui,
-  user
 }) => {
   const { goBack } = useHistory();
   const { formatMessage } = useIntl();
@@ -28,7 +26,7 @@ const MainLayout = ({
         ...htmlTitleValues,
         ...titleValues
       }) + formatMessage({ id: 'head.title' })} />
-      <MainHeader ui={ui} user={user} />
+      <MainHeader />
       <main className="main-layout">
         <div className="main-hero">
           {title && <h1>{title}</h1>}
@@ -51,7 +49,7 @@ const MainLayout = ({
         </div>
         {children}
       </main>
-      <MainFooter ui={ui} />
+      <MainFooter />
     </React.Fragment>
   );
 };

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import {Button, Container, Icon} from 'semantic-ui-react';
@@ -9,129 +9,94 @@ import MainMenu from '../MainMenu/MainMenu';
 import * as uiActions from '../../../redux/reducers/ui';
 import * as userActions from '../../../redux/reducers/user';
 
-class MainHeader extends Component {
-  
-  state  = {
-    isCookiesAccepted: false,
+function MainHeader({ closeMainMenu, cookies, logoutUser, setLang, toggleMainMenu, ui, user }) {
+  const { lang, menus: { main }} = ui;
+  const [isCookiesAccepted, setIsCookiesAccepted] = useState(false);
+  const [isHeaderFixed, setIsHeaderFixed] = useState(false);
+
+  const handleScroll = (e) => {
+    const { scrollTop } = e.target.scrollingElement;
+    setIsHeaderFixed(scrollTop > 0);
   };
-  
-  componentDidMount() {
-    const { cookies } = this.props;
-    if (cookies.get('cookies_accepted')) {
-      this.setState(prevState => ({
-        ...prevState,
-        isCookiesAccepted: true
-      }));
-    } else {
-      this.setState(prevState => ({
-        ...prevState,
-        isCookiesAccepted: false
-      }));
-    }
-    window.addEventListener('scroll', this.handleScroll);
-  }
-  
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-  }
-  
-  handleLangSwitch = (lang) => {
-    const { setLang } = this.props;
-    setLang(lang);
-    this.setState({ lang });
-  };
-  
-  handleLogout = () => {
-    const { logoutUser, closeMainMenu } = this.props;
+
+  useEffect(() => {
+    setIsCookiesAccepted(!!cookies.get('cookies_accepted'));
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [cookies]);
+
+  const handleLogout = () => {
     logoutUser();
     closeMainMenu();
   };
-  
-  handleCookies = () => {
-    const { cookies } = this.props;
+
+  const handleCookies = () => {
     cookies.set('cookies_accepted', true, { path: '/' });
-    this.setState(prevState => ({
-      ...prevState,
-      isCookiesAccepted: true
-    }));
   };
-  
-  handleScroll = (e) => {
-    const { scrollTop } = e.target.scrollingElement;
-    this.setState(prevState => ({
-      ...prevState,
-      isHeaderFixed: scrollTop > 0
-    }));
-  };
-  
-  render() {
-    const { ui, user, toggleMainMenu, closeMainMenu } = this.props;
-    const { lang, menus: { main }} = ui;
-    const { isCookiesAccepted, isHeaderFixed } = this.state;
-    return (
-      <React.Fragment>
-        { !isCookiesAccepted && (
-          <div className='cookie-notice'>
-            <Container>
-              <div className='content'>
-                <FormattedMessage
-                  id="cookieNotice.content"
-                  tagName='p'
-                  values={{
-                    a: linkText => (
-                      <a href="https://internet.ee/eis/kupsised-internet-ee-lehel" rel="noreferrer" target="_blank">
-                        {linkText}
-                      </a>
-                    ),
-                  }}
-                />
-              </div>
-              <div className='actions'>
-                <Button type='button' primary onClick={this.handleCookies}>
-                  <FormattedMessage
-                    id='cookieNotice.close'
-                  />
-                </Button>
-              </div>
-            </Container>
-          </div>
-        )}
-        <header className={ classNames({ 'main-header': true, 'u-fixed': isHeaderFixed }) }>
-          <MediaQuery query="(min-width: 1224px)">
-            <div className='main-header-top'>
-              <PortalMenu items={main} lang={lang} />
-              <LangMenu lang={lang} handleLangSwitch={this.handleLangSwitch} />
-              <UserMenu user={user} toggleMainMenu={toggleMainMenu} handleLogout={this.handleLogout} />
+
+  return (
+    <React.Fragment>
+      { !isCookiesAccepted && (
+        <div className='cookie-notice'>
+          <Container>
+            <div className='content'>
+              <FormattedMessage
+                id="cookieNotice.content"
+                tagName='p'
+                values={{
+                  a: linkText => (
+                    <a href="https://internet.ee/eis/kupsised-internet-ee-lehel" rel="noreferrer" target="_blank">
+                      {linkText}
+                    </a>
+                  ),
+                }}
+              />
             </div>
-          </MediaQuery>
-          <div className='main-header-bottom'>
-            <Logo />
-            <MediaQuery query="(min-width: 1224px)">
-              <MainMenu items={main} user={user} lang={lang} />
-            </MediaQuery>
-            <MediaQuery query="(max-width: 1223px)">
-              <div className='actions'>
-                <button type='button' className='btn btn-menu' onClick={() => toggleMainMenu()}>
-                  <Icon name='bars'/>
-                </button>
-              </div>
-            </MediaQuery>
-          </div>
-        </header>
-        <MediaQuery query="(max-width: 1223px)">
-          <div className="menu-mobile">
-            <button type="button" className="btn btn-menu" onClick={() => toggleMainMenu()}>
-              <Icon name="times" />
-            </button>
-            <LangMenu lang={lang} handleLangSwitch={this.handleLangSwitch} />
-            <MainMenu items={main} user={user} lang={lang} closeMainMenu={closeMainMenu} />
-            <UserMenu user={user} closeMainMenu={closeMainMenu} handleLogout={this.handleLogout} />
+            <div className='actions'>
+              <Button type='button' primary onClick={handleCookies}>
+                <FormattedMessage
+                  id='cookieNotice.close'
+                />
+              </Button>
+            </div>
+          </Container>
+        </div>
+      )}
+      <header className={ classNames({ 'main-header': true, 'u-fixed': isHeaderFixed }) }>
+        <MediaQuery query="(min-width: 1224px)">
+          <div className='main-header-top'>
             <PortalMenu items={main} lang={lang} />
+            <LangMenu lang={lang} handleLangSwitch={setLang} />
+            <UserMenu user={user} toggleMainMenu={toggleMainMenu} handleLogout={handleLogout} />
           </div>
         </MediaQuery>
-      </React.Fragment>
-    );
-  }
+        <div className='main-header-bottom'>
+          <Logo />
+          <MediaQuery query="(min-width: 1224px)">
+            <MainMenu items={main} user={user} lang={lang} />
+          </MediaQuery>
+          <MediaQuery query="(max-width: 1223px)">
+            <div className='actions'>
+              <button type='button' className='btn btn-menu' onClick={() => toggleMainMenu()}>
+                <Icon name='bars'/>
+              </button>
+            </div>
+          </MediaQuery>
+        </div>
+      </header>
+      <MediaQuery query="(max-width: 1223px)">
+        <div className="menu-mobile">
+          <button type="button" className="btn btn-menu" onClick={() => toggleMainMenu()}>
+            <Icon name="times" />
+          </button>
+          <LangMenu lang={lang} handleLangSwitch={setLang} />
+          <MainMenu items={main} user={user} lang={lang} closeMainMenu={closeMainMenu} />
+          <UserMenu user={user} closeMainMenu={closeMainMenu} handleLogout={handleLogout} />
+          <PortalMenu items={main} lang={lang} />
+        </div>
+      </MediaQuery>
+    </React.Fragment>
+  );
 }
 
 const Logo = () => {
@@ -210,4 +175,9 @@ const UserMenu = ({ user, handleLogout }) => {
   return null;
 };
 
-export default withCookies(connect(null, { ...uiActions, ...userActions })(MainHeader));
+const mapStateToProps = ({ ui, user }) => ({
+  ui,
+  user: user.data,
+});
+
+export default withCookies(connect(mapStateToProps, { ...uiActions, ...userActions })(MainHeader));

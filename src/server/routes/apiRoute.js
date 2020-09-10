@@ -7,6 +7,7 @@ dotenv.config();
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
 
 const isSessionValid = req => {
+  console.log(JSON.stringify(req.session, null, 2));
   return (
     !!req.session.token &&
     new Date(req.session.token.expires_at).getTime() > new Date().getTime()

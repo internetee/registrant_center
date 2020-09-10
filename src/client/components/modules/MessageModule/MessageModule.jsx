@@ -1,11 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Message, Container, Icon } from 'semantic-ui-react';
 import staticMessages from '../../../utils/staticMessages.json';
 
-/**
- * @return {null}
- */
 function MessageModule({ message, lang, formMessage }) {
   if (message) {
     let text = staticMessages[lang][message.type][message.code];
@@ -34,13 +31,8 @@ function MessageModule({ message, lang, formMessage }) {
   }
   return null;
 }
+const mapStateToProps = ({ ui }) => ({
+  lang: ui.lang,
+});
 
-MessageModule.propTypes = {
-  formMessage: PropTypes.bool,
-};
-
-MessageModule.defaultProps = {
-  formMessage: false,
-};
-
-export default MessageModule;
+export default connect(mapStateToProps)(MessageModule);

@@ -146,7 +146,7 @@ const DomainPage = ({
   
   return (
     <MainLayout ui={ui} user={user} hasBackButton title={domain.name}>
-      { !isSaving && message && <MessageModule message={message} lang={lang} /> }
+      { !isSaving && message && <MessageModule message={message} /> }
       <div className='page page--domain'>
         <div className='page--header'>
           <Container textAlign='center'>

@@ -125,7 +125,7 @@ const DomainEditPage = ({ contacts, domain, fetchContacts, message, ui, updateCo
         </div>
         <Card centered>
           <Card.Content>
-            {!isSaving && message && <MessageModule message={message} lang={lang} formMessage />}
+            {!isSaving && message && <MessageModule message={message} formMessage />}
             <Form onSubmit={toggleSubmitConfirmModal}>
               { !isUserNameDifferent && (
                 <Form.Field>

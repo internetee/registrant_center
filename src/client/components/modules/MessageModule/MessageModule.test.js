@@ -13,17 +13,17 @@ describe('components/modules/MessageModule', () => {
   };
   
   it('should render', () => {
-    const cmp = mount(<MessageModule message={mockErrorMessage} lang='et' />);
+    const cmp = mount(<MessageModule message={mockErrorMessage} />);
     expect(cmp).toMatchSnapshot();
   });
   
   it('should render error message', () => {
-    const cmp = mount(<MessageModule message={mockErrorMessage} lang='et' />);
+    const cmp = mount(<MessageModule message={mockErrorMessage} />);
     expect(cmp.find('.message').hasClass('negative')).toBeTruthy();
   });
   
   it('should render success message', () => {
-    const cmp = mount(<MessageModule message={mockSuccessMessage} lang='et' />);
+    const cmp = mount(<MessageModule message={mockSuccessMessage} />);
     expect(cmp.find('.message').hasClass('positive')).toBeTruthy();
   });
   
