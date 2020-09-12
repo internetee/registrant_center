@@ -1,16 +1,19 @@
-import staticMessages from '../../utils/staticMessages.json';
+import { useIntl } from 'react-intl';
 
-const Roles = ({ lang, roles }) => {
-  return roles.map((role, i) => {
-    const { domain } = staticMessages[lang];
-    if (i === roles.length - 1) {
-      return domain[role];
-    }
-    if (i === roles.length - 2) {
-      return `${domain[role]} & `;
-    }
-    return `${domain[role]}, `;
-  });
+const Roles = ({ roles }) => {
+    const { formatMessage } = useIntl();
+    return roles.map((role, i) => {
+        const domainRole = formatMessage({
+            id: `domain.${role}`,
+        });
+        if (i === roles.length - 1) {
+            return domainRole;
+        }
+        if (i === roles.length - 2) {
+            return `${domainRole} & `;
+        }
+        return `${domainRole}, `;
+    });
 };
 
 export default Roles;

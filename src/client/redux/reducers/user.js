@@ -1,133 +1,131 @@
-import { push } from 'connected-react-router';
 import api from '../../utils/api';
 import {
-  FETCH_USER_REQUEST,
-  FETCH_USER_SUCCESS,
-  FETCH_USER_FAILURE,
-  LOGOUT_USER
+    FETCH_USER_REQUEST,
+    FETCH_USER_SUCCESS,
+    FETCH_USER_FAILURE,
+    LOGOUT_USER,
 } from '../actions';
 
 const requestUser = () => {
-  return {
-    type: FETCH_USER_REQUEST,
-    isLoading: true
-  };
+    return {
+        isLoading: true,
+        type: FETCH_USER_REQUEST,
+    };
 };
 
 const receiveUser = data => {
-  return {
-    type: FETCH_USER_SUCCESS,
-    status: 200,
-    data: {
-      ...data,
-      name: `${data.first_name} ${data.last_name}`
-    },
-    isLoading: false,
-    isInvalidated: false
-  };
+    return {
+        data: {
+            ...data,
+            name: `${data.first_name} ${data.last_name}`,
+        },
+        isInvalidated: false,
+        isLoading: false,
+        status: 200,
+        type: FETCH_USER_SUCCESS,
+    };
 };
 
 const invalidateUserRequest = status => {
-  return {
-    type: FETCH_USER_FAILURE,
-    status,
-    isLoading: false,
-    isInvalidated: true
-  };
+    return {
+        isInvalidated: true,
+        isLoading: false,
+        status,
+        type: FETCH_USER_FAILURE,
+    };
 };
 
 const fetchUser = () => dispatch => {
-  dispatch(requestUser());
-  return api
-    .fetchUser()
-    .then(res => res.data)
-    .then(async data => {
-      dispatch(receiveUser(data));
-    })
-    .catch(error => {
-      dispatch(invalidateUserRequest(error.response.status));
-    });
+    dispatch(requestUser());
+    return api
+        .fetchUser()
+        .then(res => res.data)
+        .then(async data => {
+            dispatch(receiveUser(data));
+        })
+        .catch(error => {
+            dispatch(invalidateUserRequest(error.response.status));
+        });
 };
 
 const logoutUser = () => dispatch => {
-  return api
-    .destroyUser()
-    .then(res => res.status)
-    .then(data => {
-      dispatch({
-        type: LOGOUT_USER,
-        status: data
-      });
-      dispatch(push('/login'));
-    })
-    .catch(error => {
-      dispatch({
-        type: LOGOUT_USER,
-        status: error.response.status
-      });
-    });
+    return api
+        .destroyUser()
+        .then(res => res.status)
+        .then(data => {
+            dispatch({
+                status: data,
+                type: LOGOUT_USER,
+            });
+        })
+        .catch(error => {
+            dispatch({
+                status: error.response.status,
+                type: LOGOUT_USER,
+            });
+        });
 };
 
 const shouldFetchUser = state => {
-  const { user } = state;
-  if (!user.fetchedAt) {
-    return true;
-  }
-  if (user.isLoading) {
-    return false;
-  }
-  return user.isInvalidated;
+    const { user } = state;
+    if (!user.fetchedAt) {
+        return true;
+    }
+    if (user.isLoading) {
+        return false;
+    }
+    return user.isInvalidated;
 };
 
 const fetchUserIfNeeded = () => (dispatch, getState) => {
-  if (shouldFetchUser(getState())) {
-    return dispatch(fetchUser());
-  }
-  return Promise.resolve();
+    if (shouldFetchUser(getState())) {
+        return dispatch(fetchUser());
+    }
+    return Promise.resolve();
 };
 
 const initialState = {
-  isLoading: false,
-  isInvalidated: false,
-  data: {},
-  status: null,
-  fetchedAt: null
+    data: {},
+    fetchedAt: null,
+    isInvalidated: false,
+    isLoading: false,
+    status: null,
 };
 
 export default function(state = initialState, action) {
-  switch (action.type) {
-    case FETCH_USER_FAILURE:
-      return {
-        ...state,
-        status: action.status,
-        isLoading: action.isLoading,
-        isInvalidated: action.isInvalidated
-      };
+    switch (action.type) {
+        case FETCH_USER_FAILURE:
+            return {
+                ...state,
+                isInvalidated: action.isInvalidated,
+                isLoading: action.isLoading,
+                status: action.status,
+            };
 
-    case FETCH_USER_REQUEST:
-      return {
-        ...state,
-        isLoading: action.isLoading
-      };
+        case FETCH_USER_REQUEST:
+            return {
+                ...state,
+                isLoading: action.isLoading,
+            };
 
-    case FETCH_USER_SUCCESS:
-      return {
-        ...state,
-        data: action.data,
-        status: action.status,
-        isLoading: action.isLoading,
-        isInvalidated: action.isInvalidated,
-        fetchedAt: Date.now()
-      };
+        case FETCH_USER_SUCCESS:
+            return {
+                ...state,
+                data: action.data,
+                fetchedAt: Date.now(),
+                isInvalidated: action.isInvalidated,
+                isLoading: action.isLoading,
+                status: action.status,
+            };
 
-    case LOGOUT_USER:
-      return {
-        ...initialState,
-        status: state.status
-      };
-    default:
-      return state;
-  }
+        case LOGOUT_USER:
+            return {
+                ...initialState,
+                status: state.status,
+            };
+        default:
+            return state;
+    }
 }
 
 export { initialState, fetchUser, logoutUser, fetchUserIfNeeded };

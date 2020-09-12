@@ -19,7 +19,7 @@ configure({ adapter: new Adapter() });
 const cookies = new Cookies();
 
 const document = {
-  cookies: cookies.getAll()
+    cookies: cookies.getAll(),
 };
 
 dotenv.config({ path: '.env.test' });
@@ -28,7 +28,7 @@ const { HOST } = process.env;
 
 // expose common functions used in tests
 global.__INIT_DATA_FROM_SERVER_RENDER__ = {
-  HOST,
+    HOST,
 };
 global.apiHost = HOST;
 global.innerWidth = 1280;

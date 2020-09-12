@@ -25,14 +25,18 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', () => {
-  cy.setCookie('user', JSON.stringify({
-    id: '5bd15f10d815766614da7c58',
-    ident: '39988776655',
-    first_name: 'Test',
-    last_name: 'Registrant'
-  }), {
-    path: '/',
-    maxAge: 7200000,
-    secure: true
-  });
+    cy.setCookie(
+        'user',
+        JSON.stringify({
+            id: '5bd15f10d815766614da7c58',
+            ident: '39988776655',
+            first_name: 'Test',
+            last_name: 'Registrant',
+        }),
+        {
+            path: '/',
+            maxAge: 7200000,
+            secure: true,
+        }
+    );
 });

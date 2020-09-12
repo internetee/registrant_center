@@ -1,11 +1,11 @@
-import {Helmet} from 'react-helmet';
+import { Helmet } from 'react-helmet';
 import getLog from '../utils/logger';
 
 const log = getLog();
 
 function renderHTML(helmet) {
-  const { HOST, NODE_ENV } = process.env;
-  return `
+    const { HOST, NODE_ENV } = process.env;
+    return `
     <!doctype html>
     <html ${helmet.htmlAttributes.toString()}>
       <head>
@@ -19,7 +19,7 @@ function renderHTML(helmet) {
       <body ${helmet.bodyAttributes.toString()} >
         <div id="app"></div>
         <script>
-          window.__INIT_DATA_FROM_SERVER_RENDER__ = ${JSON.stringify({HOST, NODE_ENV})};
+          window.__INIT_DATA_FROM_SERVER_RENDER__ = ${JSON.stringify({ HOST, NODE_ENV })};
         </script>
         <script src="/bundles/index.js"></script>
       </body>
@@ -28,12 +28,12 @@ function renderHTML(helmet) {
 }
 
 export default async function(req, res) {
-  try {
-    const helmet = Helmet.renderStatic();
-    res.setHeader('Content-Type', 'text/html');
-    res.send(renderHTML(helmet));
-  } catch (error) {
-    log.error(error.stack);
-    res.status(500).sendFile('src/server/views/500.html', { root: process.cwd() });
-  }
+    try {
+        const helmet = Helmet.renderStatic();
+        res.setHeader('Content-Type', 'text/html');
+        res.send(renderHTML(helmet));
+    } catch (error) {
+        log.error(error.stack);
+        res.status(500).sendFile('src/server/views/500.html', { root: process.cwd() });
+    }
 }

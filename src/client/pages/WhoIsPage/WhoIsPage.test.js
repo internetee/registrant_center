@@ -7,25 +7,25 @@ const cookies = new Cookies();
 
 const mockAction = () => {};
 const props = {
-  ui: {
-    lang: 'et',
-    uiElemSize: 'big',
-    menus: {
-      main: mockMainMenu,
-      footer: mockFooterMenu
-    }
-  },
-  user: mockUser.data,
-  initialDomains: mockDomains.data,
-  initialContacts: mockContacts,
-  history,
-  cookies,
-  updateContact: mockAction
+    ui: {
+        lang: 'et',
+        uiElemSize: 'big',
+        menus: {
+            main: mockMainMenu,
+            footer: mockFooterMenu,
+        },
+    },
+    user: mockUser.data,
+    initialDomains: mockDomains.data,
+    initialContacts: mockContacts,
+    history,
+    cookies,
+    updateContact: mockAction,
 };
 
 describe('pages/WhoIs', () => {
-  it('should render content', () => {
-    const page = shallow(<WhoIsPage {...props} />);
-    expect(page).toMatchSnapshot();
-  });
+    it('should render content', () => {
+        const page = shallow(<WhoIsPage {...props} />);
+        expect(page).toMatchSnapshot();
+    });
 });

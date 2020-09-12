@@ -8,7 +8,7 @@ export { default as MessageModule } from './modules/MessageModule/MessageModule'
 export { default as PageMessage } from './PageMessage/PageMessage';
 export { default as Roles } from './Roles/Roles';
 export { default as WhoIsConfirmDialog } from './WhoIsConfirmDialog/WhoIsConfirmDialog';
-
+export { default as ProtectedRoute } from './ProtectedRoute/ProtectedRoute';
 // pass through common 3rd party components to also cut down on import boilerplate
 
 export { Helmet } from 'react-helmet';

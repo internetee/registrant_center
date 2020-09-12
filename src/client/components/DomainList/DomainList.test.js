@@ -6,10 +6,15 @@ import mockContacts from '../../../../test/mocks/contacts';
 const cookies = new Cookies();
 
 describe('components/DomainList', () => {
-  
-  it('should render DomainsList', () => {
-    const cmp = shallow(<DomainList lang='et' domains={mockDomains.data} contacts={mockContacts.data} cookies={cookies} />);
-    expect(cmp).toMatchSnapshot();
-  });
-  
+    it('should render DomainsList', () => {
+        const cmp = shallow(
+            <DomainList
+                contacts={mockContacts.data}
+                cookies={cookies}
+                domains={mockDomains.data}
+                lang="et"
+            />
+        );
+        expect(cmp).toMatchSnapshot();
+    });
 });

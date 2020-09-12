@@ -29,24 +29,25 @@ const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const {
-  HOST,
-  PORT,
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URL,
-  TOKEN_PATH,
-  AUTH_PATH,
-  ISSUER_URL,
-  JWKS_PATH,
-  DB_NAME,
-  DB_USER,
-  DB_PASS,
-  NODE_ENV
+    HOST,
+    PORT,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    REDIRECT_URL,
+    TOKEN_PATH,
+    AUTH_PATH,
+    ISSUER_URL,
+    JWKS_PATH,
+    DB_NAME,
+    DB_USER,
+    DB_PASS,
+    NODE_ENV,
 } = process.env;
 const logIncoming = process.env.LOG_INCOMING;
 
 const app = express();
 
+/*
 if (NODE_ENV === 'development') {
   const htpasswd = auth.basic({
     realm: 'EIS Registreerijaportaal',
@@ -54,6 +55,7 @@ if (NODE_ENV === 'development') {
   });
   app.use(auth.connect(htpasswd));
 }
+ */
 
 app.enable('trust proxy');
 
@@ -63,12 +65,12 @@ app.use(cookieParser());
 
 // logging
 if (logIncoming) {
-  const incomingLog = getLog('INCOMING');
-  app.use(
-    morgan('short', {
-      stream: { write: message => incomingLog.info(message.trim()) }
-    })
-  );
+    const incomingLog = getLog('INCOMING');
+    app.use(
+        morgan('short', {
+            stream: { write: message => incomingLog.info(message.trim()) },
+        })
+    );
 }
 
 // compression
@@ -85,20 +87,20 @@ const MongoStore = connectMongo(session);
 mongoose.Promise = global.Promise;
 
 mongoose.connect(
-  `mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(
-    DB_PASS
-  )}@localhost:27017/${encodeURIComponent(DB_NAME)}`,
-  { useNewUrlParser: true }
+    `mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(
+        DB_PASS
+    )}@localhost:27017/${encodeURIComponent(DB_NAME)}`,
+    { useNewUrlParser: true }
 );
 
 const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET,
-  saveUninitialized: false,
-  resave: false,
-  store: new MongoStore({ mongooseConnection: mongoose.connection }),
-  cookie: {
-    maxAge: 7200000
-  }
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: {
+        maxAge: 7200000,
+    },
 });
 
 app.use(sessionMiddleware);
@@ -106,47 +108,47 @@ app.use(sessionMiddleware);
 // middlewares
 let LOCALE = 'et';
 app.use((req, res, next) => {
-  LOCALE = req.cookies.locale || 'et';
-  next();
+    LOCALE = req.cookies.locale || 'et';
+    next();
 });
 
 let publicKey = '';
 
 (async () => {
-  try {
-    const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
-    console.log('Received public key from TARA'); // eslint-disable-line no-console
-    publicKey = data.keys[0]; // eslint-disable-line prefer-destructuring
-  } catch (e) {
-    console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
-  }
+    try {
+        const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
+        console.log('Received public key from TARA'); // eslint-disable-line no-console
+        publicKey = data.keys[0]; // eslint-disable-line prefer-destructuring
+    } catch (e) {
+        console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
+    }
 })();
 
 // grant auth
 app.use(
-  grant({
-    defaults: {
-      protocol: 'https',
-      host: HOST,
-      state: true,
-      callback: '/auth/callback',
-      transport: 'querystring'
-    },
-    openid: {
-      authorize_url: ISSUER_URL + AUTH_PATH,
-      access_url: ISSUER_URL + TOKEN_PATH,
-      oauth: 2,
-      key: CLIENT_ID,
-      secret: CLIENT_SECRET,
-      scope: 'openid',
-      redirect_uri: `${HOST}${REDIRECT_URL}`,
-      response_type: 'code',
-      callback: REDIRECT_URL,
-      custom_params: {
-        ui_locales: LOCALE
-      }
-    }
-  })
+    grant({
+        defaults: {
+            protocol: 'https',
+            host: HOST,
+            state: true,
+            callback: '/auth/callback',
+            transport: 'querystring',
+        },
+        openid: {
+            authorize_url: ISSUER_URL + AUTH_PATH,
+            access_url: ISSUER_URL + TOKEN_PATH,
+            oauth: 2,
+            key: CLIENT_ID,
+            secret: CLIENT_SECRET,
+            scope: 'openid',
+            redirect_uri: `${HOST}${REDIRECT_URL}`,
+            response_type: 'code',
+            callback: REDIRECT_URL,
+            custom_params: {
+                ui_locales: LOCALE,
+            },
+        },
+    })
 );
 
 app.use(helmet());
@@ -165,31 +167,29 @@ app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
 
 // all page rendering
-app.get(REDIRECT_URL, (req, res) =>
-  callbackPage(req, res, jwkToPem(publicKey).trim())
-);
+app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
 app.get('*', renderPageRoute);
 
 const server = https.createServer(credentials, app).listen(PORT, () => {
-  banner();
-  // eslint-disable-next-line no-console
-  console.log(
-    JSON.stringify(
-      {
-        Host: HOST,
-        Port: PORT,
-        Environment: NODE_ENV,
-        Commands: {
-          rs: 'Restart server',
-          'ctrl+c': 'Stop server'
-        }
-      },
-      null,
-      2
-    )
-  );
-  // 'ready' is a hook used by the e2e (integration) tests (see node-while)
-  server.emit('ready');
+    banner();
+    // eslint-disable-next-line no-console
+    console.log(
+        JSON.stringify(
+            {
+                Host: HOST,
+                Port: PORT,
+                Environment: NODE_ENV,
+                Commands: {
+                    rs: 'Restart server',
+                    'ctrl+c': 'Stop server',
+                },
+            },
+            null,
+            2
+        )
+    );
+    // 'ready' is a hook used by the e2e (integration) tests (see node-while)
+    server.emit('ready');
 });
 
 // export server instance so we can hook into it in e2e tests etc

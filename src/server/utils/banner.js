@@ -1,8 +1,8 @@
 import colors from './terminalColors';
 
 export default () => {
-  // eslint-disable-next-line no-console
-  console.log(`${colors.cyan}
+    // eslint-disable-next-line no-console
+    console.log(`${colors.cyan}
   _____          _   _                           
  | ____|___  ___| |_(_)                          
  |  _| / _ \\/ __| __| |                          
@@ -18,4 +18,3 @@ export default () => {
  |____/|_|_| |_|\\__\\__,_|___/\\__,_|\\__|\\__,_|___/
   ${colors.reset}`);
 };
-

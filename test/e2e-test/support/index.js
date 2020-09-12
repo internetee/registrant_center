@@ -15,5 +15,5 @@
 import './commands';
 
 Cypress.Cookies.defaults({
-  whitelist: 'user'
+    whitelist: 'user',
 });
