@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/UserData should show content 1`] = `ShallowWrapper {}`;

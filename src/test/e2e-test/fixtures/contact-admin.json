@@ -1,0 +1,26 @@
+{
+    "id": "528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7",
+    "name": "Test Admin",
+    "code": "TEST:ADMIN",
+    "ident": {
+        "code": "10987654321",
+        "type": "org",
+        "country_code": "EE"
+    },
+    "email": "test@admin.ee",
+    "phone": "+372.1234567",
+    "fax": null,
+    "address": {
+        "street": null,
+        "zip": null,
+        "city": null,
+        "state": null,
+        "country_code": null
+    },
+    "auth_info": "0e81a4b9049eda45c823a9",
+    "statuses": [
+        "ok",
+        "linked"
+    ],
+    "disclosed_attributes": []
+}

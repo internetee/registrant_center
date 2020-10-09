@@ -1,0 +1,144 @@
+{
+  "_id": "5bd15f10d815766614da7c58",
+  "ident": "39988776655",
+  "first_name": "Test",
+  "last_name": "Registrant",
+  "created_at": "2018-10-25T06:13:36.382Z",
+  "__v": 0,
+  "updated_at": "2018-11-12T11:29:55.523Z",
+  "visited_at": "2018-11-12T11:29:55.523Z",
+  "companies": [
+    {
+      "yldandmed": {
+        "aadressid": [
+          {
+            "algus_kpv": 1063587600,
+            "ehak_nimetus": "Tallinna linn, Harju maakond",
+            "postiindeks": 10121,
+            "tanav_maja_korter": "K.A.Hermanni 4",
+            "ehak": 784,
+            "kande_nr": 1,
+            "kaardi_tyyp": "MTÜ",
+            "kaardi_piirkond": 1,
+            "kaardi_nr": 1,
+            "kirje_id": 1031249
+          }
+        ],
+        "sidevahendid": [
+          {
+            "lopp_kpv": 1341968400,
+            "sisu": 12345678,
+            "kirje_id": 2000121037,
+            "liik": "MOB",
+            "liik_tekstina": "Mobiiltelefon"
+          },
+          {
+            "lopp_kpv": 1341968400,
+            "sisu": 12345678,
+            "kirje_id": 2000162572,
+            "liik": "MOB",
+            "liik_tekstina": "Mobiiltelefon"
+          },
+          {
+            "sisu": 12345678,
+            "kirje_id": 2000308639,
+            "liik": "MOB",
+            "liik_tekstina": "Mobiiltelefon"
+          },
+          {
+            "sisu": 12345678,
+            "kirje_id": 2000308638,
+            "liik": "MOB",
+            "liik_tekstina": "Mobiiltelefon"
+          },
+          {
+            "sisu": "koha@taitja.ee",
+            "kirje_id": 2000308640,
+            "liik": "EMAIL",
+            "liik_tekstina": "Elektronposti aadress"
+          },
+          {
+            "sisu": "koha@taitja.ee",
+            "kirje_id": 2000308641,
+            "liik": "EMAIL",
+            "liik_tekstina": "Elektronposti aadress"
+          }
+        ]
+      },
+      "ariregistri_kood": 80262843,
+      "nimi": "Korteriühistu Testi pst 123"
+    },
+    {
+      "yldandmed": {
+        "aadressid": [
+          {
+            "algus_kpv": 998874000,
+            "ehak_nimetus": "Tallinna linn, Harju maakond",
+            "lopp_kpv": 1002070800,
+            "postiindeks": 10119,
+            "tanav_maja_korter": "Tõnismägi 3A-3",
+            "ehak": 784,
+            "kande_nr": 1,
+            "kaardi_tyyp": "R",
+            "kaardi_piirkond": 1,
+            "kaardi_nr": 1,
+            "kirje_id": 754636
+          },
+          {
+            "algus_kpv": 1002070800,
+            "ehak_nimetus": "Tallinna linn, Harju maakond",
+            "lopp_kpv": 1176685200,
+            "postiindeks": 10135,
+            "tanav_maja_korter": "Pärnu mnt 59",
+            "ehak": 784,
+            "kande_nr": 2,
+            "kaardi_tyyp": "R",
+            "kaardi_piirkond": 1,
+            "kaardi_nr": 1,
+            "kirje_id": 765399
+          }
+        ],
+        "sidevahendid": [
+          {
+            "lopp_kpv": 1000688400,
+            "sisu": 12345678,
+            "kirje_id": 2000089312,
+            "liik": "MOB",
+            "liik_tekstina": "Mobiiltelefon"
+          },
+          {
+            "lopp_kpv": 1176685200,
+            "sisu": 12345678,
+            "kirje_id": 2000091209,
+            "liik": "TEL",
+            "liik_tekstina": "Telefon"
+          }
+        ]
+      },
+      "ariregistri_kood": 12183709,
+      "nimi": "OÜ Test Invest"
+    },
+    {
+      "yldandmed": {
+        "aadressid": [
+          {
+            "algus_kpv": 1020992400,
+            "ehak_nimetus": "Tallinna linn, Harju maakond",
+            "lopp_kpv": 1103590800,
+            "postiindeks": 10120,
+            "tanav_maja_korter": "Karu 17",
+            "ehak": 784,
+            "kande_nr": 1,
+            "kaardi_tyyp": "R",
+            "kaardi_piirkond": 1,
+            "kaardi_nr": 1,
+            "kirje_id": 851254
+          }
+        ],
+        "sidevahendid": []
+      },
+      "ariregistri_kood": 10230586,
+      "nimi": "Test OÜ"
+    }
+  ]
+}

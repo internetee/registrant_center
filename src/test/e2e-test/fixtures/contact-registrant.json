@@ -1,0 +1,28 @@
+{
+    "id": "cfbfbb76-aed8-497a-91c1-48d82cbc4588",
+    "name": "Test Registrant",
+    "code": "TEST:REGISTRANT",
+    "ident": {
+        "code": "39988776655",
+        "type": "priv",
+        "country_code": "EE"
+    },
+    "email": "test@registrant.ee",
+    "phone": "+372.1234567",
+    "fax": null,
+    "address": {
+        "street": null,
+        "zip": null,
+        "city": null,
+        "state": null,
+        "country_code": null
+    },
+    "auth_info": "16c57aa7c435b959179c7b",
+    "statuses": [
+        "ok",
+        "linked"
+    ],
+    "disclosed_attributes": [
+        "email"
+    ]
+}
