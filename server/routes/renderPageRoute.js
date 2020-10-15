@@ -4,7 +4,6 @@ import getLog from '../utils/logger';
 const log = getLog();
 
 function renderHTML(helmet) {
-    const { HOST, NODE_ENV } = process.env;
     return `
     <!doctype html>
     <html ${helmet.htmlAttributes.toString()}>
@@ -13,21 +12,17 @@ function renderHTML(helmet) {
         ${helmet.title.toString()}
         ${helmet.meta.toString()}
         ${helmet.link.toString()}
-    
         <link rel="stylesheet" href="/bundles/index.css">
       </head>
       <body ${helmet.bodyAttributes.toString()} >
         <div id="app"></div>
-        <script>
-          window.__INIT_DATA_FROM_SERVER_RENDER__ = ${JSON.stringify({ HOST, NODE_ENV })};
-        </script>
         <script src="/bundles/index.js"></script>
       </body>
     </html>
   `;
 }
 
-export default async function(req, res) {
+export default async function renderPageRoute(req, res) {
     try {
         const helmet = Helmet.renderStatic();
         res.setHeader('Content-Type', 'text/html');

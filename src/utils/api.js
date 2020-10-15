@@ -62,6 +62,10 @@ export default {
         return instance.get(`/api/domains?offset=${offset}`);
     },
 
+    fetchCompanies: (offset) => {
+        return instance.get(`/api/companies?offset=${offset}`);
+    },
+
     fetchContacts: (uuid = false, offset) => {
         if (uuid) {
             return instance.get(`/api/contacts/${uuid}`);

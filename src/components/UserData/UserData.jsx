@@ -1,13 +1,11 @@
 /* eslint-disable camelcase,sort-keys */
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Button, Grid, Icon, Container } from 'semantic-ui-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { CSVDownload } from 'react-csv';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { connect } from 'react-redux';
-import domainStatuses from '../../utils/domainStatuses.json';
-import staticMessages from '../../utils/staticMessages.json';
 import vfs from '../../utils/vfs_fonts';
 import * as contactsActions from '../../redux/reducers/contacts';
 
@@ -21,36 +19,15 @@ pdfMake.fonts = {
     },
 };
 
-class UserData extends Component {
-    state = {
-        perPage: 200,
-        activePage: 0,
-        isLoadingPDF: false,
-        isLoadingCSV: false,
-        userCSV: null,
-    };
+const UserData = ({ domains }) => {
+    const hasDomains = !!Object.keys(domains).length;
+    const [isLoadingCSV, setIsLoadingCSV] = useState(false);
+    const [isLoadingPDF, setIsLoadingPDF] = useState(false);
+    const [userCSV, setUserCSV] = useState(null);
+    const { formatMessage } = useIntl();
 
-    savePDF = async () => {
-        this.setState((prevState) => ({
-            ...prevState,
-            isLoadingPDF: true,
-        }));
-        const { domains, fetchContacts, lang } = this.props;
-        const contacts = domains.reduce(
-            (acc, { admin_contacts, tech_contacts }) => [
-                ...new Set([
-                    ...acc,
-                    ...[
-                        ...admin_contacts.map(({ id }) => id),
-                        ...tech_contacts.map(({ id }) => id),
-                    ],
-                ]),
-            ],
-            []
-        );
-        const res = await Promise.all(contacts.map((id) => fetchContacts(id)));
-        const labels = staticMessages[lang].domain;
-
+    const savePDF = async () => {
+        setIsLoadingPDF(true);
         const paginatedDomains = [];
         const copied = [...domains];
         const numOfChild = Math.ceil(copied.length / 500);
@@ -108,59 +85,91 @@ class UserData extends Component {
                     ...chunk.map((item, i) => {
                         let domainData = [
                             item.transfer_code
-                                ? [{ text: labels.transfer_code, bold: true }, item.transfer_code]
+                                ? [
+                                      {
+                                          text: formatMessage({ id: 'domain.transfer_code' }),
+                                          bold: true,
+                                      },
+                                      item.transfer_code,
+                                  ]
                                 : [],
                             item.registrar.name
                                 ? [
-                                      { text: labels.registrar, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.registrar' }),
+                                          bold: true,
+                                      },
                                       `${item.registrar.name} (${item.registrar.website})`,
                                   ]
                                 : [],
                             item.registered_at
                                 ? [
-                                      { text: labels.registered_at, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.registered_at' }),
+                                          bold: true,
+                                      },
                                       moment(item.registered_at).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.valid_to
                                 ? [
-                                      { text: labels.valid_to, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.valid_to' }),
+                                          bold: true,
+                                      },
                                       moment(item.valid_to).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.created_at
                                 ? [
-                                      { text: labels.created_at, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.created_at' }),
+                                          bold: true,
+                                      },
                                       moment(item.created_at).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.updated_at
                                 ? [
-                                      { text: labels.updated_at, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.updated_at' }),
+                                          bold: true,
+                                      },
                                       moment(item.updated_at).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.period
                                 ? [
-                                      { text: labels.period, bold: true },
+                                      { text: formatMessage({ id: 'domain.period' }), bold: true },
                                       `${item.period} (${item.period_unit})`,
                                   ]
                                 : [],
                             item.outzone_at
                                 ? [
-                                      { text: labels.outzone_at, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.outzone_at' }),
+                                          bold: true,
+                                      },
                                       moment(item.outzone_at).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.delete_at
                                 ? [
-                                      { text: labels.delete_at, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.delete_at' }),
+                                          bold: true,
+                                      },
                                       moment(item.delete_at).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.registrant_verification_asked_at
                                 ? [
-                                      { text: labels.registrant_verification_asked_at, bold: true },
+                                      {
+                                          text: formatMessage({
+                                              id: 'domain.registrant_verification_asked_at',
+                                          }),
+                                          bold: true,
+                                      },
                                       moment(item.registrant_verification_asked_at).format(
                                           'DD.MM.Y HH:mm'
                                       ),
@@ -168,24 +177,43 @@ class UserData extends Component {
                                 : [],
                             item.registrant_verification_token
                                 ? [
-                                      { text: labels.registrant_verification_token, bold: true },
+                                      {
+                                          text: formatMessage({
+                                              id: 'domain.registrant_verification_token',
+                                          }),
+                                          bold: true,
+                                      },
                                       item.registrant_verification_token,
                                   ]
                                 : [],
                             item.force_delete_at
                                 ? [
-                                      { text: labels.force_delete_at, bold: true },
+                                      {
+                                          text: formatMessage({ id: 'domain.force_delete_at' }),
+                                          bold: true,
+                                      },
                                       moment(item.force_delete_at).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.locked_by_registrant_at
                                 ? [
-                                      { text: labels.locked_by_registrant_at, bold: true },
+                                      {
+                                          text: formatMessage({
+                                              id: 'domain.locked_by_registrant_at',
+                                          }),
+                                          bold: true,
+                                      },
                                       moment(item.locked_by_registrant_at).format('DD.MM.Y HH:mm'),
                                   ]
                                 : [],
                             item.reserved
-                                ? [{ text: labels.reserved, bold: true }, item.reserved]
+                                ? [
+                                      {
+                                          text: formatMessage({ id: 'domain.reserved' }),
+                                          bold: true,
+                                      },
+                                      item.reserved,
+                                  ]
                                 : [],
                         ];
                         const domainNameservers = item.nameservers
@@ -196,34 +224,41 @@ class UserData extends Component {
                               ])
                             : [];
                         const registrantContacts = item.registrant && [
-                            { text: labels.registrant, bold: true },
+                            { text: formatMessage({ id: 'domain.role.registrant' }), bold: true },
                             item.registrant.name,
                             '-',
                         ];
                         const techContacts = item.tech_contacts
-                            ? item.tech_contacts.map((contact) => {
-                                  const techContact = res.data[contact.id];
+                            ? item.tech_contacts.map(({ email, name }) => {
                                   return [
-                                      { text: labels.tech, bold: true },
-                                      contact.name,
-                                      (techContact && techContact.email) || '',
+                                      {
+                                          text: formatMessage({ id: 'domain.role.tech' }),
+                                          bold: true,
+                                      },
+                                      name,
+                                      email,
                                   ];
                               })
                             : ['', '', ''];
                         const adminContacts = item.admin_contacts
-                            ? item.admin_contacts.map((contact) => {
-                                  const adminContact = res.data[contact.id];
+                            ? item.admin_contacts.map(({ email, name }) => {
                                   return [
-                                      { text: labels.admin, bold: true },
-                                      contact.name,
-                                      (adminContact && adminContact.email) || '',
+                                      {
+                                          text: formatMessage({ id: 'domain.role.admin' }),
+                                          bold: true,
+                                      },
+                                      name,
+                                      email,
                                   ];
                               })
                             : ['', '', ''];
                         const domainStatus = item.statuses
                             ? item.statuses.map((status) => [
-                                  { text: domainStatuses[status][lang].label, bold: true },
-                                  domainStatuses[status][lang].definition,
+                                  {
+                                      text: formatMessage({ id: `domain.status.${status}` }),
+                                      bold: true,
+                                  },
+                                  formatMessage({ id: `domain.status.${status}.description` }),
                               ])
                             : [];
                         domainData = domainData.filter((e) => e.length > 0);
@@ -261,7 +296,7 @@ class UserData extends Component {
                                             { text: 'Nimi', bold: true },
                                             { text: 'E-post', bold: true },
                                         ],
-                                        ...registrantContacts,
+                                        registrantContacts,
                                         ...techContacts,
                                         ...adminContacts,
                                     ],
@@ -280,7 +315,10 @@ class UserData extends Component {
                                     paddingBottom: () => 4,
                                 },
                             },
-                            { text: labels.nameservers, style: 'subheader' },
+                            {
+                                text: formatMessage({ id: 'domain.nameservers' }),
+                                style: 'subheader',
+                            },
                             {
                                 style: 'table',
                                 table: {
@@ -309,7 +347,7 @@ class UserData extends Component {
                                     paddingBottom: () => 4,
                                 },
                             },
-                            { text: labels.statuses, style: 'subheader' },
+                            { text: formatMessage({ id: 'domain.statuses' }), style: 'subheader' },
                             {
                                 style: 'table',
                                 table: {
@@ -337,86 +375,71 @@ class UserData extends Component {
             };
             pdfMake.createPdf(doc).download(`domeenid_chunk_${index}.pdf`);
         });
-        this.setState((prevState) => ({
-            ...prevState,
-            isLoadingPDF: false,
-        }));
+        setIsLoadingPDF(false);
     };
 
-    handleCsvData = async () => {
-        const { domains, fetchContacts, lang } = this.props;
-        const labels = staticMessages[lang].domain;
-        this.setState({ isLoadingCSV: true });
-        const contacts = domains.reduce(
-            (acc, { admin_contacts, tech_contacts }) => [
-                ...new Set([
-                    ...acc,
-                    ...[
-                        ...admin_contacts.map(({ id }) => id),
-                        ...tech_contacts.map(({ id }) => id),
-                    ],
-                ]),
-            ],
-            []
-        );
-        const res = await Promise.all(contacts.map((id) => fetchContacts(id)));
-        const userCSV = domains.map((item) => {
-            const registrant = res.data[item.registrant.id];
+    const handleCsvData = async () => {
+        setIsLoadingCSV(true);
+        const csv = domains.map((item) => {
             return {
-                [labels.name]: item.name ? item.name : '',
-                [labels.transfer_code]: item.transfer_code ? item.transfer_code : '',
-                [labels.registrar]: item.registrar.name
+                [formatMessage({ id: 'domain.name' })]: item.name ? item.name : '',
+                [formatMessage({ id: 'domain.transfer_code' })]: item.transfer_code
+                    ? item.transfer_code
+                    : '',
+                [formatMessage({ id: 'domain.registrar' })]: item.registrar.name
                     ? `${item.registrar.name} (${item.registrar.website})`
                     : '',
-                [labels.registered_at]: item.registered_at
+                [formatMessage({ id: 'domain.registered_at' })]: item.registered_at
                     ? moment(item.registered_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.valid_to]: item.valid_to
+                [formatMessage({ id: 'domain.valid_to' })]: item.valid_to
                     ? moment(item.valid_to).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.created_at]: item.created_at
+                [formatMessage({ id: 'domain.created_at' })]: item.created_at
                     ? moment(item.created_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.updated_at]: item.updated_at
+                [formatMessage({ id: 'domain.updated_at' })]: item.updated_at
                     ? moment(item.updated_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.period]: item.period ? `${item.period} (${item.period_unit})` : '',
-                [labels.outzone_at]: item.outzone_at
+                [formatMessage({ id: 'domain.period' })]: item.period
+                    ? `${item.period} (${item.period_unit})`
+                    : '',
+                [formatMessage({ id: 'domain.outzone_at' })]: item.outzone_at
                     ? moment(item.outzone_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.delete_at]: item.delete_at
+                [formatMessage({ id: 'domain.delete_at' })]: item.delete_at
                     ? moment(item.delete_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.force_delete_at]: item.force_delete_at
+                [formatMessage({ id: 'domain.force_delete_at' })]: item.force_delete_at
                     ? moment(item.force_delete_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.registrant_verification_token]: item.registrant_verification_token
-                    ? item.registrant_verification_token
-                    : '',
-                [labels.registrant_verification_asked_at]: item.registrant_verification_asked_at
+                [formatMessage({
+                    id: 'domain.registrant_verification_token',
+                })]: item.registrant_verification_token ? item.registrant_verification_token : '',
+                [formatMessage({
+                    id: 'domain.registrant_verification_asked_at',
+                })]: item.registrant_verification_asked_at
                     ? moment(item.registrant_verification_asked_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.locked_by_registrant_at]: item.locked_by_registrant_at
+                [formatMessage({
+                    id: 'domain.locked_by_registrant_at',
+                })]: item.locked_by_registrant_at
                     ? moment(item.locked_by_registrant_at).format('DD.MM.Y HH:mm')
                     : '',
-                [labels.registrant]: item.registrant ? registrant.name : '',
-                [labels.tech_contacts]: item.tech_contacts
+                [formatMessage({ id: 'domain.registrant' })]: item.registrant
+                    ? item.registrant.name
+                    : '',
+                [formatMessage({ id: 'domain.tech_contacts' })]: item.tech_contacts
                     ? item.tech_contacts
-                          .map(
-                              (contact) =>
-                                  `${res.data[contact.id].name} ( ${res.data[contact.id].email} )`
-                          )
+                          .map((contact) => `${contact.name} ( ${contact.email} )`)
                           .join('\n')
                     : '',
-                [labels.admin_contacts]: item.admin_contacts
+                [formatMessage({ id: 'domain.admin_contacts' })]: item.admin_contacts
                     ? item.admin_contacts
-                          .map(
-                              (contact) =>
-                                  `${res.data[contact.id].name} ( ${res.data[contact.id].email} )`
-                          )
+                          .map((contact) => `${contact.name} ( ${contact.email} )`)
                           .join('\n')
                     : '',
-                [labels.nameservers]: item.nameservers
+                [formatMessage({ id: 'domain.nameservers' })]: item.nameservers
                     ? item.nameservers
                           .map((server) => [
                               server.hostname,
@@ -425,78 +448,72 @@ class UserData extends Component {
                           ])
                           .join('\n')
                     : '',
-                [labels.statuses]: item.statuses
-                    ? item.statuses.map((status) => domainStatuses[status][lang].label).join('\n')
+                [formatMessage({ id: 'domain.statuses' })]: item.statuses
+                    ? item.statuses
+                          .map((status) => formatMessage({ id: `domain.status.${status}` }))
+                          .join('\n')
                     : '',
-                [labels.reserved]: item.reserved ? item.reserved : '',
+                [formatMessage({ id: 'domain.reserved' })]: item.reserved ? item.reserved : '',
             };
         });
-        await this.setState({
-            userCSV,
-            isLoadingCSV: false,
-        });
+
+        setIsLoadingCSV(false);
+        setUserCSV(csv);
     };
 
-    render() {
-        const { isLoadingCSV, isLoadingPDF, userCSV } = this.state;
-        return (
-            <div className="user-data">
-                <Container>
-                    <Grid textAlign="center">
-                        <Grid.Row centered columns="1">
-                            <Grid.Column textAlign="center">
-                                <FormattedMessage id="userData.title" tagName="h3" />
-                                <Button.Group>
-                                    <Button
-                                        animated="fade"
-                                        loading={isLoadingCSV}
-                                        onClick={this.handleCsvData}
-                                        secondary
-                                        size="large"
-                                    >
-                                        <Button.Content visible>
-                                            <Icon name="table" />
-                                            CSV
-                                        </Button.Content>
-                                        <Button.Content hidden>
-                                            <Icon name="download" />
-                                        </Button.Content>
-                                    </Button>
-                                    <Button.Or text="või" />
-                                    <Button
-                                        animated="fade"
-                                        loading={isLoadingPDF}
-                                        onClick={this.savePDF}
-                                        primary
-                                        size="large"
-                                    >
-                                        <Button.Content visible>
-                                            <Icon name="file pdf" />
-                                            PDF
-                                        </Button.Content>
-                                        <Button.Content hidden>
-                                            <Icon name="download" />
-                                        </Button.Content>
-                                    </Button>
-                                </Button.Group>
-                                {userCSV && (
-                                    <CSVDownload data={userCSV} filename="eis_andmed.csv" />
-                                )}
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid>
-                </Container>
-            </div>
-        );
-    }
-}
-
-const mapStateToProps = (state) => {
-    return {
-        domains: state.domains.data,
-    };
+    return (
+        <div className="user-data">
+            <Container>
+                <Grid textAlign="center">
+                    <Grid.Row centered columns="1">
+                        <Grid.Column textAlign="center">
+                            <FormattedMessage id="userData.title" tagName="h3" />
+                            <Button.Group>
+                                <Button
+                                    animated="fade"
+                                    disabled={!hasDomains}
+                                    loading={isLoadingCSV}
+                                    onClick={handleCsvData}
+                                    secondary
+                                    size="large"
+                                >
+                                    <Button.Content visible>
+                                        <Icon name="table" />
+                                        CSV
+                                    </Button.Content>
+                                    <Button.Content hidden>
+                                        <Icon name="download" />
+                                    </Button.Content>
+                                </Button>
+                                <Button.Or text="või" />
+                                <Button
+                                    animated="fade"
+                                    disabled={!hasDomains}
+                                    loading={isLoadingPDF}
+                                    onClick={savePDF}
+                                    primary
+                                    size="large"
+                                >
+                                    <Button.Content visible>
+                                        <Icon name="file pdf" />
+                                        PDF
+                                    </Button.Content>
+                                    <Button.Content hidden>
+                                        <Icon name="download" />
+                                    </Button.Content>
+                                </Button>
+                            </Button.Group>
+                            {userCSV && <CSVDownload data={userCSV} filename="eis_andmed.csv" />}
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </Container>
+        </div>
+    );
 };
 
-export default connect(mapStateToProps, {
-    ...contactsActions,
-})(UserData);
+const mapStateToProps = ({ domains }) => ({
+    domains: domains.ids.map((id) => domains.data[id]),
+});
+
+export default connect(mapStateToProps)(UserData);

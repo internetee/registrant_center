@@ -158,7 +158,7 @@ const WhoIsPage = ({
         <MainLayout hasBackButton titleKey="whois.title">
             {!isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">
-                {initialDomains ? (
+                {initialDomains.length ? (
                     <>
                         <div className="page--header">
                             <Container>

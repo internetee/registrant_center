@@ -12,7 +12,9 @@ import {
 } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { useCookies } from 'react-cookie';
+import { bindActionCreators } from 'redux';
 import { Loading, MainLayout, PageMessage } from '../../components';
+import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 
 const perPageOptions = [
     { key: 6, text: '6', value: 6 },
@@ -20,19 +22,25 @@ const perPageOptions = [
     { key: 24, text: '24', value: 24 },
 ];
 
-const CompaniesPage = ({ initialCompanies }) => {
+const CompaniesPage = ({ companies = [], fetchCompanies }) => {
     const [cookies, setCookie] = useCookies(['companies_per_page']);
     const { companies_per_page } = cookies;
     const [perPage, setPerPage] = useState(companies_per_page ? Number(companies_per_page) : 24);
     const [activePage, setActivePage] = useState(1);
-    const [companies, setCompanies] = useState(initialCompanies);
+    const [results, setResults] = useState(companies);
     const [isLoading, setIsLoading] = useState(true);
     const [queryKeys, setQueryKeys] = useState('');
 
     useEffect(() => {
-        setCompanies(initialCompanies);
-        setIsLoading(false);
-    }, [initialCompanies, cookies]);
+        (async () => {
+            await fetchCompanies();
+            setIsLoading(false);
+        })();
+    }, [fetchCompanies]);
+
+    useEffect(() => {
+        setResults(companies);
+    }, [companies]);
 
     const handlePageChange = (e, { activePage: page }) => {
         setActivePage(page);
@@ -46,7 +54,7 @@ const CompaniesPage = ({ initialCompanies }) => {
 
     const handleSearchChange = (event, { value }) => {
         if (value === '') {
-            setCompanies(initialCompanies);
+            setResults(companies);
         }
         setQueryKeys(value);
     };
@@ -54,68 +62,46 @@ const CompaniesPage = ({ initialCompanies }) => {
     const handleSearchReset = () => {
         setActivePage(1);
         setQueryKeys('');
-        setCompanies(initialCompanies);
+        setResults(companies);
     };
 
     const handleSearch = () => {
-        let filteredCompanies = initialCompanies.slice();
+        let filteredCompanies = companies.slice();
         if (queryKeys.length) {
             const query = queryKeys.toLowerCase();
-            filteredCompanies = filteredCompanies.filter((company) => {
-                return (
-                    company.nimi.toLowerCase().includes(query) ||
-                    company.ariregistri_kood.toString().toLowerCase().includes(query) ||
-                    company.yldandmed.aadressid.some((item) => {
-                        return (
-                            item.tanav_maja_korter.toLowerCase().includes(query) ||
-                            item.ehak_nimetus.toLowerCase().includes(query) ||
-                            item.postiindeks.toLowerCase().includes(query)
-                        );
-                    })
-                );
-            });
-            setCompanies(filteredCompanies);
+            filteredCompanies = filteredCompanies.filter(
+                (company) =>
+                    company.name.toLowerCase().includes(query) ||
+                    company.registry_no.toString().toLowerCase().includes(query)
+            );
+            setResults(filteredCompanies);
         } else if (queryKeys.length === 0) {
-            setCompanies(initialCompanies);
+            setResults(companies);
         }
     };
 
-    if (isLoading && !companies) return <Loading />;
+    if (isLoading) return <Loading />;
     let companiesList = [];
     const paginatedCompanies = [];
-    if (companies.length) {
-        const copied = [...companies];
+
+    if (results && results.length) {
+        const copied = [...results];
         const numOfChild = Math.ceil(copied.length / perPage);
         for (let i = 0; i < numOfChild; i += 1) {
             paginatedCompanies.push(copied.splice(0, perPage));
         }
         companiesList = paginatedCompanies[activePage - 1].map((company) => (
-            <Table.Row key={company.ariregistri_kood}>
-                <Table.Cell>{company.nimi}</Table.Cell>
-                <Table.Cell>{company.ariregistri_kood}</Table.Cell>
-                <Table.Cell>
-                    {company.yldandmed.sidevahendid.length > 0 &&
-                        company.yldandmed.sidevahendid.map((item) => {
-                            return <p key={item.kirje_id}>{item.sisu}</p>;
-                        })}
-                </Table.Cell>
-                <Table.Cell>
-                    {company.yldandmed.aadressid.length > 0 &&
-                        company.yldandmed.aadressid.map((item) => {
-                            return (
-                                <p
-                                    key={item.tanav_maja_korter}
-                                >{`${item.tanav_maja_korter}, ${item.ehak_nimetus}, ${item.postiindeks}`}</p>
-                            );
-                        })}
-                </Table.Cell>
+            <Table.Row key={company.registry_no}>
+                <Table.Cell>{company.name}</Table.Cell>
+                <Table.Cell>{company.registry_no}</Table.Cell>
             </Table.Row>
         ));
     }
+
     return (
         <MainLayout hasBackButton titleKey="companies.title">
             <div className="page page--companies">
-                {initialCompanies.length ? (
+                {companies.length ? (
                     <>
                         <div className="page--header">
                             <Container>
@@ -148,7 +134,7 @@ const CompaniesPage = ({ initialCompanies }) => {
                                 </Form>
                             </Container>
                         </div>
-                        {companies ? (
+                        {results ? (
                             <>
                                 <Container>
                                     <Table>
@@ -159,12 +145,6 @@ const CompaniesPage = ({ initialCompanies }) => {
                                                 </Table.HeaderCell>
                                                 <Table.HeaderCell>
                                                     <FormattedMessage id="companies.registerCode" />
-                                                </Table.HeaderCell>
-                                                <Table.HeaderCell>
-                                                    <FormattedMessage id="companies.contacts" />
-                                                </Table.HeaderCell>
-                                                <Table.HeaderCell>
-                                                    <FormattedMessage id="companies.addresses" />
                                                 </Table.HeaderCell>
                                             </Table.Row>
                                         </Table.Header>
@@ -254,8 +234,16 @@ const CompaniesPage = ({ initialCompanies }) => {
     );
 };
 
-const mapStateToProps = (state) => ({
-    initialCompanies: state.user.data.companies,
+const mapStateToProps = ({ companies }) => ({
+    companies: companies.ids.map((id) => companies.data[id]),
 });
 
-export default connect(mapStateToProps)(CompaniesPage);
+const mapDispatchToProps = (dispatch) =>
+    bindActionCreators(
+        {
+            fetchCompanies: fetchCompaniesAction,
+        },
+        dispatch
+    );
+
+export default connect(mapStateToProps, mapDispatchToProps)(CompaniesPage);

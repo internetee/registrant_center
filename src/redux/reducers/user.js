@@ -39,12 +39,14 @@ const logoutUser = () => (dispatch) => {
         .then((res) => res.status)
         .then((data) => {
             dispatch({
+                isLoggedOut: true,
                 status: data,
                 type: LOGOUT_USER,
             });
         })
         .catch((error) => {
             dispatch({
+                isLoggedOut: true,
                 status: error.response.status,
                 type: LOGOUT_USER,
             });
@@ -54,10 +56,11 @@ const logoutUser = () => (dispatch) => {
 const initialState = {
     data: {},
     isInvalidated: false,
+    isLoggedOut: null,
     status: null,
 };
 
-export default function (state = initialState, action) {
+export default function reducer(state = initialState, action) {
     switch (action.type) {
         case FETCH_USER_FAILURE:
             return {
@@ -85,6 +88,7 @@ export default function (state = initialState, action) {
         case LOGOUT_USER:
             return {
                 ...initialState,
+                isLoggedOut: action.isLoggedOut,
                 status: action.status,
             };
         default:

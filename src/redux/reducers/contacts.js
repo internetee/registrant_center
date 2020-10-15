@@ -120,7 +120,7 @@ const initialState = {
     message: null,
 };
 
-export default function (state = initialState, { payload, type }) {
+export default function reducer(state = initialState, { payload, type }) {
     switch (type) {
         case LOGOUT_USER:
             return initialState;

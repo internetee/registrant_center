@@ -1,22 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { bindActionCreators } from 'redux';
-import { DomainList, UserData, MainLayout } from '../../components';
+import { DomainList, UserData, MainLayout, Loading } from '../../components';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 
 const HomePage = ({ domains, fetchDomains, ui, user }) => {
     const { lang } = ui;
+    const [isLoading, setIsLoading] = useState(true);
     moment.locale(lang);
 
     useEffect(() => {
         (async () => {
             await fetchDomains();
+            setIsLoading(false);
         })();
     }, [fetchDomains]);
+
+    if (isLoading) return <Loading />;
 
     return (
         <MainLayout

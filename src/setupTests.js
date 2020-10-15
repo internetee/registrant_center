@@ -18,8 +18,8 @@ configure({ adapter: new Adapter() });
 // React Enzyme adapter
 dotenv.config({ path: '.env.test' });
 
-const { HOST } = process.env;
-global.apiHost = HOST;
+const { PUBLIC_URL } = process.env;
+global.apiHost = PUBLIC_URL;
 global.XMLHttpRequest = undefined;
 
 // Mock API data

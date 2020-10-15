@@ -1,56 +1,63 @@
-/*
-Setup for winston logger. Default logger setup is to console and to file. Common
-config (like desired log level, or log file location) is already controlled by config 
-files (see config/default.js) so they can be easily configured per environment.
-*/
-import path from 'path';
-import winston, { config as winstonConfig } from 'winston';
-import callerCallsite from 'caller-callsite';
-import util from 'util';
-import FileRotateTransport from 'fast-file-rotate';
+import winston from 'winston';
+import 'winston-daily-rotate-file';
 
-import colors from './terminalColors';
+const ignorePaths = [
+    '/service-worker.js',
+    '/favicon.ico',
+    '/static',
+    '/eis-logo-white.svg',
+    '/auth',
+];
 
-const { CONSOLE_LOG_LEVEL } = process.env;
+const ignoreRoute = (req) => !!ignorePaths.find((path) => req.url.includes(path));
 
-winston.addColors({
-    debug: 'grey',
-    error: 'red',
-    info: 'white',
-    warn: 'yellow',
-});
+const logger = {
+    exitOnError: false,
+    format: winston.format.simple(),
+    ignoreRoute,
+    meta: false,
+    msg: (req, res) => {
+        return `${req.method} ${req.protocol}://${req.get('host')}${req.originalUrl} (${
+            res.statusCode
+        }) ${Math.floor(res.responseTime / 1000)}, User-Agent: ${req.get(
+            'User-Agent'
+        )}, Referrer: ${req.get('Referrer')}, IP: ${
+            req.ip.indexOf(':') >= 0 ? req.ip.substring(req.ip.lastIndexOf(':') + 1) : req.i
+        }`;
+    },
+};
 
-function isEmptyObjectOrUndefined(obj) {
-    return !obj || (Object.keys(obj).length === 0 && obj.constructor === Object);
-}
+export const accessLog = {
+    ...logger,
+    transports: [
+        new winston.transports.DailyRotateFile({
+            datePattern: 'YYYY-MM-DD',
+            dirname: 'logs',
+            filename: 'access-%DATE%.log',
+            level: 'debug',
+        }),
+    ],
+};
 
-function formatLogMessage(options, context = '') {
-    const time = new Date().toISOString();
-    const logLevel = winstonConfig.colorize(options.level, options.level.toUpperCase().padEnd(5));
-    const meta = isEmptyObjectOrUndefined(options.meta) ? '' : util.format(options.meta);
-    return `${colors.dim}${time}${colors.reset} ${logLevel} ${colors.dim}[${context}]${colors.reset} ${options.message} ${meta}`;
-}
+export const errorLog = {
+    ...logger,
+    transports: [
+        new winston.transports.DailyRotateFile({
+            datePattern: 'YYYY-MM-DD',
+            dirname: 'logs',
+            filename: 'error-%DATE%.log',
+            level: 'error',
+        }),
+    ],
+};
 
-export default function getLog(context) {
-    const filePath = context || path.basename(callerCallsite().getFileName());
-
-    return winston.createLogger({
-        exitOnError: false,
-        transports: [
-            new winston.transports.Console({
-                colorize: true,
-                formatter: (options) => {
-                    return formatLogMessage(options, filePath);
-                },
-                handleExceptions: true,
-                json: false,
-                level: CONSOLE_LOG_LEVEL,
-            }),
-
-            new FileRotateTransport({
-                dateFormat: 'YYYY-MM-DD-HH:mm',
-                fileName: `${__dirname}/logs/%DATE%.log`,
-            }),
-        ],
-    });
-}
+export const consoleLog = {
+    baseMeta: null,
+    colorize: true,
+    expressFormat: true,
+    format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
+    ignoreRoute,
+    meta: false,
+    metaField: null,
+    transports: [new winston.transports.Console()],
+};

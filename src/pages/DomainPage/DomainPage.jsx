@@ -52,10 +52,12 @@ const DomainPage = ({
 
     useEffect(() => {
         (async () => {
-            await fetchDomain(match.params.id);
+            if (!domain) {
+                await fetchDomain(match.params.id);
+            }
             setIsLoading(false);
         })();
-    }, [fetchDomain, match]);
+    }, [domain, fetchDomain, match]);
 
     useEffect(() => {
         if (domain) {
@@ -142,7 +144,6 @@ const DomainPage = ({
                 code: 500,
                 type: `domain${isLocked ? 'Unlock' : 'Lock'}`,
             });
-            console.log(error); // eslint-disable-line no-console
         }
         setIsSaving(false);
     };

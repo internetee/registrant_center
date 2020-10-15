@@ -1,16 +1,5 @@
-// ANSI codes for coloring terminal output
-// https://coderwall.com/p/yphywg/printing-colorful-text-in-terminal-when-run-node-js-script
+/* eslint-disable sort-keys */
 export default {
-    // text colour
-    black: '\x1b[30m',
-    red: '\x1b[31m',
-    green: '\x1b[32m',
-    yellow: '\x1b[33m',
-    blue: '\x1b[34m',
-    magenta: '\x1b[35m',
-    cyan: '\x1b[36m',
-    white: '\x1b[37m',
-
     // background color
     bgBlack: '\x1b[40m',
     bgRed: '\x1b[41m',
@@ -20,6 +9,16 @@ export default {
     bgMagenta: '\x1b[45m',
     bgCyan: '\x1b[46m',
     bgWhite: '\x1b[47m',
+
+    // text colour
+    black: '\x1b[30m',
+    blue: '\x1b[34m',
+    cyan: '\x1b[36m',
+    green: '\x1b[32m',
+    magenta: '\x1b[35m',
+    red: '\x1b[31m',
+    white: '\x1b[37m',
+    yellow: '\x1b[33m',
 
     // other styles
     reset: '\x1b[0m',

@@ -24,14 +24,14 @@ const MainLayout = ({
         <>
             <Helmet
                 title={
-                    title ||
-                    formatMessage(
-                        { id: htmlTitleKey || titleKey },
-                        {
-                            ...htmlTitleValues,
-                            ...titleValues,
-                        }
-                    ) + formatMessage({ id: 'head.title' })
+                    (title ||
+                        formatMessage(
+                            { id: htmlTitleKey || titleKey },
+                            {
+                                ...htmlTitleValues,
+                                ...titleValues,
+                            }
+                        )) + formatMessage({ id: 'head.title' })
                 }
             />
             <MainHeader />

@@ -16,7 +16,9 @@
 
 # server
 /server/build
-/server/utils/logs
+
+# logs
+/logs/*
 
 # misc
 .DS_Store

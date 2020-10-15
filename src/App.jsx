@@ -10,7 +10,10 @@ import {
     fetchMenu as fetchMenuAction,
     getDeviceType as getDeviceTypeAction,
 } from './redux/reducers/ui';
-import { logoutUser as logoutUserAction } from './redux/reducers/user';
+import {
+    fetchUser as fetchUserAction,
+    logoutUser as logoutUserAction,
+} from './redux/reducers/user';
 
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const DomainPage = lazy(() => import('./pages/DomainPage/DomainPage'));
@@ -20,13 +23,13 @@ const WhoIsPage = lazy(() => import('./pages/WhoIsPage/WhoIsPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage/ErrorPage'));
 
-function App({ fetchMenu, getDeviceType, ui }) {
+function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, ui, user }) {
     const location = useLocation();
-    const [isLoading, setIsLoading] = useState(false);
-    const { isMenuOpen, lang } = ui || {};
+    const [isLoading, setIsLoading] = useState(true);
+    const { isMainMenuOpen, lang } = ui || {};
+    const { name } = user;
 
     useEffect(() => {
-        window.scrollTo(0, 0);
         getDeviceType(window.innerWidth);
         window.addEventListener('resize', getDeviceType);
         return () => window.removeEventListener('resize', getDeviceType);
@@ -40,6 +43,16 @@ function App({ fetchMenu, getDeviceType, ui }) {
             setIsLoading(false);
         })();
     }, [fetchMenu]);
+
+    useEffect(() => {
+        (async () => {
+            setIsLoading(true);
+            if (!name && location.pathname !== '/login' && !isLoggedOut) {
+                await fetchUser();
+            }
+            setIsLoading(false);
+        })();
+    }, [fetchUser, isLoggedOut, location, name]);
 
     return (
         <IntlProvider key={lang} defaultLocale="et" locale={lang} messages={translations[lang]}>
@@ -73,7 +86,7 @@ function App({ fetchMenu, getDeviceType, ui }) {
                     </Helmet>
                 )}
             </FormattedMessage>
-            <div className={classNames({ 'app-wrapper': true, 'u-menu-open': isMenuOpen })}>
+            <div className={classNames({ 'app-wrapper': true, 'u-menu-open': isMainMenuOpen })}>
                 <ScrollToTop location={location}>
                     {isLoading ? (
                         <Loading />
@@ -100,14 +113,17 @@ function App({ fetchMenu, getDeviceType, ui }) {
     );
 }
 
-const mapStateToProps = ({ ui }) => ({
+const mapStateToProps = ({ ui, user }) => ({
+    isLoggedOut: user.isLoggedOut,
     ui,
+    user: user.data,
 });
 
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
             fetchMenu: fetchMenuAction,
+            fetchUser: fetchUserAction,
             getDeviceType: getDeviceTypeAction,
             logoutUser: logoutUserAction,
         },

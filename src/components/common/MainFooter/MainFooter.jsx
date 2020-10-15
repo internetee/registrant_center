@@ -8,10 +8,13 @@ const MainFooter = ({ ui }) => {
     const menu = footer.reduce((acc, item) => {
         if (item.language.code === lang) {
             const body = item.text.body.split('href="/').join('href="https://www.internet.ee/');
-            acc.push({
-                id: item.id,
-                body,
-            });
+            return [
+                ...acc,
+                {
+                    body,
+                    id: item.id,
+                },
+            ];
         }
         return acc;
     }, []);

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import User from '../utils/UserSchema';
 
 dotenv.config();
 
@@ -68,9 +67,16 @@ export default {
     },
 
     destroyUser: async (req, res) => {
-        req.session.regenerate(() => {
-            res.end();
-        });
+        req.session = null;
+        res.end();
+    },
+
+    getCompanies: async ({ query, session }, res) => {
+        const { offset } = query;
+        return handleResponse(
+            () => API(session, res).get(`/api/v1/registrant/companies?offset=${offset}`),
+            res
+        );
     },
 
     getContacts: async ({ query, params, session }, res) => {
@@ -144,16 +150,10 @@ export default {
     },
 
     getUser: async ({ session }, res) => {
-        if (typeof session.user === 'undefined') {
-            return res.status(400).json({
-                error: 'Invalid user',
-            });
-        }
         try {
-            const user = await User.findOne({ ident: session.user.ident });
-            if (user) {
+            const userData = session.user;
+            if (userData) {
                 if (!session.token) {
-                    const userData = session.user;
                     const response = await API(session).post(
                         '/api/v1/registrant/auth/eid',
                         userData
@@ -161,13 +161,10 @@ export default {
                     // eslint-disable-next-line no-param-reassign
                     session.token = response.data;
                 }
-                return res.status(200).json(user);
+                return res.status(200).json(userData);
             }
-            return res.status(404).json({
-                error: 'User not found',
-            });
+            return res.status(498).json({});
         } catch (e) {
-            console.log('----- EIS API', e.response.status);
             if (e.response.status) {
                 return res.status(e.response.status).json({});
             }

@@ -5,6 +5,13 @@ import { Button, Container, Icon, Form } from 'semantic-ui-react';
 
 import { MainLayout, MessageModule } from '../../components';
 
+const { REACT_APP_SERVER_PORT, REACT_APP_URL } = process.env;
+
+const authPath =
+    process.env.NODE_ENV === 'development'
+        ? `${REACT_APP_URL}:${REACT_APP_SERVER_PORT}/connect/openid`
+        : '/connect/openid';
+
 function LoginPage({ user, ui }) {
     const message = {
         code: user.status > 0 ? user.status : null,
@@ -37,7 +44,7 @@ function LoginPage({ user, ui }) {
                                 <FormattedMessage id="login.options.smartId" tagName="p" />
                             </div>
                         </div>
-                        <Form action="/connect/openid">
+                        <Form action={authPath}>
                             <Button primary size={ui.uiElemSize} type="submit">
                                 <FormattedMessage id="actions.login" tagName="span" />
                             </Button>

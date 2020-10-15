@@ -4,7 +4,8 @@
     "plugin:react/recommended",
     "airbnb",
     "prettier",
-    "prettier/react"
+    "prettier/react",
+    "react-app"
   ],
   "plugins": ["prettier"],
   "env": {

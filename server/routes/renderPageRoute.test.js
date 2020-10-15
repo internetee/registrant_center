@@ -9,15 +9,15 @@ describe('server/routes/renderPageRoute', () => {
 
     it('should render login page', async () => {
         const mockReq = {
-            url: '/login',
             session: {
                 regenerate: jest.fn(),
             },
+            url: '/login',
         };
         const mockRes = {
+            redirect: jest.fn(),
             send: jest.fn(),
             sendFile: jest.fn(),
-            redirect: jest.fn(),
             setHeader: jest.fn(),
             status: jest.fn(),
         };

@@ -1,26 +1,23 @@
 /* eslint-disable sort-keys */
 import axios from 'axios';
 import dotenv from 'dotenv';
-import auth from 'http-auth';
 import express from 'express';
 import helmet from 'helmet';
-import session from 'express-session';
+import session from 'cookie-session';
 import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import connectMongo from 'connect-mongo';
 import grant from 'grant-express';
 import cookieParser from 'cookie-parser';
 import https from 'https';
 import favicon from 'serve-favicon';
 import compression from 'compression';
 import path from 'path';
-import morgan from 'morgan';
 import fs from 'fs';
+import expressWinston from 'express-winston';
 import jwkToPem from 'jwk-to-pem';
 import callbackPage from './routes/callbackPageRoute';
 import banner from './utils/banner';
-import getLog from './utils/logger';
 import API from './routes/apiRoute';
+import { accessLog, consoleLog, errorLog } from './utils/logger';
 
 dotenv.config();
 
@@ -29,36 +26,22 @@ const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const {
-    HOST,
-    PORT,
+    AUTH_PATH,
     CLIENT_ID,
     CLIENT_SECRET,
-    REDIRECT_URL,
-    TOKEN_PATH,
-    AUTH_PATH,
+    HOST,
     ISSUER_URL,
     JWKS_PATH,
-    DB_NAME,
-    DB_USER,
-    DB_PASS,
-    LOG_INCOMING: logIncoming,
     NODE_ENV,
+    REACT_APP_SERVER_PORT,
+    REDIRECT_URL,
     SESSION_SECRET,
+    TOKEN_PATH,
 } = process.env;
 
 let publicKey = '';
 
 const app = express();
-
-/*
-if (NODE_ENV === 'development') {
-  const htpasswd = auth.basic({
-    realm: 'EIS Registreerijaportaal',
-    file: `${__dirname}/../../.htpasswd`
-  });
-  app.use(auth.connect(htpasswd));
-}
- */
 
 app.enable('trust proxy');
 
@@ -67,43 +50,27 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // logging
-if (logIncoming) {
-    const incomingLog = getLog('INCOMING');
-    app.use(
-        morgan('short', {
-            stream: { write: (message) => incomingLog.info(message.trim()) },
-        })
-    );
-}
+app.use(expressWinston.logger(consoleLog));
+app.use(expressWinston.logger(accessLog));
+app.use(expressWinston.errorLogger(errorLog));
 
 // compression
 app.use(compression()); // GZip compress responses
 
 // static files
-app.use(express.static(path.join(__dirname, 'build')));
+if (NODE_ENV !== 'development') {
+    app.use(express.static(path.join(__dirname, 'build')));
+}
 app.use(favicon(path.join(__dirname, '../public/favicon.ico')));
 
-const MongoStore = connectMongo(session);
-mongoose.Promise = global.Promise;
-
-mongoose.connect(
-    `mongodb://${encodeURIComponent(DB_USER)}:${encodeURIComponent(
-        DB_PASS
-    )}@localhost:27017/${encodeURIComponent(DB_NAME)}`,
-    { useNewUrlParser: true }
-);
-
-const sessionMiddleware = session({
-    secret: SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    cookie: {
+app.use(
+    session({
+        httpOnly: true,
         maxAge: 7200000,
-    },
-});
-
-app.use(sessionMiddleware);
+        secret: SESSION_SECRET,
+        secure: true,
+    })
+);
 
 (async () => {
     try {
@@ -122,6 +89,11 @@ app.use((req, res, next) => {
     next();
 });
 
+const redirect_uri =
+    NODE_ENV === 'development'
+        ? `https://${HOST}:${REACT_APP_SERVER_PORT}${REDIRECT_URL}`
+        : `https://${HOST}${REDIRECT_URL}`;
+
 // grant auth
 app.use(
     grant({
@@ -139,7 +111,7 @@ app.use(
             key: CLIENT_ID,
             secret: CLIENT_SECRET,
             scope: 'openid',
-            redirect_uri: `https://${HOST}:${PORT}${REDIRECT_URL}`,
+            redirect_uri,
             response_type: 'code',
             callback: REDIRECT_URL,
             custom_params: {
@@ -159,6 +131,7 @@ app.get('/api/domains', API.getDomains);
 app.get('/api/domains/:uuid', API.getDomain);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
 app.delete('/api/domains/:uuid/registry_lock', API.deleteDomainRegistryLock);
+app.get('/api/companies', API.getCompanies);
 app.get('/api/contacts', API.getContacts);
 app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
@@ -169,19 +142,10 @@ app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'build', 'index.ht
 
 const server = https
     .createServer(credentials, app)
-    .listen(NODE_ENV === 'test' ? 3000 : PORT, () => {
+    .listen(NODE_ENV === 'test' ? 4000 : REACT_APP_SERVER_PORT, () => {
         banner();
         // eslint-disable-next-line no-console
-        console.log(
-            JSON.stringify(
-                {
-                    Host: HOST,
-                    Environment: NODE_ENV,
-                },
-                null,
-                2
-            )
-        );
+        console.log(`Environment: ${NODE_ENV}`);
         // 'ready' is a hook used by the e2e (integration) tests (see node-while)
         server.emit('ready');
     });

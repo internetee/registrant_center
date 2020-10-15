@@ -7,36 +7,38 @@ const MainMenu = ({ items, lang, user, closeMainMenu }) => {
     const [menu, setMenu] = useState([]);
 
     useEffect(() => {
-        const menuItems = items
-            .reduce((acc, item) => {
-                // Exclude portals menu items
-                const exludedItems = [2133844, 2223713, 2142515];
-                // Find current language first level menu items
-                if (
-                    item.language.code === lang &&
-                    item.node.parent_id === 2089596 &&
-                    !exludedItems.includes(item.node.id)
-                ) {
-                    // Find current menu items children
-                    const children = items.filter(
-                        (child) =>
-                            child.node.parent_id === item.node.id &&
-                            child.language.code === lang &&
-                            !exludedItems.includes(child.node.id)
-                    );
-                    return [
-                        ...acc,
-                        {
-                            ...item,
-                            children,
-                            isOpen: false,
-                        },
-                    ];
-                }
-                return acc;
-            }, [])
-            .sort((a, b) => a.node.position - b.node.position);
-        setMenu(menuItems);
+        if (items) {
+            const menuItems = items
+                .reduce((acc, item) => {
+                    // Exclude portals menu items
+                    const exludedItems = [2133844, 2223713, 2142515];
+                    // Find current language first level menu items
+                    if (
+                        item.language.code === lang &&
+                        item.node.parent_id === 2089596 &&
+                        !exludedItems.includes(item.node.id)
+                    ) {
+                        // Find current menu items children
+                        const children = items.filter(
+                            (child) =>
+                                child.node.parent_id === item.node.id &&
+                                child.language.code === lang &&
+                                !exludedItems.includes(child.node.id)
+                        );
+                        return [
+                            ...acc,
+                            {
+                                ...item,
+                                children,
+                                isOpen: false,
+                            },
+                        ];
+                    }
+                    return acc;
+                }, [])
+                .sort((a, b) => a.node.position - b.node.position);
+            setMenu(menuItems);
+        }
     }, [items, lang]);
 
     const handleSubmenu = (cur) => {

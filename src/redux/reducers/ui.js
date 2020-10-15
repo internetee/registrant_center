@@ -34,7 +34,6 @@ const requestMenu = (menu) => (dispatch, getState) => {
     dispatch({
         isInvalidated: false,
         isLoading: true,
-        menus: getState().ui.menus,
         status: null,
         type: fetchMenuAction(menu, 'request'),
     });
@@ -44,8 +43,7 @@ const receiveMenu = (menu, data) => (dispatch, getState) => {
     dispatch({
         isInvalidated: false,
         isLoading: false,
-        menus: {
-            ...getState().ui.menus,
+        payload: {
             [menu]: data,
         },
         status: 200,
@@ -57,7 +55,9 @@ const invalidateMenuRequest = (menu, status) => {
     return {
         isInvalidated: true,
         isLoading: false,
-        menus: {},
+        payload: {
+            [menu]: null,
+        },
         status,
         type: fetchMenuAction(menu, 'failure'),
     };
@@ -76,20 +76,14 @@ const fetchMenu = (menu) => (dispatch) => {
         });
 };
 
-const toggleMainMenu = () => (dispatch, getState) => {
+const toggleMainMenu = () => (dispatch) => {
     dispatch({
-        mainMenu: {
-            isOpen: !getState().ui.mainMenu.isOpen,
-        },
         type: TOGGLE_MAIN_MENU,
     });
 };
 
 const closeMainMenu = () => (dispatch) => {
     dispatch({
-        mainMenu: {
-            isOpen: false,
-        },
         type: CLOSE_MAIN_MENU,
     });
 };
@@ -102,22 +96,21 @@ const getDeviceType = (width) => (dispatch) => {
 };
 
 const initialState = {
+    isMainMenuOpen: false,
     lang: cookies.get('locale') || 'et',
-    mainMenu: {
-        isOpen: false,
-    },
     menus: {},
     uiElemSize: 'big',
 };
 
-export default function (state = initialState, action) {
+export default function reducer(state = initialState, action) {
     if (action.type && action.type.startsWith('FETCH_MENU')) {
         return {
             ...state,
             isInvalidated: action.isInvalidated,
             isLoading: action.isLoading,
             menus: {
-                ...action.menus,
+                ...state.menus,
+                ...action.payload,
             },
             status: action.status,
         };
@@ -127,13 +120,13 @@ export default function (state = initialState, action) {
         case TOGGLE_MAIN_MENU:
             return {
                 ...state,
-                mainMenu: action.mainMenu,
+                isMainMenuOpen: !state.isMainMenuOpen,
             };
 
         case CLOSE_MAIN_MENU:
             return {
                 ...state,
-                mainMenu: action.mainMenu,
+                isMainMenuOpen: false,
             };
 
         case GET_DEVICE_TYPE:
