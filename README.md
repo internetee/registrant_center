@@ -15,10 +15,6 @@
 
 ## Setup
 - Create .env file from .env.example
-- Change ```PORT``` erinevate keskkondade jaoks
-    - Development: ```.env.development```
-    - Production: ```.env.production```
-    - Test: ```.env.test```
 
 ```
 npm i
