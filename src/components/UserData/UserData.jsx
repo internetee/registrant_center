@@ -7,7 +7,6 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { connect } from 'react-redux';
 import vfs from '../../utils/vfs_fonts';
-import * as contactsActions from '../../redux/reducers/contacts';
 
 pdfMake.vfs = vfs;
 pdfMake.fonts = {

@@ -41,5 +41,6 @@
     "react/prop-types": 0,
     "react/sort-comp": ["error"],
     "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false }]
-  }
+  },
+  "ignorePatterns": ["**/build/*"]
 }

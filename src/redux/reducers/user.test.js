@@ -59,6 +59,7 @@ describe('User action creators', () => {
 
         const expectedActions = [
             {
+                isLoggedOut: true,
                 status: 200,
                 type: 'LOGOUT_USER',
             },
@@ -101,11 +102,13 @@ describe('User reducers', () => {
     it('should handle LOGOUT_USER', () => {
         expect(
             reducer([], {
+                isLoggedOut: true,
                 status: 200,
                 type: 'LOGOUT_USER',
             })
         ).toEqual({
             ...initialState,
+            isLoggedOut: true,
             status: 200,
         });
     });

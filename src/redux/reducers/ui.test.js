@@ -17,10 +17,8 @@ describe('Locale action creators', () => {
         ];
         const store = mockStore({
             ui: {
+                isMainMenuOpen: false,
                 lang: 'et',
-                mainMenu: {
-                    isOpen: false,
-                },
                 menus: {},
                 uiElemSize: 'big',
             },
@@ -34,10 +32,8 @@ describe('Locale action creators', () => {
 describe('Locale reducers', () => {
     it('should return the initial state', () => {
         expect(reducer(undefined, {})).toEqual({
+            isMainMenuOpen: false,
             lang: 'et',
-            mainMenu: {
-                isOpen: false,
-            },
             menus: {},
             uiElemSize: 'big',
         });

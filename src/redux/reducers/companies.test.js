@@ -45,7 +45,7 @@ describe('Contacts action creators', () => {
                 type: 'FETCH_COMPANIES_REQUEST',
             },
             {
-                payload: companies,
+                payload: companies.companies,
                 type: 'FETCH_COMPANIES_SUCCESS',
             },
         ];
@@ -100,18 +100,18 @@ describe('Contacts reducers', () => {
     it('should handle FETCH_COMPANIES_SUCCESS', () => {
         expect(
             reducer(initialState, {
-                payload: companies,
+                payload: companies.companies,
                 type: 'FETCH_COMPANIES_SUCCESS',
             })
         ).toEqual({
-            data: companies.reduce(
+            data: companies.companies.reduce(
                 (acc, item) => ({
                     ...acc,
                     [item.registry_no]: item,
                 }),
                 {}
             ),
-            ids: companies.map((item) => item.registry_no),
+            ids: companies.companies.map((item) => item.registry_no),
             isLoading: false,
             message: null,
         });
