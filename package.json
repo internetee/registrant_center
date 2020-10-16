@@ -101,5 +101,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://eis-client.dev4.we.ee:1234"
+  "proxy": "https://localhost:1234"
 }
