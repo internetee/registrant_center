@@ -23,6 +23,7 @@ import {
 } from '../../components';
 import Domain from './Domain';
 import * as contactsActions from '../../redux/reducers/contacts';
+import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 import Helpers from '../../utils/helpers';
 
 const perPageOptions = [
@@ -32,9 +33,10 @@ const perPageOptions = [
 ];
 
 const WhoIsPage = ({
+    contacts,
+    domains,
     fetchContacts,
-    initialContacts,
-    initialDomains,
+    fetchDomains,
     message,
     ui,
     updateContact,
@@ -43,17 +45,17 @@ const WhoIsPage = ({
     const [cookies, setCookies] = useCookies(['whoIsPerPage']);
     const { whoIsPerPage } = cookies;
     const [isDirty, setIsDirty] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [perPage, setPerPage] = useState(whoIsPerPage ? Number(whoIsPerPage) : 12);
     const [activePage, setActivePage] = useState(1);
     const [queryKeys, setQueryKeys] = useState('');
-    const [contacts, setContacts] = useState({});
-    const [domains, setDomains] = useState(Object.values(initialDomains));
+    const [whoIsData, setWhoIsData] = useState({});
+    const [results, setResults] = useState(domains);
     const { uiElemSize } = ui;
 
     const paginatedDomains = [];
-    const copied = [...domains];
+    const copied = [...results];
     const numOfChild = Math.ceil(copied.length / perPage);
     for (let i = 0; i < numOfChild; i += 1) {
         paginatedDomains.push(copied.splice(0, perPage));
@@ -61,14 +63,19 @@ const WhoIsPage = ({
 
     useEffect(() => {
         (async () => {
+            await fetchDomains();
             await fetchContacts();
             setIsLoading(false);
         })();
-    }, [fetchContacts]);
+    }, [fetchContacts, fetchDomains]);
 
     useEffect(() => {
-        setContacts(initialContacts);
-    }, [initialContacts]);
+        setWhoIsData(contacts);
+    }, [contacts]);
+
+    useEffect(() => {
+        setResults(domains);
+    }, [domains]);
 
     const handleItemsPerPage = (event, { value }) => {
         setCookies('whoIsPerPage', value, { path: '/whois' });
@@ -78,20 +85,20 @@ const WhoIsPage = ({
 
     const handleSearchChange = (event, { value }) => {
         setQueryKeys(value);
-        setDomains(value ? domains : initialDomains);
+        setResults(value ? results : domains);
     };
 
     const handleSearchReset = () => {
         setQueryKeys('');
         setActivePage(1);
-        setContacts(initialContacts);
-        setDomains(initialDomains);
+        setWhoIsData(contacts);
+        setResults(domains);
     };
 
     const handleSearch = () => {
         if (queryKeys.length > 0) {
             const query = queryKeys.toString().toLowerCase();
-            const results = Object.values(initialDomains).filter((domain) => {
+            const queryResults = domains.filter((domain) => {
                 return (
                     domain.name.toLowerCase().includes(query) ||
                     domain.tech_contacts.some((item) => item.name.toLowerCase().includes(query)) ||
@@ -104,15 +111,15 @@ const WhoIsPage = ({
                     )
                 );
             });
-            setDomains(results.length ? results : []);
+            setResults(queryResults.length ? queryResults : []);
         } else if (queryKeys.length === 0) {
-            setDomains(Object.values(initialDomains));
+            setResults(domains);
         }
         setActivePage(1);
     };
 
     const handleWhoIsChange = (data) => {
-        setContacts((prevState) =>
+        setWhoIsData((prevState) =>
             Object.entries(prevState).reduce((acc, [id, contact]) => {
                 if (data[id]) {
                     return {
@@ -141,7 +148,7 @@ const WhoIsPage = ({
         setIsLoading(true);
         setIsSubmitConfirmModalOpen(false);
         await Promise.all(
-            Object.values(contacts)
+            Object.values(whoIsData)
                 .filter(({ changed }) => changed)
                 .map((contact) => {
                     const form = {
@@ -154,11 +161,15 @@ const WhoIsPage = ({
         setIsLoading(false);
     };
 
+    if (!domains.length && isLoading) {
+        return <Loading />;
+    }
+
     return (
         <MainLayout hasBackButton titleKey="whois.title">
             {!isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">
-                {initialDomains.length ? (
+                {domains.length ? (
                     <>
                         <div className="page--header">
                             <Container>
@@ -209,10 +220,10 @@ const WhoIsPage = ({
                                 </Form>
                             </Container>
                         </div>
-                        {isLoading || !domains.length ? (
+                        {isLoading || !results.length ? (
                             <>
                                 {isLoading && <Loading />}
-                                {!isLoading && !domains.length && (
+                                {!isLoading && !results.length && (
                                     <PageMessage
                                         headerContent={
                                             <FormattedMessage
@@ -286,7 +297,7 @@ const WhoIsPage = ({
                                                         contacts={Helpers.getUserContacts(
                                                             user,
                                                             domain,
-                                                            contacts
+                                                            whoIsData
                                                         )}
                                                         name={domain.name}
                                                         onChange={handleWhoIsChange}
@@ -344,7 +355,7 @@ const WhoIsPage = ({
                             </div>
                         )}
                         <WhoIsConfirmDialog
-                            contacts={contacts}
+                            contacts={whoIsData}
                             onCancel={toggleSubmitConfirmModal}
                             onConfirm={handleWhoIsSubmit}
                             open={isSubmitConfirmModalOpen}
@@ -363,8 +374,8 @@ const WhoIsPage = ({
 
 const mapStateToProps = (state) => {
     return {
-        initialContacts: state.contacts.data,
-        initialDomains: state.domains.data,
+        contacts: state.contacts.data,
+        domains: state.domains.ids.map((id) => state.domains.data[id]),
         ui: state.ui,
         user: state.user.data,
     };
@@ -372,4 +383,5 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
     ...contactsActions,
+    fetchDomains: fetchDomainsAction,
 })(WhoIsPage);

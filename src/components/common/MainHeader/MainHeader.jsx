@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import { Button, Container, Icon } from 'semantic-ui-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useCookies } from 'react-cookie';
 import classNames from 'classnames';
 import MainMenu from '../MainMenu/MainMenu';
@@ -11,6 +11,7 @@ import * as userActions from '../../../redux/reducers/user';
 
 function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, user }) {
     const [cookies, setCookies] = useCookies(['cookiesAccepted']);
+    const { formatMessage } = useIntl();
     const { cookiesAccepted } = cookies;
     const {
         lang,
@@ -51,7 +52,9 @@ function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, us
                                 values={{
                                     a: (linkText) => (
                                         <a
-                                            href="https://internet.ee/eis/kupsised-internet-ee-lehel"
+                                            href={formatMessage({
+                                                id: 'cookieNotice.content.link',
+                                            })}
                                             rel="noopener noreferrer"
                                             target="_blank"
                                         >

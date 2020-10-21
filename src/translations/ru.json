@@ -91,7 +91,6 @@
   "domains.status": "Status",
   "domains.title": "My domains <span>({userTotalDomains})</ span>",
   "domains.validUntil": "Valid until",
-  "errorpage.none.message.text": "",
   "errorpage.none.message.title": "Unfortunately, the page corresponding to this URL was not found",
   "errorpage.title": "Page not found",
   "footer.eis": "Eesti interneti Sihtasutus",

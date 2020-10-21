@@ -12,7 +12,7 @@ import {
     LOGOUT_USER,
 } from '../actions';
 
-const request = {
+let request = {
     data: [],
     offset: 0,
 };
@@ -30,10 +30,16 @@ const requestContacts = () => ({
     type: FETCH_CONTACTS_REQUEST,
 });
 
-const receiveContacts = (payload) => ({
-    payload,
-    type: FETCH_CONTACTS_SUCCESS,
-});
+const receiveContacts = (payload) => {
+    request = {
+        data: [],
+        offset: 0,
+    };
+    return {
+        payload,
+        type: FETCH_CONTACTS_SUCCESS,
+    };
+};
 
 const requestContactUpdate = () => ({
     type: UPDATE_CONTACT_REQUEST,

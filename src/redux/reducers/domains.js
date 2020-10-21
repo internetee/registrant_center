@@ -18,7 +18,7 @@ import {
 import { fetchContacts } from './contacts';
 import domainStatuses from '../../utils/domainStatuses.json';
 
-const request = {
+let request = {
     data: [],
     offset: 0,
 };
@@ -78,10 +78,16 @@ const requestDomains = () => ({
     type: FETCH_DOMAINS_REQUEST,
 });
 
-const receiveDomains = (payload) => ({
-    payload,
-    type: FETCH_DOMAINS_SUCCESS,
-});
+const receiveDomains = (payload) => {
+    request = {
+        data: [],
+        offset: 0,
+    };
+    return {
+        payload,
+        type: FETCH_DOMAINS_SUCCESS,
+    };
+};
 
 const failDomains = () => ({
     type: FETCH_DOMAINS_FAILURE,

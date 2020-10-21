@@ -6,7 +6,7 @@ import {
     LOGOUT_USER,
 } from '../actions';
 
-const request = {
+let request = {
     data: [],
     offset: 0,
 };
@@ -15,10 +15,17 @@ const requestCompanies = () => ({
     type: FETCH_COMPANIES_REQUEST,
 });
 
-const receiveCompanies = (payload) => ({
-    payload,
-    type: FETCH_COMPANIES_SUCCESS,
-});
+const receiveCompanies = (payload) => {
+    request = {
+        data: [],
+        offset: 0,
+    };
+
+    return {
+        payload,
+        type: FETCH_COMPANIES_SUCCESS,
+    };
+};
 
 const invalidateCompanies = () => ({
     type: FETCH_COMPANIES_FAILURE,

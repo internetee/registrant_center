@@ -20,7 +20,7 @@ function LoginPage({ user, ui }) {
 
     return (
         <MainLayout heroKey="login.hero.text" titleKey="login.title">
-            {message.code && <MessageModule message={message} />}
+            {user.isLoggedOut && message.code && <MessageModule message={message} />}
             <div className="page page--login">
                 <div className="u-container">
                     <Container className="page--login--area" text textAlign="center">

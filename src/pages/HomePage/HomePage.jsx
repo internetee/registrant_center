@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -10,8 +10,9 @@ import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains
 
 const HomePage = ({ domains, fetchDomains, ui, user }) => {
     const { lang } = ui;
-    const [isLoading, setIsLoading] = useState(true);
     moment.locale(lang);
+    const [isLoading, setIsLoading] = useState(true);
+    const { formatMessage } = useIntl();
 
     useEffect(() => {
         (async () => {
@@ -25,9 +26,6 @@ const HomePage = ({ domains, fetchDomains, ui, user }) => {
     return (
         <MainLayout
             heroKey="dashboard.hero.text"
-            heroValues={{
-                lastVisit: moment(user.visited_at).format('D.MM.YYYY HH:mm'),
-            }}
             htmlTitleKey="dashboard.htmlTitle"
             titleKey="dashboard.title"
             titleValues={{
@@ -59,7 +57,9 @@ const HomePage = ({ domains, fetchDomains, ui, user }) => {
                                     values={{
                                         a: (linkText) => (
                                             <a
-                                                href="https://www.internet.ee/domeenid/whois-teenuse-kasutajatingimused"
+                                                href={formatMessage({
+                                                    id: 'quicklinks.whois.content.link',
+                                                })}
                                                 rel="noopener noreferrer"
                                                 target="_blank"
                                             >

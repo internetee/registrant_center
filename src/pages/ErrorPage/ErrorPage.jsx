@@ -8,9 +8,7 @@ const ErrorPage = () => {
             <PageMessage
                 headerContent={<FormattedMessage id="errorpage.none.message.title" />}
                 icon="times circle outline"
-            >
-                <FormattedMessage id="errorpage.none.message.text" tagName="p" />
-            </PageMessage>
+            />
         </MainLayout>
     );
 };
