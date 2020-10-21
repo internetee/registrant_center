@@ -63,7 +63,7 @@
   "domain.registrant_verification_token": "Registreerija kinnituse võti",
   "domain.registrar": "Registripidaja",
   "domain.registrar.name": "Nimi",
-  "domain.registrar.tooltip": "Halduskontakt on tõieõigulisk registreerija esindaja nii võimaluste kui vastutuse osas. Halduskontakt ei saa vaid lisada ega eemaldada halduskontakte. ",
+  "domain.registrar.tooltip": "Domeeni registreeringut haldav registripidaja. Registripidaja vahendusel on võimalik teostada kõiki domeeniga seotud toiminguid registreeringu pikendamisest andmete muutmiseni.",
   "domain.registrar.website": "Koduleht",
   "domain.reserved": "Reserveeritud",
   "domain.role": "Roll: ",
