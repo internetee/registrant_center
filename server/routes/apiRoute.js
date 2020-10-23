@@ -165,7 +165,7 @@ export default {
             }
             return res.status(498).json({});
         } catch (e) {
-            if (e.response.status) {
+            if (e?.response?.status) {
                 return res.status(e.response.status).json({});
             }
             return res.status(408).json({});
