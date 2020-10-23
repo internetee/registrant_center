@@ -10,7 +10,7 @@
     "build": "node ./buildScript",
     "lint": "npx eslint --ext jsx,js src server",
     "test": "npm run lint && react-scripts test",
-    "test:e2e": "concurrently \"npm run serve:test\" \"cypress run\" --kill-others --kill-others-on-fail",
+    "test:e2e": "concurrently \"npm run serve:test\" \"cypress run\" --kill-others --success first",
     "start": "concurrently \"npm run start-server\" \"npm run start-front\" --kill-others --kill-others-on-fail",
     "deploy": "npm run test && npm run build && npm run test:e2e && npm run serve"
   },

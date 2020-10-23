@@ -19,7 +19,9 @@ import Helpers from '../../utils/helpers';
 const DomainEditPage = ({
     contacts,
     domain,
+    fetchContacts,
     fetchDomain,
+    isLoadingDomain,
     match,
     message,
     ui,
@@ -36,12 +38,22 @@ const DomainEditPage = ({
 
     useEffect(() => {
         (async () => {
-            if (!domain) {
+            if (!domain && !isLoadingDomain) {
                 await fetchDomain(params.id);
+            }
+            if (domain) {
+                await Promise.all(
+                    Object.keys(domain.contacts).map((key) => {
+                        if (!contacts[key]) {
+                            return fetchContacts(key);
+                        }
+                        return true;
+                    })
+                );
             }
             setIsLoading(false);
         })();
-    }, [domain, fetchDomain, params]);
+    }, [contacts, domain, fetchContacts, fetchDomain, isLoadingDomain, params]);
 
     useEffect(() => {
         if (domain) {
@@ -100,11 +112,11 @@ const DomainEditPage = ({
         setIsSaving(false);
     };
 
-    if (isLoading) {
+    if (isLoading && isLoadingDomain) {
         return <Loading />;
     }
 
-    if (!domain) {
+    if (!domain && !isLoadingDomain) {
         return (
             <MainLayout hasBackButton titleKey="domain.404.title">
                 <PageMessage
@@ -253,6 +265,7 @@ const mapStateToProps = (state, { match }) => {
     return {
         contacts: state.contacts.data,
         domain: state.domains.data[match.params.id],
+        isLoadingDomain: state.domains.isLoading,
         message: state.contacts.message,
         ui: state.ui,
         user: state.user.data,

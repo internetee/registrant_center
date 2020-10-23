@@ -16,6 +16,7 @@ import Masonry from 'react-masonry-component';
 import Flatpickr from 'react-flatpickr';
 import { Estonian } from 'flatpickr/dist/l10n/et';
 import { Russian } from 'flatpickr/dist/l10n/ru';
+import 'flatpickr/dist/themes/light.css';
 import classNames from 'classnames';
 import { useCookies } from 'react-cookie';
 import DomainGridItem from './GridItem';

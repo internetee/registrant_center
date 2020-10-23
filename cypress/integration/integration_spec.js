@@ -7,6 +7,7 @@ describe('Integration tests', () => {
         cy.route('GET', '**/api/menu/footer', 'fx:menuFooter').as('getFooterMenu');
         cy.route('GET', '**/api/user', 'fx:user').as('getUser');
         cy.route('POST', '**/api/destroy', 'fx:user').as('destroySession');
+        cy.route('GET', '**/api/companies?*', 'fx:companies').as('getCompanies');
         cy.route('GET', '**/api/domains?*', 'fx:domains').as('getDomains');
         cy.route('GET', '**/api/domains/*', 'fx:domain').as('getDomain');
         cy.route('POST', '**/api/domains/*/registry_lock', 'fx:domains').as('setDomainLock');
@@ -112,7 +113,6 @@ describe('Integration tests', () => {
     it('Links to domain.ee detail view', () => {
         cy.get('.domains-grid--item:first-child .link').click();
         cy.url().should('eq', `${baseUrl}/domain/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e`);
-        cy.wait('@getDomain').its('status').should('eq', 200);
         cy.wait('@getAdmin').its('status').should('eq', 200);
         cy.wait('@getTech').its('status').should('eq', 200);
         cy.wait('@getRegistrant').its('status').should('eq', 200);
@@ -128,14 +128,14 @@ describe('Integration tests', () => {
     it('Sends API request to set domain lock', () => {
         cy.get('[data-test="open-lock-modal"]').click();
         cy.get('[data-test="lock-domain"]').click();
-        cy.wait('@setDomainLock');
+        cy.wait('@setDomainLock').its('status').should('eq', 200);
     });
 
     it('Sends API request to change WhoIs visibility', () => {
         cy.get('.adv-field-group input[name="name"] + label').click();
         cy.get('.form-actions button').click();
         cy.get('[data-test="change-contacts"]').click();
-        cy.wait('@setRegistrantContacts');
+        cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
     });
 
     it('Links to domain.ee edit view', () => {
@@ -148,7 +148,7 @@ describe('Integration tests', () => {
         cy.get('input[name="name"] + label').click();
         cy.get('.form-actions button').click();
         cy.get('[data-test="change-contacts"]').click();
-        cy.wait('@setRegistrantContacts');
+        cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
     });
 
     it('Links back to domain.ee detail view', () => {
@@ -176,7 +176,7 @@ describe('Integration tests', () => {
     it('Sends API request to delete domain lock', () => {
         cy.get('[data-test="open-unlock-modal"]').click();
         cy.get('[data-test="lock-domain"]').click();
-        cy.wait('@deleteDomainLock');
+        cy.wait('@deleteDomainLock').its('status').should('eq', 200);
     });
 
     it('Links back to Dashboard from lockeddomain.ee detail view', () => {
@@ -187,10 +187,11 @@ describe('Integration tests', () => {
     it('Links to Companies page', () => {
         cy.get('.quicklinks--link[href="/companies"]').click();
         cy.url().should('eq', `${baseUrl}/companies`);
+        cy.wait('@getCompanies').its('status').should('eq', 200);
     });
 
     it('Displays companies list', () => {
-        cy.get('.table tbody tr').should('have.length', 3);
+        cy.get('.table tbody tr').should('have.length', 2);
     });
 
     it('Links back to Dashboard from Companies page', () => {
@@ -201,6 +202,7 @@ describe('Integration tests', () => {
     it('Links to WhoIs page', () => {
         cy.get('.quicklinks--link[href="/whois"]').click();
         cy.url().should('eq', `${baseUrl}/whois`);
+        cy.wait('@getDomains').its('status').should('eq', 200);
     });
 
     it('Displays domains list', () => {
@@ -224,7 +226,7 @@ describe('Integration tests', () => {
         cy.get('.table tbody tr:first-child .adv-field-group input[name="name"] + label').click();
         cy.get('.form-filter--actions button').click();
         cy.get('[data-test="change-contacts"]').click();
-        cy.wait('@setRegistrantContacts');
+        cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
     });
 
     it('Links back to Dashboard from WhoIs page', () => {

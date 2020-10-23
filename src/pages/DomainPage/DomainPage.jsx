@@ -35,6 +35,7 @@ const DomainPage = ({
     match,
     ui,
     unlockDomain,
+    fetchContacts,
     updateContact,
     user,
 }) => {
@@ -55,9 +56,19 @@ const DomainPage = ({
             if (!domain) {
                 await fetchDomain(match.params.id);
             }
+            if (domain) {
+                await Promise.all(
+                    Object.keys(domain.contacts).map((key) => {
+                        if (!contacts[key]) {
+                            return fetchContacts(key);
+                        }
+                        return true;
+                    })
+                );
+            }
             setIsLoading(false);
         })();
-    }, [domain, fetchDomain, match]);
+    }, [contacts, domain, fetchContacts, fetchDomain, match]);
 
     useEffect(() => {
         if (domain) {
