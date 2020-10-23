@@ -5,12 +5,12 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { WhoIsEdit } from '../../../components';
 
-export default function Domain({ name, contacts, onChange }) {
+export default function Domain({ id, name, contacts, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
     return (
         <Table.Row verticalAlign="top">
             <Table.Cell width={6}>
-                <Link to={`/domain/${name}`}>{name}</Link>
+                <Link to={`/domain/${id}`}>{name}</Link>
             </Table.Cell>
             <Table.Cell width={8}>
                 <div className="ui form">

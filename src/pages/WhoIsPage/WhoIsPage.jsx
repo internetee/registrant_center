@@ -299,6 +299,7 @@ const WhoIsPage = ({
                                                             domain,
                                                             whoIsData
                                                         )}
+                                                        id={domain.id}
                                                         name={domain.name}
                                                         onChange={handleWhoIsChange}
                                                     />
