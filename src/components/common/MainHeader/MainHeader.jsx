@@ -5,9 +5,14 @@ import { Button, Container, Icon } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useCookies } from 'react-cookie';
 import classNames from 'classnames';
+import { bindActionCreators } from 'redux';
 import MainMenu from '../MainMenu/MainMenu';
-import * as uiActions from '../../../redux/reducers/ui';
-import * as userActions from '../../../redux/reducers/user';
+import {
+    closeMainMenu as closeMainMenuAction,
+    setLang as setLangAction,
+    toggleMainMenu as toggleMainMenuAction,
+} from '../../../redux/reducers/ui';
+import { logoutUser as logoutUserAction } from '../../../redux/reducers/user';
 
 function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, user }) {
     const [cookies, setCookies] = useCookies(['cookiesAccepted']);
@@ -87,7 +92,12 @@ function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, us
                 <div className="main-header-bottom">
                     <Logo />
                     <MediaQuery query="(min-width: 1224px)">
-                        <MainMenu items={main} lang={lang} user={user} />
+                        <MainMenu
+                            closeMainMenu={closeMainMenu}
+                            items={main}
+                            lang={lang}
+                            user={user}
+                        />
                     </MediaQuery>
                     <MediaQuery query="(max-width: 1223px)">
                         <div className="actions">
@@ -228,4 +238,15 @@ const mapStateToProps = ({ ui, user }) => ({
     user: user.data,
 });
 
-export default connect(mapStateToProps, { ...uiActions, ...userActions })(MainHeader);
+const mapDispatchToProps = (dispatch) =>
+    bindActionCreators(
+        {
+            closeMainMenu: closeMainMenuAction,
+            logoutUser: logoutUserAction,
+            setLang: setLangAction,
+            toggleMainMenu: toggleMainMenuAction,
+        },
+        dispatch
+    );
+
+export default connect(mapStateToProps, mapDispatchToProps)(MainHeader);

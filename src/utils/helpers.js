@@ -77,7 +77,7 @@ export default {
                     ...domain.contacts[contact.id],
                     disclosed_attributes: new Set(contact.disclosed_attributes),
                     initialEmail: contact.email,
-                    initialName: contact.email,
+                    initialName: contact.name,
                 },
             }),
             {}

@@ -10,7 +10,7 @@ const { REACT_APP_SERVER_PORT, REACT_APP_URL } = process.env;
 const authPath =
     process.env.NODE_ENV === 'development'
         ? `${REACT_APP_URL}:${REACT_APP_SERVER_PORT}/connect/openid`
-        : '/connect/openid';
+        : `${REACT_APP_URL}/connect/openid`;
 
 function LoginPage({ user, ui }) {
     const message = {

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Icon } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 
 const MainMenu = ({ items, lang, user, closeMainMenu }) => {
     const [menu, setMenu] = useState([]);
+    const { push } = useHistory();
 
     useEffect(() => {
         if (items) {
@@ -55,12 +56,17 @@ const MainMenu = ({ items, lang, user, closeMainMenu }) => {
         );
     };
 
+    const handleLink = () => {
+        push('/');
+        closeMainMenu();
+    };
+
     return (
         <nav className="menu-main">
             <ul>
                 {user && user.ident && (
                     <li>
-                        <Link onClick={() => closeMainMenu()} to="/">
+                        <Link onClick={handleLink} to="/">
                             <FormattedMessage id="menu.main.dashboard" />
                         </Link>
                     </li>
