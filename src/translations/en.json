@@ -10,6 +10,7 @@
   "companies.none.message.content": "Your personal id number did not return any companies from Estonian BUsiness Registry.",
   "companies.none.message.title": "According to the Estonian Business Register, you don't own any companies",
   "companies.registerCode": "Register code",
+  "companies.searchForACompany": "Search for a company",
   "companies.search.message.content": " ",
   "companies.search.message.title": "No matching companies found",
   "companies.title": "My companies",
@@ -23,6 +24,7 @@
   "domain.404.message.title": "Unfortunately, the domain with this name was not found",
   "domain.404.title": "Domain not found",
   "domain.admin_contacts": "Admin contacts",
+  "domain.changeContacts": "Change contacts",
   "domain.contact.admin": "Admin",
   "domain.contact.email": "E-mail",
   "domain.contact.name": "Name",
@@ -161,6 +163,7 @@
   "domains.form.selectStatus": "Status",
   "domains.none.message.title": "You currently don't own any domain",
   "domains.registrar": "Registrar",
+  "domains.searchForADomain": "Search for a domain",
   "domains.search.message.title": "No matching results found",
   "domains.status": "Status",
   "domains.title": "My domains <span>({userTotalDomains})</span>",
@@ -225,6 +228,7 @@
   "whois.none.message.title": "You currently don't own any domain",
   "whois.page_title": "WHOIS Privacy Settings | .ee registrant portal",
   "whois.publicInfo": "Info public",
+  "whois.searchForADomain": "Search for a domain",
   "whois.search.message.title": "No matching domains found",
   "whois.title": "WHOIS Privacy Settings"
 }

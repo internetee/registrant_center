@@ -23,7 +23,7 @@ const WhoIsPage = lazy(() => import('./pages/WhoIsPage/WhoIsPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage/ErrorPage'));
 
-function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, ui, user }) {
+function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, user }) {
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(true);
     const { isMainMenuOpen, lang } = ui || {};
@@ -103,7 +103,7 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, ui, user }) {
                                 <ProtectedRoute component={CompaniesPage} exact path="/companies" />
                                 <ProtectedRoute component={WhoIsPage} exact path="/whois" />
                                 <Route component={LoginPage} exact path="/login" />
-                                <Route component={ErrorPage} exact path="/*" />
+                                <Route component={ErrorPage} exact path="/:lang" />
                             </Switch>
                         </Suspense>
                     )}

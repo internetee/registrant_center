@@ -10,6 +10,7 @@
   "companies.none.message.content": "Teie isikukoodile ei vastanud äriregsitris ühtegi ettevõtet mille juhatusse te kuuluks.",
   "companies.none.message.title": "Äriregistri andmetel ei kuulu Teile ühtegi ettevõtet",
   "companies.registerCode": "Registrikood",
+  "companies.searchForACompany": "Otsi ettevõtet",
   "companies.search.message.content": " ",
   "companies.search.message.title": "Otsingule vastavaid ettevõtteid ei leitud",
   "companies.title": "Minu ettevõtted",
@@ -23,6 +24,7 @@
   "domain.404.message.title": "Kahjuks sellise nimega domeeni ei leitud",
   "domain.404.title": "Domeeni ei leitud",
   "domain.admin_contacts": "Halduskontaktid",
+  "domain.changeContacts": "Muuda kontakte",
   "domain.contact.admin": "Haldus",
   "domain.contact.email": "E-mail",
   "domain.contact.name": "Nimi",
@@ -161,6 +163,7 @@
   "domains.form.selectStatus": "Staatus",
   "domains.none.message.title": "Teile ei kuulu hetkel ühtegi domeeni",
   "domains.registrar": "Registripidaja",
+  "domains.searchForADomain": "Otsi domeeni",
   "domains.search.message.title": "Otsingule vastavaid domeene ei leitud",
   "domains.status": "Staatus",
   "domains.title": "Minu domeenid <span>({userTotalDomains})</span>",
@@ -225,6 +228,7 @@
   "whois.none.message.title": "Teile ei kuulu hetkel ühtegi domeeni",
   "whois.page_title": "WHOIS Privaatsusseaded | EIS Registreerijaportaal",
   "whois.publicInfo": "Info avalik",
+  "whois.searchForADomain": "Otsi domeeni",
   "whois.search.message.title": "Otsingule vastavaid domeene ei leitud",
   "whois.title": "WHOIS Privaatsusseaded"
 }

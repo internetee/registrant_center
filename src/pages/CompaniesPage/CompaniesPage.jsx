@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
     Pagination,
     Button,
@@ -23,6 +23,7 @@ const perPageOptions = [
 ];
 
 const CompaniesPage = ({ companies = [], fetchCompanies }) => {
+    const { formatMessage } = useIntl();
     const [cookies, setCookie] = useCookies(['companies_per_page']);
     const { companies_per_page } = cookies;
     const [perPage, setPerPage] = useState(companies_per_page ? Number(companies_per_page) : 24);
@@ -117,7 +118,9 @@ const CompaniesPage = ({ companies = [], fetchCompanies }) => {
                                                 disabled={isLoading}
                                                 name="queryKeys"
                                                 onChange={handleSearchChange}
-                                                placeholder="Otsi ettevõtet"
+                                                placeholder={formatMessage({
+                                                    id: 'companies.searchForACompany',
+                                                })}
                                                 size="massive"
                                                 type="text"
                                             />

@@ -52,7 +52,7 @@ const fetchCompanies = (offset = request.offset) => (dispatch) => {
 const initialState = {
     data: {},
     ids: [],
-    isLoading: false,
+    isLoading: null,
     message: null,
 };
 

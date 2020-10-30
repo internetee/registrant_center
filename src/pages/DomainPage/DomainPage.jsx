@@ -14,6 +14,7 @@ import {
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import {
     Loading,
     WhoIsEdit,
@@ -23,63 +24,69 @@ import {
     WhoIsConfirmDialog,
 } from '../../components';
 import domainStatuses from '../../utils/domainStatuses.json';
-import * as domainsActions from '../../redux/reducers/domains';
-import * as contactsActions from '../../redux/reducers/contacts';
+import {
+    fetchDomain as fetchDomainAction,
+    lockDomain as lockDomainAction,
+    unlockDomain as unlockDomainAction,
+} from '../../redux/reducers/domains';
+import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
+import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
 import Helpers from '../../utils/helpers';
 
 const DomainPage = ({
-    domain,
-    fetchDomain,
+    companies,
     contacts,
+    domain,
+    fetchCompanies,
+    fetchDomain,
+    isLoading,
     lockDomain,
     match,
     ui,
     unlockDomain,
-    fetchContacts,
     updateContact,
     user,
 }) => {
     const { uiElemSize } = ui;
     const [isDirty, setIsDirty] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [isLockable, setIsLockable] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [isDomainLockModalOpen, setIsDomainLockModalOpen] = useState(false);
     const [userContacts, setUserContacts] = useState({});
     const [message, setMessage] = useState(null);
+    const [isCompany, setIsCompany] = useState(null);
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
     useEffect(() => {
         (async () => {
-            if (!domain) {
+            if ((!domain || domain?.shouldFetchContacts) && !isLoading) {
                 await fetchDomain(match.params.id);
             }
-            if (domain) {
-                await Promise.all(
-                    Object.keys(domain.contacts).map((key) => {
-                        if (!contacts[key]) {
-                            return fetchContacts(key);
-                        }
-                        return true;
-                    })
-                );
-            }
-            setIsLoading(false);
         })();
-    }, [contacts, domain, fetchContacts, fetchDomain, match]);
+    }, [domain, fetchDomain, isLoading, match]);
+
+    useEffect(() => {
+        if (registrantContacts?.ident?.type === 'org') {
+            if (companies.isLoading === null) {
+                setIsCompany(true);
+                (async () => {
+                    await fetchCompanies();
+                })();
+            } else {
+                setIsLockable(domain.isLockable && companies.data[registrantContacts.ident.code]);
+            }
+        }
+    }, [companies, domain, fetchCompanies, registrantContacts]);
 
     useEffect(() => {
         if (domain) {
-            const statuses = domain.statuses.sort(
-                (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
-            );
             const userContact = Helpers.getUserContacts(user, domain, contacts);
             if (Object.keys(userContact).length) {
                 setUserContacts(userContact);
                 setIsLockable(
-                    ['pendingDelete', 'serverHold'].every((status) => !statuses.includes(status)) &&
+                    domain.isLockable &&
                         Object.values(userContact).some((item) =>
                             item.roles.some((role) => ['admin', 'registrant'].includes(role))
                         )
@@ -90,7 +97,7 @@ const DomainPage = ({
                 ...contacts[domain.registrant.id],
             });
         }
-    }, [contacts, domain, user]);
+    }, [companies, contacts, domain, user]);
 
     const handleWhoIsChange = (data) => {
         setUserContacts((prevState) =>
@@ -140,14 +147,13 @@ const DomainPage = ({
         setIsDomainLockModalOpen(false);
         setMessage(null);
         try {
-            let res;
             if (isLocked) {
-                res = await unlockDomain(uuid);
+                await unlockDomain(uuid);
             } else {
-                res = await lockDomain(uuid);
+                await lockDomain(uuid);
             }
             setMessage({
-                code: res.status,
+                code: 200,
                 type: `domain${isLocked ? 'Unlock' : 'Lock'}`,
             });
         } catch (error) {
@@ -187,7 +193,7 @@ const DomainPage = ({
                         <div className="page--header--actions">
                             <Button
                                 as={Link}
-                                content="Muuda kontakte"
+                                content={<FormattedMessage id="domain.changeContacts" />}
                                 data-test="link-domain-edit"
                                 primary
                                 size={uiElemSize}
@@ -320,8 +326,20 @@ const DomainPage = ({
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                <DomainContacts contacts={domain.tech_contacts} type="tech" />
-                                <DomainContacts contacts={domain.admin_contacts} type="admin" />
+                                <DomainContacts
+                                    contacts={domain.tech_contacts.map((item) => ({
+                                        ...item,
+                                        ...contacts[item.id],
+                                    }))}
+                                    type="tech"
+                                />
+                                <DomainContacts
+                                    contacts={domain.admin_contacts.map((item) => ({
+                                        ...item,
+                                        ...contacts[item.id],
+                                    }))}
+                                    type="admin"
+                                />
                             </Table.Body>
                         </Table>
                     </Container>
@@ -464,20 +482,22 @@ const DomainPage = ({
                             </h2>
                             <FormattedMessage id="domain.whoisPrivacy.text" tagName="p" />
                         </header>
-                        <Form onSubmit={toggleSubmitConfirmModal}>
-                            <WhoIsEdit contacts={userContacts} onChange={handleWhoIsChange} />
-                            <div className="form-actions">
-                                <Button
-                                    disabled={!isDirty}
-                                    loading={isSaving}
-                                    primary
-                                    size={uiElemSize}
-                                    type="submit"
-                                >
-                                    <FormattedMessage id="actions.save" tagName="span" />
-                                </Button>
-                            </div>
-                        </Form>
+                        {!isCompany && (
+                            <Form onSubmit={toggleSubmitConfirmModal}>
+                                <WhoIsEdit contacts={userContacts} onChange={handleWhoIsChange} />
+                                <div className="form-actions">
+                                    <Button
+                                        disabled={!isDirty}
+                                        loading={isSaving}
+                                        primary
+                                        size={uiElemSize}
+                                        type="submit"
+                                    >
+                                        <FormattedMessage id="actions.save" tagName="span" />
+                                    </Button>
+                                </div>
+                            </Form>
+                        )}
                     </Container>
                 </div>
             </div>
@@ -573,13 +593,24 @@ const DomainContacts = ({ type, contacts }) => {
 };
 
 const mapStateToProps = (state, { match }) => ({
+    companies: state.companies,
     contacts: state.contacts.data,
     domain: state.domains.data[match.params.id],
+    isLoading: state.domains.isLoading,
     ui: state.ui,
     user: state.user.data,
 });
 
-export default connect(mapStateToProps, {
-    ...domainsActions,
-    ...contactsActions,
-})(DomainPage);
+const mapDispatchToProps = (dispatch) =>
+    bindActionCreators(
+        {
+            fetchCompanies: fetchCompaniesAction,
+            fetchDomain: fetchDomainAction,
+            lockDomain: lockDomainAction,
+            unlockDomain: unlockDomainAction,
+            updateContact: updateContactAction,
+        },
+        dispatch
+    );
+
+export default connect(mapStateToProps, mapDispatchToProps)(DomainPage);

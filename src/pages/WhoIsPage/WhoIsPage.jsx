@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
     Button,
     Form,
@@ -24,6 +24,7 @@ import {
 import Domain from './Domain';
 import * as contactsActions from '../../redux/reducers/contacts';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
+import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import Helpers from '../../utils/helpers';
 
 const perPageOptions = [
@@ -33,8 +34,10 @@ const perPageOptions = [
 ];
 
 const WhoIsPage = ({
+    companies,
     contacts,
     domains,
+    fetchCompanies,
     fetchContacts,
     fetchDomains,
     message,
@@ -42,6 +45,7 @@ const WhoIsPage = ({
     updateContact,
     user,
 }) => {
+    const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['whoIsPerPage']);
     const { whoIsPerPage } = cookies;
     const [isDirty, setIsDirty] = useState(false);
@@ -65,9 +69,10 @@ const WhoIsPage = ({
         (async () => {
             await fetchDomains();
             await fetchContacts();
+            await fetchCompanies();
             setIsLoading(false);
         })();
-    }, [fetchContacts, fetchDomains]);
+    }, [fetchCompanies, fetchContacts, fetchDomains]);
 
     useEffect(() => {
         setWhoIsData(contacts);
@@ -187,7 +192,9 @@ const WhoIsPage = ({
                                                 disabled={isLoading}
                                                 name="queryKeys"
                                                 onChange={handleSearchChange}
-                                                placeholder="Otsi domeeni"
+                                                placeholder={formatMessage({
+                                                    id: 'whois.searchForADomain',
+                                                })}
                                                 size="massive"
                                                 type="text"
                                             />
@@ -294,10 +301,11 @@ const WhoIsPage = ({
                                                 {paginatedDomains[activePage - 1].map((domain) => (
                                                     <Domain
                                                         key={domain.id}
-                                                        contacts={Helpers.getUserContacts(
+                                                        contacts={Helpers.parseDomainContacts(
                                                             user,
                                                             domain,
-                                                            whoIsData
+                                                            whoIsData,
+                                                            companies
                                                         )}
                                                         id={domain.id}
                                                         name={domain.name}
@@ -375,6 +383,7 @@ const WhoIsPage = ({
 
 const mapStateToProps = (state) => {
     return {
+        companies: state.companies.data,
         contacts: state.contacts.data,
         domains: state.domains.ids.map((id) => state.domains.data[id]),
         ui: state.ui,
@@ -384,5 +393,6 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
     ...contactsActions,
+    fetchCompanies: fetchCompaniesAction,
     fetchDomains: fetchDomainsAction,
 })(WhoIsPage);

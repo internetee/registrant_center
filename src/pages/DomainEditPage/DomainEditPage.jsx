@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Form, Input, Container, Card } from 'semantic-ui-react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import {
     WhoIsEdit,
     MessageModule,
@@ -12,55 +13,53 @@ import {
     WhoIsConfirmDialog,
     Loading,
 } from '../../components';
-import * as domainsActions from '../../redux/reducers/domains';
-import * as contactsActions from '../../redux/reducers/contacts';
 import Helpers from '../../utils/helpers';
+import { fetchDomain as fetchDomainAction } from '../../redux/reducers/domains';
+import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
+import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
 
 const DomainEditPage = ({
+    companies,
     contacts,
     domain,
-    fetchContacts,
+    fetchCompanies,
     fetchDomain,
-    isLoadingDomain,
+    isLoading,
     match,
     message,
     ui,
     updateContact,
     user,
 }) => {
-    const { params } = match;
     const { uiElemSize } = ui;
     const [isDirty, setIsDirty] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [formData, setFormData] = useState({});
+    const [isCompany, setIsCompany] = useState(false);
 
     useEffect(() => {
         (async () => {
-            if (!domain && !isLoadingDomain) {
-                await fetchDomain(params.id);
+            if ((!domain || domain?.shouldFetchContacts) && !isLoading) {
+                await fetchDomain(match.params.id);
             }
-            if (domain) {
-                await Promise.all(
-                    Object.keys(domain.contacts).map((key) => {
-                        if (!contacts[key]) {
-                            return fetchContacts(key);
-                        }
-                        return true;
-                    })
-                );
-            }
-            setIsLoading(false);
         })();
-    }, [contacts, domain, fetchContacts, fetchDomain, isLoadingDomain, params]);
+    }, [domain, fetchDomain, isLoading, match]);
 
     useEffect(() => {
         if (domain) {
-            // setErrors(contacts.errors);
-            setFormData(Helpers.getUserContacts(user, domain, contacts));
+            const registrant = contacts[domain.registrant.id];
+            if (registrant && registrant.ident.type === 'org') {
+                setIsCompany(true);
+                if (companies.isLoading === null) {
+                    (async () => {
+                        await fetchCompanies();
+                    })();
+                }
+            }
+            setFormData(Helpers.parseDomainContacts(user, domain, contacts, companies.data));
         }
-    }, [contacts, domain, user]);
+    }, [companies, contacts, domain, fetchCompanies, user]);
 
     const handleChange = (e, id) => {
         const { name, value } = e.target;
@@ -88,35 +87,34 @@ const DomainEditPage = ({
         setIsSubmitConfirmModalOpen(false);
         await Promise.all(
             Object.values(formData).map((contact) => {
-                let values;
-                if (contact.ident.code === user.ident && contact.ident.type === 'org') {
-                    values = {
+                const registrant = formData[domain.registrant.id];
+                if (registrant && registrant.ident.type === 'org') {
+                    return updateContact(contact.id, {
                         email: contact.email,
                         phone: contact.phone,
-                    };
-                } else if (contact.ident.code === user.ident && contact.ident.type === 'priv') {
-                    values = {
-                        disclosed_attributes: [...contact.disclosed_attributes],
-                        email: contact.email,
-                        phone: contact.phone,
-                    };
-                } else {
-                    values = {
-                        disclosed_attributes: [...contact.disclosed_attributes],
-                    };
+                    });
                 }
-                return updateContact(contact.id, values);
+                if (contact.ident.code === user.ident) {
+                    return updateContact(contact.id, {
+                        disclosed_attributes: [...contact.disclosed_attributes],
+                        email: contact.email,
+                        phone: contact.phone,
+                    });
+                }
+                return updateContact(contact.id, {
+                    disclosed_attributes: [...contact.disclosed_attributes],
+                });
             })
         );
         setIsDirty(false);
         setIsSaving(false);
     };
 
-    if (isLoading && isLoadingDomain) {
+    if (isLoading) {
         return <Loading />;
     }
 
-    if (!domain && !isLoadingDomain) {
+    if (!domain) {
         return (
             <MainLayout hasBackButton titleKey="domain.404.title">
                 <PageMessage
@@ -230,8 +228,16 @@ const DomainEditPage = ({
                                     </Form.Field>
                                 </Form.Group>
                             ))}
-                            <FormattedMessage id="domain.contactsVisibility" tagName="h3" />
-                            <WhoIsEdit checkAll contacts={formData} onChange={handleWhoIsChange} />
+                            {!isCompany && (
+                                <>
+                                    <FormattedMessage id="domain.contactsVisibility" tagName="h3" />
+                                    <WhoIsEdit
+                                        checkAll
+                                        contacts={formData}
+                                        onChange={handleWhoIsChange}
+                                    />
+                                </>
+                            )}
                             <div className="form-actions">
                                 <Button
                                     disabled={!isDirty}
@@ -263,16 +269,24 @@ const DomainEditPage = ({
 
 const mapStateToProps = (state, { match }) => {
     return {
+        companies: state.companies,
         contacts: state.contacts.data,
         domain: state.domains.data[match.params.id],
-        isLoadingDomain: state.domains.isLoading,
+        isLoading: state.domains.isLoading,
         message: state.contacts.message,
         ui: state.ui,
         user: state.user.data,
     };
 };
 
-export default connect(mapStateToProps, {
-    ...domainsActions,
-    ...contactsActions,
-})(DomainEditPage);
+const mapDispatchToProps = (dispatch) =>
+    bindActionCreators(
+        {
+            fetchCompanies: fetchCompaniesAction,
+            fetchDomain: fetchDomainAction,
+            updateContact: updateContactAction,
+        },
+        dispatch
+    );
+
+export default connect(mapStateToProps, mapDispatchToProps)(DomainEditPage);

@@ -282,7 +282,7 @@ describe('Domains reducers', () => {
             data: domains.reduce(
                 (acc, item) => ({
                     ...acc,
-                    [item.id]: parseDomain(item),
+                    [item.id]: parseDomain(item, true),
                 }),
                 {}
             ),

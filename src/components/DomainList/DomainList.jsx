@@ -44,9 +44,6 @@ const getLocale = (locale) => {
     if (locale === 'et') {
         return Estonian;
     }
-    if (locale === 'ru') {
-        return Russian;
-    }
     return {};
 };
 
@@ -323,7 +320,9 @@ const DomainList = ({ domains, lang }) => {
                                     className="icon"
                                     name="queryKeys"
                                     onChange={handleChange}
-                                    placeholder="Otsi domeeni"
+                                    placeholder={formatMessage({
+                                        id: 'domains.searchForADomain',
+                                    })}
                                     size="massive"
                                     type="text"
                                     value={queryKeys}

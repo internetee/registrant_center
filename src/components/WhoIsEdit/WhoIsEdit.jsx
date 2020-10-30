@@ -6,6 +6,8 @@ import Roles from '../Roles/Roles';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
     const contactsList = Object.values(contacts);
+    const isCompany = contactsList.find(({ ident }) => ident.type === 'org');
+
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { disclosed_attributes }) => ({
             checkedCount: acc.checkedCount + disclosed_attributes.size,
@@ -80,6 +82,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
         );
     };
 
+    if (!contactsList.length) {
+        return null;
+    }
+
     return (
         <>
             {checkAll && (
@@ -87,6 +93,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                     <Checkbox
                         checked={isCheckedAll}
                         className="large"
+                        disabled={isCompany}
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) =>
@@ -111,6 +118,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         <Form.Field>
                             <Checkbox
                                 checked={item.disclosed_attributes.has('name')}
+                                disabled={item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
                                         id="whois.edit.name"
@@ -130,6 +138,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         <Form.Field>
                             <Checkbox
                                 checked={item.disclosed_attributes.has('email')}
+                                disabled={item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
                                         id="whois.edit.email"

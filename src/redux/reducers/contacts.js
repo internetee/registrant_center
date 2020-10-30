@@ -63,13 +63,26 @@ const invalidateContact = () => ({
     type: FETCH_CONTACT_FAILURE,
 });
 
+const fetchContact = (uuid) => (dispatch) => {
+    dispatch(requestContact());
+    return api
+        .fetchContacts(uuid)
+        .then((res) => res.data)
+        .then((data) => {
+            return dispatch(receiveContact(data));
+        })
+        .catch(() => {
+            return dispatch(invalidateContact());
+        });
+};
+
 const fetchContacts = (uuid, offset = request.offset) => (dispatch) => {
     if (uuid) {
         dispatch(requestContact());
         return api
             .fetchContacts(uuid)
             .then((res) => res.data)
-            .then((data) => {
+            .then(async (data) => {
                 return dispatch(receiveContact(data));
             })
             .catch(() => {
@@ -173,7 +186,10 @@ export default function reducer(state = initialState, { payload, type }) {
         case FETCH_CONTACT_SUCCESS:
             return {
                 ...state,
-                data: { ...state.data, [payload.id]: payload },
+                data: {
+                    ...state.data,
+                    [payload.id]: payload,
+                },
                 ids: state.ids.includes(payload.id) ? state.ids : [...state.ids, payload.id],
                 isLoading: false,
                 message: null,
@@ -208,4 +224,4 @@ export default function reducer(state = initialState, { payload, type }) {
     }
 }
 
-export { initialState, fetchContacts, updateContact };
+export { initialState, fetchContact, fetchContacts, updateContact, receiveContacts };
