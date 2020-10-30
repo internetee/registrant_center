@@ -291,19 +291,6 @@ describe('Domains reducers', () => {
         });
     });
 
-    it('should handle LOCK_DOMAIN_REQUEST', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'LOCK_DOMAIN_REQUEST',
-                }
-            )
-        ).toEqual({
-            isLoading: true,
-        });
-    });
-
     it('should handle LOCK_DOMAIN_SUCCESS', () => {
         expect(
             reducer(
@@ -317,24 +304,10 @@ describe('Domains reducers', () => {
             data: {
                 [domains[0].id]: parseDomain(domains[0]),
             },
-            isLoading: false,
             message: {
                 code: 200,
                 type: 'domainLock',
             },
-        });
-    });
-
-    it('should handle UNLOCK_DOMAIN_REQUEST', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'UNLOCK_DOMAIN_REQUEST',
-                }
-            )
-        ).toEqual({
-            isLoading: true,
         });
     });
 
@@ -351,7 +324,6 @@ describe('Domains reducers', () => {
             data: {
                 [domains[0].id]: parseDomain(domains[0]),
             },
-            isLoading: false,
             message: {
                 code: 200,
                 type: 'domainUnlock',
