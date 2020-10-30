@@ -98,5 +98,9 @@
   "ok": {
     "priority": 24,
     "color": "green"
+  },
+  "disputed": {
+    "priority": 25,
+    "color": "black"
   }
 }

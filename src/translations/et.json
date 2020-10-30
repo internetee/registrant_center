@@ -73,6 +73,8 @@
   "domain.role.registrant": "Registreerija",
   "domain.role.tech": "Tehniline",
   "domain.status.all": "Kõik staatused",
+  "domain.status.disputed": "Vaidlustatud",
+  "domain.status.disputed.description": "Domeenil on omaniku kahjuks seotud kehtiv Domeenivaidluskomisjoni otsus.",
   "domain.status.clientDeleteProhibited": "Kustumine keelatud",
   "domain.status.clientDeleteProhibited.description": "Registreeringut ei ole võimalik kustutada.",
   "domain.status.clientHold": "Peatatud",
