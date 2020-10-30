@@ -23,7 +23,7 @@ let request = {
     offset: 0,
 };
 
-const parseDomain = (domain) => {
+const parseDomain = (domain, shouldFetchContacts = false) => {
     const { admin_contacts, registrant, tech_contacts } = domain;
     const statuses = domain.statuses.sort(
         (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
@@ -51,6 +51,7 @@ const parseDomain = (domain) => {
             }),
             {}
         ),
+        isLockable: ['pendingDelete', 'serverHold'].every((status) => !statuses.includes(status)),
         isLocked:
             domain.locked_by_registrant_at &&
             [
@@ -58,6 +59,7 @@ const parseDomain = (domain) => {
                 'serverDeleteProhibited',
                 'serverTransferProhibited',
             ].every((r) => statuses.includes(r)),
+        shouldFetchContacts,
     };
 };
 
@@ -234,7 +236,7 @@ export default function reducer(state = initialState, { payload, type }) {
                 data: payload.reduce(
                     (acc, item) => ({
                         ...acc,
-                        [item.id]: parseDomain(item),
+                        [item.id]: parseDomain(item, true),
                     }),
                     {}
                 ),
@@ -251,7 +253,6 @@ export default function reducer(state = initialState, { payload, type }) {
         case LOCK_DOMAIN_REQUEST:
             return {
                 ...state,
-                isLoading: true,
             };
 
         case LOCK_DOMAIN_SUCCESS:
@@ -261,7 +262,6 @@ export default function reducer(state = initialState, { payload, type }) {
                     ...state.data,
                     [payload.id]: parseDomain(payload),
                 },
-                isLoading: false,
                 message: {
                     code: 200,
                     type: 'domainLock',
@@ -271,7 +271,6 @@ export default function reducer(state = initialState, { payload, type }) {
         case LOCK_DOMAIN_FAILURE:
             return {
                 ...state,
-                isLoading: false,
                 message: {
                     ...payload,
                     type: 'domainLock',
@@ -281,7 +280,6 @@ export default function reducer(state = initialState, { payload, type }) {
         case UNLOCK_DOMAIN_REQUEST:
             return {
                 ...state,
-                isLoading: true,
             };
 
         case UNLOCK_DOMAIN_SUCCESS:
@@ -291,7 +289,6 @@ export default function reducer(state = initialState, { payload, type }) {
                     ...state.data,
                     [payload.id]: parseDomain(payload),
                 },
-                isLoading: false,
                 message: {
                     code: 200,
                     type: 'domainUnlock',
@@ -301,7 +298,6 @@ export default function reducer(state = initialState, { payload, type }) {
         case UNLOCK_DOMAIN_FAILURE:
             return {
                 ...state,
-                isLoading: false,
                 message: {
                     ...payload,
                     type: 'domainUnlock',

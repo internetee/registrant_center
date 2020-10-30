@@ -62,12 +62,11 @@ export default {
             return acc;
         }, []);
     },
-    getUserContacts: (user = {}, domain = {}, contacts = {}) => {
+    getUserContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
         const userContacts = Object.values(contacts).filter(
             (contact) =>
-                contact.ident.code === user.ident &&
-                contact.ident.type !== 'org' &&
-                domain.contacts[contact.id]
+                (contact.ident.code === user.ident && domain.contacts[contact.id]) ||
+                (contact.ident.type === 'org' && companies[contact.ident.code])
         );
         return userContacts.reduce(
             (acc, contact) => ({
@@ -82,5 +81,26 @@ export default {
             }),
             {}
         );
+    },
+    parseDomainContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
+        return Object.keys(domain.contacts).reduce((acc, key) => {
+            const contact = contacts[key];
+            if (
+                (contact && contact.ident.code === user.ident && domain.contacts[key]) ||
+                (contact && contact.ident.type === 'org' && companies[contact.ident.code])
+            ) {
+                return {
+                    ...acc,
+                    [contact.id]: {
+                        ...contact,
+                        ...domain.contacts[key],
+                        disclosed_attributes: new Set(contact.disclosed_attributes),
+                        initialEmail: contact.email,
+                        initialName: contact.name,
+                    },
+                };
+            }
+            return acc;
+        }, {});
     },
 };

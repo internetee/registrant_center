@@ -204,11 +204,6 @@ const LangMenu = ({ lang, handleLangSwitch }) => {
                         in english
                     </button>
                 </li>
-                <li className={lang === 'ru' ? 'active' : ''}>
-                    <button onClick={() => handleLangSwitch('ru')} type="button">
-                        no pycckuu
-                    </button>
-                </li>
             </ul>
         </nav>
     );

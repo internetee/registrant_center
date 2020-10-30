@@ -15,7 +15,6 @@ import {
 import Masonry from 'react-masonry-component';
 import Flatpickr from 'react-flatpickr';
 import { Estonian } from 'flatpickr/dist/l10n/et';
-import { Russian } from 'flatpickr/dist/l10n/ru';
 import 'flatpickr/dist/themes/light.css';
 import classNames from 'classnames';
 import { useCookies } from 'react-cookie';
@@ -43,9 +42,6 @@ const perPageOptions = [
 const getLocale = (locale) => {
     if (locale === 'et') {
         return Estonian;
-    }
-    if (locale === 'ru') {
-        return Russian;
     }
     return {};
 };
@@ -323,7 +319,9 @@ const DomainList = ({ domains, lang }) => {
                                     className="icon"
                                     name="queryKeys"
                                     onChange={handleChange}
-                                    placeholder="Otsi domeeni"
+                                    placeholder={formatMessage({
+                                        id: 'domains.searchForADomain',
+                                    })}
                                     size="massive"
                                     type="text"
                                     value={queryKeys}

@@ -9,9 +9,16 @@ describe('Integration tests', () => {
         cy.route('POST', '**/api/destroy', 'fx:user').as('destroySession');
         cy.route('GET', '**/api/companies?*', 'fx:companies').as('getCompanies');
         cy.route('GET', '**/api/domains?*', 'fx:domains').as('getDomains');
-        cy.route('GET', '**/api/domains/*', 'fx:domain').as('getDomain');
-        cy.route('POST', '**/api/domains/*/registry_lock', 'fx:domains').as('setDomainLock');
-        cy.route('DELETE', '**/api/domains/*/registry_lock', 'fx:domains').as('deleteDomainLock');
+        cy.route('GET', '**/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e', 'fx:domain').as(
+            'getDomain'
+        );
+        cy.route(
+            'GET',
+            '**/api/domains/2198affc-7479-499d-9eae-b0611ec2fb49',
+            'fx:domain-locked'
+        ).as('getLockedDomain');
+        cy.route('POST', '**/api/domains/*/registry_lock', 'fx:domain').as('setDomainLock');
+        cy.route('DELETE', '**/api/domains/*/registry_lock', 'fx:domain').as('deleteDomainLock');
         cy.route('GET', '**/api/contacts?*', 'fx:contacts').as('getContacts');
         cy.route(
             'GET',
@@ -164,6 +171,10 @@ describe('Integration tests', () => {
     it('Links to lockeddomain.ee detail view', () => {
         cy.get('.domains-grid--item:last-child .link').click();
         cy.url().should('eq', `${baseUrl}/domain/2198affc-7479-499d-9eae-b0611ec2fb49`);
+        cy.wait('@getLockedDomain').its('status').should('eq', 200);
+        cy.wait('@getAdmin').its('status').should('eq', 200);
+        cy.wait('@getTech').its('status').should('eq', 200);
+        cy.wait('@getRegistrant').its('status').should('eq', 200);
     });
 
     it('Shows & closes domain unlock modal', () => {
@@ -215,14 +226,8 @@ describe('Integration tests', () => {
     });
 
     it('Send API request to change WhoIs visibility', () => {
-        cy.get('.table tbody tr:first-child input[name="name"]').should(
-            'be',
-            'visible'
-        );
-        cy.get('.table tbody tr:first-child input[name="email"]').should(
-            'be',
-            'visible'
-        );
+        cy.get('.table tbody tr:first-child input[name="name"]').should('be', 'visible');
+        cy.get('.table tbody tr:first-child input[name="email"]').should('be', 'visible');
         cy.get('.table tbody tr:first-child .adv-field-group input[name="name"] + label').click();
         cy.get('.form-filter--actions button').click();
         cy.get('[data-test="change-contacts"]').click();
