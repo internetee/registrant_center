@@ -46,11 +46,11 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
 
     useEffect(() => {
         (async () => {
-            setIsLoading(true);
             if (!name && location.pathname !== '/login' && !isLoggedOut) {
+                setIsLoading(true);
                 await fetchUser();
+                setIsLoading(false);
             }
-            setIsLoading(false);
         })();
     }, [fetchUser, isLoggedOut, location, name]);
 

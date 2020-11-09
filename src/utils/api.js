@@ -37,6 +37,7 @@ export default {
             },
             httpsAgent: agent,
             method: 'GET',
+            timeout: 15000,
         });
     },
 
