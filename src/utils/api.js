@@ -56,6 +56,22 @@ export default {
         );
     },
 
+    fetchRegistrantUpdate: (domain, token) => {
+        return instance.get(`/api/confirms/${domain}/${token}`, {
+            credentials: 'include',
+            method: 'GET',
+            timeout: 4000,
+        });
+    },
+
+    sendVerificationResponse: (name, token, action) => {
+        return instance.get(`/api/confirms/${name}/${token}/${action}`, {
+            credentials: 'include',
+            method: 'GET',
+            timeout: 4000,
+        });
+    },
+
     fetchDomains: (uuid = false, offset) => {
         if (uuid) {
             return instance.get(`/api/domains/${uuid}`);
@@ -75,5 +91,5 @@ export default {
     },
     updateContact: (uuid, form) => instance.patch(`/api/contacts/${uuid}`, JSON.stringify(form)),
     setDomainRegistryLock: (uuid) => instance.post(`/api/domains/${uuid}/registry_lock`),
-    deleteDomainRegistryLock: (uuid) => instance.delete(`/api/domains/${uuid}/registry_lock`),
+    deleteDomainRegistryLock: (uuid) => instance.delete(`/api/domains/${uuid}/registry_lock`)
 };

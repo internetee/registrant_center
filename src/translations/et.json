@@ -232,5 +232,9 @@
   "whois.publicInfo": "Info avalik",
   "whois.searchForADomain": "Otsi domeeni",
   "whois.search.message.title": "Otsingule vastavaid domeene ei leitud",
-  "whois.title": "WHOIS Privaatsusseaded"
+  "whois.title": "WHOIS Privaatsusseaded",
+  "confirmation.title": "Domeeni omanikuvahetuse kinnitus",
+  "confirmation.not_available": "Domeeni omanikuvahetust pole võimalik kinnitada.",
+  "confirmation.new_registrant": "Uus registreerija",
+  "confirmation.current_registrant": "Praegune registreerija"
 }

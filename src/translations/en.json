@@ -232,5 +232,7 @@
   "whois.publicInfo": "Info public",
   "whois.searchForADomain": "Search for a domain",
   "whois.search.message.title": "No matching domains found",
-  "whois.title": "WHOIS Privacy Settings"
+  "whois.title": "WHOIS Privacy Settings",
+  "confirmation.title": "Registrant change confirmation",
+  "confirmation.not_available": "Domain registrant verification not available."
 }

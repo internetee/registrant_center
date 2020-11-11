@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-
+import https from 'https';
 dotenv.config();
 
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
@@ -26,6 +26,9 @@ const publicAPI = axios.create({
 const API = (session) => {
     return axios.create({
         baseURL: API_HOST,
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+        }),
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -34,13 +37,14 @@ const API = (session) => {
             }),
         },
         mode: 'cors',
-        timeout: 10000,
+        timeout: 15000,
     });
 };
 
 const handleResponse = async (apiReq, res) => {
     try {
         const { data, status } = await apiReq();
+        console.log("AOSDHJASDH");
         return res.status(status).json(data);
     } catch (e) {
         if (e.response) {
@@ -159,12 +163,14 @@ export default {
                         userData
                     );
                     // eslint-disable-next-line no-param-reassign
+                    console.log(`got ${response.data}`)
                     session.token = response.data;
                 }
                 return res.status(200).json(userData);
             }
             return res.status(498).json({});
         } catch (e) {
+            console.log(e);
             if (e && e.response && e.response.status) {
                 return res.status(e.response.status).json({});
             }
@@ -186,5 +192,36 @@ export default {
             () => API(session).post(`/api/v1/registrant/domains/${uuid}/registry_lock`),
             res
         );
+    },
+
+    getRegistrantUpdate: async (req, res, session) => {
+        const name = req.params.name.toString();
+        const token = req.params.token.toString();
+        try {
+            var response = await API(session).get(`/api/v1/registrant/confirms/${name}/${token}`, {});
+            return res.status(response.status).json(response.data);
+        } catch (e) {
+            console.log(e);
+            if (e.response) {
+                return res.status(e.response.status).json({});
+            }
+            return res.status(401).json({});
+        }
+    },
+
+    sendVerificationStatus: async (req, res, session) => {
+        const name = req.params.name.toString();
+        const token = req.params.token.toString();
+        const action = req.params.action.toString();
+        try {
+            var response = await API(session).post(`/api/v1/registrant/confirms/${name}/${token}`, {});
+            return res.status(response.status).json(response.data);
+        } catch (e) {
+            console.log(e);
+            if (e.response) {
+                return res.status(e.response.status).json({});
+            }
+            return res.status(401).json({});
+        }
     },
 };
