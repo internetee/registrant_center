@@ -29,6 +29,7 @@
   "domain.contact.email": "E-mail",
   "domain.contact.name": "Nimi",
   "domain.contact.phone": "Telefon",
+  "domain.contact.country": "Kodakondsus",
   "domain.contact.tech": "Tehniline",
   "domain.contact.type": "Kontakti tüüp",
   "domain.contacts": "Kontaktid",
@@ -236,5 +237,11 @@
   "confirmation.title": "Domeeni omanikuvahetuse kinnitus",
   "confirmation.not_available": "Domeeni omanikuvahetust pole võimalik kinnitada.",
   "confirmation.new_registrant": "Uus registreerija",
-  "confirmation.current_registrant": "Praegune registreerija"
+  "confirmation.valid_registrant": "Kehtiv domeeni omanik",
+  "confirmation.current_registrant": "Praegune registreerija",
+  "confirmation.confirm": "Kinnita taotlus",
+  "confirmation.reject": "Lükka tagasi",
+  "confirmation.confirmed_alt": "Aitäh! Omanikuvahetus on edukalt heaks kiidetud. Andmed on juba registrisse teel.",
+  "confirmation.rejected_alt": "Aitäh! Omanikuvahetuse avaldus on edukalt tagasilükatud. Domeeni omanik ei muutu.",
+  "confirmation.default_alt": "Oleme saanud taotluse domeeni omanikuvahetuse jaoks. Kui kõik tundub õige, palun kinnitage taotlus."
 }

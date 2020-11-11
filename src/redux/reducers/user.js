@@ -22,17 +22,13 @@ const invalidateUserRequest = (status) => ({
 
 const fetchUser = () => (dispatch) => {
     dispatch(requestUser());
-    console.log("GONNA FETCH USER");
     return api
         .fetchUser()
         .then((res) => res.data)
         .then((data) => {
-            console.log('OK GREAT');
             dispatch(receiveUser(data));
         })
         .catch((error) => {
-            console.log('NOT GREAT')
-            console.log(error.response);
             dispatch(invalidateUserRequest(error.response.status));
         });
 };

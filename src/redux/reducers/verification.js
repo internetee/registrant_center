@@ -40,7 +40,8 @@ const requestVerificationResponse = () => ({
     type: RESPOND_REGISTRANT_CHANGE_REQUEST,
 });
 
-const successVerificationResponse = () => ({
+const successVerificationResponse = (payload) => ({
+    payload,
     type: RESPOND_REGISTRANT_CHANGE_SUCCESS,
 });
 
@@ -52,15 +53,12 @@ const respondToVerification = (name, token, action) => (dispatch) => {
     dispatch(requestVerificationResponse());
     return api
         .sendVerificationResponse(name, token, action)
-        .then((res) => res.data)
-        .then((_res) => {
-            return dispatch(successVerificationResponse({action}));
+        .then((res) => {
+            return dispatch(successVerificationResponse(res.data));
         })
         .catch((error) => {
             return dispatch(
-                failedVerificationResponse({
-                    code: error.response.status,
-                })
+                failedVerificationResponse()
             );
         });
 };
@@ -73,35 +71,46 @@ const initialState = {
 };
 
 export default function reducer(state = initialState, action) {
-    console.log("????");
     switch (action.type) {
         case FETCH_DOMAIN_REGISTRANT_UPDATE:
-            console.log("fff1");
             return {
                 ...state,
             };
 
         case FETCH_DOMAIN_REGISTRANT_UPDATE_SUCCESS:
-            console.log("fff2");
-            console.log("yee" + action.payload.domain_name);
             return {
                 domainName: action.payload.domain_name,
                 newRegistrant: action.payload.new_registrant,
                 currentRegistrant: action.payload.current_registrant,
-                status: 200
+                status: null
             };
 
         case FETCH_DOMAIN_REGISTRANT_UPDATE_FAILED:
-            console.log("fff3");
             return {
                 ...state,
                 domainName: null,
                 newRegistrant: null,
                 currentRegistrant: null,
-                status: 404
+                status: null
             };
+
+            case RESPOND_REGISTRANT_CHANGE_SUCCESS:
+                return {
+                    domainName: action.payload.domain_name,
+                    newRegistrant: action.payload.new_registrant,
+                    currentRegistrant: action.payload.current_registrant,
+                    status: action.payload.status
+                };
+
+            case RESPOND_REGISTRANT_CHANGE_FAILED:
+                return {
+                    ...state,
+                    domainName: null,
+                    newRegistrant: null,
+                    currentRegistrant: null,
+                    status: null
+                };
         default:
-            console.log("sss");
             return state;
     }
 }

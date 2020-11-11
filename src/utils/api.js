@@ -65,9 +65,10 @@ export default {
     },
 
     sendVerificationResponse: (name, token, action) => {
-        return instance.get(`/api/confirms/${name}/${token}/${action}`, {
+        console.log('called' + name + token + action);
+        return instance.post(`/api/confirms/${name}/${token}/${action}`, {
             credentials: 'include',
-            method: 'GET',
+            method: 'POST',
             timeout: 4000,
         });
     },

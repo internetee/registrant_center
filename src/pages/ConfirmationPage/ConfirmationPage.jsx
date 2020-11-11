@@ -6,7 +6,6 @@ import {
     Container,
     Table,
 } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { Loading, MainLayout, PageMessage, MessageModule } from '../../components';
@@ -14,22 +13,20 @@ import { fetchDomainRegistrantUpdate as fetchDomainRegistrantUpdateAction } from
 import { respondToVerification as respondToVerificationAction } from '../../redux/reducers/verification';
 import { bindActionCreators } from 'redux';
 
-const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, domain, verification }) => {
+const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, respondToVerification, verification }) => {
     const [isLoading, setIsLoading] = useState(true);
     const { uiElemSize } = ui;
-    const [isSaving, setIsSaving] = useState(false);
 
     const handleVerification = async (shouldConfirm) => {
-        console.log("launching");
-        setIsSaving(true);
-        await respondToVerificationAction(match.params.name, match.params.token, shouldConfirm);
-        setIsSaving(false);
+        setIsLoading(true);
+        await respondToVerification(match.params.name, match.params.token, shouldConfirm);
+        setIsLoading(false);
     };
 
     useEffect(() => {
         (async () => {
             setIsLoading(true);
-            await fetchDomainRegistrantUpdate({domain: match.params.name, token: match.params.token});
+            await fetchDomainRegistrantUpdate({ domain: match.params.name, token: match.params.token });
             setIsLoading(false);
         })();
     }, [fetchDomainRegistrantUpdate]);
@@ -57,108 +54,189 @@ const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, dom
                                 )}
                             </>
                         ) : (
-                                <div className="page--whosis">
-                                    <div className="page--header">
-                                        <Container textAlign="center">
-                                            <div>
-                                                <h2>Domeeni {verification.domainName} omanikuvahetus</h2>
-                                                <p>Oleme saanud avalduse domeeni omanikuvahetuse jaoks. Kui kõik tundub õige, palun kinnitage avaldus.</p>
+                                verification.status == null ? (
+                                    <div className="page--whosis">
+                                        <div className="page--header">
+                                            <Container textAlign="center">
+                                                <div>
+                                                    <h2>{verification.domainName}</h2>
+                                                    <p><FormattedMessage id="confirmation.default_alt" /></p>
+                                                </div>
+                                            </Container>
+                                        </div>
+                                        <div className="page--block">
+                                            <Container text>
+                                                <header className="page--block--header">
+                                                    <h2>
+                                                        <FormattedMessage id="confirmation.new_registrant" />
+                                                    </h2>
+                                                </header>
+                                                <Table basic="very">
+                                                    <Table.Body>
+                                                        <Table.Row>
+                                                            <Table.Cell width="4">
+                                                                <FormattedMessage
+                                                                    id="domain.registrar.name"
+                                                                    tagName="strong"
+                                                                />
+                                                            </Table.Cell>
+                                                            <Table.Cell>{verification.newRegistrant.name}</Table.Cell>
+                                                        </Table.Row>
+                                                        <Table.Row>
+                                                            <Table.Cell width="4">
+                                                                <FormattedMessage
+                                                                    id="domain.registrant.ident"
+                                                                    tagName="strong"
+                                                                />
+                                                            </Table.Cell>
+                                                            <Table.Cell>
+                                                                {verification.newRegistrant.ident}
+                                                            </Table.Cell>
+                                                        </Table.Row>
+                                                        <Table.Row>
+                                                            <Table.Cell width="4">
+                                                                <FormattedMessage
+                                                                    id="domain.contact.country"
+                                                                    tagName="strong"
+                                                                />
+                                                            </Table.Cell>
+                                                            <Table.Cell>
+                                                                {verification.newRegistrant.country}
+                                                            </Table.Cell>
+                                                        </Table.Row>
+                                                    </Table.Body>
+                                                </Table>
+                                            </Container>
+                                        </div>
+                                        <div className="page--block">
+                                            <Container text>
+                                                <header className="page--block--header">
+                                                    <h2>
+                                                        <FormattedMessage id="confirmation.current_registrant" />
+                                                    </h2>
+                                                </header>
+                                                <Table basic="very">
+                                                    <Table.Body>
+                                                        <Table.Row>
+                                                            <Table.Cell width="4">
+                                                                <FormattedMessage
+                                                                    id="domain.registrar.name"
+                                                                    tagName="strong"
+                                                                />
+                                                            </Table.Cell>
+                                                            <Table.Cell>{verification.currentRegistrant.name}</Table.Cell>
+                                                        </Table.Row>
+                                                        <Table.Row>
+                                                            <Table.Cell width="4">
+                                                                <FormattedMessage
+                                                                    id="domain.registrant.ident"
+                                                                    tagName="strong"
+                                                                />
+                                                            </Table.Cell>
+                                                            <Table.Cell>
+                                                                {verification.currentRegistrant.ident}
+                                                            </Table.Cell>
+                                                        </Table.Row>
+                                                        <Table.Row>
+                                                            <Table.Cell width="4">
+                                                                <FormattedMessage
+                                                                    id="domain.contact.country"
+                                                                    tagName="strong"
+                                                                />
+                                                            </Table.Cell>
+                                                            <Table.Cell>
+                                                                {verification.currentRegistrant.country}
+                                                            </Table.Cell>
+                                                        </Table.Row>
+                                                    </Table.Body>
+                                                </Table>
+                                            </Container>
+                                        </div>
+                                        <div className="page--block">
+                                            <Container textAlign="center">
+                                                <div className="page--header--actions">
+                                                    <Button
+                                                        data-test="link-domain-edit"
+                                                        onClick={() => handleVerification('rejected')}
+                                                        secondary
+                                                        size={uiElemSize}
+                                                        disabled={isLoading}
+                                                        loading={isLoading}
+                                                    >
+                                                        <FormattedMessage id="confirmation.reject" />
+                                                    </Button>
+                                                    <Button
+                                                        data-test="link-domain-edit"
+                                                        onClick={() => handleVerification('confirmed')}
+                                                        primary
+                                                        size={uiElemSize}
+                                                        disabled={isLoading}
+                                                        loading={isLoading}
+                                                    >
+                                                        <FormattedMessage id="confirmation.confirm" />
+                                                    </Button>
+                                                </div>
+                                            </Container>
+                                        </div>
+                                    </div>
+                                ) : (
+                                        <div className="page--whosis">
+                                            <div className="page--header">
+                                                <Container textAlign="center">
+                                                    <div>
+                                                        <h2>{verification.domainName}</h2>
+                                                        <p><FormattedMessage id={verification.status === 'confirmed' ? 'confirmation.confirmed_alt' : 'confirmation.rejected_alt'} /></p>
+                                                    </div>
+                                                </Container>
                                             </div>
-                                        </Container>
-                                    </div>
-                                    <div className="page--block">
-                                        <Container text>
-                                            <header className="page--block--header">
-                                                <h2>
-                                                    <FormattedMessage id="confirmation.new_registrant" />
-                                                </h2>
-                                            </header>
-                                            <Table basic="very">
-                                                <Table.Body>
-                                                    <Table.Row>
-                                                        <Table.Cell width="4">
-                                                            <FormattedMessage
-                                                                id="domain.registrar.name"
-                                                                tagName="strong"
-                                                            />
-                                                        </Table.Cell>
-                        <Table.Cell>{verification.newRegistrant.name}</Table.Cell>
-                                                    </Table.Row>
-                                                    <Table.Row>
-                                                        <Table.Cell width="4">
-                                                            <FormattedMessage
-                                                                id="domain.registrant.ident"
-                                                                tagName="strong"
-                                                            />
-                                                        </Table.Cell>
-                                                        <Table.Cell>
-                        {verification.newRegistrant.ident}
-                                    </Table.Cell>
-                                                    </Table.Row>
-                                                </Table.Body>
-                                            </Table>
-                                        </Container>
-                                    </div>
-                                    <div className="page--block">
-                                        <Container text>
-                                            <header className="page--block--header">
-                                                <h2>
-                                                    <FormattedMessage id="confirmation.current_registrant" />
-                                                </h2>
-                                            </header>
-                                            <Table basic="very">
-                                                <Table.Body>
-                                                    <Table.Row>
-                                                        <Table.Cell width="4">
-                                                            <FormattedMessage
-                                                                id="domain.registrar.name"
-                                                                tagName="strong"
-                                                            />
-                                                        </Table.Cell>
-                        <Table.Cell>{verification.currentRegistrant.name}</Table.Cell>
-                                                    </Table.Row>
-                                                    <Table.Row>
-                                                        <Table.Cell width="4">
-                                                            <FormattedMessage
-                                                                id="domain.registrant.ident"
-                                                                tagName="strong"
-                                                            />
-                                                        </Table.Cell>
-                                                        <Table.Cell>
-                                                        {verification.currentRegistrant.ident}
-                                    </Table.Cell>
-                                                    </Table.Row>
-                                                </Table.Body>
-                                            </Table>
-                                        </Container>
-                                    </div>
-                                    <div className="page--block">
-                                        <Container textAlign="center">
-                                            <div className="page--header--actions">
-                                                <Button
-                                                    content='Lükka tagasi'
-                                                    data-test="link-domain-edit"
-                                                    onClick={() => handleVerification('reject')}
-                                                    secondary
-                                                    size={uiElemSize}
-                                                    disabled={isSaving}
-                                                    loading={isSaving}
-                                                />
-                                                <Button
-                                                    content='Kinnita avaldus'
-                                                    data-test="link-domain-edit"
-                                                    onClick={() => handleVerification('confirm')}
-                                                    primary
-                                                    size={uiElemSize}
-                                                    disabled={isSaving}
-                                                    loading={isSaving}
-                                                />
+                                            <div className="page--block">
+                                                <Container text>
+                                                    <header className="page--block--header">
+                                                        <h2>
+                                                            <FormattedMessage id="confirmation.valid_registrant" />
+                                                        </h2>
+                                                    </header>
+                                                    <Table basic="very">
+                                                        <Table.Body>
+                                                            <Table.Row>
+                                                                <Table.Cell width="4">
+                                                                    <FormattedMessage
+                                                                        id="domain.registrar.name"
+                                                                        tagName="strong"
+                                                                    />
+                                                                </Table.Cell>
+                                                                <Table.Cell>{verification.currentRegistrant.name}</Table.Cell>
+                                                            </Table.Row>
+                                                            <Table.Row>
+                                                                <Table.Cell width="4">
+                                                                    <FormattedMessage
+                                                                        id="domain.registrant.ident"
+                                                                        tagName="strong"
+                                                                    />
+                                                                </Table.Cell>
+                                                                <Table.Cell>
+                                                                    {verification.currentRegistrant.ident}
+                                                                </Table.Cell>
+                                                            </Table.Row>
+                                                            <Table.Row>
+                                                                <Table.Cell width="4">
+                                                                    <FormattedMessage
+                                                                        id="domain.contact.country"
+                                                                        tagName="strong"
+                                                                    />
+                                                                </Table.Cell>
+                                                                <Table.Cell>
+                                                                    {verification.currentRegistrant.country}
+                                                                </Table.Cell>
+                                                            </Table.Row>
+                                                        </Table.Body>
+                                                    </Table>
+                                                </Container>
                                             </div>
-                                        </Container>
-                                    </div>
-                                </div>
+                                        </div>
+                                    ))
 
-                            )}
+                        }
                     </>
                 ) : (
                         <PageMessage
@@ -173,5 +251,5 @@ const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, dom
 
 export default connect(
     (state) => (state),
-    dispatch => bindActionCreators({fetchDomainRegistrantUpdate: fetchDomainRegistrantUpdateAction, respondToVerification: respondToVerificationAction}, dispatch)
-  )(ConfirmationPage)
+    dispatch => bindActionCreators({ fetchDomainRegistrantUpdate: fetchDomainRegistrantUpdateAction, respondToVerification: respondToVerificationAction }, dispatch)
+)(ConfirmationPage)
