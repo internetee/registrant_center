@@ -56,17 +56,17 @@ export default {
         );
     },
 
-    fetchRegistrantUpdate: (domain, token) => {
-        return instance.get(`/api/confirms/${domain}/${token}`, {
+    fetchVerification: (domain, token, type) => {
+        return instance.get(`/api/confirms/${domain}/${type}/${token}`, {
             credentials: 'include',
             method: 'GET',
             timeout: 4000,
         });
     },
 
-    sendVerificationResponse: (name, token, action) => {
-        console.log('called' + name + token + action);
-        return instance.post(`/api/confirms/${name}/${token}/${action}`, {
+    sendVerificationResponse: (name, token, action, type) => {
+        console.log('called' + name + token + action + type);
+        return instance.post(`/api/confirms/${name}/${type}/${token}/${action}`, {
             credentials: 'include',
             method: 'POST',
             timeout: 4000,

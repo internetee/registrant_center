@@ -194,8 +194,9 @@ export default {
     getRegistrantUpdate: async (req, res, session) => {
         const name = req.params.name.toString();
         const token = req.params.token.toString();
+        const type = req.params.type.toString();
         try {
-            var response = await API(session).get(`/api/v1/registrant/confirms/${name}/${token}`, {});
+            var response = await API(session).get(`/api/v1/registrant/confirms/${name}/${type}/${token}`, {});
             return res.status(response.status).json(response.data);
         } catch (e) {
             if (e.response) {
@@ -209,8 +210,9 @@ export default {
         const name = req.params.name.toString();
         const token = req.params.token.toString();
         const action = req.params.action.toString();
+        const type = req.params.type.toString();
         try {
-            var response = await API(session).post(`/api/v1/registrant/confirms/${name}/${token}/${action}`, {});
+            var response = await API(session).post(`/api/v1/registrant/confirms/${name}/${type}/${token}/${action}`, {});
             return res.status(response.status).json(response.data);
         } catch (e) {
             console.log(e);

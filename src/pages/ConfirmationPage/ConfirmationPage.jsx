@@ -9,32 +9,32 @@ import {
 import { connect } from 'react-redux';
 
 import { Loading, MainLayout, PageMessage, MessageModule } from '../../components';
-import { fetchDomainRegistrantUpdate as fetchDomainRegistrantUpdateAction } from '../../redux/reducers/verification';
+import { fetchVerification as fetchVerificationAction } from '../../redux/reducers/verification';
 import { respondToVerification as respondToVerificationAction } from '../../redux/reducers/verification';
 import { bindActionCreators } from 'redux';
 
-const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, respondToVerification, verification }) => {
+const ConfirmationPage = ({ match, ui, message, fetchVerification, respondToVerification, verification }) => {
     const [isLoading, setIsLoading] = useState(true);
     const { uiElemSize } = ui;
 
     const handleVerification = async (shouldConfirm) => {
         setIsLoading(true);
-        await respondToVerification(match.params.name, match.params.token, shouldConfirm);
+        await respondToVerification(match.params.name, match.params.token, shouldConfirm, match.params.type);
         setIsLoading(false);
     };
 
     useEffect(() => {
         (async () => {
             setIsLoading(true);
-            await fetchDomainRegistrantUpdate({ domain: match.params.name, token: match.params.token });
+            await fetchVerification({ domain: match.params.name, token: match.params.token, type: match.params.type });
             setIsLoading(false);
         })();
-    }, [fetchDomainRegistrantUpdate]);
+    }, [fetchVerification]);
 
     if (isLoading) return <Loading />;
 
     return (
-        <MainLayout hasBackButton titleKey="confirmation.title">
+        <MainLayout hasBackButton titleKey={match.params.type === 'change' ? "confirmation.change_title" : "confirmation.delete_title"}>
             {!isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">
                 {verification.domainName != null ? (
@@ -60,12 +60,12 @@ const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, res
                                             <Container textAlign="center">
                                                 <div>
                                                     <h2>{verification.domainName}</h2>
-                                                    <p><FormattedMessage id="confirmation.default_alt" /></p>
+                                                    <p><FormattedMessage id={match.params.type === 'change' ? "confirmation.change_default_alt" : "confirmation.delete_default_alt"}/></p>
                                                 </div>
                                             </Container>
                                         </div>
-                                        <div className="page--block">
-                                            <Container text>
+                                        {match.params.type === 'change' ? (
+                                            <div className="page--block">                                          <Container text>
                                                 <header className="page--block--header">
                                                     <h2>
                                                         <FormattedMessage id="confirmation.new_registrant" />
@@ -107,7 +107,7 @@ const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, res
                                                     </Table.Body>
                                                 </Table>
                                             </Container>
-                                        </div>
+                                            </div>) : null }
                                         <div className="page--block">
                                             <Container text>
                                                 <header className="page--block--header">
@@ -185,7 +185,7 @@ const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, res
                                                 <Container textAlign="center">
                                                     <div>
                                                         <h2>{verification.domainName}</h2>
-                                                        <p><FormattedMessage id={verification.status === 'confirmed' ? 'confirmation.confirmed_alt' : 'confirmation.rejected_alt'} /></p>
+                                                        <p><FormattedMessage id={match.params.type === 'change' ? (verification.status === 'confirmed' ? 'confirmation.change_confirmed_alt' : 'confirmation.change_rejected_alt') : (verification.status === 'confirmed' ? 'confirmation.delete_confirmed_alt' : 'confirmation.delete_rejected_alt')} /></p>
                                                     </div>
                                                 </Container>
                                             </div>
@@ -240,7 +240,7 @@ const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, res
                     </>
                 ) : (
                         <PageMessage
-                            headerContent={<FormattedMessage id="confirmation.not_available" />}
+                            headerContent={<FormattedMessage id={match.params.type === 'change' ? "confirmation.change_not_available" : "confirmation.delete_not_available"}/>}
                             icon="frown outline"
                         />
                     )}
@@ -251,5 +251,5 @@ const ConfirmationPage = ({ match, ui, message, fetchDomainRegistrantUpdate, res
 
 export default connect(
     (state) => (state),
-    dispatch => bindActionCreators({ fetchDomainRegistrantUpdate: fetchDomainRegistrantUpdateAction, respondToVerification: respondToVerificationAction }, dispatch)
+    dispatch => bindActionCreators({ fetchVerification: fetchVerificationAction, respondToVerification: respondToVerificationAction }, dispatch)
 )(ConfirmationPage)

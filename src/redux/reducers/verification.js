@@ -9,30 +9,30 @@ import {
     RESPOND_REGISTRANT_CHANGE_FAILED
 } from '../actions';
 
-const requestDomainRegistrantUpdate = () => ({
+const requestVerification = () => ({
     type: FETCH_DOMAIN_REGISTRANT_UPDATE,
 });
 
-const receiveDomainRegistrantUpdate = (payload) => ({
+const receiveVerification = (payload) => ({
     payload,
     type: FETCH_DOMAIN_REGISTRANT_UPDATE_SUCCESS,
 });
 
-const failedDomainRegistrantUpdate = () => ({
+const failedVerification = () => ({
     type: FETCH_DOMAIN_REGISTRANT_UPDATE_FAILED,
 });
 
-const fetchDomainRegistrantUpdate = ({domain, token}) => (dispatch) => {
-    dispatch(requestDomainRegistrantUpdate());
+const fetchVerification = ({domain, token, type}) => (dispatch) => {
+    dispatch(requestVerification());
     return api
-        .fetchRegistrantUpdate(domain, token)
+        .fetchVerification(domain, token, type)
         .then((res) => {
-            dispatch(receiveDomainRegistrantUpdate(res.data));
+            dispatch(receiveVerification(res.data));
         }, (_err) => {
-            dispatch(failedDomainRegistrantUpdate());
+            dispatch(failedVerification());
         })
         .catch((_err) => {
-            dispatch(failedDomainRegistrantUpdate());
+            dispatch(failedVerification());
         });
 };
 
@@ -49,14 +49,14 @@ const failedVerificationResponse = () => ({
     type: RESPOND_REGISTRANT_CHANGE_FAILED,
 });
 
-const respondToVerification = (name, token, action) => (dispatch) => {
+const respondToVerification = (name, token, action, type) => (dispatch) => {
     dispatch(requestVerificationResponse());
     return api
-        .sendVerificationResponse(name, token, action)
+        .sendVerificationResponse(name, token, action, type)
         .then((res) => {
             return dispatch(successVerificationResponse(res.data));
         })
-        .catch((error) => {
+        .catch((_e) => {
             return dispatch(
                 failedVerificationResponse()
             );
@@ -115,4 +115,4 @@ export default function reducer(state = initialState, action) {
     }
 }
 
-export { initialState, fetchDomainRegistrantUpdate, respondToVerification };
+export { initialState, fetchVerification, respondToVerification };

@@ -234,15 +234,19 @@
   "whois.searchForADomain": "Search for a domain",
   "whois.search.message.title": "No matching domains found",
   "whois.title": "WHOIS Privacy Settings",
-  "confirmation.title": "Registrant change confirmation",
-  "confirmation.not_available": "Domain registrant verification not available.",
+  "confirmation.change_title": "Registrant change confirmation",
+  "confirmation.change_not_available": "Domain registrant verification not available.",
+  "confirmation.delete_title": "Domain delete confirmation",
+  "confirmation.delete_not_available": "Domain delete verification not available.",
   "confirmation.new_registrant": "New registrant",
   "confirmation.valid_registrant": "Domain registrant",
   "confirmation.current_registrant": "Current registrant",
   "confirmation.confirm": "Approve",
   "confirmation.reject": "Reject",
-  "confirmation.confirmed_alt": "Thank you! Registrant change has been confirmed successfully. Data is already on it's way to registry.",
-  "confirmation.rejected_alt": "Thank you! Registrant change has been rejected successfully. Domain registrant is not going to change.",
-  "confirmation.default_alt": "We've received a request for domains's registrant change. If it seems fair, please approve it."
-
+  "confirmation.change_confirmed_alt": "Thank you! Registrant change has been confirmed successfully. Data is already on it's way to registry.",
+  "confirmation.change_rejected_alt": "Thank you! Registrant change has been rejected successfully. Domain registrant is not going to change.",
+  "confirmation.change_default_alt": "We've received a request for domains's registrant change. If it seems fair, please approve it.",
+  "confirmation.delete_confirmed_alt": "Thank you! Domain delete has been confirmed successfully. Data is already on it's way to registry.",
+  "confirmation.delete_rejected_alt": "Thank you! Domain delete has been rejected successfully. Domain registrant is not going to change.",
+  "confirmation.delete_default_alt": "We've received a request to delete a domain. If it seems fair, please approve it."
 }
