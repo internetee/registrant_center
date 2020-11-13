@@ -103,7 +103,11 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
                                 />
                                 <ProtectedRoute component={CompaniesPage} exact path="/companies" />
                                 <ProtectedRoute component={WhoIsPage} exact path="/whois" />
-                                <Route component={ConfirmationPage} exact path="/confirmation/:name/:type/:token" />
+                                <Route
+                                    component={ConfirmationPage}
+                                    exact
+                                    path="/confirmation/:name/:type/:token"
+                                />
                                 <Route component={LoginPage} exact path="/login" />
                                 <Route component={ErrorPage} exact path="/:lang" />
                             </Switch>

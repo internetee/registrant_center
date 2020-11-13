@@ -6,7 +6,7 @@ import {
     FETCH_DOMAIN_REGISTRANT_UPDATE_FAILED,
     RESPOND_REGISTRANT_CHANGE_REQUEST,
     RESPOND_REGISTRANT_CHANGE_SUCCESS,
-    RESPOND_REGISTRANT_CHANGE_FAILED
+    RESPOND_REGISTRANT_CHANGE_FAILED,
 } from '../actions';
 
 const requestVerification = () => ({
@@ -22,15 +22,18 @@ const failedVerification = () => ({
     type: FETCH_DOMAIN_REGISTRANT_UPDATE_FAILED,
 });
 
-const fetchVerification = ({domain, token, type}) => (dispatch) => {
+const fetchVerification = ({ domain, token, type }) => (dispatch) => {
     dispatch(requestVerification());
     return api
         .fetchVerification(domain, token, type)
-        .then((res) => {
-            dispatch(receiveVerification(res.data));
-        }, (_err) => {
-            dispatch(failedVerification());
-        })
+        .then(
+            (res) => {
+                dispatch(receiveVerification(res.data));
+            },
+            (_err) => {
+                dispatch(failedVerification());
+            }
+        )
         .catch((_err) => {
             dispatch(failedVerification());
         });
@@ -57,17 +60,15 @@ const respondToVerification = (name, token, action, type) => (dispatch) => {
             return dispatch(successVerificationResponse(res.data));
         })
         .catch((_e) => {
-            return dispatch(
-                failedVerificationResponse()
-            );
+            return dispatch(failedVerificationResponse());
         });
 };
 
 const initialState = {
+    currentRegistrant: null,
     domainName: null,
     newRegistrant: null,
-    currentRegistrant: null,
-    status: null
+    status: null,
 };
 
 export default function reducer(state = initialState, action) {
@@ -79,37 +80,37 @@ export default function reducer(state = initialState, action) {
 
         case FETCH_DOMAIN_REGISTRANT_UPDATE_SUCCESS:
             return {
+                currentRegistrant: action.payload.current_registrant,
                 domainName: action.payload.domain_name,
                 newRegistrant: action.payload.new_registrant,
-                currentRegistrant: action.payload.current_registrant,
-                status: null
+                status: null,
             };
 
         case FETCH_DOMAIN_REGISTRANT_UPDATE_FAILED:
             return {
                 ...state,
+                currentRegistrant: null,
                 domainName: null,
                 newRegistrant: null,
-                currentRegistrant: null,
-                status: null
+                status: null,
             };
 
-            case RESPOND_REGISTRANT_CHANGE_SUCCESS:
-                return {
-                    domainName: action.payload.domain_name,
-                    newRegistrant: action.payload.new_registrant,
-                    currentRegistrant: action.payload.current_registrant,
-                    status: action.payload.status
-                };
+        case RESPOND_REGISTRANT_CHANGE_SUCCESS:
+            return {
+                currentRegistrant: action.payload.current_registrant,
+                domainName: action.payload.domain_name,
+                newRegistrant: action.payload.new_registrant,
+                status: action.payload.status,
+            };
 
-            case RESPOND_REGISTRANT_CHANGE_FAILED:
-                return {
-                    ...state,
-                    domainName: null,
-                    newRegistrant: null,
-                    currentRegistrant: null,
-                    status: null
-                };
+        case RESPOND_REGISTRANT_CHANGE_FAILED:
+            return {
+                ...state,
+                currentRegistrant: null,
+                domainName: null,
+                newRegistrant: null,
+                status: null,
+            };
         default:
             return state;
     }

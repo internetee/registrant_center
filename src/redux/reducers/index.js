@@ -14,6 +14,6 @@ export default withReduxStateSync(
         domains,
         ui,
         user,
-        verification
+        verification,
     })
 );

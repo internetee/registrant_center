@@ -65,7 +65,7 @@ export default {
     },
 
     sendVerificationResponse: (name, token, action, type) => {
-        console.log('called' + name + token + action + type);
+        console.log(`called${name}${token}${action}${type}`);
         return instance.post(`/api/confirms/${name}/${type}/${token}/${action}`, {
             credentials: 'include',
             method: 'POST',
@@ -92,5 +92,5 @@ export default {
     },
     updateContact: (uuid, form) => instance.patch(`/api/contacts/${uuid}`, JSON.stringify(form)),
     setDomainRegistryLock: (uuid) => instance.post(`/api/domains/${uuid}/registry_lock`),
-    deleteDomainRegistryLock: (uuid) => instance.delete(`/api/domains/${uuid}/registry_lock`)
+    deleteDomainRegistryLock: (uuid) => instance.delete(`/api/domains/${uuid}/registry_lock`),
 };
