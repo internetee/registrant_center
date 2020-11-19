@@ -19,7 +19,10 @@ import { fetchContacts } from './contacts';
 import domainStatuses from '../../utils/domainStatuses.json';
 
 let request = {
-    data: [],
+    data: {
+        domains: [],
+        count: 0
+    },
     offset: 0,
 };
 
@@ -82,7 +85,10 @@ const requestDomains = () => ({
 
 const receiveDomains = (payload) => {
     request = {
-        data: [],
+        data: {
+            domains: [],
+            count: 0
+        },
         offset: 0,
     };
     return {
@@ -146,10 +152,11 @@ const fetchDomains = (offset = request.offset) => (dispatch) => {
         .fetchDomains(null, offset)
         .then((res) => res.data)
         .then((data) => {
-            request.data = request.data.concat(data);
-            if (data.length === 200) {
+            request.data.domains = request.data.domains.concat(data.domains);
+            request.data.count = data.count;
+            if (request.data.domains.length !== data.count) {
                 request.offset += 200;
-                return dispatch(fetchDomains(null, request.offset));
+                return dispatch(fetchDomains(request.offset));
             }
             return dispatch(receiveDomains(request.data));
         })
@@ -193,7 +200,10 @@ const unlockDomain = (uuid) => (dispatch) => {
 };
 
 const initialState = {
-    data: {},
+    data: {
+        domains: [],
+        count: 0
+    },
     ids: [],
     isLoading: false,
     message: null,
@@ -233,14 +243,17 @@ export default function reducer(state = initialState, { payload, type }) {
         case FETCH_DOMAINS_SUCCESS:
             return {
                 ...state,
-                data: payload.reduce(
-                    (acc, item) => ({
-                        ...acc,
-                        [item.id]: parseDomain(item, true),
-                    }),
-                    {}
-                ),
-                ids: payload.map((item) => item.id),
+                data: {
+                    domains: payload.domains.reduce(
+                        (acc, item) => ({
+                            ...acc,
+                            [item.id]: parseDomain(item, true),
+                        }),
+                        {}
+                    ),
+                    count: payload.count
+                },
+                ids: payload.domains.map((item) => item.id),
                 isLoading: false,
             };
 

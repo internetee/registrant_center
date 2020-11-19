@@ -46,7 +46,7 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domains, lang }) => {
+const DomainList = ({ domainCount, domains, lang }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -68,7 +68,7 @@ const DomainList = ({ domains, lang }) => {
     const [activePage, setActivePage] = useState(1);
     const [perPage, setPerPage] = useState(domainsPerPage ? Number(domainsPerPage) : 24);
     const [domainsList, setDomainsList] = useState([]);
-    const totalDomains = domains.length || 0;
+    const totalDomains = domainCount || 0;
 
     const masonry = useRef(null);
 
