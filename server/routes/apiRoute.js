@@ -1,6 +1,5 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import https from 'https';
 dotenv.config();
 
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
@@ -33,9 +32,6 @@ const API = (session) => {
                 Authorization: `Bearer ${session.token.access_token}`,
             }),
         },
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: false,
-        }),
         mode: 'cors',
         timeout: 15000,
     });
