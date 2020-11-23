@@ -36,7 +36,7 @@ const DomainEditPage = ({
     const [isSaving, setIsSaving] = useState(false);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [formData, setFormData] = useState({});
-    const [isCompany, setIsCompany] = useState(false);
+    const [stageData, setStageData] = useState({});
 
     useEffect(() => {
         (async () => {
@@ -50,7 +50,6 @@ const DomainEditPage = ({
         if (domain) {
             const registrant = contacts[domain.registrant.id];
             if (registrant && registrant.ident.type === 'org') {
-                setIsCompany(true);
                 if (companies.isLoading === null) {
                     (async () => {
                         await fetchCompanies();
@@ -62,7 +61,7 @@ const DomainEditPage = ({
     }, [companies, contacts, domain, fetchCompanies, user]);
 
     const handleChange = (e, id) => {
-        console.log(isDirty);
+        console.log(formData);
         const { name, value } = e.target;
         setFormData((prevState) => ({
             ...prevState,
@@ -85,12 +84,17 @@ const DomainEditPage = ({
         setIsSubmitConfirmModalOpen(!isSubmitConfirmModalOpen);
     };
 
+    const stageContactUpdate = (item) => {
+        var stageData = { [item.id]: formData[item.id] }
+        setStageData(stageData);
+        toggleSubmitConfirmModal();
+    }
     const handleSubmit = async () => {
         setIsSaving(true);
         setIsSubmitConfirmModalOpen(false);
         await Promise.all(
-            Object.values(formData).map((contact) => {
-                const registrant = formData[domain.registrant.id];
+            Object.values(stageData).map((contact) => {
+                const registrant = stageData[domain.registrant.id];
                 if (registrant && registrant.ident.type === 'org') {
                     return updateContact(contact.id, {
                         email: contact.email,
@@ -130,8 +134,6 @@ const DomainEditPage = ({
         );
     }
 
-    const isUserNameDifferent = new Set(Object.values(formData).map((item) => item.name)).size > 1;
-
     return (
         <MainLayout hasBackButton title={domain.name}>
             <div className="page page--domain-edit">
@@ -143,27 +145,15 @@ const DomainEditPage = ({
                 <Grid textAlign="center">
                         <Grid.Row>
                         {Object.values(formData).map((item) => (
-                            <Grid.Column computer={4} mobile={8} tablet={8} widescreen={3}>
+                            <Grid.Column key={item.id} computer={4} mobile={8} tablet={8} widescreen={3}>
                             <Card centered>
                     <Card.Content>
                         {!isSaving && message && <MessageModule formMessage message={message} />}
-                        <Form onSubmit={toggleSubmitConfirmModal}>
-                            {!isUserNameDifferent && (
-                                <Form.Field>
-                                    <FormattedMessage id="domain.registrant.name" tagName="label" />
-                                    <Input
-                                        defaultValue={item.name}
-                                        disabled
-                                        size={uiElemSize}
-                                        type="text"
-                                    />
-                                </Form.Field>
-                            )}
-                                <Form.Group key={item.id} grouped>
+                        <Form onSubmit={e => stageContactUpdate(item)}>
+                                <Form.Group grouped>
                                     <h4>
                                         <Roles roles={item.roles} />
                                     </h4>
-                                    {isUserNameDifferent && (
                                         <Form.Field>
                                             <FormattedMessage
                                                 id="domain.registrant.name"
@@ -176,7 +166,6 @@ const DomainEditPage = ({
                                                 type="text"
                                             />
                                         </Form.Field>
-                                    )}
                                     <Form.Field
                                         error={
                                             message &&
@@ -220,16 +209,13 @@ const DomainEditPage = ({
                                         />
                                     </Form.Field>
                                 </Form.Group>
-                            {!isCompany && (
                                 <>
                                     <FormattedMessage id="domain.contactsVisibility" tagName="h3" />
                                     <WhoIsEdit
-                                        checkAll
-                                        contacts={formData}
+                                        contacts={{[item.id]: formData[item.id]}}
                                         onChange={handleWhoIsChange}
                                     />
                                 </>
-                            )}
                             <div className="form-actions">
                                 <Button
                                     disabled={!isDirty.includes(item.id)}
@@ -254,7 +240,7 @@ const DomainEditPage = ({
                     </Grid>
             </div>
             <WhoIsConfirmDialog
-                contacts={formData}
+                contacts={stageData}
                 onCancel={toggleSubmitConfirmModal}
                 onConfirm={handleSubmit}
                 open={isSubmitConfirmModalOpen}
