@@ -117,7 +117,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         </label>
                         <Form.Field>
                             <Checkbox
-                                checked={item.ident.type === 'org' || item.disclosed_attributes.has('name')}
+                                checked={
+                                    item.ident.type === 'org' ||
+                                    item.disclosed_attributes.has('name')
+                                }
                                 disabled={item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
@@ -137,7 +140,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         </Form.Field>
                         <Form.Field>
                             <Checkbox
-                                checked={item.ident.type === 'org' || item.disclosed_attributes.has('email')}
+                                checked={
+                                    item.ident.type === 'org' ||
+                                    item.disclosed_attributes.has('email')
+                                }
                                 disabled={item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
