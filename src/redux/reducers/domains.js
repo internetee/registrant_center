@@ -149,7 +149,7 @@ const fetchDomains = (offset = request.offset) => (dispatch) => {
             request.data = request.data.concat(data);
             if (data.length === 200) {
                 request.offset += 200;
-                return dispatch(fetchDomains(null, request.offset));
+                return dispatch(fetchDomains(request.offset));
             }
             return dispatch(receiveDomains(request.data));
         })
