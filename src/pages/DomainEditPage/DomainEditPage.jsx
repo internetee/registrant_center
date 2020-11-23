@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Form, Input, Container, Card } from 'semantic-ui-react';
+import { Button, Form, Input, Container, Card, Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {
@@ -32,7 +32,7 @@ const DomainEditPage = ({
     user,
 }) => {
     const { uiElemSize } = ui;
-    const [isDirty, setIsDirty] = useState(false);
+    const [isDirty, setIsDirty] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [formData, setFormData] = useState({});
@@ -62,6 +62,7 @@ const DomainEditPage = ({
     }, [companies, contacts, domain, fetchCompanies, user]);
 
     const handleChange = (e, id) => {
+        console.log(isDirty);
         const { name, value } = e.target;
         setFormData((prevState) => ({
             ...prevState,
@@ -70,12 +71,14 @@ const DomainEditPage = ({
                 [name]: value,
             },
         }));
-        setIsDirty(true);
+        if(!isDirty.includes(id)) {
+            isDirty.push(id);
+            setIsDirty(isDirty);
+        }
     };
 
     const handleWhoIsChange = (data) => {
         setFormData(data);
-        setIsDirty(true);
     };
 
     const toggleSubmitConfirmModal = () => {
@@ -134,10 +137,14 @@ const DomainEditPage = ({
             <div className="page page--domain-edit">
                 <div className="page--header">
                     <Container textAlign="center">
-                        <h2>{user.name}</h2>
+                        <h2><FormattedMessage id="domainEdit.title" tagName="label" /></h2>
                     </Container>
                 </div>
-                <Card centered>
+                <Grid textAlign="center">
+                        <Grid.Row>
+                        {Object.values(formData).map((item) => (
+                            <Grid.Column computer={4} mobile={8} tablet={8} widescreen={3}>
+                            <Card centered>
                     <Card.Content>
                         {!isSaving && message && <MessageModule formMessage message={message} />}
                         <Form onSubmit={toggleSubmitConfirmModal}>
@@ -145,29 +152,15 @@ const DomainEditPage = ({
                                 <Form.Field>
                                     <FormattedMessage id="domain.registrant.name" tagName="label" />
                                     <Input
-                                        defaultValue={user.name}
+                                        defaultValue={item.name}
                                         disabled
                                         size={uiElemSize}
                                         type="text"
                                     />
                                 </Form.Field>
                             )}
-                            <Form.Field>
-                                <FormattedMessage
-                                    id="domain.registrant.ident.code"
-                                    tagName="label"
-                                />
-                                <Input
-                                    defaultValue={user.ident}
-                                    disabled
-                                    size={uiElemSize}
-                                    type="text"
-                                />
-                            </Form.Field>
-                            {Object.values(formData).map((item) => (
                                 <Form.Group key={item.id} grouped>
                                     <h4>
-                                        <FormattedMessage id="domain.role" />
                                         <Roles roles={item.roles} />
                                     </h4>
                                     {isUserNameDifferent && (
@@ -227,7 +220,6 @@ const DomainEditPage = ({
                                         />
                                     </Form.Field>
                                 </Form.Group>
-                            ))}
                             {!isCompany && (
                                 <>
                                     <FormattedMessage id="domain.contactsVisibility" tagName="h3" />
@@ -240,7 +232,7 @@ const DomainEditPage = ({
                             )}
                             <div className="form-actions">
                                 <Button
-                                    disabled={!isDirty}
+                                    disabled={!isDirty.includes(item.id)}
                                     loading={isSaving}
                                     primary
                                     size={uiElemSize}
@@ -256,6 +248,10 @@ const DomainEditPage = ({
                         </Form>
                     </Card.Content>
                 </Card>
+                            </Grid.Column>
+                        ))}
+                        </Grid.Row>
+                    </Grid>
             </div>
             <WhoIsConfirmDialog
                 contacts={formData}
