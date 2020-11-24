@@ -33,7 +33,7 @@ const DomainEditPage = ({
 }) => {
     const { uiElemSize } = ui;
     const [isDirty, setIsDirty] = useState([]);
-    const [isSaving, setIsSaving] = useState(false);
+    const [isSaving, setIsSaving] = useState([]);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [formData, setFormData] = useState({});
     const [stageData, setStageData] = useState({});
@@ -61,7 +61,6 @@ const DomainEditPage = ({
     }, [companies, contacts, domain, fetchCompanies, user]);
 
     const handleChange = (e, id) => {
-        console.log(formData);
         const { name, value } = e.target;
         setFormData((prevState) => ({
             ...prevState,
@@ -70,14 +69,18 @@ const DomainEditPage = ({
                 [name]: value,
             },
         }));
-        if(!isDirty.includes(id)) {
+        if(!(isDirty.includes(id))) {
             isDirty.push(id);
             setIsDirty(isDirty);
         }
     };
 
     const handleWhoIsChange = (data) => {
-        setFormData(data);
+        setFormData({...formData, ...data});
+        if(!(isDirty.includes(Object.keys(data)[0]))) {
+            isDirty.push(Object.keys(data)[0]);
+            setIsDirty(isDirty);
+        }
     };
 
     const toggleSubmitConfirmModal = () => {
@@ -90,7 +93,10 @@ const DomainEditPage = ({
         toggleSubmitConfirmModal();
     }
     const handleSubmit = async () => {
-        setIsSaving(true);
+        if(!isSaving.includes(Object.keys(stageData)[0])) {
+            isSaving.push(Object.keys(stageData)[0]);
+            setIsSaving(isSaving);
+        }
         setIsSubmitConfirmModalOpen(false);
         await Promise.all(
             Object.values(stageData).map((contact) => {
@@ -113,8 +119,12 @@ const DomainEditPage = ({
                 });
             })
         );
-        setIsDirty(false);
-        setIsSaving(false);
+        if(isDirty.includes(Object.keys(stageData)[0])) {
+            setIsDirty(isDirty.filter((r) => r !== Object.keys(stageData)[0]));
+        }
+        if(isSaving.includes(Object.keys(stageData)[0])) {
+            setIsSaving(isSaving.filter((id) => id !== Object.keys(stageData)[0]));
+        }
     };
 
     if (isLoading) {
@@ -145,11 +155,11 @@ const DomainEditPage = ({
                 <Grid textAlign="center">
                         <Grid.Row>
                         {Object.values(formData).map((item) => (
-                            <Grid.Column key={item.id} computer={4} mobile={8} tablet={8} widescreen={3}>
+                            <Grid.Column key={item.id} computer={4} mobile={16} tablet={8} widescreen={3}>
                             <Card centered>
                     <Card.Content>
-                        {!isSaving && message && <MessageModule formMessage message={message} />}
-                        <Form onSubmit={e => stageContactUpdate(item)}>
+                        {!isSaving.includes(item.id) && Object.keys(stageData).includes(item.id) && message && <MessageModule formMessage message={message} />}
+                        <Form onSubmit={_e => stageContactUpdate(item)}>
                                 <Form.Group grouped>
                                     <h4>
                                         <Roles roles={item.roles} />
@@ -212,6 +222,7 @@ const DomainEditPage = ({
                                 <>
                                     <FormattedMessage id="domain.contactsVisibility" tagName="h3" />
                                     <WhoIsEdit
+                                        checkAll
                                         contacts={{[item.id]: formData[item.id]}}
                                         onChange={handleWhoIsChange}
                                     />
@@ -219,7 +230,7 @@ const DomainEditPage = ({
                             <div className="form-actions">
                                 <Button
                                     disabled={!isDirty.includes(item.id)}
-                                    loading={isSaving}
+                                    loading={isSaving.includes(item.id)}
                                     primary
                                     size={uiElemSize}
                                     type="submit"
