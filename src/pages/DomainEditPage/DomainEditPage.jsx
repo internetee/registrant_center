@@ -69,15 +69,15 @@ const DomainEditPage = ({
                 [name]: value,
             },
         }));
-        if(!(isDirty.includes(id))) {
+        if (!isDirty.includes(id)) {
             isDirty.push(id);
             setIsDirty(isDirty);
         }
     };
 
     const handleWhoIsChange = (data) => {
-        setFormData({...formData, ...data});
-        if(!(isDirty.includes(Object.keys(data)[0]))) {
+        setFormData({ ...formData, ...data });
+        if (!isDirty.includes(Object.keys(data)[0])) {
             isDirty.push(Object.keys(data)[0]);
             setIsDirty(isDirty);
         }
@@ -88,12 +88,11 @@ const DomainEditPage = ({
     };
 
     const stageContactUpdate = (item) => {
-        var stageData = { [item.id]: formData[item.id] }
-        setStageData(stageData);
+        setStageData({ [item.id]: formData[item.id] });
         toggleSubmitConfirmModal();
-    }
+    };
     const handleSubmit = async () => {
-        if(!isSaving.includes(Object.keys(stageData)[0])) {
+        if (!isSaving.includes(Object.keys(stageData)[0])) {
             isSaving.push(Object.keys(stageData)[0]);
             setIsSaving(isSaving);
         }
@@ -119,10 +118,10 @@ const DomainEditPage = ({
                 });
             })
         );
-        if(isDirty.includes(Object.keys(stageData)[0])) {
+        if (isDirty.includes(Object.keys(stageData)[0])) {
             setIsDirty(isDirty.filter((r) => r !== Object.keys(stageData)[0]));
         }
-        if(isSaving.includes(Object.keys(stageData)[0])) {
+        if (isSaving.includes(Object.keys(stageData)[0])) {
             setIsSaving(isSaving.filter((id) => id !== Object.keys(stageData)[0]));
         }
     };
@@ -149,106 +148,121 @@ const DomainEditPage = ({
             <div className="page page--domain-edit">
                 <div className="page--header">
                     <Container textAlign="center">
-                        <h2><FormattedMessage id="domainEdit.title" tagName="label" /></h2>
+                        <h2>
+                            <FormattedMessage id="domainEdit.title" tagName="label" />
+                        </h2>
                     </Container>
                 </div>
                 <Grid textAlign="center">
-                        <Grid.Row>
+                    <Grid.Row>
                         {Object.values(formData).map((item) => (
-                            <Grid.Column key={item.id} computer={4} mobile={16} tablet={8} widescreen={3}>
-                            <Card centered>
-                    <Card.Content>
-                        {!isSaving.includes(item.id) && Object.keys(stageData).includes(item.id) && message && <MessageModule formMessage message={message} />}
-                        <Form onSubmit={_e => stageContactUpdate(item)}>
-                                <Form.Group grouped>
-                                    <h4>
-                                        <Roles roles={item.roles} />
-                                    </h4>
-                                        <Form.Field>
-                                            <FormattedMessage
-                                                id="domain.registrant.name"
-                                                tagName="label"
-                                            />
-                                            <Input
-                                                defaultValue={item.name}
-                                                disabled
-                                                size={uiElemSize}
-                                                type="text"
-                                            />
-                                        </Form.Field>
-                                    <Form.Field
-                                        error={
-                                            message &&
-                                            message.errors &&
-                                            message.errors.email &&
-                                            message.errors.email.length
-                                        }
-                                    >
-                                        <FormattedMessage
-                                            id="domain.registrant.email"
-                                            tagName="label"
-                                        />
-                                        <Input
-                                            defaultValue={item.email}
-                                            name="email"
-                                            onChange={(e) => handleChange(e, item.id)}
-                                            required
-                                            size={uiElemSize}
-                                            type="email"
-                                        />
-                                    </Form.Field>
-                                    <Form.Field
-                                        error={
-                                            message &&
-                                            message.errors &&
-                                            message.errors.phone &&
-                                            message.errors.phone.length
-                                        }
-                                    >
-                                        <FormattedMessage
-                                            id="domain.registrant.phone"
-                                            tagName="label"
-                                        />
-                                        <Input
-                                            defaultValue={item.phone}
-                                            name="phone"
-                                            onChange={(e) => handleChange(e, item.id)}
-                                            required
-                                            size={uiElemSize}
-                                            type="tel"
-                                        />
-                                    </Form.Field>
-                                </Form.Group>
-                                <>
-                                    <FormattedMessage id="domain.contactsVisibility" tagName="h3" />
-                                    <WhoIsEdit
-                                        checkAll
-                                        contacts={{[item.id]: formData[item.id]}}
-                                        onChange={handleWhoIsChange}
-                                    />
-                                </>
-                            <div className="form-actions">
-                                <Button
-                                    disabled={!isDirty.includes(item.id)}
-                                    loading={isSaving.includes(item.id)}
-                                    primary
-                                    size={uiElemSize}
-                                    type="submit"
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Salvesta"
-                                        id="actions.save"
-                                        tagName="span"
-                                    />
-                                </Button>
-                            </div>
-                        </Form>
-                    </Card.Content>
-                </Card>
+                            <Grid.Column
+                                key={item.id}
+                                computer={4}
+                                mobile={16}
+                                tablet={8}
+                                widescreen={3}
+                            >
+                                <Card centered>
+                                    <Card.Content>
+                                        {!isSaving.includes(item.id) &&
+                                            Object.keys(stageData).includes(item.id) &&
+                                            message && (
+                                                <MessageModule formMessage message={message} />
+                                            )}
+                                        <Form onSubmit={(_e) => stageContactUpdate(item)}>
+                                            <Form.Group grouped>
+                                                <h4>
+                                                    <Roles roles={item.roles} />
+                                                </h4>
+                                                <Form.Field>
+                                                    <FormattedMessage
+                                                        id="domain.registrant.name"
+                                                        tagName="label"
+                                                    />
+                                                    <Input
+                                                        defaultValue={item.name}
+                                                        disabled
+                                                        size={uiElemSize}
+                                                        type="text"
+                                                    />
+                                                </Form.Field>
+                                                <Form.Field
+                                                    error={
+                                                        message &&
+                                                        message.errors &&
+                                                        message.errors.email &&
+                                                        message.errors.email.length
+                                                    }
+                                                >
+                                                    <FormattedMessage
+                                                        id="domain.registrant.email"
+                                                        tagName="label"
+                                                    />
+                                                    <Input
+                                                        defaultValue={item.email}
+                                                        name="email"
+                                                        onChange={(e) => handleChange(e, item.id)}
+                                                        required
+                                                        size={uiElemSize}
+                                                        type="email"
+                                                    />
+                                                </Form.Field>
+                                                <Form.Field
+                                                    error={
+                                                        message &&
+                                                        message.errors &&
+                                                        message.errors.phone &&
+                                                        message.errors.phone.length
+                                                    }
+                                                >
+                                                    <FormattedMessage
+                                                        id="domain.registrant.phone"
+                                                        tagName="label"
+                                                    />
+                                                    <Input
+                                                        defaultValue={item.phone}
+                                                        name="phone"
+                                                        onChange={(e) => handleChange(e, item.id)}
+                                                        required
+                                                        size={uiElemSize}
+                                                        type="tel"
+                                                    />
+                                                </Form.Field>
+                                            </Form.Group>
+                                            <>
+                                                <FormattedMessage
+                                                    id="domain.contactsVisibility"
+                                                    tagName="h3"
+                                                />
+                                                <WhoIsEdit
+                                                    checkAll
+                                                    contacts={{ [item.id]: formData[item.id] }}
+                                                    onChange={handleWhoIsChange}
+                                                />
+                                            </>
+                                            <div className="form-actions">
+                                                <Button
+                                                    disabled={!isDirty.includes(item.id)}
+                                                    loading={isSaving.includes(item.id)}
+                                                    primary
+                                                    size={uiElemSize}
+                                                    type="submit"
+                                                >
+                                                    <FormattedMessage
+                                                        defaultMessage="Salvesta"
+                                                        id="actions.save"
+                                                        tagName="span"
+                                                    />
+                                                </Button>
+                                            </div>
+                                        </Form>
+                                    </Card.Content>
+                                </Card>
                             </Grid.Column>
                         ))}
-                        </Grid.Row>
-                    </Grid>
+                    </Grid.Row>
+                </Grid>
             </div>
             <WhoIsConfirmDialog
                 contacts={stageData}
