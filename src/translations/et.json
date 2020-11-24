@@ -57,7 +57,7 @@
   "domain.registrant": "Registreerija",
   "domain.registrant.email": "E-mail",
   "domain.registrant.ident": "Isikukood",
-  "domain.registrant.ident.code": "Isikukood",
+  "domain.registrant.ident.code": "Isikukood / Registrikood",
   "domain.registrant.name": "Nimi",
   "domain.registrant.phone": "Telefon",
   "domain.registrant.tooltip": "Domeeni registreeringu vastutav omanik - võib olla nii juriidiline kui eraisik.",

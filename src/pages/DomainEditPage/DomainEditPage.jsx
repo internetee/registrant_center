@@ -187,6 +187,18 @@ const DomainEditPage = ({
                                                         type="text"
                                                     />
                                                 </Form.Field>
+                                                <Form.Field>
+                                                    <FormattedMessage
+                                                        id="domain.registrant.ident.code"
+                                                        tagName="label"
+                                                    />
+                                                    <Input
+                                                        defaultValue={item.ident.code}
+                                                        disabled
+                                                        size={uiElemSize}
+                                                        type="text"
+                                                    />
+                                                </Form.Field>
                                                 <Form.Field
                                                     error={
                                                         message &&
