@@ -22,6 +22,7 @@ const CompaniesPage = lazy(() => import('./pages/CompaniesPage/CompaniesPage'));
 const WhoIsPage = lazy(() => import('./pages/WhoIsPage/WhoIsPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage/ErrorPage'));
+const ConfirmationPage = lazy(() => import('./pages/ConfirmationPage/ConfirmationPage'));
 
 function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, user }) {
     const location = useLocation();
@@ -46,11 +47,11 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
 
     useEffect(() => {
         (async () => {
-            setIsLoading(true);
             if (!name && location.pathname !== '/login' && !isLoggedOut) {
+                setIsLoading(true);
                 await fetchUser();
+                setIsLoading(false);
             }
-            setIsLoading(false);
         })();
     }, [fetchUser, isLoggedOut, location, name]);
 
@@ -102,6 +103,11 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
                                 />
                                 <ProtectedRoute component={CompaniesPage} exact path="/companies" />
                                 <ProtectedRoute component={WhoIsPage} exact path="/whois" />
+                                <Route
+                                    component={ConfirmationPage}
+                                    exact
+                                    path="/confirmation/:name/:type/:token"
+                                />
                                 <Route component={LoginPage} exact path="/login" />
                                 <Route component={ErrorPage} exact path="/:lang" />
                             </Switch>
