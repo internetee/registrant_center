@@ -66,7 +66,7 @@ const invalidateContact = () => ({
 const fetchContact = (uuid) => (dispatch) => {
     dispatch(requestContact());
     return api
-        .fetchContacts(uuid)
+        .fetchContacts(uuid, false)
         .then((res) => res.data)
         .then((data) => {
             return dispatch(receiveContact(data));
@@ -80,7 +80,7 @@ const fetchContacts = (uuid, offset = request.offset) => (dispatch) => {
     if (uuid) {
         dispatch(requestContact());
         return api
-            .fetchContacts(uuid)
+            .fetchContacts(uuid, offset)
             .then((res) => res.data)
             .then(async (data) => {
                 return dispatch(receiveContact(data));

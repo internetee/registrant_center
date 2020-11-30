@@ -61,7 +61,7 @@ const DomainPage = ({
 
     useEffect(() => {
         (async () => {
-            if ((!domain || domain?.shouldFetchContacts) && !isLoading) {
+            if (!domain && !domain?.contacts && !isLoading) {
                 await fetchDomain(match.params.id);
             }
         })();
@@ -81,7 +81,7 @@ const DomainPage = ({
     }, [companies, domain, fetchCompanies, registrantContacts]);
 
     useEffect(() => {
-        if (domain) {
+        if (domain && domain.contacts) {
             const userContact = Helpers.getUserContacts(user, domain, contacts);
             if (Object.keys(userContact).length) {
                 setUserContacts(userContact);

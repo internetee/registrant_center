@@ -81,7 +81,7 @@ const DomainGridItem = ({ domain, lang }) => {
                                         : `+${domain.statuses.length - 1}`)}
                             </Label>
                         </Label.Group>
-                        <Transition
+{/*                        <Transition
                             animation={isOpen ? 'slide down' : 'slide down'}
                             duration={300}
                             unmountOnHide
@@ -160,7 +160,7 @@ const DomainGridItem = ({ domain, lang }) => {
                                     <FormattedMessage id="domain.nameservers.text" tagName="p" />
                                 )}
                             </div>
-                        </Transition>
+                        </Transition>*/}
                         <div className="data">
                             {domain.valid_to && (
                                 <FormattedMessage
@@ -208,9 +208,9 @@ const DomainGridItem = ({ domain, lang }) => {
                             )}
                         </div>
                     </div>
-                    <button className="toggle" onClick={handleExtra} type="button">
+                    {/*<button className="toggle" onClick={handleExtra} type="button">
                         <Icon name={isOpen ? 'caret up' : 'caret down'} />
-                    </button>
+                    </button>*/}
                 </div>
             </article>
         );

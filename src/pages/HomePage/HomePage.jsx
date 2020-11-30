@@ -8,7 +8,7 @@ import { bindActionCreators } from 'redux';
 import { DomainList, UserData, MainLayout, Loading } from '../../components';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 
-const HomePage = ({ domains, fetchDomains, ui, user }) => {
+const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
     const { lang } = ui;
     moment.locale(lang);
     const [isLoading, setIsLoading] = useState(true);
@@ -72,18 +72,21 @@ const HomePage = ({ domains, fetchDomains, ui, user }) => {
                         </Grid.Row>
                     </Grid>
                 </div>
-                <DomainList domains={domains} lang={lang} />
+                <DomainList domainCount={totalDomains} domains={domains} lang={lang} />
                 <UserData lang={lang} />
             </div>
         </MainLayout>
     );
 };
 
-const mapStateToProps = ({ domains, ui, user }) => ({
-    domains: Object.values(domains.data),
-    ui,
-    user: user.data,
-});
+const mapStateToProps = ({ domains, ui, user }) => {
+    return {
+        domains: Object.values(domains.data.domains),
+        ui,
+        user: user.data,
+        totalDomains: domains.data.count
+    }
+};
 
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(

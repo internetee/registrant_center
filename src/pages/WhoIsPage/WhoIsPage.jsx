@@ -382,10 +382,11 @@ const WhoIsPage = ({
 };
 
 const mapStateToProps = (state) => {
+    console.log(state.contacts);
     return {
         companies: state.companies.data,
         contacts: state.contacts.data,
-        domains: state.domains.ids.map((id) => state.domains.data[id]),
+        domains: state.domains.ids.map((id) => state.domains.data.domains[id]),
         ui: state.ui,
         user: state.user.data,
     };
