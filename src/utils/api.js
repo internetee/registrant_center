@@ -77,11 +77,10 @@ export default {
         if (uuid) {
             return instance.get(`/api/domains/${uuid}`);
         }
-        if(simplify) {
+        if (simplify) {
             return instance.get(`/api/domains?offset=${offset}&simple=true`);
-        } else {
-            return instance.get(`/api/domains?offset=${offset}`);
         }
+        return instance.get(`/api/domains?offset=${offset}`);
     },
 
     fetchCompanies: (offset) => {

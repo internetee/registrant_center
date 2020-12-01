@@ -82,10 +82,10 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
 const mapStateToProps = ({ domains, ui, user }) => {
     return {
         domains: Object.values(domains.data.domains),
+        totalDomains: domains.data.count,
         ui,
         user: user.data,
-        totalDomains: domains.data.count
-    }
+    };
 };
 
 const mapDispatchToProps = (dispatch) =>

@@ -20,8 +20,8 @@ import domainStatuses from '../../utils/domainStatuses.json';
 
 let request = {
     data: {
+        count: 0,
         domains: [],
-        count: 0
     },
     offset: 0,
 };
@@ -32,24 +32,26 @@ const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
         (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
     );
 
-
-    const contacts = (simplify ? [
-        ...(registrant && [
-            {
-                ...registrant,
-                roles: ['registrant'],
-            },
-        ]),
-    ] : [
-        ...(admin_contacts && admin_contacts.map((item) => ({ ...item, roles: ['admin'] }))),
-        ...(tech_contacts && tech_contacts.map((item) => ({ ...item, roles: ['tech'] }))),
-        ...(registrant && [
-            {
-                ...registrant,
-                roles: ['registrant'],
-            },
-        ]),
-    ]).flat();
+    const contacts = (simplify
+        ? [
+              ...(registrant && [
+                  {
+                      ...registrant,
+                      roles: ['registrant'],
+                  },
+              ]),
+          ]
+        : [
+              ...(admin_contacts && admin_contacts.map((item) => ({ ...item, roles: ['admin'] }))),
+              ...(tech_contacts && tech_contacts.map((item) => ({ ...item, roles: ['tech'] }))),
+              ...(registrant && [
+                  {
+                      ...registrant,
+                      roles: ['registrant'],
+                  },
+              ]),
+          ]
+    ).flat();
 
     return {
         ...domain,
@@ -96,8 +98,8 @@ const requestDomains = () => ({
 const receiveDomains = (payload, simplify) => {
     request = {
         data: {
+            count: 0,
             domains: [],
-            count: 0
         },
         offset: 0,
     };
@@ -212,8 +214,8 @@ const unlockDomain = (uuid) => (dispatch) => {
 
 const initialState = {
     data: {
+        count: 0,
         domains: [],
-        count: 0
     },
     ids: [],
     isLoading: false,
@@ -254,6 +256,7 @@ export default function reducer(state = initialState, { payload, type }) {
             return {
                 ...state,
                 data: {
+                    count: payload.count,
                     domains: payload.domains.reduce(
                         (acc, item) => ({
                             ...acc,
@@ -261,7 +264,6 @@ export default function reducer(state = initialState, { payload, type }) {
                         }),
                         {}
                     ),
-                    count: payload.count
                 },
                 ids: payload.domains.map((item) => item.id),
                 isLoading: false,
