@@ -55,11 +55,15 @@ export default {
         );
     },
 
-    fetchDomains: (uuid = false, offset) => {
+    fetchDomains: (uuid = false, offset, simplify = false) => {
         if (uuid) {
             return instance.get(`/api/domains/${uuid}`);
         }
-        return instance.get(`/api/domains?offset=${offset}`);
+        if(simplify) {
+            return instance.get(`/api/domains?offset=${offset}&simple=true`);
+        } else {
+            return instance.get(`/api/domains?offset=${offset}`);
+        }
     },
 
     fetchCompanies: (offset) => {

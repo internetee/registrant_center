@@ -8,7 +8,7 @@ import * as contactsActions from '../../redux/reducers/contacts';
 import Helpers from '../../utils/helpers';
 
 function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }) {
-    const changedDomains = [];
+    const changedDomains = Helpers.getChangedUserContactsByDomain(domains.domains, contacts) || [];
     const { uiElemSize } = ui;
 
     return (

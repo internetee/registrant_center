@@ -16,7 +16,7 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
 
     useEffect(() => {
         (async () => {
-            await fetchDomains();
+            await fetchDomains(0, true);
             setIsLoading(false);
         })();
     }, [fetchDomains]);

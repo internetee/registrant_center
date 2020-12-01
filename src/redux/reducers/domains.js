@@ -26,14 +26,14 @@ let request = {
     offset: 0,
 };
 
-const parseDomain = (domain, shouldFetchContacts = false, simple = false) => {
+const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
     const { admin_contacts, registrant, tech_contacts } = domain;
     const statuses = domain.statuses.sort(
         (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
     );
 
 
-    const contacts = (simple ? [
+    const contacts = (simplify ? [
         ...(registrant && [
             {
                 ...registrant,
@@ -93,7 +93,7 @@ const requestDomains = () => ({
     type: FETCH_DOMAINS_REQUEST,
 });
 
-const receiveDomains = (payload) => {
+const receiveDomains = (payload, simplify) => {
     request = {
         data: {
             domains: [],
@@ -103,6 +103,7 @@ const receiveDomains = (payload) => {
     };
     return {
         payload,
+        simple: simplify,
         type: FETCH_DOMAINS_SUCCESS,
     };
 };
@@ -156,19 +157,19 @@ const fetchDomain = (uuid) => (dispatch) => {
         });
 };
 
-const fetchDomains = (offset = request.offset) => (dispatch) => {
+const fetchDomains = (offset = request.offset, simplify = false) => (dispatch) => {
     dispatch(requestDomains());
     return api
-        .fetchDomains(null, offset)
+        .fetchDomains(null, offset, simplify)
         .then((res) => res.data)
         .then((data) => {
             request.data.domains = request.data.domains.concat(data.domains);
             request.data.count = data.count;
             if (request.data.domains.length !== data.count) {
                 request.offset += 200;
-                return dispatch(fetchDomains(request.offset));
+                return dispatch(fetchDomains(request.offset, simplify));
             }
-            return dispatch(receiveDomains(request.data));
+            return dispatch(receiveDomains(request.data, simplify));
         })
         .catch(() => {
             dispatch(failDomains());
@@ -256,7 +257,7 @@ export default function reducer(state = initialState, { payload, type }) {
                     domains: payload.domains.reduce(
                         (acc, item) => ({
                             ...acc,
-                            [item.id]: parseDomain(item, true, true),
+                            [item.id]: parseDomain(item, true, state.simple),
                         }),
                         {}
                     ),

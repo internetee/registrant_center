@@ -382,7 +382,6 @@ const WhoIsPage = ({
 };
 
 const mapStateToProps = (state) => {
-    console.log(state.contacts);
     return {
         companies: state.companies.data,
         contacts: state.contacts.data,
