@@ -1,0 +1,83 @@
+.page--whois {
+  .ui.form {
+    > .field {
+      margin-bottom: 0;
+    }
+    &.form-filter .form-filter--search {
+      .search-field {
+        .input input {
+          padding-right: 7.143em !important;
+          @include min-screen(768px) {
+            padding-right: 6.429em !important;
+          }
+        }
+      }
+    }
+    .grouped {
+      margin-top: 20px;
+      &.adv-field-group {
+        display: none;
+        &.u-visible {
+          display: block;
+        }
+      }
+    }
+  }
+  .ui.table:not(.unstackable) {
+    tr {
+      td {
+        &:first-child {
+          font-weight: 900;
+          word-break: break-all;
+          a {
+            color: $black;
+            &:hover {
+              color: $base-blue;
+            }
+          }
+        }
+      }
+    }
+    @include max-screen(767px) {
+      display: flex;
+      flex-direction: column-reverse;
+      thead {
+        order: 0;
+        width: 100%;
+      }
+      tbody {
+        order: 1;
+        width: 100%;
+      }
+      tfoot {
+        order: 2;
+        width: 100%;
+      }
+      tr {
+        th,
+        td {
+          padding: 0 20px 10px !important;
+          text-align: left;
+          &:last-child {
+            padding-bottom: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}
+.changed-domains-list.ui.list {
+  text-align: left;
+  .item {
+    .content {
+      > a {
+        display: inline-block;
+        word-break: break-word;
+      }
+    }
+  }
+}
+
+.ui.checkbox.disabled label:hover::before {
+  border-color: #a7a8aa;
+}

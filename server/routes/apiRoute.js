@@ -1,6 +1,5 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
@@ -34,7 +33,7 @@ const API = (session) => {
             }),
         },
         mode: 'cors',
-        timeout: 10000,
+        timeout: 15000,
     });
 };
 
@@ -158,6 +157,24 @@ export default {
         }
     },
 
+    getRegistrantUpdate: async (req, res, session) => {
+        const name = req.params.name.toString();
+        const token = req.params.token.toString();
+        const type = req.params.type.toString();
+        try {
+            const response = await API(session).get(
+                `/api/v1/registrant/confirms/${name}/${type}/${token}`,
+                {}
+            );
+            return res.status(response.status).json(response.data);
+        } catch (e) {
+            if (e.response) {
+                return res.status(e.response.status).json({});
+            }
+            return res.status(401).json({});
+        }
+    },
+
     getUser: async ({ session }, res) => {
         try {
             const userData = session.user;
@@ -178,6 +195,26 @@ export default {
                 return res.status(e.response.status).json({});
             }
             return res.status(408).json({});
+        }
+    },
+
+    sendVerificationStatus: async (req, res, session) => {
+        const name = req.params.name.toString();
+        const token = req.params.token.toString();
+        const action = req.params.action.toString();
+        const type = req.params.type.toString();
+        try {
+            const response = await API(session).post(
+                `/api/v1/registrant/confirms/${name}/${type}/${token}/${action}`,
+                {}
+            );
+            return res.status(response.status).json(response.data);
+        } catch (e) {
+            console.log(e);
+            if (e.response) {
+                return res.status(e.response.status).json({});
+            }
+            return res.status(401).json({});
         }
     },
 

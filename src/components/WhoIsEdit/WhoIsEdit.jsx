@@ -6,7 +6,7 @@ import Roles from '../Roles/Roles';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
     const contactsList = Object.values(contacts);
-    const isCompany = contactsList.find(({ ident }) => ident.type === 'org');
+    const isCompany = contactsList.find(({ ident }) => ident.type === 'org') != null;
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { disclosed_attributes }) => ({

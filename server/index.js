@@ -127,6 +127,8 @@ app.use(helmet());
 app.get('/api/menu/:type', API.getMenu);
 app.get('/api/user', API.getUser);
 app.post('/api/destroy', API.destroyUser);
+app.get('/api/confirms/:name/:type/:token', API.getRegistrantUpdate);
+app.post('/api/confirms/:name/:type/:token/:action', API.sendVerificationStatus);
 app.all('/api/*', API.checkAuth);
 app.get('/api/domains', API.getDomains);
 app.get('/api/domains/:uuid', API.getDomain);
@@ -136,6 +138,7 @@ app.get('/api/companies', API.getCompanies);
 app.get('/api/contacts', API.getContacts);
 app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
+
 // all page rendering
 app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
 
