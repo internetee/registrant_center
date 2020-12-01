@@ -67,7 +67,9 @@ const WhoIsPage = ({
 
     useEffect(() => {
         (async () => {
-            await fetchDomains();
+            setIsLoading(true);
+            console.log("Launched");
+            await fetchDomains(0, false);
             await fetchContacts();
             await fetchCompanies();
             setIsLoading(false);

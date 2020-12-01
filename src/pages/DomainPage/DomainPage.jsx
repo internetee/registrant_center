@@ -61,8 +61,10 @@ const DomainPage = ({
 
     useEffect(() => {
         (async () => {
-            if (!domain && !domain?.contacts && !isLoading) {
+            if ((!domain || !domain?.contacts) && !isLoading) {
+                console.log('should fetch domain');
                 await fetchDomain(match.params.id);
+                console.log("should be fetched");
             }
         })();
     }, [domain, fetchDomain, isLoading, match]);

@@ -95,7 +95,8 @@ const requestDomains = () => ({
     type: FETCH_DOMAINS_REQUEST,
 });
 
-const receiveDomains = (payload, simplify) => {
+const receiveDomains = (payload, simplify = false) => {
+    console.log('aaa ' + simplify)
     request = {
         data: {
             count: 0,
@@ -105,7 +106,7 @@ const receiveDomains = (payload, simplify) => {
     };
     return {
         payload,
-        simple: simplify,
+        simplify : simplify,
         type: FETCH_DOMAINS_SUCCESS,
     };
 };
@@ -222,7 +223,7 @@ const initialState = {
     message: null,
 };
 
-export default function reducer(state = initialState, { payload, type }) {
+export default function reducer(state = initialState, { payload, type, simplify = false }) {
     switch (type) {
         case LOGOUT_USER:
             return initialState;
@@ -234,6 +235,7 @@ export default function reducer(state = initialState, { payload, type }) {
             };
 
         case FETCH_DOMAIN_SUCCESS:
+            console.log("TRIGGER")
             return {
                 data: { ...state.data, [payload.id]: payload },
                 ids: state.ids.includes(payload.id) ? state.ids : [...state.ids, payload.id],
@@ -260,7 +262,7 @@ export default function reducer(state = initialState, { payload, type }) {
                     domains: payload.domains.reduce(
                         (acc, item) => ({
                             ...acc,
-                            [item.id]: parseDomain(item, true, state.simple),
+                            [item.id]: parseDomain(item, true, simplify),
                         }),
                         {}
                     ),

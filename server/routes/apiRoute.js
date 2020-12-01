@@ -98,13 +98,13 @@ export default {
 
     getDomains: async ({ query, params, session }, res) => {
         const { uuid } = params;
-        const { offset, simplify } = query;
-        if (simplify === 'true') {
+        const { offset, simple } = query;
+        if (simple === 'true') {
             return handleResponse(
                 () =>
                     API(session, res).get(
                         `/api/v1/registrant/domains${
-                            uuid ? `/${uuid}` : `?offset=${offset}&simplify=true`
+                            uuid ? `/${uuid}` : `?offset=${offset}&simple=true`
                         }`
                     ),
                 res

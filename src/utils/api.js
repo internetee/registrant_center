@@ -65,7 +65,6 @@ export default {
     },
 
     sendVerificationResponse: (name, token, action, type) => {
-        console.log(`called${name}${token}${action}${type}`);
         return instance.post(`/api/confirms/${name}/${type}/${token}/${action}`, {
             credentials: 'include',
             method: 'POST',

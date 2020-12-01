@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Icon, Label } from 'semantic-ui-react';
+import { Icon, Label, Table, Transition } from 'semantic-ui-react';
 import moment from 'moment';
 import 'moment/locale/et';
 import 'moment/locale/ru';
@@ -11,13 +11,13 @@ import domainStatuses from '../../../utils/domainStatuses.json';
 const DomainGridItem = ({ domain, lang }) => {
     moment.locale(lang);
     const { formatMessage } = useIntl();
-    // const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [showStatuses, setShowStatuses] = useState(false);
 
-    // const handleExtra = () => {
-    //    setIsOpen((prevState) => !prevState);
-    //    setShowStatuses((prevState) => !prevState);
-    // };
+    const handleExtra = () => {
+        setIsOpen((prevState) => !prevState);
+        setShowStatuses((prevState) => !prevState);
+    };
 
     const handleStatuses = () => {
         setShowStatuses((prevState) => !prevState);
@@ -25,7 +25,7 @@ const DomainGridItem = ({ domain, lang }) => {
 
     if (domain) {
         return (
-            <article className={classNames('domains-grid--item', { 'is-open': false })}>
+            <article className={classNames('domains-grid--item', { 'is-open': isOpen })}>
                 <div className="container">
                     <div className="content">
                         <Link className="link" to={`/domain/${domain.id}`}>
@@ -81,7 +81,7 @@ const DomainGridItem = ({ domain, lang }) => {
                                         : `+${domain.statuses.length - 1}`)}
                             </Label>
                         </Label.Group>
-                        {/*                        <Transition
+                        <Transition
                             animation={isOpen ? 'slide down' : 'slide down'}
                             duration={300}
                             unmountOnHide
@@ -89,7 +89,7 @@ const DomainGridItem = ({ domain, lang }) => {
                         >
                             <div className="extra">
                                 <h5>
-                                    <FormattedMessage id="domains.domain.contacts.title" />
+                                    <FormattedMessage id="domain.registrant" />
                                 </h5>
                                 <div className="table-wrap">
                                     <Table basic="very" compact size="small" unstackable>
@@ -97,70 +97,21 @@ const DomainGridItem = ({ domain, lang }) => {
                                             <Table.Row>
                                                 <Table.HeaderCell>
                                                     <FormattedMessage
-                                                        id="domains.domain.contacts.type"
-                                                        tagName="strong"
-                                                    />
-                                                </Table.HeaderCell>
-                                                <Table.HeaderCell>
-                                                    <FormattedMessage
                                                         id="domains.domain.contacts.name"
-                                                        tagName="strong"
-                                                    />
-                                                </Table.HeaderCell>
-                                                <Table.HeaderCell>
-                                                    <FormattedMessage
-                                                        id="domains.domain.contacts.email"
                                                         tagName="strong"
                                                     />
                                                 </Table.HeaderCell>
                                             </Table.Row>
                                         </Table.Header>
                                         <Table.Body>
-                                            <DomainContacts
-                                                contacts={domain.tech_contacts}
-                                                type="tech"
-                                            />
-                                            <DomainContacts
-                                                contacts={domain.admin_contacts}
-                                                type="admin"
+                                            <DomainRegistrant
+                                                contact={domain.registrant}
                                             />
                                         </Table.Body>
                                     </Table>
                                 </div>
-                                <h5>
-                                    <FormattedMessage id="domains.domain.nameservers.title" />
-                                </h5>
-                                {domain.nameservers.length ? (
-                                    <div className="table-wrap">
-                                        <Table basic="very" compact size="small" unstackable>
-                                            <Table.Header>
-                                                <Table.Row>
-                                                    <Table.HeaderCell>
-                                                        <FormattedMessage
-                                                            id="domains.domain.nameservers.hostname"
-                                                            tagName="strong"
-                                                        />
-                                                    </Table.HeaderCell>
-                                                    <Table.HeaderCell>
-                                                        <strong>IPv4</strong>
-                                                    </Table.HeaderCell>
-                                                    <Table.HeaderCell>
-                                                        <strong>IPv6</strong>
-                                                    </Table.HeaderCell>
-                                                </Table.Row>
-                                            </Table.Header>
-                                            <Table.Body>
-                                                <DomainNameservers
-                                                    nameservers={domain.nameservers}
-                                                />
-                                            </Table.Body>
-                                        </Table>
-                                    </div>
-                                ) : (
-                                    <FormattedMessage id="domain.nameservers.text" tagName="p" />
-                                )}
                             </div>
-                        </Transition> */}
+                        </Transition>
                         <div className="data">
                             {domain.valid_to && (
                                 <FormattedMessage
@@ -208,9 +159,9 @@ const DomainGridItem = ({ domain, lang }) => {
                             )}
                         </div>
                     </div>
-                    {/* <button className="toggle" onClick={handleExtra} type="button">
+                    <button className="toggle" onClick={handleExtra} type="button">
                         <Icon name={isOpen ? 'caret up' : 'caret down'} />
-                    </button> */}
+                    </button>
                 </div>
             </article>
         );
@@ -218,40 +169,10 @@ const DomainGridItem = ({ domain, lang }) => {
     return null;
 };
 
-/* const DomainNameservers = ({ nameservers }) => {
-    return nameservers.map((item) => (
-        <Table.Row key={item.ipv4}>
-            <Table.Cell width="5">{item.hostname}</Table.Cell>
-            <Table.Cell>{item.ipv4}</Table.Cell>
-            <Table.Cell>{item.ipv6 ? item.ipv6 : '–'}</Table.Cell>
-        </Table.Row>
-    ));
-}; */
+const DomainRegistrant = ({ contact }) => {
+    <Table.Row key={contact.id}>
+    <Table.Cell>{contact.name}</Table.Cell>
+</Table.Row>
 
-/* const DomainContacts = ({ contacts, type }) =>
-    contacts.map((item) => (
-        <Table.Row key={item.id}>
-            <Table.Cell width="3">
-                {type === 'admin' && (
-                    <FormattedMessage
-                        defaultMessage="Admin"
-                        id="domains.domain.contacts.admin"
-                        tagName="strong"
-                    />
-                )}
-                {type === 'tech' && (
-                    <FormattedMessage
-                        defaultMessage="Tehniline"
-                        id="domains.domain.contacts.tech"
-                        tagName="strong"
-                    />
-                )}
-            </Table.Cell>
-            <Table.Cell>{item.name}</Table.Cell>
-            <Table.Cell>
-                {item.email && <a href={`mailto:${item.email}`}>{item.email}</a>}
-            </Table.Cell>
-        </Table.Row>
-    )); */
-
+}
 export default DomainGridItem;
