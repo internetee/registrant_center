@@ -9,9 +9,9 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
     const isCompany = contactsList.find(({ ident }) => ident.type === 'org');
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
-        (acc, { disclosed_attributes }) => ({
-            checkedCount: acc.checkedCount + disclosed_attributes.size,
-            isCheckedAll: acc.isCheckedAll + disclosed_attributes.size === acc.totalCount + 2,
+        (acc, { ident, disclosed_attributes }) => ({
+            checkedCount: acc.checkedCount + (ident.type == 'org' ? 2 : disclosed_attributes.size),
+            isCheckedAll: acc.checkedCount + (ident.type == 'org' ? 2 : disclosed_attributes.size) === acc.totalCount + 2,
             totalCount: acc.totalCount + 2,
         }),
         {
