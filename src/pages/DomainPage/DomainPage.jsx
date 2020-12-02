@@ -61,10 +61,8 @@ const DomainPage = ({
 
     useEffect(() => {
         (async () => {
-            if ((!domain || !domain?.contacts) && !isLoading) {
-                console.log('should fetch domain');
+            if ((!domain || typeof domain?.tech_contacts == 'undefined') && !isLoading) {
                 await fetchDomain(match.params.id);
-                console.log("should be fetched");
             }
         })();
     }, [domain, fetchDomain, isLoading, match]);
@@ -83,7 +81,7 @@ const DomainPage = ({
     }, [companies, domain, fetchCompanies, registrantContacts]);
 
     useEffect(() => {
-        if (domain && domain.contacts) {
+        if (domain && domain.admin_contacts) {
             const userContact = Helpers.getUserContacts(user, domain, contacts);
             if (Object.keys(userContact).length) {
                 setUserContacts(userContact);

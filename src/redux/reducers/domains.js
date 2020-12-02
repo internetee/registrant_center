@@ -96,7 +96,6 @@ const requestDomains = () => ({
 });
 
 const receiveDomains = (payload, simplify = false) => {
-    console.log('aaa ' + simplify)
     request = {
         data: {
             count: 0,
@@ -106,7 +105,7 @@ const receiveDomains = (payload, simplify = false) => {
     };
     return {
         payload,
-        simplify : simplify,
+        simplify,
         type: FETCH_DOMAINS_SUCCESS,
     };
 };
@@ -235,7 +234,6 @@ export default function reducer(state = initialState, { payload, type, simplify 
             };
 
         case FETCH_DOMAIN_SUCCESS:
-            console.log("TRIGGER")
             return {
                 data: { ...state.data, [payload.id]: payload },
                 ids: state.ids.includes(payload.id) ? state.ids : [...state.ids, payload.id],

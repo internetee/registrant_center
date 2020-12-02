@@ -104,9 +104,7 @@ const DomainGridItem = ({ domain, lang }) => {
                                             </Table.Row>
                                         </Table.Header>
                                         <Table.Body>
-                                            <DomainRegistrant
-                                                contact={domain.registrant}
-                                            />
+                                            <DomainRegistrant contact={domain.registrant} />
                                         </Table.Body>
                                     </Table>
                                 </div>
@@ -169,10 +167,10 @@ const DomainGridItem = ({ domain, lang }) => {
     return null;
 };
 
-const DomainRegistrant = ({ contact }) => {
+const DomainRegistrant = ({ contact }) => (
     <Table.Row key={contact.id}>
-    <Table.Cell>{contact.name}</Table.Cell>
-</Table.Row>
+        <Table.Cell>{contact.name}</Table.Cell>
+    </Table.Row>
+);
 
-}
 export default DomainGridItem;
