@@ -8,8 +8,7 @@ import * as contactsActions from '../../redux/reducers/contacts';
 import Helpers from '../../utils/helpers';
 
 function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }) {
-    // const changedDomains = Helpers.getChangedUserContactsByDomain(domains.domains, contacts) || [];
-    const changedDomains = [];
+    const changedDomains = Helpers.getChangedUserContactsByDomain(domains.domains, contacts);
     const { uiElemSize } = ui;
 
     return (
@@ -34,7 +33,7 @@ function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }
                                 <List.Content>
                                     <List.Header
                                         as="a"
-                                        href={`/domain/${encodeURIComponent(item.name)}`}
+                                        href={`/domain/${encodeURIComponent(item.id)}`}
                                         target="_blank"
                                     >
                                         {item.name}

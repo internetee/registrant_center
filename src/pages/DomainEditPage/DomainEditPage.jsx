@@ -40,7 +40,7 @@ const DomainEditPage = ({
 
     useEffect(() => {
         (async () => {
-            if ((!domain || domain?.shouldFetchContacts) && !isLoading) {
+            if ((!domain || !domain?.tech_contacts) && !isLoading) {
                 await fetchDomain(match.params.id);
             }
         })();

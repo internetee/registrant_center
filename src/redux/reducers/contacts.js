@@ -80,7 +80,7 @@ const fetchContacts = (uuid, offset = request.offset) => (dispatch) => {
     if (uuid) {
         dispatch(requestContact());
         return api
-            .fetchContacts(uuid, offset)
+            .fetchContacts(uuid, offset, true)
             .then((res) => res.data)
             .then(async (data) => {
                 return dispatch(receiveContact(data));

@@ -86,9 +86,13 @@ export default {
         return instance.get(`/api/companies?offset=${offset}`);
     },
 
-    fetchContacts: (uuid = false, offset = false) => {
+    fetchContacts: (uuid = false, offset = false, linked = false) => {
         if (uuid) {
-            return instance.get(`/api/contacts/${uuid}`);
+            if(linked) {
+                return instance.get(`/api/contacts/${uuid}?links=true`);
+            } else {
+                return instance.get(`/api/contacts/${uuid}`);
+            }
         }
         return instance.get(`/api/contacts?offset=${offset}`);
     },
