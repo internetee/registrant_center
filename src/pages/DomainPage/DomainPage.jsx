@@ -61,7 +61,7 @@ const DomainPage = ({
 
     useEffect(() => {
         (async () => {
-            if ((!domain?.tech_contacts) && !isLoading) {
+            if (!domain?.tech_contacts && !isLoading) {
                 await fetchDomain(match.params.id);
             }
         })();

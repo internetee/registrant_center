@@ -88,11 +88,10 @@ export default {
 
     fetchContacts: (uuid = false, offset = false, linked = false) => {
         if (uuid) {
-            if(linked) {
+            if (linked) {
                 return instance.get(`/api/contacts/${uuid}?links=true`);
-            } else {
-                return instance.get(`/api/contacts/${uuid}`);
             }
+            return instance.get(`/api/contacts/${uuid}`);
         }
         return instance.get(`/api/contacts?offset=${offset}`);
     },
