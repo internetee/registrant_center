@@ -163,7 +163,6 @@ const fetchRawDomainList = async () => {
             offset += 200;
         }
     }
-    console.log(domains)
     return domains;
 };
 
