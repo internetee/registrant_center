@@ -142,6 +142,31 @@ const failDomainUnlock = (payload) => ({
     type: UNLOCK_DOMAIN_FAILURE,
 });
 
+const fetchRawDomainList = async () => {
+    let offset = 0;
+    let domains = [];
+    let count = 0;
+
+    let res = await api.fetchDomains(null, offset, false)
+    domains = domains.concat(res.data.domains);
+    count = res.data.count;
+    if (domains.length !== count) {
+        offset += 200;
+    } else {
+        return domains;
+    };
+
+    while(domains.length != count) {
+        let res = api.fetchDomains(null, offset, false)
+        domains = domains.concat(res.data.domains);
+        if (domains.length !== count) {
+            offset += 200;
+        }
+    }
+
+    return domains;
+}
+
 const fetchDomain = (uuid) => (dispatch) => {
     dispatch(requestDomain());
     return api
@@ -334,4 +359,4 @@ export default function reducer(state = initialState, { payload, type, simplify 
     }
 }
 
-export { initialState, fetchDomain, fetchDomains, lockDomain, parseDomain, unlockDomain };
+export { initialState, fetchDomain, fetchDomains, lockDomain, parseDomain, unlockDomain, fetchRawDomainList };

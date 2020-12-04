@@ -97,7 +97,19 @@ const DomainGridItem = ({ domain, lang }) => {
                                             <Table.Row>
                                                 <Table.HeaderCell>
                                                     <FormattedMessage
-                                                        id="domains.domain.contacts.name"
+                                                        id="domain.registrant.name"
+                                                        tagName="strong"
+                                                    />
+                                                </Table.HeaderCell>
+                                                <Table.HeaderCell>
+                                                    <FormattedMessage
+                                                        id="domain.registrant.email"
+                                                        tagName="strong"
+                                                    />
+                                                </Table.HeaderCell>
+                                                <Table.HeaderCell>
+                                                    <FormattedMessage
+                                                        id="domain.registrant.phone"
                                                         tagName="strong"
                                                     />
                                                 </Table.HeaderCell>
@@ -170,6 +182,8 @@ const DomainGridItem = ({ domain, lang }) => {
 const DomainRegistrant = ({ contact }) => (
     <Table.Row key={contact.id}>
         <Table.Cell>{contact.name}</Table.Cell>
+        <Table.Cell>{contact.email}</Table.Cell>
+        <Table.Cell>{contact.phone}</Table.Cell>
     </Table.Row>
 );
 
