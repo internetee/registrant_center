@@ -55,7 +55,7 @@ const DomainPage = ({
     const [isDomainLockModalOpen, setIsDomainLockModalOpen] = useState(false);
     const [userContacts, setUserContacts] = useState({});
     const [message, setMessage] = useState(null);
-    const [isCompany, setIsCompany] = useState(null);
+    // const [isCompany, ] = useState(null);
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
@@ -70,7 +70,7 @@ const DomainPage = ({
     useEffect(() => {
         if (registrantContacts?.ident?.type === 'org') {
             if (companies.isLoading === null) {
-                setIsCompany(true);
+                // setIsCompany(true);
                 (async () => {
                     await fetchCompanies();
                 })();
@@ -482,20 +482,20 @@ const DomainPage = ({
                             </h2>
                             <FormattedMessage id="domain.whoisPrivacy.text" tagName="p" />
                         </header>
-                            <Form onSubmit={toggleSubmitConfirmModal}>
-                                <WhoIsEdit contacts={userContacts} onChange={handleWhoIsChange} />
-                                <div className="form-actions">
-                                    <Button
-                                        disabled={!isDirty}
-                                        loading={isSaving}
-                                        primary
-                                        size={uiElemSize}
-                                        type="submit"
-                                    >
-                                        <FormattedMessage id="actions.save" tagName="span" />
-                                    </Button>
-                                </div>
-                            </Form>
+                        <Form onSubmit={toggleSubmitConfirmModal}>
+                            <WhoIsEdit contacts={userContacts} onChange={handleWhoIsChange} />
+                            <div className="form-actions">
+                                <Button
+                                    disabled={!isDirty}
+                                    loading={isSaving}
+                                    primary
+                                    size={uiElemSize}
+                                    type="submit"
+                                >
+                                    <FormattedMessage id="actions.save" tagName="span" />
+                                </Button>
+                            </div>
+                        </Form>
                     </Container>
                 </div>
             </div>

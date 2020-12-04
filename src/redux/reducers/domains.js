@@ -147,25 +147,25 @@ const fetchRawDomainList = async () => {
     let domains = [];
     let count = 0;
 
-    let res = await api.fetchDomains(null, offset, false)
+    let res = await api.fetchDomains(null, offset, false);
     domains = domains.concat(res.data.domains);
     count = res.data.count;
     if (domains.length !== count) {
         offset += 200;
     } else {
         return domains;
-    };
+    }
 
-    while(domains.length != count) {
-        let res = api.fetchDomains(null, offset, false)
+    while (domains.length !== count) {
+        res = api.fetchDomains(null, offset, false);
         domains = domains.concat(res.data.domains);
         if (domains.length !== count) {
             offset += 200;
         }
     }
-
+    console.log(domains)
     return domains;
-}
+};
 
 const fetchDomain = (uuid) => (dispatch) => {
     dispatch(requestDomain());
@@ -359,4 +359,12 @@ export default function reducer(state = initialState, { payload, type, simplify 
     }
 }
 
-export { initialState, fetchDomain, fetchDomains, lockDomain, parseDomain, unlockDomain, fetchRawDomainList };
+export {
+    initialState,
+    fetchDomain,
+    fetchDomains,
+    lockDomain,
+    parseDomain,
+    unlockDomain,
+    fetchRawDomainList,
+};

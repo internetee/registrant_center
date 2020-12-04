@@ -26,12 +26,11 @@ const UserData = ({ domains }) => {
     const [userCSV, setUserCSV] = useState(null);
     const { formatMessage } = useIntl();
 
-
     const savePDF = async () => {
         setIsLoadingPDF(true);
-        domains = await fetchRawDomainList();
+        const domainList = await fetchRawDomainList();
         const paginatedDomains = [];
-        const copied = [...domains];
+        const copied = [...domainList];
         const numOfChild = Math.ceil(copied.length / 500);
         for (let i = 0; i < numOfChild; i += 1) {
             paginatedDomains.push(copied.splice(0, 500));
@@ -382,8 +381,8 @@ const UserData = ({ domains }) => {
 
     const handleCsvData = async () => {
         setIsLoadingCSV(true);
-        domains = await fetchRawDomainList();
-        const csv = domains.map((item) => {
+        const domainList = await fetchRawDomainList();
+        const csv = domainList.map((item) => {
             return {
                 [formatMessage({ id: 'domain.name' })]: item.name ? item.name : '',
                 [formatMessage({ id: 'domain.transfer_code' })]: item.transfer_code
