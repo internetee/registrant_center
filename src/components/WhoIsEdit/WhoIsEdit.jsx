@@ -10,8 +10,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { ident, disclosed_attributes }) => ({
-            checkedCount: acc.checkedCount + (ident.type == 'org' ? 2 : disclosed_attributes.size),
-            isCheckedAll: acc.checkedCount + (ident.type == 'org' ? 2 : disclosed_attributes.size) === acc.totalCount + 2,
+            checkedCount: acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size),
+            isCheckedAll:
+                acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size) ===
+                acc.totalCount + 2,
             totalCount: acc.totalCount + 2,
         }),
         {
