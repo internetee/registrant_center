@@ -9,9 +9,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
     const isCompany = contactsList.find(({ ident }) => ident.type === 'org') != null;
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
-        (acc, { disclosed_attributes }) => ({
-            checkedCount: acc.checkedCount + disclosed_attributes.size,
-            isCheckedAll: acc.isCheckedAll + disclosed_attributes.size === acc.totalCount + 2,
+        (acc, { ident, disclosed_attributes }) => ({
+            checkedCount: acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size),
+            isCheckedAll:
+                acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size) ===
+                acc.totalCount + 2,
             totalCount: acc.totalCount + 2,
         }),
         {
@@ -117,7 +119,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         </label>
                         <Form.Field>
                             <Checkbox
-                                checked={item.disclosed_attributes.has('name')}
+                                checked={
+                                    item.ident.type === 'org' ||
+                                    item.disclosed_attributes.has('name')
+                                }
                                 disabled={item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
@@ -137,7 +142,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         </Form.Field>
                         <Form.Field>
                             <Checkbox
-                                checked={item.disclosed_attributes.has('email')}
+                                checked={
+                                    item.ident.type === 'org' ||
+                                    item.disclosed_attributes.has('email')
+                                }
                                 disabled={item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
