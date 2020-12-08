@@ -5,6 +5,7 @@ import user from './user';
 import domains from './domains';
 import companies from './companies';
 import contacts from './contacts';
+import verification from './verification';
 
 export default withReduxStateSync(
     combineReducers({
@@ -13,5 +14,6 @@ export default withReduxStateSync(
         domains,
         ui,
         user,
+        verification,
     })
 );
