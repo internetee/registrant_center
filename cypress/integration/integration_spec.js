@@ -22,17 +22,17 @@ describe('Integration tests', () => {
         cy.route('GET', '**/api/contacts?*', 'fx:contacts').as('getContacts');
         cy.route(
             'GET',
-            '**/api/contacts/cfbfbb76-aed8-497a-91c1-48d82cbc4588',
+            '**/api/contacts/cfbfbb76-aed8-497a-91c1-48d82cbc4588?links=true',
             'fx:contact-registrant'
         ).as('getRegistrant');
         cy.route(
             'GET',
-            '**/api/contacts/528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7',
+            '**/api/contacts/528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7?links=true',
             'fx:contact-admin'
         ).as('getAdmin');
         cy.route(
             'GET',
-            '**/api/contacts/700829af-4bdd-4c5f-8389-f6568e2ba4ad',
+            '**/api/contacts/700829af-4bdd-4c5f-8389-f6568e2ba4ad?links=true',
             'fx:contact-tech'
         ).as('getTech');
         cy.route('PATCH', '**/api/contacts/*', 'fx:contacts').as('setContacts');

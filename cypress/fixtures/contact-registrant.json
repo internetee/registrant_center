@@ -24,5 +24,21 @@
     ],
     "disclosed_attributes": [
         "email"
+    ],
+    "links": [
+        {
+            "name": "domain.ee",
+            "id": "bd695cc9-1da8-4c39-b7ac-9a2055e0a93e",
+            "roles": [
+                "registrant"
+            ]
+        },
+        {
+            "name": "lockeddomain.ee",
+            "id": "2198affc-7479-499d-9eae-b0611ec2fb49",
+            "roles": [
+                "registrant"
+            ]
+        }
     ]
 }
