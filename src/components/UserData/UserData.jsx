@@ -7,6 +7,7 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { connect } from 'react-redux';
 import vfs from '../../utils/vfs_fonts';
+import { fetchRawDomainList } from '../../redux/reducers/domains';
 
 pdfMake.vfs = vfs;
 pdfMake.fonts = {
@@ -27,8 +28,9 @@ const UserData = ({ domains }) => {
 
     const savePDF = async () => {
         setIsLoadingPDF(true);
+        const domainList = await fetchRawDomainList();
         const paginatedDomains = [];
-        const copied = [...domains];
+        const copied = [...domainList];
         const numOfChild = Math.ceil(copied.length / 500);
         for (let i = 0; i < numOfChild; i += 1) {
             paginatedDomains.push(copied.splice(0, 500));
@@ -379,7 +381,8 @@ const UserData = ({ domains }) => {
 
     const handleCsvData = async () => {
         setIsLoadingCSV(true);
-        const csv = domains.map((item) => {
+        const domainList = await fetchRawDomainList();
+        const csv = domainList.map((item) => {
             return {
                 [formatMessage({ id: 'domain.name' })]: item.name ? item.name : '',
                 [formatMessage({ id: 'domain.transfer_code' })]: item.transfer_code
@@ -511,8 +514,10 @@ const UserData = ({ domains }) => {
     );
 };
 
-const mapStateToProps = ({ domains }) => ({
-    domains: domains.ids.map((id) => domains.data[id]),
-});
+const mapStateToProps = ({ domains }) => {
+    return {
+        domains: Object.values(domains.data.domains),
+    };
+};
 
 export default connect(mapStateToProps)(UserData);

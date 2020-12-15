@@ -1,35 +1,55 @@
 export default {
     getChangedUserContactsByDomain: (domains = {}, contacts = {}) => {
-        return Object.values(domains).reduce((acc, domain) => {
-            const changedDomain = {
-                id: domain.id,
-                name: domain.name,
-                roles: new Set(),
-            };
-            if (contacts[domain.registrant.id]) {
-                changedDomain.roles.add('registrant');
+        try {
+            const contactsObj = Object.values(contacts);
+            if (contactsObj.length && contactsObj[0].links.length) {
+                const arr = [];
+                contactsObj.forEach((c) => {
+                    c.links.forEach((d) => {
+                        arr.push({
+                            id: d.id,
+                            name: d.name,
+                            roles: d.roles,
+                        });
+                    });
+                });
+
+                return arr;
             }
-            domain.tech_contacts.forEach(({ id }) => {
-                if (contacts[id]) {
-                    changedDomain.roles.add('tech');
+            return Object.values(domains).reduce((acc, domain) => {
+                const changedDomain = {
+                    id: domain.id,
+                    name: domain.name,
+                    roles: new Set(),
+                };
+                if (contacts[domain.registrant.id]) {
+                    changedDomain.roles.add('registrant');
                 }
-            });
-            domain.admin_contacts.forEach(({ id }) => {
-                if (contacts[id]) {
-                    changedDomain.roles.add('admin');
+                domain.tech_contacts.forEach(({ id }) => {
+                    if (contacts[id]) {
+                        changedDomain.roles.add('tech');
+                    }
+                });
+                domain.admin_contacts.forEach(({ id }) => {
+                    if (contacts[id]) {
+                        changedDomain.roles.add('admin');
+                    }
+                });
+                if (changedDomain.roles.size > 0) {
+                    return [
+                        ...acc,
+                        {
+                            ...changedDomain,
+                            roles: [...changedDomain.roles],
+                        },
+                    ];
                 }
-            });
-            if (changedDomain.roles.size > 0) {
-                return [
-                    ...acc,
-                    {
-                        ...changedDomain,
-                        roles: [...changedDomain.roles],
-                    },
-                ];
-            }
-            return acc;
-        }, []);
+                return acc;
+            }, []);
+        } catch (e) {
+            console.log(e);
+            return [];
+        }
     },
     getDomainContacts: (domain = {}, contacts = {}) => {
         return Object.values(contacts).reduce((acc, item) => {

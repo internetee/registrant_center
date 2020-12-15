@@ -67,7 +67,7 @@ const WhoIsPage = ({
 
     useEffect(() => {
         (async () => {
-            await fetchDomains();
+            await fetchDomains(0, false);
             await fetchContacts();
             await fetchCompanies();
             setIsLoading(false);
@@ -166,7 +166,7 @@ const WhoIsPage = ({
         setIsLoading(false);
     };
 
-    if (!domains.length && isLoading) {
+    if ((!domains?.length || domains[0]?.tech_contacts?.length) && isLoading) {
         return <Loading />;
     }
 
@@ -174,7 +174,7 @@ const WhoIsPage = ({
         <MainLayout hasBackButton titleKey="whois.title">
             {!isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">
-                {domains.length ? (
+                {domains?.length ? (
                     <>
                         <div className="page--header">
                             <Container>
@@ -385,7 +385,7 @@ const mapStateToProps = (state) => {
     return {
         companies: state.companies.data,
         contacts: state.contacts.data,
-        domains: state.domains.ids.map((id) => state.domains.data[id]),
+        domains: state.domains.ids.map((id) => state.domains.data.domains[id]),
         ui: state.ui,
         user: state.user.data,
     };

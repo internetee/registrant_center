@@ -19,25 +19,40 @@ import { fetchContacts } from './contacts';
 import domainStatuses from '../../utils/domainStatuses.json';
 
 let request = {
-    data: [],
+    data: {
+        count: 0,
+        domains: [],
+    },
     offset: 0,
 };
 
-const parseDomain = (domain, shouldFetchContacts = false) => {
+const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
     const { admin_contacts, registrant, tech_contacts } = domain;
     const statuses = domain.statuses.sort(
         (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
     );
-    const contacts = [
-        ...(admin_contacts && admin_contacts.map((item) => ({ ...item, roles: ['admin'] }))),
-        ...(tech_contacts && tech_contacts.map((item) => ({ ...item, roles: ['tech'] }))),
-        ...(registrant && [
-            {
-                ...registrant,
-                roles: ['registrant'],
-            },
-        ]),
-    ].flat();
+
+    const contacts = (simplify
+        ? [
+              ...(registrant && [
+                  {
+                      ...registrant,
+                      roles: ['registrant'],
+                  },
+              ]),
+          ]
+        : [
+              ...(admin_contacts && admin_contacts.map((item) => ({ ...item, roles: ['admin'] }))),
+              ...(tech_contacts && tech_contacts.map((item) => ({ ...item, roles: ['tech'] }))),
+              ...(registrant && [
+                  {
+                      ...registrant,
+                      roles: ['registrant'],
+                  },
+              ]),
+          ]
+    ).flat();
+
     return {
         ...domain,
         contacts: contacts.reduce(
@@ -80,13 +95,17 @@ const requestDomains = () => ({
     type: FETCH_DOMAINS_REQUEST,
 });
 
-const receiveDomains = (payload) => {
+const receiveDomains = (payload, simplify = false) => {
     request = {
-        data: [],
+        data: {
+            count: 0,
+            domains: [],
+        },
         offset: 0,
     };
     return {
         payload,
+        simplify,
         type: FETCH_DOMAINS_SUCCESS,
     };
 };
@@ -123,6 +142,30 @@ const failDomainUnlock = (payload) => ({
     type: UNLOCK_DOMAIN_FAILURE,
 });
 
+const fetchRawDomainList = async () => {
+    let offset = 0;
+    let domains = [];
+    let count = 0;
+
+    let res = await api.fetchDomains(null, offset, false);
+    domains = domains.concat(res.data.domains);
+    count = res.data.count;
+    if (domains.length !== count) {
+        offset += 200;
+    } else {
+        return domains;
+    }
+
+    while (domains.length !== count) {
+        res = api.fetchDomains(null, offset, false);
+        domains = domains.concat(res.data.domains);
+        if (domains.length !== count) {
+            offset += 200;
+        }
+    }
+    return domains;
+};
+
 const fetchDomain = (uuid) => (dispatch) => {
     dispatch(requestDomain());
     return api
@@ -140,18 +183,19 @@ const fetchDomain = (uuid) => (dispatch) => {
         });
 };
 
-const fetchDomains = (offset = request.offset) => (dispatch) => {
+const fetchDomains = (offset = request.offset, simplify = false) => (dispatch) => {
     dispatch(requestDomains());
     return api
-        .fetchDomains(null, offset)
+        .fetchDomains(null, offset, simplify)
         .then((res) => res.data)
         .then((data) => {
-            request.data = request.data.concat(data);
-            if (data.length === 200) {
+            request.data.domains = request.data.domains.concat(data.domains);
+            request.data.count = data.count;
+            if (request.data.domains.length !== data.count) {
                 request.offset += 200;
-                return dispatch(fetchDomains(null, request.offset));
+                return dispatch(fetchDomains(request.offset, simplify));
             }
-            return dispatch(receiveDomains(request.data));
+            return dispatch(receiveDomains(request.data, simplify));
         })
         .catch(() => {
             dispatch(failDomains());
@@ -193,13 +237,16 @@ const unlockDomain = (uuid) => (dispatch) => {
 };
 
 const initialState = {
-    data: {},
+    data: {
+        count: 0,
+        domains: [],
+    },
     ids: [],
     isLoading: false,
     message: null,
 };
 
-export default function reducer(state = initialState, { payload, type }) {
+export default function reducer(state = initialState, { payload, type, simplify = false }) {
     switch (type) {
         case LOGOUT_USER:
             return initialState;
@@ -212,7 +259,6 @@ export default function reducer(state = initialState, { payload, type }) {
 
         case FETCH_DOMAIN_SUCCESS:
             return {
-                ...state,
                 data: { ...state.data, [payload.id]: payload },
                 ids: state.ids.includes(payload.id) ? state.ids : [...state.ids, payload.id],
                 isLoading: false,
@@ -233,14 +279,17 @@ export default function reducer(state = initialState, { payload, type }) {
         case FETCH_DOMAINS_SUCCESS:
             return {
                 ...state,
-                data: payload.reduce(
-                    (acc, item) => ({
-                        ...acc,
-                        [item.id]: parseDomain(item, true),
-                    }),
-                    {}
-                ),
-                ids: payload.map((item) => item.id),
+                data: {
+                    count: payload.count,
+                    domains: payload.domains.reduce(
+                        (acc, item) => ({
+                            ...acc,
+                            [item.id]: parseDomain(item, true, simplify),
+                        }),
+                        {}
+                    ),
+                },
+                ids: payload.domains.map((item) => item.id),
                 isLoading: false,
             };
 
@@ -309,4 +358,12 @@ export default function reducer(state = initialState, { payload, type }) {
     }
 }
 
-export { initialState, fetchDomain, fetchDomains, lockDomain, parseDomain, unlockDomain };
+export {
+    initialState,
+    fetchDomain,
+    fetchDomains,
+    lockDomain,
+    parseDomain,
+    unlockDomain,
+    fetchRawDomainList,
+};

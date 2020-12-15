@@ -80,7 +80,18 @@ export default {
 
     getContacts: async ({ query, params, session }, res) => {
         const { uuid } = params;
-        const { offset } = query;
+        const { offset, links } = query;
+        if (links === 'true') {
+            return handleResponse(
+                () =>
+                    API(session, res).get(
+                        `/api/v1/registrant/contacts${
+                            uuid ? `/${uuid}?links=true` : `?offset=${offset}`
+                        }`
+                    ),
+                res
+            );
+        }
         return handleResponse(
             () =>
                 API(session, res).get(
@@ -98,7 +109,18 @@ export default {
 
     getDomains: async ({ query, params, session }, res) => {
         const { uuid } = params;
-        const { offset } = query;
+        const { offset, simple } = query;
+        if (simple === 'true') {
+            return handleResponse(
+                () =>
+                    API(session, res).get(
+                        `/api/v1/registrant/domains${
+                            uuid ? `/${uuid}` : `?offset=${offset}&simple=true`
+                        }`
+                    ),
+                res
+            );
+        }
         return handleResponse(
             () =>
                 API(session, res).get(
@@ -201,7 +223,6 @@ export default {
             );
             return res.status(response.status).json(response.data);
         } catch (e) {
-            console.log(e);
             if (e.response) {
                 return res.status(e.response.status).json({});
             }

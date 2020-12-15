@@ -72,13 +72,14 @@ describe('Domains action creators', () => {
     });
 
     it('dipatches the right actions to fetch domains', () => {
-        axios.get.mockResolvedValueOnce({ data: domains });
+        axios.get.mockResolvedValueOnce({ data: { count: 2, domains } });
         const expectedActions = [
             {
                 type: 'FETCH_DOMAINS_REQUEST',
             },
             {
-                payload: domains,
+                payload: { count: 2, domains },
+                simplify: false,
                 type: 'FETCH_DOMAINS_SUCCESS',
             },
         ];
@@ -274,18 +275,21 @@ describe('Domains reducers', () => {
             reducer(
                 {},
                 {
-                    payload: domains,
+                    payload: { count: 2, domains },
                     type: 'FETCH_DOMAINS_SUCCESS',
                 }
             )
         ).toEqual({
-            data: domains.reduce(
-                (acc, item) => ({
-                    ...acc,
-                    [item.id]: parseDomain(item, true),
-                }),
-                {}
-            ),
+            data: {
+                count: 2,
+                domains: domains.reduce(
+                    (acc, item) => ({
+                        ...acc,
+                        [item.id]: parseDomain(item, true),
+                    }),
+                    {}
+                ),
+            },
             ids: domains.map(({ id }) => id),
             isLoading: false,
         });

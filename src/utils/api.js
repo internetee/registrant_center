@@ -65,7 +65,6 @@ export default {
     },
 
     sendVerificationResponse: (name, token, action, type) => {
-        console.log(`called${name}${token}${action}${type}`);
         return instance.post(`/api/confirms/${name}/${type}/${token}/${action}`, {
             credentials: 'include',
             method: 'POST',
@@ -73,9 +72,12 @@ export default {
         });
     },
 
-    fetchDomains: (uuid = false, offset) => {
+    fetchDomains: (uuid = false, offset, simplify = false) => {
         if (uuid) {
             return instance.get(`/api/domains/${uuid}`);
+        }
+        if (simplify) {
+            return instance.get(`/api/domains?offset=${offset}&simple=true`);
         }
         return instance.get(`/api/domains?offset=${offset}`);
     },
@@ -84,8 +86,11 @@ export default {
         return instance.get(`/api/companies?offset=${offset}`);
     },
 
-    fetchContacts: (uuid = false, offset) => {
+    fetchContacts: (uuid = false, offset = false, linked = false) => {
         if (uuid) {
+            if (linked) {
+                return instance.get(`/api/contacts/${uuid}?links=true`);
+            }
             return instance.get(`/api/contacts/${uuid}`);
         }
         return instance.get(`/api/contacts?offset=${offset}`);
