@@ -47,7 +47,7 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
 
     useEffect(() => {
         (async () => {
-            if(!name && !isLoggedOut) {
+            if (!name && !isLoggedOut) {
                 fetchUser();
             }
         })();
@@ -92,7 +92,9 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
                     ) : (
                         <Suspense fallback={<Loading />}>
                             <Switch location={location}>
-                                {name && location.pathname === '/login' ? < Redirect to='/'/> : null }
+                                {name && location.pathname === '/login' ? (
+                                    <Redirect to="/" />
+                                ) : null}
                                 <ProtectedRoute component={HomePage} exact path="/" />
                                 <ProtectedRoute component={DomainPage} exact path="/domain/:id" />
                                 <ProtectedRoute
