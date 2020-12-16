@@ -29,7 +29,8 @@ const fetchUser = () => (dispatch) => {
             dispatch(receiveUser(data));
         })
         .catch((error) => {
-            dispatch(invalidateUserRequest(error.response.status));
+            const status = error.response?.status || 501;
+            dispatch(invalidateUserRequest(status));
         });
 };
 

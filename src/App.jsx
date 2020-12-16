@@ -1,5 +1,5 @@
 import React, { lazy, useEffect, useState, Suspense } from 'react';
-import { Switch, Route, useLocation } from 'react-router-dom';
+import { Switch, Route, useLocation, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { IntlProvider, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
@@ -47,10 +47,8 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
 
     useEffect(() => {
         (async () => {
-            if (!name && location.pathname !== '/login' && !isLoggedOut) {
-                setIsLoading(true);
-                await fetchUser();
-                setIsLoading(false);
+            if (!name && !isLoggedOut) {
+                fetchUser();
             }
         })();
     }, [fetchUser, isLoggedOut, location, name]);
@@ -94,6 +92,9 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
                     ) : (
                         <Suspense fallback={<Loading />}>
                             <Switch location={location}>
+                                {name && location.pathname === '/login' ? (
+                                    <Redirect to="/" />
+                                ) : null}
                                 <ProtectedRoute component={HomePage} exact path="/" />
                                 <ProtectedRoute component={DomainPage} exact path="/domain/:id" />
                                 <ProtectedRoute
