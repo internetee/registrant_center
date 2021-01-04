@@ -407,6 +407,17 @@ const DomainPage = ({
                                         )}
                                     </Table.Cell>
                                 </Table.Row>
+                                {domain.transfer_code && (
+                                        <Table.Row>
+                                            <Table.Cell width="4">
+                                                <FormattedMessage
+                                                    id="domain.transfer_code"
+                                                    tagName="strong"
+                                                />
+                                            </Table.Cell>
+                                            <Table.Cell>{domain.transfer_code}</Table.Cell>
+                                        </Table.Row>
+                                    )}
                             </Table.Body>
                         </Table>
                     </Container>
