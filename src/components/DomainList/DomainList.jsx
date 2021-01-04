@@ -81,9 +81,9 @@ const DomainList = ({ domainCount, domains, lang }) => {
                     minDate: domain.valid_to < acc.minDate ? domain.valid_to : acc.minDate,
                     registrants: {
                         ...acc.registrants,
-                        [domain.registrant.id]: {
+                        [domain.registrant.ident]: {
                             text: domain.registrant.name,
-                            value: domain.registrant.id,
+                            value: domain.registrant.ident,
                         },
                     },
                     sortedDomains: [
@@ -278,7 +278,7 @@ const DomainList = ({ domainCount, domains, lang }) => {
                     })
                     .filter((domain) => {
                         if (queryRegistrant.length && queryRegistrant !== 'all') {
-                            return domain.registrant.id.includes(queryRegistrant);
+                            return domain.registrant.ident.includes(queryRegistrant);
                         }
                         return true;
                     })
