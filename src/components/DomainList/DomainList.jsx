@@ -146,7 +146,13 @@ const DomainList = ({ domainCount, domains, lang }) => {
                     (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
                 )
             );
-            setRegistrantsOptions(Object.values(registrants));
+
+            const reg_list = Object.values(registrants);
+            reg_list.some(
+                (i, idx) => i.value == 'all' && reg_list.unshift(reg_list.splice(idx, 1)[0])
+            );
+
+            setRegistrantsOptions(reg_list);
             setFilteredDomains(sortedDomains);
             setDomainsList(sortedDomains);
             setMinValidToDate(new Date(minDate));
