@@ -243,21 +243,7 @@ const DomainList = ({ domainCount, domains, lang }) => {
                     .filter((domain) => {
                         const query = queryKeys.toString().toLowerCase();
                         if (query.length) {
-                            return (
-                                domain.name.toLowerCase().includes(query) ||
-                                domain.tech_contacts.some((item) =>
-                                    item.name.toLowerCase().includes(query)
-                                ) ||
-                                domain.admin_contacts.some((item) =>
-                                    item.name.toLowerCase().includes(query)
-                                ) ||
-                                domain.nameservers.some(
-                                    (item) =>
-                                        item.hostname.toLowerCase().includes(query) ||
-                                        item.ipv4.toString().toLowerCase().includes(query) ||
-                                        item.ipv6.toString().toLowerCase().includes(query)
-                                )
-                            );
+                            return domain.name.toLowerCase().includes(query);
                         }
                         return true;
                     })
