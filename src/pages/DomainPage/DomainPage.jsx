@@ -63,6 +63,9 @@ const DomainPage = ({
         (async () => {
             if (!domain?.tech_contacts && !isLoading) {
                 await fetchDomain(match.params.id);
+                if (companies.isLoading === null) {
+                    fetchCompanies();
+                }
             }
         })();
     }, [domain, fetchDomain, isLoading, match]);
@@ -82,7 +85,7 @@ const DomainPage = ({
 
     useEffect(() => {
         if (domain?.tech_contacts) {
-            const userContact = Helpers.getUserContacts(user, domain, contacts);
+            const userContact = Helpers.getUserContacts(user, domain, contacts, companies);
             if (Object.keys(userContact).length) {
                 setUserContacts(userContact);
                 setIsLockable(
