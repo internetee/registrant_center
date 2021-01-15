@@ -83,10 +83,12 @@ export default {
         }, []);
     },
     getUserContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
+        console.log(contacts);
+        const company_list = companies.data ? companies.data : companies;
         const userContacts = Object.values(contacts).filter(
             (contact) =>
                 (contact.ident.code === user.ident && domain.contacts[contact.id]) ||
-                (contact.ident.type === 'org' && companies[contact.ident.code])
+                (contact.ident.type === 'org' && company_list[contact.ident.code])
         );
         return userContacts.reduce(
             (acc, contact) => ({
@@ -103,11 +105,14 @@ export default {
         );
     },
     parseDomainContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
+        const company_list = companies.data ? companies.data : companies;
+
         return Object.keys(domain.contacts).reduce((acc, key) => {
             const contact = contacts[key];
+            console.log(contact);
             if (
                 (contact && contact.ident.code === user.ident && domain.contacts[key]) ||
-                (contact && contact.ident.type === 'org' && companies[contact.ident.code])
+                (contact && contact.ident.type === 'org' && company_list[contact.ident.code])
             ) {
                 return {
                     ...acc,

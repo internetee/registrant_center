@@ -42,6 +42,9 @@ const DomainEditPage = ({
         (async () => {
             if ((!domain || !domain?.tech_contacts) && !isLoading) {
                 await fetchDomain(match.params.id);
+                if (companies.isLoading === null) {
+                    fetchCompanies();
+                }
             }
         })();
     }, [domain, fetchDomain, isLoading, match]);
@@ -109,6 +112,12 @@ const DomainEditPage = ({
                 if (contact.ident.code === user.ident) {
                     return updateContact(contact.id, {
                         disclosed_attributes: [...contact.disclosed_attributes],
+                        email: contact.email,
+                        phone: contact.phone,
+                    });
+                }
+                if (contact.ident.type === 'org') {
+                    return updateContact(contact.id, {
                         email: contact.email,
                         phone: contact.phone,
                     });
