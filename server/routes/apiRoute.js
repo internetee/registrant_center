@@ -193,11 +193,11 @@ export default {
             const userData = session.user;
             if (userData) {
                 if (!session.token) {
-                    let token = {
-                        "access_token": API_TOKEN,
-                        "expires_at": EXPIRES_AT,
-                        "type": "Bearer"
-                    }
+                    const token = {
+                        access_token: API_TOKEN,
+                        expires_at: EXPIRES_AT,
+                        type: 'Bearer',
+                    };
                     // eslint-disable-next-line no-param-reassign
                     session.token = token;
                 }
