@@ -2,7 +2,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
+const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY, API_TOKEN, EXPIRES_AT } = process.env;
 
 const isSessionValid = (req) => {
     return (
@@ -193,12 +193,13 @@ export default {
             const userData = session.user;
             if (userData) {
                 if (!session.token) {
-                    const response = await API(session).post(
-                        '/api/v1/registrant/auth/eid',
-                        userData
-                    );
+                    let token = {
+                        "access_token": API_TOKEN,
+                        "expires_at": EXPIRES_AT,
+                        "type": "Bearer"
+                    }
                     // eslint-disable-next-line no-param-reassign
-                    session.token = response.data;
+                    session.token = token;
                 }
                 return res.status(200).json(userData);
             }
