@@ -42,6 +42,10 @@ function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }
                             </List.Item>
                         ))}
                     </List>
+
+                    {changedDomains.length > 10 && (
+                        <FormattedMessage id="whois.confirmModal.not_full_list" tagName="p" />
+                    )}
                 </Modal.Content>
             }
             header={

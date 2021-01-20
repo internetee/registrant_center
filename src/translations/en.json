@@ -219,6 +219,7 @@
   "whois.confirm_modal.description.roles": "Role:",
   "whois.confirmModal.description.title": "Your changes also apply to these domains:",
   "whois.confirmModal.title": "Are you sure you want to change your contact information?",
+  "whois.confirmModal.not_full_list": "NB! The list of domains associated with this contact is not full.",
   "whois.content.text": " ",
   "whois.content.title": "WHOIS data",
   "whois.domain": "Domain",
