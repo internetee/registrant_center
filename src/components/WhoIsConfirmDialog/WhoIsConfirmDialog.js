@@ -38,13 +38,6 @@ function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }
                                     >
                                         {item.name}
                                     </List.Header>
-                                    <List.Description>
-                                        <FormattedMessage
-                                            id="whois.confirm_modal.description.roles"
-                                            tagName="strong"
-                                        />
-                                        <Roles roles={item.roles} />
-                                    </List.Description>
                                 </List.Content>
                             </List.Item>
                         ))}

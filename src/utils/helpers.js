@@ -9,7 +9,7 @@ export default {
                         arr.push({
                             id: d.id,
                             name: d.name,
-                            roles: d.roles,
+                            roles: [],
                         });
                     });
                 });
