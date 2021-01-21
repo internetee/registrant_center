@@ -219,6 +219,7 @@
   "whois.confirm_modal.description.roles": "Roll:",
   "whois.confirmModal.description.title": "Teie muudatused kajastuvad järgmiste domeenide puhul:",
   "whois.confirmModal.title": "Kas oled kindel, et soovid kontaktandmeid muuta?",
+  "whois.confirmModal.not_full_list": "NB! Kontaktiga seotud domeenide nimekiri ei ole lõplik.",
   "whois.content.text": " ",
   "whois.content.title": "WHOIS andmed",
   "whois.domain": "Domeen",
