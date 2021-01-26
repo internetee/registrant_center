@@ -29,7 +29,7 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
             htmlTitleKey="dashboard.htmlTitle"
             titleKey="dashboard.title"
             titleValues={{
-                name: `${user.first_name} ${user.last_name}`,
+                name: `${user.first_name} ${user.last_name} (${user.ident})`,
                 span: (text) => <span>{text}</span>,
             }}
             ui={ui}
