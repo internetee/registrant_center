@@ -68,8 +68,8 @@ describe('server/routes/callbackPageRoute', () => {
     });
 });
 
-describe('Devide ident for the country code and isikukood', () => {
-    it('Check ident person', () => {
+describe('Check removing country code from ident', () => {
+    it('Check if person has Estonian ident', () => {
         let ident = get_user_ident('EE38903110313');
         expect(ident).toBe('38903110313');
     });
@@ -80,7 +80,7 @@ describe('Devide ident for the country code and isikukood', () => {
     })
 });
 
-describe('Check country code of ident', () => {
+describe('Check country code from ident', () => {
     it('Check country code of Estonian ident', () => {
         let country_code = get_user_country_code('EE38903110313');
         expect(country_code).toBe('EE');
