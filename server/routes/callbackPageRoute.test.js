@@ -3,7 +3,7 @@
  */
 
 import axios from 'axios';
-import callbackPage from './callbackPageRoute';
+import callbackPage, {get_user_country_code, get_user_ident} from './callbackPageRoute';
 
 const publicKey =
     '-----BEGIN RSA PUBLIC KEY-----\n' +
@@ -67,3 +67,27 @@ describe('server/routes/callbackPageRoute', () => {
         expect(mockReq.session.user).toHaveLength(1);
     });
 });
+
+describe('Devide ident for the country code and isikukood', () => {
+    it('Check ident person', () => {
+        let ident = get_user_ident('EE38903110313');
+        expect(ident).toBe('38903110313');
+    });
+
+    it('Check if person has some foreign ident', () => {
+        let ident = get_user_ident('FRACD43556DB');
+        expect(ident).toBe('ACD43556DB')
+    })
+});
+
+describe('Check country code of ident', () => {
+    it('Check country code of Estonian ident', () => {
+        let country_code = get_user_country_code('EE38903110313');
+        expect(country_code).toBe('EE');
+    });
+    it('Check country code of Foreign ident', () => {
+        let country_code = get_user_country_code('FRACD43556DB');
+        expect(country_code).toBe('FR');
+    })
+    
+})

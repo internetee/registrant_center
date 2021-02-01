@@ -89,12 +89,16 @@ export default async function callbackPageRoute(req, res, publicKey) {
                 }
                 const userData = {
                     first_name: capitalize.words(verifiedJwt.profile_attributes.given_name),
-                    ident: verifiedJwt.sub.replace(/\D/g, ''),
+                    // ident: verifiedJwt.sub.replace(/\D/g, ''),
+                    ident: get_user_ident(verifiedJwt.sub),
+                    country_code: get_user_country_code(verifiedJwt.sub), 
                     last_name: capitalize.words(verifiedJwt.profile_attributes.family_name),
                 };
 
                 console.log('Decrypted JWT from TARA:');
                 console.log(verifiedJwt);
+                console.log('userData:')
+                console.log(userData);
                 req.session.user = userData;
                 if (NODE_ENV === 'development') {
                     res.redirect(`https://${HOST}:3000`);
@@ -111,4 +115,12 @@ export default async function callbackPageRoute(req, res, publicKey) {
             res.redirect('/login');
         }
     }
+}
+
+export const get_user_ident = (ident) => {
+    return ident.substr(2);
+}
+
+export const get_user_country_code = (ident) => {
+    return ident.substr(0, 2);
 }
