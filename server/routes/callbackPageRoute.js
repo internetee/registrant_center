@@ -117,10 +117,6 @@ export default async function callbackPageRoute(req, res, publicKey) {
     }
 }
 
-export const get_user_ident = (ident) => {
-    return ident.substr(2);
-}
+export const get_user_ident = ident => ident.substr(2);
 
-export const get_user_country_code = (ident) => {
-    return ident.substr(0, 2);
-}
+export const get_user_country_code = ident => ident.substr(0, 2);
