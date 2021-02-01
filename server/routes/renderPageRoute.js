@@ -1,7 +1,5 @@
 import { Helmet } from 'react-helmet';
-import getLog from '../utils/logger';
-
-const log = getLog();
+// import getLog from '../utils/logger';
 
 function renderHTML(helmet) {
     return `
