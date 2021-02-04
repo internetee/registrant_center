@@ -11,7 +11,7 @@ import {
     Dropdown,
     Container,
     Pagination,
-    Checkbox
+    Checkbox,
 } from 'semantic-ui-react';
 import Masonry from 'react-masonry-component';
 import Flatpickr from 'react-flatpickr';
@@ -357,7 +357,11 @@ const DomainList = ({ domainCount, domains, lang }) => {
                         </div>
                         <Transition animation="slide down" visible={isAdvSearchOpen}>
                             <div className="form-filter--adv-search">
-                                <span style={{ textAlign: "center", display: "flex", justifyContent: "center", margin: "10px" }}>
+                                <span style={{  display: "flex",
+                                                justifyContent: "center", 
+                                                margin: "10px", 
+                                                textAlign: "center"
+                                            }}>
                                     Domain count: {domainCount} domains out of {domainCount}</span>
                                 <Form.Group>
                                     <Form.Field width="5">
@@ -416,32 +420,12 @@ const DomainList = ({ domainCount, domains, lang }) => {
                                             value={queryStatus}
                                         />
                                     </Form.Field>
-                                    {/* <Form.Field width="4">
-                                        <FormattedMessage id="domains.form.selectRole" tagName="label" />
-                                        <Dropdown 
-                                            fluid
-                                            name="queryRole"
-                                            selection
-                                            onChange={handleChange}>
-                                                <Dropdown.Menu>
-                                                    <Dropdown.Item text="Role 1" />
-                                                    <Dropdown.Item text="Role 2" />
-                                                    <Dropdown.Item text="Role 3" />
-                                                </Dropdown.Menu>
-                                        </Dropdown>
-                                    </Form.Field> */}
                                     <Form.Field width="4">
-                                        <Checkbox label="Admin" defaultChecked /><br />
-                                        <Checkbox label="Tech" /><br />
-                                        <Checkbox label="Registrant" defaultChecked /><br />
+                                        <div><Checkbox label="Admin" defaultChecked /></div>
+                                        <div><Checkbox label="Registrant" defaultChecked /></div>
+                                        <div><Checkbox label="Tech" /></div>
                                     </Form.Field>
                                     <div className="form-actions">
-                                        <Button primary>
-                                            <FormattedMessage
-                                                id="domains.form.csv"
-                                                tagName="span"
-                                            />
-                                        </Button>
                                         <Button primary>
                                             <FormattedMessage
                                                 id="domains.form.filter"

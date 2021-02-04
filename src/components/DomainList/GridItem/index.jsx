@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -7,6 +7,7 @@ import moment from 'moment';
 import 'moment/locale/et';
 import 'moment/locale/ru';
 import domainStatuses from '../../../utils/domainStatuses.json';
+import { fetchDomain as fetchDomainAction } from '../../../redux/reducers/domains';
 
 const DomainGridItem = ({ domain, lang }) => {
     moment.locale(lang);

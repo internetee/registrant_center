@@ -27,7 +27,7 @@ const store = createStore(
 
 render(
     <React.StrictMode>
-        <Provider store={store}>
+        <Provider store={store} s={store.getState()}>
             <CookiesProvider>
                 <BrowserRouter>
                     <App />
