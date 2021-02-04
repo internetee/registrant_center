@@ -72,18 +72,17 @@ export default {
         });
     },
 
-    fetchDomains: (uuid = false, offset, simplify = false, roles = ["registrant", "admin"]) => {
-        let url = '/api/domains/';
-
+    // roles = ["registrant", "admin"]
+    fetchDomains: (uuid = false, offset, simplify = false) => {
         if (uuid) {
             return instance.get(`/api/domains/${uuid}`);
         }
         if (simplify) {
             return instance.get(`/api/domains?offset=${offset}&simple=true`);
         }
-        if (roles) {
-            return instance.get(`/api/domains?offset=${offset}&simple=true&${roles.join(roles)}`);
-        }
+        // if (roles) {
+        //     return instance.get(`/api/domains?offset=${offset}&simple=true&${roles.join(roles)}`);
+        // }
         return instance.get(`/api/domains?offset=${offset}`);
     },
 

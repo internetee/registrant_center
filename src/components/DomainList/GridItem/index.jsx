@@ -7,7 +7,6 @@ import moment from 'moment';
 import 'moment/locale/et';
 import 'moment/locale/ru';
 import domainStatuses from '../../../utils/domainStatuses.json';
-import { fetchDomain as fetchDomainAction } from '../../../redux/reducers/domains';
 
 const DomainGridItem = ({ domain, lang }) => {
     moment.locale(lang);

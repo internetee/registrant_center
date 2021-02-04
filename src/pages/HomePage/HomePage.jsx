@@ -16,12 +16,14 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
 
     useEffect(() => {
         (async () => {
-            await fetchDomains(0, true);
+            await fetchDomains(0, false, true);
             setIsLoading(false);
         })();
     }, [fetchDomains]);
 
     if (isLoading) return <Loading />;
+
+    console.log(domains);
 
     return (
         <MainLayout
