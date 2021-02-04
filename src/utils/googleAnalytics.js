@@ -1,20 +1,19 @@
-import dotenv from 'dotenv';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactGA from 'react-ga';
 import { Route } from 'react-router-dom';
 
-const { REACT_APP_GA_TRACKING_ID } = process.env
+const { REACT_APP_GA_TRACKING_ID } = process.env;
+const { props } = this.props;
 class GoogleAnalytics extends Component {
-    componentDidMount () {
-        this.logPageChange(
-            this.props.location.pathname,
-            this.props.location.search
-        );
+    componentDidMount() {
+        this.logPageChange(props.location.pathname, props.location.search);
     }
 
-    componentDidUpdate ({ location: prevLocation }) {
-        const { location: { pathname, search } } = this.props;
+    componentDidUpdate({ location: prevLocation }) {
+        const {
+            location: { pathname, search },
+        } = this.props;
         const isDifferentPathname = pathname !== prevLocation.pathname;
         const isDifferentSearch = search !== prevLocation.search;
 
@@ -23,18 +22,18 @@ class GoogleAnalytics extends Component {
         }
     }
 
-    logPageChange (pathname, search = '') {
+    logPageChange(pathname, search = '') {
         const page = pathname + search;
-        const { location } = window;
+        const { location } = this.window;
         ReactGA.set({
-            page,
             location: `${location.origin}${page}`,
-            ...this.props.options
+            page,
+            ...props.options,
         });
         ReactGA.pageview(page);
     }
 
-    render () {
+    render() {
         return null;
     }
 }
@@ -42,25 +41,24 @@ class GoogleAnalytics extends Component {
 GoogleAnalytics.propTypes = {
     location: PropTypes.shape({
         pathname: PropTypes.string,
-        search: PropTypes.string
+        search: PropTypes.string,
     }).isRequired,
-    options: PropTypes.object
 };
 
 const RouteTracker = () => <Route component={GoogleAnalytics} />;
 
 const init = (options = {}) => {
     if (REACT_APP_GA_TRACKING_ID) {
+        console.log(REACT_APP_GA_TRACKING_ID);
         ReactGA.initialize(REACT_APP_GA_TRACKING_ID);
         return true;
-    } else {
-        console.log("FUCK")
-        return false;
     }
+    console.log('FUCK');
+    return false;
 };
 
 export default {
     GoogleAnalytics,
+    init,
     RouteTracker,
-    init
 };
