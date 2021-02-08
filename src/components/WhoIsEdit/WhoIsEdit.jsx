@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
 import Roles from '../Roles/Roles';
 
-function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
+function WhoIsEdit({ domain, contacts, isOpen, checkAll, onChange }) {
     const contactsList = Object.values(contacts);
     const isCompany = contactsList.find(({ ident }) => ident.type === 'org') != null;
 
@@ -119,11 +119,13 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         </label>
                         <Form.Field>
                             <Checkbox
+                            // domain.registrant.org ||
                                 checked={
+                                    domain.registrant.org ||
                                     item.ident.type === 'org' ||
                                     item.disclosed_attributes.has('name')
                                 }
-                                disabled={item.ident.type === 'org'}
+                                disabled={domain.registrant.org || item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
                                         id="whois.edit.name"
@@ -143,10 +145,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange }) {
                         <Form.Field>
                             <Checkbox
                                 checked={
+                                    domain.registrant.org ||
                                     item.ident.type === 'org' ||
                                     item.disclosed_attributes.has('email')
                                 }
-                                disabled={item.ident.type === 'org'}
+                                disabled={domain.registrant.org || item.ident.type === 'org'}
                                 label={
                                     <FormattedMessage
                                         id="whois.edit.email"
