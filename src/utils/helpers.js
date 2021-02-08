@@ -83,9 +83,9 @@ export default {
         }, []);
     },
     getDomains: (domains = {}) => {
-        return Object.values(domains).map(item => {
+        return Object.values(domains).map((item) => {
             return item;
-        })
+        });
     },
     getUserContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
         console.log(contacts);
