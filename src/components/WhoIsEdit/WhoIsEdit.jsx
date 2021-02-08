@@ -119,7 +119,6 @@ function WhoIsEdit({ domain, contacts, isOpen, checkAll, onChange }) {
                         </label>
                         <Form.Field>
                             <Checkbox
-                            // domain.registrant.org ||
                                 checked={
                                     domain.registrant.org ||
                                     item.ident.type === 'org' ||

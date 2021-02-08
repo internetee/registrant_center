@@ -45,7 +45,7 @@ const DomainPage = ({
     ui,
     unlockDomain,
     updateContact,
-    user
+    user,
 }) => {
     const { uiElemSize } = ui;
     const [isDirty, setIsDirty] = useState(false);
@@ -497,7 +497,11 @@ const DomainPage = ({
                             <FormattedMessage id="domain.whoisPrivacy.text" tagName="p" />
                         </header>
                         <Form onSubmit={toggleSubmitConfirmModal}>
-                            <WhoIsEdit contacts={userContacts} domain={domain} onChange={handleWhoIsChange} />
+                            <WhoIsEdit 
+                                contacts={userContacts} 
+                                domain={domain} 
+                                onChange={handleWhoIsChange} 
+                            />
                             <div className="form-actions">
                                 <Button
                                     disabled={!isDirty}
@@ -610,7 +614,7 @@ const mapStateToProps = (state, { match }) => ({
     domain: state.domains.data[match.params.id],
     isLoading: state.domains.isLoading,
     ui: state.ui,
-    user: state.user.data
+    user: state.user.data,
 });
 
 const mapDispatchToProps = (dispatch) =>

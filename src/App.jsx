@@ -53,8 +53,6 @@ function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, us
         })();
     }, [fetchUser, isLoggedOut, location, name]);
 
-    console.log("rerender")
-
     return (
         <IntlProvider key={lang} defaultLocale="et" locale={lang} messages={translations[lang]}>
             <FormattedMessage id="app.title">
