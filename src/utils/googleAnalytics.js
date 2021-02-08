@@ -4,10 +4,12 @@ import ReactGA from 'react-ga';
 import { Route } from 'react-router-dom';
 
 const { REACT_APP_GA_TRACKING_ID } = process.env;
-const { props } = this.props;
 class GoogleAnalytics extends Component {
     componentDidMount() {
-        this.logPageChange(props.location.pathname, props.location.search);
+        const {
+            location: { pathname, search },
+        } = this.props;
+        this.logPageChange(pathname, search);
     }
 
     componentDidUpdate({ location: prevLocation }) {
@@ -24,11 +26,11 @@ class GoogleAnalytics extends Component {
 
     logPageChange(pathname, search = '') {
         const page = pathname + search;
-        const { location } = this.window;
+        const { options } = this.props;
         ReactGA.set({
-            location: `${location.origin}${page}`,
+            location: `${window.location.origin}${page}`,
             page,
-            ...props.options,
+            ...options,
         });
         ReactGA.pageview(page);
     }
@@ -49,11 +51,9 @@ const RouteTracker = () => <Route component={GoogleAnalytics} />;
 
 const init = (options = {}) => {
     if (REACT_APP_GA_TRACKING_ID) {
-        console.log(REACT_APP_GA_TRACKING_ID);
         ReactGA.initialize(REACT_APP_GA_TRACKING_ID);
         return true;
     }
-    console.log('FUCK');
     return false;
 };
 
