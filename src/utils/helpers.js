@@ -82,6 +82,11 @@ export default {
             return acc;
         }, []);
     },
+    getDomains: (domains = {}) => {
+        return Object.values(domains).map(item => {
+            return item;
+        })
+    },
     getUserContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
         console.log(contacts);
         const company_list = companies.data ? companies.data : companies;

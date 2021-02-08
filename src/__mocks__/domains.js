@@ -14,6 +14,7 @@ const domains = [
         registrant: {
             name: 'Test Registrant',
             id: 'cfbfbb76-aed8-497a-91c1-48d82cbc4588',
+            org: 'false'
         },
         tech_contacts: [
             {
@@ -74,6 +75,7 @@ const domains = [
         registrant: {
             name: 'Test Registrant',
             id: 'cfbfbb76-aed8-497a-91c1-48d82cbc4588',
+            org: 'true'
         },
         tech_contacts: [
             {
