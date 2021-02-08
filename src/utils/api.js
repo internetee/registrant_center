@@ -72,17 +72,17 @@ export default {
         });
     },
 
-    // roles = ["registrant", "admin"]
-    fetchDomains: (uuid = false, offset, simplify = false) => {
+    fetchDomains: (uuid = false, offset, simplify = true, tech = false) => {
         if (uuid) {
             return instance.get(`/api/domains/${uuid}`);
         }
         if (simplify) {
+            if (tech) {
+                return instance.get(`/api/domains?offset=${offset}&simple=true&tech=true`);
+            }
             return instance.get(`/api/domains?offset=${offset}&simple=true`);
         }
-        // if (roles) {
-        //     return instance.get(`/api/domains?offset=${offset}&simple=true&${roles.join(roles)}`);
-        // }
+        if (tech) return instance.get(`/api/domains?offset=${offset}&simple=true&tech=true`);
         return instance.get(`/api/domains?offset=${offset}`);
     },
 

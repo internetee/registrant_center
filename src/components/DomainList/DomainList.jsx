@@ -10,8 +10,7 @@ import {
     Transition,
     Dropdown,
     Container,
-    Pagination,
-    Checkbox,
+    Pagination
 } from 'semantic-ui-react';
 import Masonry from 'react-masonry-component';
 import Flatpickr from 'react-flatpickr';
@@ -47,7 +46,7 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domainCount, domains, lang }) => {
+const DomainList = ({ domainCount, domains, lang, checked, isTech }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -59,8 +58,9 @@ const DomainList = ({ domainCount, domains, lang }) => {
         queryStatus: 'all',
         queryValidToMax: null,
         queryValidToMin: null,
+        queryRole: isTech
     });
-    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax } = form;
+    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax, queryRole } = form;
     const [minValidToDate, setMinValidToDate] = useState(null);
     const [maxValidToDate, setMaxValidToDate] = useState(null);
     const [filteredDomains, setFilteredDomains] = useState([]);
@@ -71,7 +71,7 @@ const DomainList = ({ domainCount, domains, lang }) => {
     const [domainsList, setDomainsList] = useState([]);
     const totalDomains = domainCount || 0;
 
-    const masonry = useRef(null);
+    const masonry = useRef(null);;
 
     useEffect(() => {
         if (domains.length) {
@@ -290,6 +290,32 @@ const DomainList = ({ domainCount, domains, lang }) => {
         setFilteredDomains(domainsList);
     };
 
+    const roleOptions = [
+        {
+            key: 'Registrant & Admin',
+            text: 'Registrant & Admin',
+            value: 'Registrant & Admin'
+        },
+        {
+            key: 'Tech',
+            text: 'Tech',
+            value: 'Tech'
+        }
+    ]
+
+    const handleRole = (event, { name, value }) => {
+        if (value === 'Registrant & Admin' && isTech) { 
+            checked(false); }
+        if (value === 'Tech' && !isTech) { 
+            checked(true); }; 
+    };
+
+    const setRoleValue = () => {
+        // isTech ? 'Tech' : 'Registrant & Admin'
+        if (isTech) return 'Tech'
+        return 'Registrant & Admin'
+    }
+
     return (
         <div className="domains-list--wrap">
             <div className="page--header">
@@ -421,9 +447,18 @@ const DomainList = ({ domainCount, domains, lang }) => {
                                         />
                                     </Form.Field>
                                     <Form.Field width="4">
-                                        <div><Checkbox label="Admin" defaultChecked /></div>
-                                        <div><Checkbox label="Registrant" defaultChecked /></div>
-                                        <div><Checkbox label="Tech" /></div>
+                                    <FormattedMessage
+                                            id="domains.form.selectRole"
+                                            tagName="label"
+                                        />
+                                        <Dropdown
+                                            fluid
+                                            onChange={handleRole}
+                                            name="queryRole"
+                                            options={roleOptions}
+                                            selection
+                                            defaultValue={ isTech ? roleOptions[1].value : roleOptions[0].value }
+                                        />    
                                     </Form.Field>
                                     <div className="form-actions">
                                         <Button primary>

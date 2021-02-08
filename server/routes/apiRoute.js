@@ -109,8 +109,19 @@ export default {
 
     getDomains: async ({ query, params, session }, res) => {
         const { uuid } = params;
-        const { offset, simple } = query;
+        const { offset, simple, tech } = query;
         if (simple === 'true') {
+            if (tech === 'true') {
+                return handleResponse(
+                    () => 
+                        API(session, res).get(
+                            `/api/v1/registrant/domains${
+                                uuid ? `/${uuid}` : `?offset=${offset}&simple=true&tech=true`
+                            }`
+                        ),
+                    res
+                );
+            }
             return handleResponse(
                 () =>
                     API(session, res).get(
@@ -119,6 +130,18 @@ export default {
                         }`
                     ),
                 res
+            );
+        }
+        if (tech === 'true') {
+            return handleResponse(
+                () => 
+                () => 
+                        API(session, res).get(
+                            `/api/v1/registrant/domains${
+                                uuid ? `/${uuid}` : `?offset=${offset}&simple=false&tech=true`
+                            }`
+                        ),
+                    res
             );
         }
         return handleResponse(

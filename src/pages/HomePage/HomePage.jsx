@@ -14,16 +14,29 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
     const [isLoading, setIsLoading] = useState(true);
     const { formatMessage } = useIntl();
 
+    const [isTech, setTech] = useState(false)
     useEffect(() => {
+        if (isTech) {
         (async () => {
-            await fetchDomains(0, false, true);
+            await fetchDomains(0, true, true);
             setIsLoading(false);
         })();
-    }, [fetchDomains]);
+    } 
+        else {
+            (async () => {
+                await fetchDomains(0, true, false);
+                setIsLoading(false);
+            })();
+        }
+}       
+    , [fetchDomains, isTech]);
+
+    const checked = (cond=false) => {
+        setIsLoading(true);
+        setTech(cond);
+    }
 
     if (isLoading) return <Loading />;
-
-    console.log(domains);
 
     return (
         <MainLayout
@@ -74,8 +87,8 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
                         </Grid.Row>
                     </Grid>
                 </div>
-                <DomainList domainCount={totalDomains} domains={domains} lang={lang} />
-                <UserData lang={lang} />
+                <DomainList domainCount={totalDomains} domains={domains} lang={lang} checked={checked} isTech={isTech} />
+                <UserData lang={lang} isTech={isTech} />
             </div>
         </MainLayout>
     );
