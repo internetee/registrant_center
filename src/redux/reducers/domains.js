@@ -100,6 +100,7 @@ const receiveDomains = (payload, simplify = false) => {
         data: {
             count: 0,
             domains: [],
+            total: 0
         },
         offset: 0,
     };
@@ -148,7 +149,6 @@ const fetchRawDomainList = async (isTech) => {
     let count = 0;
 
     let res = await api.fetchDomains(null, offset, false, isTech);
-    console.log(res);
     domains = domains.concat(res.data.domains);
     count = res.data.count;
     if (domains.length !== count) {
@@ -192,6 +192,7 @@ const fetchDomains = (offset = request.offset, simplify = false, tech = false) =
         .then((data) => {
             request.data.domains = request.data.domains.concat(data.domains);
             request.data.count = data.count;
+            request.data.total = data.total;
             if (request.data.domains.length !== data.count) {
                 request.offset += 200;
                 return dispatch(fetchDomains(request.offset, simplify, tech));
@@ -282,6 +283,7 @@ export default function reducer(state = initialState, { payload, type, simplify 
                 ...state,
                 data: {
                     count: payload.count,
+                    total: payload.total,
                     domains: payload.domains.reduce(
                         (acc, item) => ({
                             ...acc,

@@ -46,7 +46,7 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domainCount, domains, lang, checked, isTech }) => {
+const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -292,28 +292,29 @@ const DomainList = ({ domainCount, domains, lang, checked, isTech }) => {
 
     const roleOptions = [
         {
-            key: 'Registrant & Admin',
-            text: 'Registrant & Admin',
-            value: 'Registrant & Admin'
+            id: "domains.roles.regAndAdmRoles",
+            key: "domains.roles.regAndAdmRoles",
+            text: formatMessage({id: "domains.roles.regAndAdmRoles"}),
+            value: "domains.roles.regAndAdmRoles"
         },
         {
-            key: 'Tech',
-            text: 'Tech',
-            value: 'Tech'
+            id: "domains.roles.allRoles",
+            key: "domains.roles.allRoles",
+            text: formatMessage({id: "domains.roles.allRoles"}),
+            value: "domains.roles.allRoles"
         }
     ]
 
     const handleRole = (event, { name, value }) => {
-        if (value === 'Registrant & Admin' && isTech) { 
+        if (value === "domains.roles.regAndAdmRoles" && isTech) { 
             checked(false); }
-        if (value === 'Tech' && !isTech) { 
+        if (value === "domains.roles.allRoles" && !isTech) { 
             checked(true); }; 
     };
 
     const setRoleValue = () => {
-        // isTech ? 'Tech' : 'Registrant & Admin'
-        if (isTech) return 'Tech'
-        return 'Registrant & Admin'
+        if (isTech) return "domains.roles.allRoles"
+        return "domains.roles.regAndAdmRoles"
     }
 
     return (
@@ -325,7 +326,7 @@ const DomainList = ({ domainCount, domains, lang, checked, isTech }) => {
                             id="domains.title"
                             tagName="h2"
                             values={{
-                                span: (text) => <span>{text}</span>,
+                                span: (text) => <span>{text} of {domainTotal}</span>,
                                 userTotalDomains: totalDomains,
                             }}
                         />
@@ -388,7 +389,7 @@ const DomainList = ({ domainCount, domains, lang, checked, isTech }) => {
                                                 margin: "10px", 
                                                 textAlign: "center"
                                             }}>
-                                    Domain count: {domainCount} domains out of {domainCount}</span>
+                                </span>
                                 <Form.Group>
                                     <Form.Field width="5">
                                         <FormattedMessage

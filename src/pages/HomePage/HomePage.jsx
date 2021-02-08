@@ -8,13 +8,13 @@ import { bindActionCreators } from 'redux';
 import { DomainList, UserData, MainLayout, Loading } from '../../components';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 
-const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
+const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount }) => {
     const { lang } = ui;
     moment.locale(lang);
     const [isLoading, setIsLoading] = useState(true);
     const { formatMessage } = useIntl();
-
     const [isTech, setTech] = useState(false)
+    
     useEffect(() => {
         if (isTech) {
         (async () => {
@@ -87,7 +87,7 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
                         </Grid.Row>
                     </Grid>
                 </div>
-                <DomainList domainCount={totalDomains} domains={domains} lang={lang} checked={checked} isTech={isTech} />
+                <DomainList domainCount={totalDomains} domainTotal={absoluteCount} domains={domains} lang={lang} checked={checked} isTech={isTech} />
                 <UserData lang={lang} isTech={isTech} />
             </div>
         </MainLayout>
@@ -100,6 +100,7 @@ const mapStateToProps = ({ domains, ui, user }) => {
         totalDomains: domains.data.count,
         ui,
         user: user.data,
+        absoluteCount: domains.data.total
     };
 };
 
