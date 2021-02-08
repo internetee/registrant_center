@@ -498,7 +498,11 @@ const DomainPage = ({
                             <FormattedMessage id="domain.whoisPrivacy.text" tagName="p" />
                         </header>
                         <Form onSubmit={toggleSubmitConfirmModal}>
-                            <WhoIsEdit contacts={userContacts} onChange={handleWhoIsChange} domains={domains} />
+                            <WhoIsEdit 
+                                contacts={userContacts} 
+                                onChange={handleWhoIsChange} 
+                                domains={domains} 
+                            />
                             <div className="form-actions">
                                 <Button
                                     disabled={!isDirty}
