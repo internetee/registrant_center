@@ -397,7 +397,8 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                         </div>
                         <Transition animation="slide down" visible={isAdvSearchOpen}>
                             <div className="form-filter--adv-search">
-                                <span style={{
+                                <span style=
+                                            {{
                                                 display: 'flex',
                                                 justifyContent: 'center',
                                                 margin: '10px',
