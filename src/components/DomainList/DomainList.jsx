@@ -60,13 +60,14 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
         queryValidToMax: null,
         queryValidToMin: null,
     });
-    const { 
+    const {
         queryKeys,
         queryRegistrant,
         queryStatus,
         queryValidToMin,
         queryValidToMax,
-        queryRole } = form;
+        queryRole 
+    } = form;
     const [minValidToDate, setMinValidToDate] = useState(null);
     const [maxValidToDate, setMaxValidToDate] = useState(null);
     const [filteredDomains, setFilteredDomains] = useState([]);
@@ -300,28 +301,32 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
         {
             id: 'domains.roles.regAndAdmRoles',
             key: 'domains.roles.regAndAdmRoles',
-            text: formatMessage({id: 'domains.roles.regAndAdmRoles'}),
+            text: formatMessage({ id: 'domains.roles.regAndAdmRoles' }),
             value: 'domains.roles.regAndAdmRoles',
         },
         {
             id: 'domains.roles.allRoles',
             key: 'domains.roles.allRoles',
-            text: formatMessage({id: 'domains.roles.allRoles'}),
+            text: formatMessage({ id: 'domains.roles.allRoles' }),
             value: 'domains.roles.allRoles',
-        }
-    ]
+        },
+    ];
 
     const handleRole = (event, { name, value }) => {
-        if (value === 'domains.roles.regAndAdmRoles' && isTech) { 
-            checked(false); }
-        if (value === 'domains.roles.allRoles' && !isTech) { 
-            checked(true); }; 
+        if (value === 'domains.roles.regAndAdmRoles' && isTech) 
+        {
+            checked(false);
+        }
+        if (value === 'domains.roles.allRoles' && !isTech) 
+        {
+            checked(true);
+        }
     };
 
     const setRoleValue = () => {
-        if (isTech) return 'domains.roles.allRoles'
-        return 'domains.roles.regAndAdmRoles'
-    }
+        if (isTech) return 'domains.roles.allRoles';
+        return 'domains.roles.regAndAdmRoles';
+    };
 
     return (
         <div className="domains-list--wrap">
@@ -394,7 +399,8 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                                                 justifyContent: "center", 
                                                 margin: "10px", 
                                                 textAlign: "center"
-                                            }} />
+                                            }} 
+                                />
                                 <Form.Group>
                                     <Form.Field width="5">
                                         <FormattedMessage
@@ -458,7 +464,10 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                                             tagName="label"
                                         />
                                         <Dropdown
-                                            defaultValue={ isTech ? roleOptions[1].value : roleOptions[0].value }
+                                            defaultValue=
+                                            { 
+                                                isTech ? roleOptions[1].value : roleOptions[0].value 
+                                            }
                                             fluid
                                             name="queryRole"
                                             onChange={handleRole}
