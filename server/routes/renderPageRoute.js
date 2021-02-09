@@ -26,7 +26,7 @@ export default async function renderPageRoute(req, res) {
         res.setHeader('Content-Type', 'text/html');
         res.send(renderHTML(helmet));
     } catch (error) {
-        log.error(error.stack);
+        console.log(error.stack);
         res.status(500).sendFile('src/server/views/500.html', { root: process.cwd() });
     }
 }

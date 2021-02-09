@@ -56,7 +56,7 @@ export default async function callbackPageRoute(req, res, publicKey) {
             method: 'POST',
             url: ISSUER_URL + TOKEN_PATH,
         };
-        
+
         const {
             data: { id_token },
         } = await axios(options); // eslint-disable-line camelcase
@@ -89,16 +89,15 @@ export default async function callbackPageRoute(req, res, publicKey) {
                     throw new Error(err);
                 }
                 const userData = {
+                    country_code: get_user_country_code(verifiedJwt.sub),
                     first_name: capitalize.words(verifiedJwt.profile_attributes.given_name),
-                    // ident: verifiedJwt.sub.replace(/\D/g, ''),
                     ident: get_user_ident(verifiedJwt.sub),
-                    country_code: get_user_country_code(verifiedJwt.sub), 
                     last_name: capitalize.words(verifiedJwt.profile_attributes.family_name),
                 };
 
                 console.log('Decrypted JWT from TARA:');
                 console.log(verifiedJwt);
-                console.log('userData:')
+                console.log('userData:');
                 console.log(userData);
                 req.session.user = userData;
                 if (NODE_ENV === 'development') {
@@ -118,6 +117,6 @@ export default async function callbackPageRoute(req, res, publicKey) {
     }
 }
 
-export const get_user_ident = ident => ident.substr(2);
+export const get_user_ident = (ident) => ident.substr(2);
 
-export const get_user_country_code = ident => ident.substr(0, 2);
+export const get_user_country_code = (ident) => ident.substr(0, 2);
