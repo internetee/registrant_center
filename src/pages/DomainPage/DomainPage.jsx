@@ -500,8 +500,8 @@ const DomainPage = ({
                         <Form onSubmit={toggleSubmitConfirmModal}>
                             <WhoIsEdit 
                                 contacts={userContacts} 
-                                onChange={handleWhoIsChange} 
                                 domains={domains} 
+                                onChange={handleWhoIsChange} 
                             />
                             <div className="form-actions">
                                 <Button

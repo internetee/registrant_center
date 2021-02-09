@@ -283,7 +283,6 @@ export default function reducer(state = initialState, { payload, type, simplify 
                 ...state,
                 data: {
                     count: payload.count,
-                    total: payload.total,
                     domains: payload.domains.reduce(
                         (acc, item) => ({
                             ...acc,
@@ -291,6 +290,7 @@ export default function reducer(state = initialState, { payload, type, simplify 
                         }),
                         {}
                     ),
+                    total: payload.total,
                 },
                 ids: payload.domains.map((item) => item.id),
                 isLoading: false,

@@ -10,7 +10,7 @@ import {
     Transition,
     Dropdown,
     Container,
-    Pagination
+    Pagination,
 } from 'semantic-ui-react';
 import Masonry from 'react-masonry-component';
 import Flatpickr from 'react-flatpickr';
@@ -55,12 +55,18 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
     const [form, setForm] = useState({
         queryKeys: '',
         queryRegistrant: 'all',
+        queryRole: isTech,
         queryStatus: 'all',
         queryValidToMax: null,
         queryValidToMin: null,
-        queryRole: isTech
     });
-    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax, queryRole } = form;
+    const { 
+        queryKeys,
+        queryRegistrant,
+        queryStatus,
+        queryValidToMin,
+        queryValidToMax,
+        queryRole } = form;
     const [minValidToDate, setMinValidToDate] = useState(null);
     const [maxValidToDate, setMaxValidToDate] = useState(null);
     const [filteredDomains, setFilteredDomains] = useState([]);
@@ -71,7 +77,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
     const [domainsList, setDomainsList] = useState([]);
     const totalDomains = domainCount || 0;
 
-    const masonry = useRef(null);;
+    const masonry = useRef(null);
 
     useEffect(() => {
         if (domains.length) {
@@ -292,29 +298,29 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
 
     const roleOptions = [
         {
-            id: "domains.roles.regAndAdmRoles",
-            key: "domains.roles.regAndAdmRoles",
-            text: formatMessage({id: "domains.roles.regAndAdmRoles"}),
-            value: "domains.roles.regAndAdmRoles"
+            id: 'domains.roles.regAndAdmRoles',
+            key: 'domains.roles.regAndAdmRoles',
+            text: formatMessage({id: 'domains.roles.regAndAdmRoles'}),
+            value: 'domains.roles.regAndAdmRoles',
         },
         {
-            id: "domains.roles.allRoles",
-            key: "domains.roles.allRoles",
-            text: formatMessage({id: "domains.roles.allRoles"}),
-            value: "domains.roles.allRoles"
+            id: 'domains.roles.allRoles',
+            key: 'domains.roles.allRoles',
+            text: formatMessage({id: 'domains.roles.allRoles'}),
+            value: 'domains.roles.allRoles',
         }
     ]
 
     const handleRole = (event, { name, value }) => {
-        if (value === "domains.roles.regAndAdmRoles" && isTech) { 
+        if (value === 'domains.roles.regAndAdmRoles' && isTech) { 
             checked(false); }
-        if (value === "domains.roles.allRoles" && !isTech) { 
+        if (value === 'domains.roles.allRoles' && !isTech) { 
             checked(true); }; 
     };
 
     const setRoleValue = () => {
-        if (isTech) return "domains.roles.allRoles"
-        return "domains.roles.regAndAdmRoles"
+        if (isTech) return 'domains.roles.allRoles'
+        return 'domains.roles.regAndAdmRoles'
     }
 
     return (
@@ -388,8 +394,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                                                 justifyContent: "center", 
                                                 margin: "10px", 
                                                 textAlign: "center"
-                                            }}>
-                                </span>
+                                            }} />
                                 <Form.Group>
                                     <Form.Field width="5">
                                         <FormattedMessage
@@ -453,12 +458,12 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                                             tagName="label"
                                         />
                                         <Dropdown
+                                            defaultValue={ isTech ? roleOptions[1].value : roleOptions[0].value }
                                             fluid
-                                            onChange={handleRole}
                                             name="queryRole"
+                                            onChange={handleRole}
                                             options={roleOptions}
                                             selection
-                                            defaultValue={ isTech ? roleOptions[1].value : roleOptions[0].value }
                                         />    
                                     </Form.Field>
                                     <div className="form-actions">

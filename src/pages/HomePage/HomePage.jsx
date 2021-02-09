@@ -87,8 +87,8 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
                         </Grid.Row>
                     </Grid>
                 </div>
-                <DomainList domainCount={totalDomains} domainTotal={absoluteCount} domains={domains} lang={lang} checked={checked} isTech={isTech} />
-                <UserData lang={lang} isTech={isTech} />
+                <DomainList checked={checked} domainCount={totalDomains} domains={domains} domainTotal={absoluteCount} isTech={isTech} lang={lang} />
+                <UserData isTech={isTech} lang={lang} />
             </div>
         </MainLayout>
     );
@@ -96,11 +96,11 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
 
 const mapStateToProps = ({ domains, ui, user }) => {
     return {
+        absoluteCount: domains.data.total,
         domains: Object.values(domains.data.domains),
         totalDomains: domains.data.count,
         ui,
         user: user.data,
-        absoluteCount: domains.data.total
     };
 };
 
