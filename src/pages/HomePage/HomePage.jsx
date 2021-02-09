@@ -20,14 +20,14 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
             (async () => {
                 await fetchDomains(0, true, true);
                 setIsLoading(false);
-            })();}
-        else {
+            })();
+        } else {
             (async () => {
                 await fetchDomains(0, true, false);
                 setIsLoading(false);
-            })();}
-    }
-    , [fetchDomains, isTech]);
+            })();
+        }
+    }, [fetchDomains, isTech]);
 
     const checked = (cond = false) => {
         setIsLoading(true);
@@ -85,7 +85,7 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
                         </Grid.Row>
                     </Grid>
                 </div>
-                <DomainList 
+                <DomainList
                     checked={checked}
                     domainCount={totalDomains}
                     domains={domains}
