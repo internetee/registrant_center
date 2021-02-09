@@ -20,14 +20,12 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
             (async () => {
                 await fetchDomains(0, true, true);
                 setIsLoading(false);
-            })();
-        }
+            })();}
         else {
             (async () => {
                 await fetchDomains(0, true, false);
                 setIsLoading(false);
-            })();
-        }
+            })();}
     }
     , [fetchDomains, isTech]);
 
