@@ -100,7 +100,7 @@ const receiveDomains = (payload, simplify = false) => {
         data: {
             count: 0,
             domains: [],
-            total: 0
+            total: 0,
         },
         offset: 0,
     };

@@ -13,28 +13,28 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
     moment.locale(lang);
     const [isLoading, setIsLoading] = useState(true);
     const { formatMessage } = useIntl();
-    const [isTech, setTech] = useState(false)
+    const [isTech, setTech] = useState(false);
     
     useEffect(() => {
         if (isTech) {
-        (async () => {
+            (async () => {
             await fetchDomains(0, true, true);
             setIsLoading(false);
-        })();
-    } 
+            })();
+        } 
         else {
             (async () => {
                 await fetchDomains(0, true, false);
                 setIsLoading(false);
             })();
         }
-}       
+    }       
     , [fetchDomains, isTech]);
 
-    const checked = (cond=false) => {
+    const checked = (cond = false) => {
         setIsLoading(true);
         setTech(cond);
-    }
+    };
 
     if (isLoading) return <Loading />;
 
@@ -87,7 +87,14 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
                         </Grid.Row>
                     </Grid>
                 </div>
-                <DomainList checked={checked} domainCount={totalDomains} domains={domains} domainTotal={absoluteCount} isTech={isTech} lang={lang} />
+                <DomainList 
+                    checked={checked}
+                    domainCount={totalDomains}
+                    domains={domains}
+                    domainTotal={absoluteCount}
+                    isTech={isTech}
+                    lang={lang}
+                />
                 <UserData isTech={isTech} lang={lang} />
             </div>
         </MainLayout>

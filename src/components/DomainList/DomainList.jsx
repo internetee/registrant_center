@@ -313,12 +313,10 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
     ];
 
     const handleRole = (event, { name, value }) => {
-        if (value === 'domains.roles.regAndAdmRoles' && isTech)
-        {
+        if (value === 'domains.roles.regAndAdmRoles' && isTech) {
             checked(false);
         }
-        if (value === 'domains.roles.allRoles' && !isTech)
-        {
+        if (value === 'domains.roles.allRoles' && !isTech) {
             checked(true);
         }
     };
@@ -337,7 +335,11 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                             id="domains.title"
                             tagName="h2"
                             values={{
-                                span: (text) => <span>{text} of {domainTotal}</span>,
+                                span: (text) => (
+                                    <span>
+                                        {text} of {domainTotal}
+                                    </span>
+                                ),
                                 userTotalDomains: totalDomains,
                             }}
                         />
@@ -395,11 +397,12 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                         </div>
                         <Transition animation="slide down" visible={isAdvSearchOpen}>
                             <div className="form-filter--adv-search">
-                                <span style={{  display: "flex",
-                                                justifyContent: "center",
-                                                margin: "10px",
-                                                textAlign: "center",
-                                            }} 
+                                <span style={{
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                margin: '10px',
+                                                textAlign: 'center',
+                                            }}
                                 />
                                 <Form.Group>
                                     <Form.Field width="5">

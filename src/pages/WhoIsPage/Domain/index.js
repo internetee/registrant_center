@@ -14,7 +14,13 @@ export default function Domain({ id, name, contacts, onChange, domains }) {
             </Table.Cell>
             <Table.Cell width={8}>
                 <div className="ui form">
-                    <WhoIsEdit checkAll contacts={contacts} domains={domains} isOpen={isOpen} onChange={onChange} />
+                    <WhoIsEdit
+                        checkAll
+                        contacts={contacts}
+                        domains={domains}
+                        isOpen={isOpen}
+                        onChange={onChange}
+                    />
                 </div>
             </Table.Cell>
             <Table.Cell singleLine textAlign="right" width={2}>
