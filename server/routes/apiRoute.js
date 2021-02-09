@@ -113,7 +113,7 @@ export default {
         if (simple === 'true') {
             if (tech === 'true') {
                 return handleResponse(
-                    () => 
+                    () =>
                         API(session, res).get(
                             `/api/v1/registrant/domains${
                                 uuid ? `/${uuid}` : `?offset=${offset}&simple=true&tech=true`
@@ -134,14 +134,13 @@ export default {
         }
         if (tech === 'true') {
             return handleResponse(
-                () => 
-                () => 
-                        API(session, res).get(
-                            `/api/v1/registrant/domains${
-                                uuid ? `/${uuid}` : `?offset=${offset}&simple=false&tech=true`
-                            }`
-                        ),
-                    res
+                () =>
+                    API(session, res).get(
+                        `/api/v1/registrant/domains${
+                            uuid ? `/${uuid}` : `?offset=${offset}&simple=false&tech=true`
+                        }`
+                    ),
+                res
             );
         }
         return handleResponse(
