@@ -66,7 +66,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
         queryStatus,
         queryValidToMin,
         queryValidToMax,
-        queryRole 
+        queryRole,
     } = form;
     const [minValidToDate, setMinValidToDate] = useState(null);
     const [maxValidToDate, setMaxValidToDate] = useState(null);
@@ -313,11 +313,11 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
     ];
 
     const handleRole = (event, { name, value }) => {
-        if (value === 'domains.roles.regAndAdmRoles' && isTech) 
+        if (value === 'domains.roles.regAndAdmRoles' && isTech)
         {
             checked(false);
         }
-        if (value === 'domains.roles.allRoles' && !isTech) 
+        if (value === 'domains.roles.allRoles' && !isTech)
         {
             checked(true);
         }
@@ -396,9 +396,9 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                         <Transition animation="slide down" visible={isAdvSearchOpen}>
                             <div className="form-filter--adv-search">
                                 <span style={{  display: "flex",
-                                                justifyContent: "center", 
-                                                margin: "10px", 
-                                                textAlign: "center"
+                                                justifyContent: "center",
+                                                margin: "10px",
+                                                textAlign: "center",
                                             }} 
                                 />
                                 <Form.Group>
@@ -459,21 +459,20 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
                                         />
                                     </Form.Field>
                                     <Form.Field width="4">
-                                    <FormattedMessage
+                                        <FormattedMessage
                                             id="domains.form.selectRole"
                                             tagName="label"
                                         />
                                         <Dropdown
-                                            defaultValue=
-                                            { 
-                                                isTech ? roleOptions[1].value : roleOptions[0].value 
+                                            defaultValue={
+                                                isTech ? roleOptions[1].value : roleOptions[0].value
                                             }
                                             fluid
                                             name="queryRole"
                                             onChange={handleRole}
                                             options={roleOptions}
                                             selection
-                                        />    
+                                        />
                                     </Form.Field>
                                     <div className="form-actions">
                                         <Button primary>
