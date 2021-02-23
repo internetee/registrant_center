@@ -46,7 +46,7 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domainCount, domains, lang }) => {
+const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -55,11 +55,19 @@ const DomainList = ({ domainCount, domains, lang }) => {
     const [form, setForm] = useState({
         queryKeys: '',
         queryRegistrant: 'all',
+        queryRole: isTech,
         queryStatus: 'all',
         queryValidToMax: null,
         queryValidToMin: null,
     });
-    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax } = form;
+    const {
+        queryKeys,
+        queryRegistrant,
+        queryStatus,
+        queryValidToMin,
+        queryValidToMax,
+        queryRole,
+    } = form;
     const [minValidToDate, setMinValidToDate] = useState(null);
     const [maxValidToDate, setMaxValidToDate] = useState(null);
     const [filteredDomains, setFilteredDomains] = useState([]);
@@ -289,6 +297,35 @@ const DomainList = ({ domainCount, domains, lang }) => {
         setFilteredDomains(domainsList);
     };
 
+    const roleOptions = [
+        {
+            id: 'domains.roles.regAndAdmRoles',
+            key: 'domains.roles.regAndAdmRoles',
+            text: formatMessage({ id: 'domains.roles.regAndAdmRoles' }),
+            value: 'domains.roles.regAndAdmRoles',
+        },
+        {
+            id: 'domains.roles.allRoles',
+            key: 'domains.roles.allRoles',
+            text: formatMessage({ id: 'domains.roles.allRoles' }),
+            value: 'domains.roles.allRoles',
+        },
+    ];
+
+    const handleRole = (event, { name, value }) => {
+        if (value === 'domains.roles.regAndAdmRoles' && isTech) {
+            checked(false);
+        }
+        if (value === 'domains.roles.allRoles' && !isTech) {
+            checked(true);
+        }
+    };
+
+    const setRoleValue = () => {
+        if (isTech) return 'domains.roles.allRoles';
+        return 'domains.roles.regAndAdmRoles';
+    };
+
     return (
         <div className="domains-list--wrap">
             <div className="page--header">
@@ -298,7 +335,11 @@ const DomainList = ({ domainCount, domains, lang }) => {
                             id="domains.title"
                             tagName="h2"
                             values={{
-                                span: (text) => <span>{text}</span>,
+                                span: (text) => (
+                                    <span>
+                                        {text} of {domainTotal}
+                                    </span>
+                                ),
                                 userTotalDomains: totalDomains,
                             }}
                         />
@@ -356,6 +397,14 @@ const DomainList = ({ domainCount, domains, lang }) => {
                         </div>
                         <Transition animation="slide down" visible={isAdvSearchOpen}>
                             <div className="form-filter--adv-search">
+                                <span
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        margin: '10px',
+                                        textAlign: 'center',
+                                    }}
+                                />
                                 <Form.Group>
                                     <Form.Field width="5">
                                         <FormattedMessage
@@ -411,6 +460,22 @@ const DomainList = ({ domainCount, domains, lang }) => {
                                             options={statuses}
                                             selection
                                             value={queryStatus}
+                                        />
+                                    </Form.Field>
+                                    <Form.Field width="4">
+                                        <FormattedMessage
+                                            id="domains.form.selectRole"
+                                            tagName="label"
+                                        />
+                                        <Dropdown
+                                            defaultValue={
+                                                isTech ? roleOptions[1].value : roleOptions[0].value
+                                            }
+                                            fluid
+                                            name="queryRole"
+                                            onChange={handleRole}
+                                            options={roleOptions}
+                                            selection
                                         />
                                     </Form.Field>
                                     <div className="form-actions">

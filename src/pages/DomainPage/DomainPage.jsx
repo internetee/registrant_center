@@ -37,6 +37,7 @@ const DomainPage = ({
     companies,
     contacts,
     domain,
+    domains,
     fetchCompanies,
     fetchDomain,
     isLoading,
@@ -497,7 +498,11 @@ const DomainPage = ({
                             <FormattedMessage id="domain.whoisPrivacy.text" tagName="p" />
                         </header>
                         <Form onSubmit={toggleSubmitConfirmModal}>
-                            <WhoIsEdit contacts={userContacts} onChange={handleWhoIsChange} />
+                            <WhoIsEdit
+                                contacts={userContacts}
+                                domains={domains}
+                                onChange={handleWhoIsChange}
+                            />
                             <div className="form-actions">
                                 <Button
                                     disabled={!isDirty}
@@ -608,6 +613,7 @@ const mapStateToProps = (state, { match }) => ({
     companies: state.companies,
     contacts: state.contacts.data,
     domain: state.domains.data[match.params.id],
+    domains: state.domains,
     isLoading: state.domains.isLoading,
     ui: state.ui,
     user: state.user.data,

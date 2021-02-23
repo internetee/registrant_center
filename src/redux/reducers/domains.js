@@ -100,6 +100,7 @@ const receiveDomains = (payload, simplify = false) => {
         data: {
             count: 0,
             domains: [],
+            total: 0,
         },
         offset: 0,
     };
@@ -142,12 +143,12 @@ const failDomainUnlock = (payload) => ({
     type: UNLOCK_DOMAIN_FAILURE,
 });
 
-const fetchRawDomainList = async () => {
+const fetchRawDomainList = async (isTech) => {
     let offset = 0;
     let domains = [];
     let count = 0;
 
-    let res = await api.fetchDomains(null, offset, false);
+    let res = await api.fetchDomains(null, offset, false, isTech);
     domains = domains.concat(res.data.domains);
     count = res.data.count;
     if (domains.length !== count) {
@@ -183,19 +184,20 @@ const fetchDomain = (uuid) => (dispatch) => {
         });
 };
 
-const fetchDomains = (offset = request.offset, simplify = false) => (dispatch) => {
+const fetchDomains = (offset = request.offset, simplify = false, tech = false) => (dispatch) => {
     dispatch(requestDomains());
     return api
-        .fetchDomains(null, offset, simplify)
+        .fetchDomains(null, offset, simplify, tech)
         .then((res) => res.data)
         .then((data) => {
             request.data.domains = request.data.domains.concat(data.domains);
             request.data.count = data.count;
+            request.data.total = data.total;
             if (request.data.domains.length !== data.count) {
                 request.offset += 200;
-                return dispatch(fetchDomains(request.offset, simplify));
+                return dispatch(fetchDomains(request.offset, simplify, tech));
             }
-            return dispatch(receiveDomains(request.data, simplify));
+            return dispatch(receiveDomains(request.data, simplify, tech));
         })
         .catch(() => {
             dispatch(failDomains());
@@ -288,6 +290,7 @@ export default function reducer(state = initialState, { payload, type, simplify 
                         }),
                         {}
                     ),
+                    total: payload.total,
                 },
                 ids: payload.domains.map((item) => item.id),
                 isLoading: false,

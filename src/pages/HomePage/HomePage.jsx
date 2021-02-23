@@ -8,18 +8,31 @@ import { bindActionCreators } from 'redux';
 import { DomainList, UserData, MainLayout, Loading } from '../../components';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 
-const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
+const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount }) => {
     const { lang } = ui;
     moment.locale(lang);
     const [isLoading, setIsLoading] = useState(true);
     const { formatMessage } = useIntl();
+    const [isTech, setTech] = useState(false);
 
     useEffect(() => {
-        (async () => {
-            await fetchDomains(0, true);
-            setIsLoading(false);
-        })();
-    }, [fetchDomains]);
+        if (isTech) {
+            (async () => {
+                await fetchDomains(0, true, true);
+                setIsLoading(false);
+            })();
+        } else {
+            (async () => {
+                await fetchDomains(0, true, false);
+                setIsLoading(false);
+            })();
+        }
+    }, [fetchDomains, isTech]);
+
+    const checked = (cond = false) => {
+        setIsLoading(true);
+        setTech(cond);
+    };
 
     if (isLoading) return <Loading />;
 
@@ -72,8 +85,15 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
                         </Grid.Row>
                     </Grid>
                 </div>
-                <DomainList domainCount={totalDomains} domains={domains} lang={lang} />
-                <UserData lang={lang} />
+                <DomainList
+                    checked={checked}
+                    domainCount={totalDomains}
+                    domains={domains}
+                    domainTotal={absoluteCount}
+                    isTech={isTech}
+                    lang={lang}
+                />
+                <UserData isTech={isTech} lang={lang} />
             </div>
         </MainLayout>
     );
@@ -81,6 +101,7 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user }) => {
 
 const mapStateToProps = ({ domains, ui, user }) => {
     return {
+        absoluteCount: domains.data.total,
         domains: Object.values(domains.data.domains),
         totalDomains: domains.data.count,
         ui,
