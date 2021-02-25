@@ -60,6 +60,8 @@ const DomainPage = ({
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
+    console.log('DOMAIN: ', domain);
+
     useEffect(() => {
         (async () => {
             if (!domain?.tech_contacts && !isLoading) {
@@ -502,6 +504,7 @@ const DomainPage = ({
                                 contacts={userContacts}
                                 domains={domains}
                                 onChange={handleWhoIsChange}
+                                domain={domain}
                             />
                             <div className="form-actions">
                                 <Button

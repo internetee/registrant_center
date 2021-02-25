@@ -7,6 +7,12 @@ import { WhoIsEdit } from '../../../components';
 
 export default function Domain({ id, name, contacts, onChange, domains }) {
     const [isOpen, setIsOpen] = useState(false);
+
+    let index = 0;
+    domains.find((o, i) => {
+        if (o.id === id) index = i;
+    });
+
     return (
         <Table.Row verticalAlign="top">
             <Table.Cell width={6}>
@@ -20,6 +26,7 @@ export default function Domain({ id, name, contacts, onChange, domains }) {
                         domains={domains}
                         isOpen={isOpen}
                         onChange={onChange}
+                        domain={domains[index]}
                     />
                 </div>
             </Table.Cell>

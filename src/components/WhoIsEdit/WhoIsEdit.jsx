@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
 import Roles from '../Roles/Roles';
 
-function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains }) {
+function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
     const contactsList = Object.values(contacts);
     const isCompany = contactsList.find(({ ident }) => ident.type === 'org') != null;
 
