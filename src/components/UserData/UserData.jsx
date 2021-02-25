@@ -19,7 +19,7 @@ pdfMake.fonts = {
     },
 };
 
-const UserData = ({ domains }) => {
+const UserData = ({ domains, isTech }) => {
     const hasDomains = !!Object.keys(domains).length;
     const [isLoadingCSV, setIsLoadingCSV] = useState(false);
     const [isLoadingPDF, setIsLoadingPDF] = useState(false);
@@ -28,7 +28,7 @@ const UserData = ({ domains }) => {
 
     const savePDF = async () => {
         setIsLoadingPDF(true);
-        const domainList = await fetchRawDomainList();
+        const domainList = await fetchRawDomainList(isTech);
         const paginatedDomains = [];
         const copied = [...domainList];
         const numOfChild = Math.ceil(copied.length / 500);
@@ -381,7 +381,7 @@ const UserData = ({ domains }) => {
 
     const handleCsvData = async () => {
         setIsLoadingCSV(true);
-        const domainList = await fetchRawDomainList();
+        const domainList = await fetchRawDomainList(isTech);
         const csv = domainList.map((item) => {
             return {
                 [formatMessage({ id: 'domain.name' })]: item.name ? item.name : '',

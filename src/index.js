@@ -13,6 +13,7 @@ import reducers from './redux/reducers';
 import './utils/polyfills';
 import 'eis-registrant-theme/dist/semantic.min.css';
 import './index.scss';
+import GA from './utils/googleAnalytics';
 
 const stateSyncConfig = {
     whitelist: ['LOGOUT_USER'],
@@ -30,6 +31,7 @@ render(
         <Provider store={store}>
             <CookiesProvider>
                 <BrowserRouter>
+                    {GA.init() && <GA.RouteTracker />}
                     <App />
                 </BrowserRouter>
             </CookiesProvider>

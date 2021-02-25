@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
 import Roles from '../Roles/Roles';
 
-function WhoIsEdit({ domain, contacts, isOpen, checkAll, onChange }) {
+function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains }) {
     const contactsList = Object.values(contacts);
     const isCompany = contactsList.find(({ ident }) => ident.type === 'org') != null;
 
@@ -24,6 +24,8 @@ function WhoIsEdit({ domain, contacts, isOpen, checkAll, onChange }) {
     );
 
     const indeterminate = checkedCount > 0 && checkedCount < totalCount;
+
+    console.log(domains);
 
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {

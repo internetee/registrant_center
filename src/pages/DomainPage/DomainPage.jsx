@@ -37,6 +37,7 @@ const DomainPage = ({
     companies,
     contacts,
     domain,
+    domains,
     fetchCompanies,
     fetchDomain,
     isLoading,
@@ -499,7 +500,7 @@ const DomainPage = ({
                         <Form onSubmit={toggleSubmitConfirmModal}>
                             <WhoIsEdit
                                 contacts={userContacts}
-                                domain={domain}
+                                domains={domains}
                                 onChange={handleWhoIsChange}
                             />
                             <div className="form-actions">
@@ -612,6 +613,7 @@ const mapStateToProps = (state, { match }) => ({
     companies: state.companies,
     contacts: state.contacts.data,
     domain: state.domains.data[match.params.id],
+    domains: state.domains,
     isLoading: state.domains.isLoading,
     ui: state.ui,
     user: state.user.data,

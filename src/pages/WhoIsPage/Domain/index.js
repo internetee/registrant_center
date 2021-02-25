@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { WhoIsEdit } from '../../../components';
 
-export default function Domain({ id, name, contacts, onChange }) {
+export default function Domain({ id, name, contacts, onChange, domains }) {
     const [isOpen, setIsOpen] = useState(false);
     return (
         <Table.Row verticalAlign="top">
@@ -14,7 +14,13 @@ export default function Domain({ id, name, contacts, onChange }) {
             </Table.Cell>
             <Table.Cell width={8}>
                 <div className="ui form">
-                    <WhoIsEdit checkAll contacts={contacts} isOpen={isOpen} onChange={onChange} />
+                    <WhoIsEdit
+                        checkAll
+                        contacts={contacts}
+                        domains={domains}
+                        isOpen={isOpen}
+                        onChange={onChange}
+                    />
                 </div>
             </Table.Cell>
             <Table.Cell singleLine textAlign="right" width={2}>
