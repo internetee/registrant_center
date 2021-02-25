@@ -259,8 +259,8 @@ const DomainEditPage = ({
                                                 <WhoIsEdit
                                                     checkAll
                                                     contacts={{ [item.id]: formData[item.id] }}
-                                                    onChange={handleWhoIsChange}
                                                     domain={domain}
+                                                    onChange={handleWhoIsChange}
                                                 />
                                             </>
                                             <div className="form-actions">
@@ -288,10 +288,10 @@ const DomainEditPage = ({
             </div>
             <WhoIsConfirmDialog
                 contacts={stageData}
+                domain={domain}
                 onCancel={toggleSubmitConfirmModal}
                 onConfirm={handleSubmit}
                 open={isSubmitConfirmModalOpen}
-                domain={domain}
             />
         </MainLayout>
     );

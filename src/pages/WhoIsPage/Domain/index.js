@@ -23,10 +23,10 @@ export default function Domain({ id, name, contacts, onChange, domains }) {
                     <WhoIsEdit
                         checkAll
                         contacts={contacts}
+                        domain={domains[index]}
                         domains={domains}
                         isOpen={isOpen}
                         onChange={onChange}
-                        domain={domains[index]}
                     />
                 </div>
             </Table.Cell>

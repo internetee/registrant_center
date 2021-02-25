@@ -307,10 +307,10 @@ const WhoIsPage = ({
                                                             whoIsData,
                                                             companies
                                                         )}
+                                                        domains={domains}
                                                         id={domain.id}
                                                         name={domain.name}
                                                         onChange={handleWhoIsChange}
-                                                        domains={domains}
                                                     />
                                                 ))}
                                             </Table.Body>
