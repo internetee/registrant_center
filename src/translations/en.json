@@ -45,7 +45,7 @@
   "domain.lock": "Lock",
   "domain.lock.description": "Regsitry lock disables all registrar and registrant initiated changes to the domain registration data. Only serverside changes are enabled.",
   "domain.lock.no": "No",
-  "domain.lock.title": "Are you sure you want to remove registry lock",
+  "domain.lock.title": "Are you sure you want to apply registry lock",
   "domain.lock.yes": "Yes",
   "domain.locked_by_registrant_at": "Locked by registrant at",
   "domain.name": "Domain",
