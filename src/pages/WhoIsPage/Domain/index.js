@@ -24,7 +24,6 @@ export default function Domain({ id, name, contacts, onChange, domains }) {
                         checkAll
                         contacts={contacts}
                         domain={domains[index]}
-                        domains={domains}
                         isOpen={isOpen}
                         onChange={onChange}
                     />

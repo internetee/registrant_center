@@ -1,20 +1,30 @@
-/* eslint-disable camelcase */
+/* eslint-disable  */
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
 import Roles from '../Roles/Roles';
 
-function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
+function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
     const contactsList = Object.values(contacts);
-    const isCompany = contactsList.find(({ ident }) => domain.registrant.org) != null;
+    const isCompany = contactsList.find(({ ident }) => ident.type === 'org' || domain.registrant.org) != null;
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { ident, disclosed_attributes }) => ({
-            checkedCount:
-                acc.checkedCount + (domain.registrant.org ? 2 : disclosed_attributes.size),
-            isCheckedAll:
-                acc.checkedCount + (domain.registrant.org ? 2 : disclosed_attributes.size) ===
-                acc.totalCount + 2,
+            // checkedCount: (domain.registrant.org ? 2 : 0) + acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size),
+            // isCheckedAll:
+            //     acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size) ===
+            //     acc.totalCount + 2,
+            // disclose_attr = это поля эмэйл имя
+            // domain.registrant.org ||
+            // checkedCount: (domain.registrant.org ? contactsList.length*2 : disclosed_attributes.size),
+            checkedCount: acc.checkedCount + (function() {
+                if (domain.registrant.org)
+                    return contactsList.length
+                if (ident.type === 'org')
+                    return 2 
+                return disclosed_attributes.size
+            })(),
+            isCheckedAll: domain.registrant.org || disclosed_attributes.size === contactsList.length*2,
             totalCount: acc.totalCount + 2,
         }),
         {
@@ -24,11 +34,8 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
         }
     );
 
+    console.log(domain.registrant.org)
     const indeterminate = checkedCount > 0 && checkedCount < totalCount;
-
-    const checkedCounter = () => {
-        if (isCheckedAll) console.log('Checked');
-    };
 
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {
@@ -52,7 +59,6 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
         onChange(changedContacts);
     };
 
-    // ========================================================================================
     const CheckAllLabel = () => {
         if (indeterminate) {
             return (
@@ -101,12 +107,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
                     <Checkbox
                         checked={isCheckedAll || isCompany}
                         className="large"
-                        disabled={isCompany}
+                        disabled={isCheckedAll || isCompany}
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
                             handleChange(elem.checked, Object.keys(contacts), ['name', 'email']);
-                            if (elem.checked) checkedCounter();
                         }}
                     />
                 </Form.Field>
@@ -131,7 +136,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
                                     item.ident.type === 'org' ||
                                     item.disclosed_attributes.has('name')
                                 }
-                                disabled={domain.registrant.org || item.ident.type === 'org'}
+                                disabled={item.ident.type === 'org' || domain.registrant.org}
                                 label={
                                     <FormattedMessage
                                         id="whois.edit.name"
@@ -143,8 +148,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
                                 }
                                 name="name"
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], ['name'])
-                                }
+                                    handleChange(elem.checked, [item.id], ['name'])}
                                 value={item.name}
                             />
                         </Form.Field>
@@ -155,7 +159,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
                                     item.ident.type === 'org' ||
                                     item.disclosed_attributes.has('email')
                                 }
-                                disabled={domain.registrant.org || item.ident.type === 'org'}
+                                disabled={item.ident.type === 'org' || domain.registrant.org}
                                 label={
                                     <FormattedMessage
                                         id="whois.edit.email"
