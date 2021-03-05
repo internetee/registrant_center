@@ -47,7 +47,6 @@ export default {
                 return acc;
             }, []);
         } catch (e) {
-            console.log(e);
             return [];
         }
     },
@@ -114,7 +113,6 @@ export default {
 
         return Object.keys(domain.contacts).reduce((acc, key) => {
             const contact = contacts[key];
-            console.log(contact);
             if (
                 (contact && contact.ident.code === user.ident && domain.contacts[key]) ||
                 (contact && contact.ident.type === 'org' && company_list[contact.ident.code])

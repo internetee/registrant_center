@@ -6,13 +6,14 @@ import Roles from '../Roles/Roles';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
     const contactsList = Object.values(contacts);
-    const isCompany = contactsList.find(({ ident }) => ident.type === 'org') != null;
+    const isCompany = contactsList.find(({ ident }) => domain.registrant.org) != null;
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { ident, disclosed_attributes }) => ({
-            checkedCount: acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size),
+            checkedCount:
+                acc.checkedCount + (domain.registrant.org ? 2 : disclosed_attributes.size),
             isCheckedAll:
-                acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size) ===
+                acc.checkedCount + (domain.registrant.org ? 2 : disclosed_attributes.size) ===
                 acc.totalCount + 2,
             totalCount: acc.totalCount + 2,
         }),
@@ -25,7 +26,9 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
 
     const indeterminate = checkedCount > 0 && checkedCount < totalCount;
 
-    console.log(domains);
+    const checkedCounter = () => {
+        if (isCheckedAll) console.log('Checked');
+    };
 
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {
@@ -49,6 +52,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
         onChange(changedContacts);
     };
 
+    // ========================================================================================
     const CheckAllLabel = () => {
         if (indeterminate) {
             return (
@@ -95,14 +99,15 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domains, domain }) {
             {checkAll && (
                 <Form.Field>
                     <Checkbox
-                        checked={isCheckedAll}
+                        checked={isCheckedAll || isCompany}
                         className="large"
                         disabled={isCompany}
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
-                        onChange={(e, elem) =>
-                            handleChange(elem.checked, Object.keys(contacts), ['name', 'email'])
-                        }
+                        onChange={(e, elem) => {
+                            handleChange(elem.checked, Object.keys(contacts), ['name', 'email']);
+                            if (elem.checked) checkedCounter();
+                        }}
                     />
                 </Form.Field>
             )}
