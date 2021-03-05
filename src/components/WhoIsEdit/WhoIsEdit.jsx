@@ -10,16 +10,15 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { ident, disclosed_attributes }) => ({
-            // checkedCount: (domain.registrant.org ? 2 : 0) + acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size),
-            // isCheckedAll:
-            //     acc.checkedCount + (ident.type === 'org' ? 2 : disclosed_attributes.size) ===
-            //     acc.totalCount + 2,
-            // disclose_attr = это поля эмэйл имя
-            // domain.registrant.org ||
-            // checkedCount: (domain.registrant.org ? contactsList.length*2 : disclosed_attributes.size),
             checkedCount: acc.checkedCount + (function() {
-                if (domain.registrant.org)
-                    return contactsList.length
+                if (domain.registrant.org) {
+                    console.log(contactsList)
+                    if (contactsList.length === 1)
+                        return contactsList.length * 2
+                    if (contactsList === 3)
+                        return contactsList.length * 2
+                    return 2
+                }
                 if (ident.type === 'org')
                     return 2 
                 return disclosed_attributes.size
@@ -34,7 +33,6 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
         }
     );
 
-    console.log(domain.registrant.org)
     const indeterminate = checkedCount > 0 && checkedCount < totalCount;
 
     const handleChange = (checked, ids, type) => {
@@ -107,7 +105,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                     <Checkbox
                         checked={isCheckedAll || isCompany}
                         className="large"
-                        disabled={isCheckedAll || isCompany}
+                        disabled={isCompany}
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
