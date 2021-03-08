@@ -12,11 +12,6 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
         (acc, { ident, disclosed_attributes }) => ({
             checkedCount: acc.checkedCount + (function() {
                 if (domain.registrant.org) {
-                    console.log(contactsList)
-                    if (contactsList.length === 1)
-                        return contactsList.length * 2
-                    if (contactsList === 3)
-                        return contactsList.length * 2
                     return 2
                 }
                 if (ident.type === 'org')
