@@ -60,6 +60,8 @@ const DomainPage = ({
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
+    console.log('DOMAIN: ', domain);
+
     useEffect(() => {
         (async () => {
             if (!domain?.tech_contacts && !isLoading) {
@@ -500,6 +502,7 @@ const DomainPage = ({
                         <Form onSubmit={toggleSubmitConfirmModal}>
                             <WhoIsEdit
                                 contacts={userContacts}
+                                domain={domain}
                                 domains={domains}
                                 onChange={handleWhoIsChange}
                             />

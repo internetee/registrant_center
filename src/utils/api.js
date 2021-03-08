@@ -74,11 +74,15 @@ export default {
 
     fetchDomains: (uuid = false, offset, simplify = true, tech = false) => {
         if (uuid) {
-            return instance.get(`/api/domains/${uuid}`);
+            const d = instance.get(`/api/domains/${uuid}`);
+            console.log('Domain ', d);
+            return d;
         }
         if (simplify) {
             if (tech) {
-                return instance.get(`/api/domains?offset=${offset}&simple=true&tech=true`);
+                const d = instance.get(`/api/domains?offset=${offset}&simple=true&tech=true`);
+                console.log('Domain: ', d);
+                return d;
             }
             return instance.get(`/api/domains?offset=${offset}&simple=true`);
         }

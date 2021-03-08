@@ -47,7 +47,6 @@ export default {
                 return acc;
             }, []);
         } catch (e) {
-            console.log(e);
             return [];
         }
     },
@@ -82,6 +81,11 @@ export default {
             return acc;
         }, []);
     },
+    getDomains: (domains = {}) => {
+        return Object.values(domains).map((item) => {
+            return item;
+        });
+    },
     getUserContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
         console.log(contacts);
         const company_list = companies.data ? companies.data : companies;
@@ -109,7 +113,6 @@ export default {
 
         return Object.keys(domain.contacts).reduce((acc, key) => {
             const contact = contacts[key];
-            console.log(contact);
             if (
                 (contact && contact.ident.code === user.ident && domain.contacts[key]) ||
                 (contact && contact.ident.type === 'org' && company_list[contact.ident.code])
