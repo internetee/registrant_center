@@ -283,11 +283,9 @@ const DomainPage = ({
                                                         tagName="strong"
                                                     />
                                                 </Table.Cell>
-                                                <Table.Cell>
-                                                    {registrantContacts.ident}
-                                                </Table.Cell>
+                                                <Table.Cell>{registrantContacts.ident}</Table.Cell>
                                             </Table.Row>
-                                    )}
+                                        )}
                                     {registrantContacts.email && (
                                         <Table.Row>
                                             <Table.Cell width="4">
