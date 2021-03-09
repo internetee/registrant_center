@@ -248,7 +248,8 @@ const DomainPage = ({
                                                 : ''
                                         }`}</Table.Cell>
                                     </Table.Row>
-                                    {registrantContacts.ident_type === 'priv' && registrantContacts.ident && (
+                                    {registrantContacts.ident_type === 'priv' &&
+                                     registrantContacts.ident && (
                                         <Table.Row>
                                             <Table.Cell width="4">
                                                 <FormattedMessage
@@ -259,7 +260,8 @@ const DomainPage = ({
                                             <Table.Cell>{registrantContacts.ident.code}</Table.Cell>
                                         </Table.Row>
                                     )}
-                                    {registrantContacts.ident_type === 'birthday' && registrantContacts.ident && (
+                                    {registrantContacts.ident_type === 'birthday' &&
+                                     registrantContacts.ident && (
                                         <Table.Row>
                                             <Table.Cell width="4">
                                                 <FormattedMessage
@@ -270,7 +272,8 @@ const DomainPage = ({
                                             <Table.Cell>{registrantContacts.ident}</Table.Cell>
                                         </Table.Row>
                                     )}
-                                    {registrantContacts.ident_type === 'org' && registrantContacts.ident && (
+                                    {registrantContacts.ident_type === 'org' && 
+                                    registrantContacts.ident && (
                                         <Table.Row>
                                             <Table.Cell width="4">
                                                 <FormattedMessage
