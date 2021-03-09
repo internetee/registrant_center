@@ -170,9 +170,6 @@ const WhoIsPage = ({
         return <Loading />;
     }
 
-    console.log(paginatedDomains[activePage - 1])
-    console.log(activePage)
-
     return (
         <MainLayout hasBackButton titleKey="whois.title">
             {!isLoading && message && <MessageModule message={message} />}
@@ -301,8 +298,7 @@ const WhoIsPage = ({
                                                 </Table.Row>
                                             </Table.Footer>
                                             <Table.Body>
-                                                {
-                                                paginatedDomains[activePage - 1].map((domain) => (
+                                                {paginatedDomains[activePage - 1].map((domain) => (
                                                     <Domain
                                                         key={domain.id}
                                                         contacts={Helpers.parseDomainContacts(
@@ -339,7 +335,7 @@ const WhoIsPage = ({
                                             }}
                                             onPageChange={(e, { activePage: page }) =>
                                             setActivePage(page)
-                                        }
+                                            }
                                             prevItem={{
                                                 content: (
                                                     <>
