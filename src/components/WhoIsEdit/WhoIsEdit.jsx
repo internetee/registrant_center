@@ -13,16 +13,17 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
         (acc, { ident, disclosed_attributes }) => ({
             checkedCount:
                 acc.checkedCount +
-                (function() {
+                (function () {
                     if (domain.registrant.org) {
                         return 2;
                     }
                     if (ident.type === 'org') {
                         return 2;
                     }
-                    return disclosed_attributes.size
-                    })(),
-            isCheckedAll: domain.registrant.org || disclosed_attributes.size === contactsList.length*2,
+                    return disclosed_attributes.size;
+                })(),
+            isCheckedAll: 
+                domain.registrant.org || disclosed_attributes.size === contactsList.length*2,
             totalCount: acc.totalCount + 2,
         }),
         {
