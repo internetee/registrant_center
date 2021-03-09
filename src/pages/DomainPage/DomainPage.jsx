@@ -250,40 +250,43 @@ const DomainPage = ({
                                     </Table.Row>
                                     {registrantContacts.ident_type === 'priv' &&
                                         registrantContacts.ident && (
-                                        <Table.Row>
-                                            <Table.Cell width="4">
-                                                <FormattedMessage
-                                                    id="domain.registrant.ident"
-                                                    tagName="strong"
-                                                />
-                                            </Table.Cell>
-                                            <Table.Cell>{registrantContacts.ident.code}</Table.Cell>
-                                        </Table.Row>
-                                    )}
-                                    {registrantContacts.ident_type === 'birthday' && 
+                                            <Table.Row>
+                                                <Table.Cell width="4">
+                                                    <FormattedMessage
+                                                        id="domain.registrant.ident"
+                                                        tagName="strong"
+                                                    />
+                                                </Table.Cell>
+                                                <Table.Cell>{registrantContacts.ident.code}</Table.Cell>
+                                            </Table.Row>
+                                        )
+                                    }
+                                    {registrantContacts.ident_type === 'birthday' &&
                                         registrantContacts.ident && (
-                                        <Table.Row>
-                                            <Table.Cell width="4">
-                                                <FormattedMessage
-                                                    id="domain.registrant.ident.birthday"
-                                                    tagName="strong"
-                                                />
-                                            </Table.Cell>
-                                            <Table.Cell>{registrantContacts.ident}</Table.Cell>
-                                        </Table.Row>
-                                    )}
+                                            <Table.Row>
+                                                <Table.Cell width="4">
+                                                    <FormattedMessage
+                                                        id="domain.registrant.ident.birthday"
+                                                        tagName="strong"
+                                                    />
+                                                </Table.Cell>
+                                                <Table.Cell>{registrantContacts.ident}</Table.Cell>
+                                            </Table.Row>
+                                        )
+                                    }
                                     {registrantContacts.ident_type === 'org' && 
                                         registrantContacts.ident && (
-                                        <Table.Row>
-                                            <Table.Cell width="4">
-                                                <FormattedMessage
-                                                    id="domain.registrant.ident.org"
-                                                    tagName="strong"
-                                                />
-                                            </Table.Cell>
-                                            <Table.Cell>{registrantContacts.ident}</Table.Cell>
-                                        </Table.Row>
-                                    )}
+                                            <Table.Row>
+                                                <Table.Cell width="4">
+                                                    <FormattedMessage
+                                                        id="domain.registrant.ident.org"
+                                                        tagName="strong"
+                                                    />
+                                                </Table.Cell>
+                                                <Table.Cell>{registrantContacts.ident}</Table.Cell>
+                                            </Table.Row>
+                                        )
+                                    }
                                     {registrantContacts.email && (
                                         <Table.Row>
                                             <Table.Cell width="4">
