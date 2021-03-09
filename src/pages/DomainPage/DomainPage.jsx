@@ -259,8 +259,7 @@ const DomainPage = ({
                                                 </Table.Cell>
                                                 <Table.Cell>{registrantContacts.ident.code}</Table.Cell>
                                             </Table.Row>
-                                        )
-                                    }
+                                    )}
                                     {registrantContacts.ident_type === 'birthday' &&
                                         registrantContacts.ident && (
                                             <Table.Row>
@@ -272,9 +271,8 @@ const DomainPage = ({
                                                 </Table.Cell>
                                                 <Table.Cell>{registrantContacts.ident}</Table.Cell>
                                             </Table.Row>
-                                        )
-                                    }
-                                    {registrantContacts.ident_type === 'org' && 
+                                    )}
+                                    {registrantContacts.ident_type === 'org' &&
                                         registrantContacts.ident && (
                                             <Table.Row>
                                                 <Table.Cell width="4">
@@ -285,8 +283,7 @@ const DomainPage = ({
                                                 </Table.Cell>
                                                 <Table.Cell>{registrantContacts.ident}</Table.Cell>
                                             </Table.Row>
-                                        )
-                                    }
+                                    )}
                                     {registrantContacts.email && (
                                         <Table.Row>
                                             <Table.Cell width="4">
