@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
@@ -260,8 +260,8 @@ const DomainPage = ({
                                             <Table.Cell>{registrantContacts.ident.code}</Table.Cell>
                                         </Table.Row>
                                     )}
-                                    {registrantContacts.ident_type === 'birthday' &&
-                                     registrantContacts.ident && (
+                                    {registrantContacts.ident_type === 'birthday' && 
+                                        registrantContacts.ident && (
                                         <Table.Row>
                                             <Table.Cell width="4">
                                                 <FormattedMessage
