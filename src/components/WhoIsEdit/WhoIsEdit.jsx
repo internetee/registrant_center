@@ -1,4 +1,4 @@
-/* eslint-disable  */
+/* eslint-disable camelcase */
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
