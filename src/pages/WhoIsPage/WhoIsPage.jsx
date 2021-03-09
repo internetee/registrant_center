@@ -334,7 +334,7 @@ const WhoIsPage = ({
                                                 icon: true,
                                             }}
                                             onPageChange={(e, { activePage: page }) =>
-                                            setActivePage(page)
+                                                setActivePage(page)
                                             }
                                             prevItem={{
                                                 content: (
