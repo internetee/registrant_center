@@ -22,8 +22,8 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                     }
                     return disclosed_attributes.size;
                 })(),
-            isCheckedAll: 
-                domain.registrant.org || disclosed_attributes.size === contactsList.length*2,
+            isCheckedAll:
+                domain.registrant.org || disclosed_attributes.size === contactsList.length * 2,
             totalCount: acc.totalCount + 2,
         }),
         {
@@ -146,7 +146,8 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 }
                                 name="name"
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], ['name'])}
+                                    handleChange(elem.checked, [item.id], ['name'])
+                                }
                                 value={item.name}
                             />
                         </Form.Field>
