@@ -60,8 +60,6 @@ const DomainPage = ({
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
-    console.log('DOMAIN: ', domain);
-
     useEffect(() => {
         (async () => {
             if (!domain?.tech_contacts && !isLoading) {
@@ -250,7 +248,7 @@ const DomainPage = ({
                                                 : ''
                                         }`}</Table.Cell>
                                     </Table.Row>
-                                    {registrantContacts.ident && (
+                                    {registrantContacts.ident_type === 'priv' && registrantContacts.ident && (
                                         <Table.Row>
                                             <Table.Cell width="4">
                                                 <FormattedMessage
@@ -259,6 +257,28 @@ const DomainPage = ({
                                                 />
                                             </Table.Cell>
                                             <Table.Cell>{registrantContacts.ident.code}</Table.Cell>
+                                        </Table.Row>
+                                    )}
+                                    {registrantContacts.ident_type === 'birthday' && registrantContacts.ident && (
+                                        <Table.Row>
+                                            <Table.Cell width="4">
+                                                <FormattedMessage
+                                                    id="domain.registrant.ident.birthday"
+                                                    tagName="strong"
+                                                />
+                                            </Table.Cell>
+                                            <Table.Cell>{registrantContacts.ident}</Table.Cell>
+                                        </Table.Row>
+                                    )}
+                                    {registrantContacts.ident_type === 'org' && registrantContacts.ident && (
+                                        <Table.Row>
+                                            <Table.Cell width="4">
+                                                <FormattedMessage
+                                                    id="domain.registrant.ident.org"
+                                                    tagName="strong"
+                                                />
+                                            </Table.Cell>
+                                            <Table.Cell>{registrantContacts.ident}</Table.Cell>
                                         </Table.Row>
                                     )}
                                     {registrantContacts.email && (
