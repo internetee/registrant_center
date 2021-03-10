@@ -395,7 +395,9 @@ const WhoIsPage = ({
                                                 disabled: activePage === paginatedDomains.length,
                                                 icon: true,
                                             }}
-                                            onPageChange={(e, page) => setActivePage(page)}
+                                            onPageChange={(e, { activePage: page }) =>
+                                                setActivePage(page)
+                                            }
                                             prevItem={{
                                                 content: (
                                                     <>

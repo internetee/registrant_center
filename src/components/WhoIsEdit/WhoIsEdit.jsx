@@ -1,4 +1,4 @@
-/* eslint-disable  */
+/* eslint-disable camelcase */
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
@@ -6,19 +6,24 @@ import Roles from '../Roles/Roles';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
     const contactsList = Object.values(contacts);
-    const isCompany = contactsList.find(({ ident }) => ident.type === 'org' || domain.registrant.org) != null;
+    const isCompany =
+        contactsList.find(({ ident }) => ident.type === 'org' || domain.registrant.org) != null;
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { ident, disclosed_attributes }) => ({
-            checkedCount: acc.checkedCount + (function() {
-                if (domain.registrant.org) {
-                    return 2
-                }
-                if (ident.type === 'org')
-                    return 2 
-                return disclosed_attributes.size
-            })(),
-            isCheckedAll: domain.registrant.org || disclosed_attributes.size === contactsList.length*2,
+            checkedCount:
+                acc.checkedCount +
+                (function () {
+                    if (domain.registrant.org) {
+                        return 2;
+                    }
+                    if (ident.type === 'org') {
+                        return 2;
+                    }
+                    return disclosed_attributes.size;
+                })(),
+            isCheckedAll:
+                domain.registrant.org || disclosed_attributes.size === contactsList.length * 2,
             totalCount: acc.totalCount + 2,
         }),
         {
@@ -141,7 +146,8 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 }
                                 name="name"
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], ['name'])}
+                                    handleChange(elem.checked, [item.id], ['name'])
+                                }
                                 value={item.name}
                             />
                         </Form.Field>

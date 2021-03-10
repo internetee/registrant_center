@@ -321,11 +321,6 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
         }
     };
 
-    const setRoleValue = () => {
-        if (isTech) return 'domains.roles.allRoles';
-        return 'domains.roles.regAndAdmRoles';
-    };
-
     return (
         <div className="domains-list--wrap">
             <div className="page--header">
