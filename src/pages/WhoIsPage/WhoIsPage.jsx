@@ -65,6 +65,26 @@ const WhoIsPage = ({
         paginatedDomains.push(copied.splice(0, perPage));
     }
 
+    const [isTech, setTech] = useState(false);
+    useEffect(() => {
+        if (isTech) {
+            (async () => {
+                await fetchDomains(0, true, true);
+                // setIsLoading(false);
+            })();
+        } else {
+            (async () => {
+                await fetchDomains(0, true, false);
+                // setIsLoading(false);
+            })();
+        }
+    }, [fetchDomains, isTech]);
+
+    const checked = (cond = false) => {
+        // setIsLoading(true);
+        setTech(cond);
+    };
+
     useEffect(() => {
         (async () => {
             await fetchDomains(0, false);
@@ -170,6 +190,32 @@ const WhoIsPage = ({
         return <Loading />;
     }
 
+
+    const handleRole = (event, { name, value }) => {
+        if (value === 'domains.roles.regAndAdmRoles' && isTech) {
+            checked(false);
+        }
+        if (value === 'domains.roles.allRoles' && !isTech) {
+            checked(true);
+        }
+    };
+
+    const roleOptions = [
+        {
+            id: 'domains.roles.regAndAdmRoles',
+            key: 'domains.roles.regAndAdmRoles',
+            text: formatMessage({ id: 'domains.roles.regAndAdmRoles' }),
+            value: 'domains.roles.regAndAdmRoles',
+        },
+        {
+            id: 'domains.roles.allRoles',
+            key: 'domains.roles.allRoles',
+            text: formatMessage({ id: 'domains.roles.allRoles' }),
+            value: 'domains.roles.allRoles',
+        },
+    ];
+
+
     return (
         <MainLayout hasBackButton titleKey="whois.title">
             {!isLoading && message && <MessageModule message={message} />}
@@ -224,6 +270,22 @@ const WhoIsPage = ({
                                             </MediaQuery>
                                         </div>
                                     </div>
+                                    <div>
+                                        <FormattedMessage
+                                            id="domains.form.selectRole"
+                                            tagName="label"
+                                        />
+                                        <Dropdown
+                                            defaultValue={
+                                                isTech ? roleOptions[1].value : roleOptions[0].value
+                                            }
+                                            fluid
+                                            name="queryRole"
+                                            onChange={handleRole}
+                                            options={roleOptions}
+                                            selection
+                                        />
+                                        </div>
                                 </Form>
                             </Container>
                         </div>
