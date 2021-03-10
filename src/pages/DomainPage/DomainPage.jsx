@@ -60,8 +60,6 @@ const DomainPage = ({
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
-    console.log('DOMAIN: ', domain);
-
     useEffect(() => {
         (async () => {
             if (!domain?.tech_contacts && !isLoading) {
@@ -91,11 +89,23 @@ const DomainPage = ({
             const userContact = Helpers.getUserContacts(user, domain, contacts, companies);
             if (Object.keys(userContact).length) {
                 setUserContacts(userContact);
+                const domain_contacts_keys = Object.keys(domain.contacts);
+                const user_contacts_keys = Object.keys(userContact);
+
+                let lockableFlag = false;
+
+                console.log(domain_contacts_keys.length)
+                for (let i = 0; i < user_contacts_keys.length; i+=1) {
+                    for (let j = 0; j < domain_contacts_keys.length; j+=1) {
+                        if (user_contacts_keys[i] === domain_contacts_keys[j]) {
+                            if (domain.contacts[domain_contacts_keys[j]].roles.includes('tech')) break;
+                            lockableFlag = true
+                        }
+                    }
+                }
+
                 setIsLockable(
-                    domain.isLockable &&
-                        Object.values(userContact).some((item) =>
-                            item.roles.some((role) => ['admin', 'registrant'].includes(role))
-                        )
+                    domain.isLockable && lockableFlag
                 );
             }
             setRegistrantContacts({
