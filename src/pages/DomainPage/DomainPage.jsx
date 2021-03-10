@@ -295,7 +295,7 @@ const DomainPage = ({
                                                 </Table.Cell>
                                                 <Table.Cell>
                                                     {registrantContacts.ident.code ||
-                                                            registrantContacts.ident}
+                                                        registrantContacts.ident}
                                                 </Table.Cell>
                                             </Table.Row>
                                         )}
