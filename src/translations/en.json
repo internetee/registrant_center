@@ -58,6 +58,8 @@
   "domain.registrant": "Registrant",
   "domain.registrant.email": "E-mail",
   "domain.registrant.ident": "Identity code",
+  "domain.registrant.ident.birthday": "Birthday",
+  "domain.registrant.ident.org": "Business code",
   "domain.registrant.ident.code": "Identity code",
   "domain.registrant.name": "Name",
   "domain.registrant.phone": "Phone",

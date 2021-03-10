@@ -87,7 +87,6 @@ export default {
         });
     },
     getUserContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
-        console.log(contacts);
         const company_list = companies.data ? companies.data : companies;
         const userContacts = Object.values(contacts).filter(
             (contact) =>
@@ -110,7 +109,6 @@ export default {
     },
     parseDomainContacts: (user = {}, domain = {}, contacts = {}, companies = {}) => {
         const company_list = companies.data ? companies.data : companies;
-
         return Object.keys(domain.contacts).reduce((acc, key) => {
             const contact = contacts[key];
             if (

@@ -257,7 +257,7 @@ const DomainPage = ({
                                                 : ''
                                         }`}</Table.Cell>
                                     </Table.Row>
-                                    {registrantContacts.ident && (
+                                    {registrantContacts.ident_type === 'priv' && (
                                         <Table.Row>
                                             <Table.Cell width="4">
                                                 <FormattedMessage
@@ -265,9 +265,40 @@ const DomainPage = ({
                                                     tagName="strong"
                                                 />
                                             </Table.Cell>
-                                            <Table.Cell>{registrantContacts.ident.code}</Table.Cell>
+                                            <Table.Cell>
+                                                {registrantContacts.ident.code ||
+                                                    registrantContacts.ident}
+                                            </Table.Cell>
                                         </Table.Row>
                                     )}
+                                    {(registrantContacts.ident.type === 'birthday' ||
+                                        registrantContacts.ident_type === 'birthday') &&
+                                        registrantContacts.ident && (
+                                            <Table.Row>
+                                                <Table.Cell width="4">
+                                                    <FormattedMessage
+                                                        id="domain.registrant.ident.birthday"
+                                                        tagName="strong"
+                                                    />
+                                                </Table.Cell>
+                                                <Table.Cell>{registrantContacts.ident}</Table.Cell>
+                                            </Table.Row>
+                                        )}
+                                    {registrantContacts.ident_type === 'org' &&
+                                        registrantContacts.ident && (
+                                            <Table.Row>
+                                                <Table.Cell width="4">
+                                                    <FormattedMessage
+                                                        id="domain.registrant.ident.org"
+                                                        tagName="strong"
+                                                    />
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    {registrantContacts.ident.code ||
+                                                        registrantContacts.ident}
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        )}
                                     {registrantContacts.email && (
                                         <Table.Row>
                                             <Table.Cell width="4">
