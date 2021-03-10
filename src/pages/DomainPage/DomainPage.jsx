@@ -271,9 +271,8 @@ const DomainPage = ({
                                             </Table.Cell>
                                         </Table.Row>
                                     )}
-                                    {
-                                    (registrantContacts.ident.type === 'birthday' ||
-                                    registrantContacts.ident_type === 'birthday') &&
+                                    {(registrantContacts.ident.type === 'birthday' ||
+                                        registrantContacts.ident_type === 'birthday') &&
                                         registrantContacts.ident && (
                                             <Table.Row>
                                                 <Table.Cell width="4">
@@ -294,7 +293,10 @@ const DomainPage = ({
                                                         tagName="strong"
                                                     />
                                                 </Table.Cell>
-                                                <Table.Cell>{registrantContacts.ident.code || registrantContacts.ident}</Table.Cell>
+                                                <Table.Cell>
+                                                    {registrantContacts.ident.code ||
+                                                            registrantContacts.ident}
+                                                </Table.Cell>
                                             </Table.Row>
                                         )}
                                     {registrantContacts.email && (
