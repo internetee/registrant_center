@@ -266,10 +266,13 @@ const DomainPage = ({
                                                 />
                                             </Table.Cell>
                                             <Table.Cell>
-                                                {registrantContacts.ident.code || registrantContacts.ident}
+                                                {registrantContacts.ident.code ||
+                                                    registrantContacts.ident}
                                             </Table.Cell>
-                                        </Table.Row>)}
-                                    {(registrantContacts.ident.type === 'birthday' ||
+                                        </Table.Row>
+                                    )}
+                                    {
+                                    (registrantContacts.ident.type === 'birthday' ||
                                     registrantContacts.ident_type === 'birthday') &&
                                         registrantContacts.ident && (
                                             <Table.Row>
