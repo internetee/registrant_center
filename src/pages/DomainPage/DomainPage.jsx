@@ -91,22 +91,19 @@ const DomainPage = ({
                 setUserContacts(userContact);
                 const domain_contacts_keys = Object.keys(domain.contacts);
                 const user_contacts_keys = Object.keys(userContact);
-
                 let lockableFlag = false;
 
-                console.log(domain_contacts_keys.length)
-                for (let i = 0; i < user_contacts_keys.length; i+=1) {
-                    for (let j = 0; j < domain_contacts_keys.length; j+=1) {
+                for (let i = 0; i < user_contacts_keys.length; i += 1) {
+                    for (let j = 0; j < domain_contacts_keys.length; j += 1) {
                         if (user_contacts_keys[i] === domain_contacts_keys[j]) {
-                            if (domain.contacts[domain_contacts_keys[j]].roles.includes('tech')) break;
-                            lockableFlag = true
+                            if (domain.contacts[domain_contacts_keys[j]].roles.includes('tech')) 
+                                break;
+                            lockableFlag = true;
                         }
                     }
                 }
 
-                setIsLockable(
-                    domain.isLockable && lockableFlag
-                );
+                setIsLockable(domain.isLockable && lockableFlag);
             }
             setRegistrantContacts({
                 ...domain.registrant,
