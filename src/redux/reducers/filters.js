@@ -8,7 +8,7 @@ const setSortByRoles = (isTech) => ({
 const initialState = {
     isTech: false,
 };
-  
+
 export default function reducer(state = initialState, { payload, type }) {
     if (type === 'SET_TECH') {
         return {
@@ -17,7 +17,6 @@ export default function reducer(state = initialState, { payload, type }) {
         };
     }
     return state;
-};
+}
 
-export { initialState, setSortByRoles }
-
+export { initialState, setSortByRoles };
