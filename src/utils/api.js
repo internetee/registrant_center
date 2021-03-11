@@ -84,6 +84,9 @@ export default {
             }
             return instance.get(`/api/domains?offset=${offset}&simple=true`);
         }
+        if (!simplify && tech) {
+            return instance.get(`/api/domains?offset=${offset}&simple=false&tech=true`);
+        }
         if (tech) return instance.get(`/api/domains?offset=${offset}&simple=true&tech=true`);
         return instance.get(`/api/domains?offset=${offset}`);
     },

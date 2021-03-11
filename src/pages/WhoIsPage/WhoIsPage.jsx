@@ -11,7 +11,7 @@ import {
     Pagination,
     Dropdown,
 } from 'semantic-ui-react';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import MediaQuery from 'react-responsive';
 import {
@@ -25,6 +25,7 @@ import Domain from './Domain';
 import * as contactsActions from '../../redux/reducers/contacts';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
+import { setSortByRoles as setSortByRolesAction } from '../../redux/reducers/filters';
 import Helpers from '../../utils/helpers';
 
 const perPageOptions = [
@@ -40,10 +41,12 @@ const WhoIsPage = ({
     fetchCompanies,
     fetchContacts,
     fetchDomains,
+    setSortByRoles,
     message,
     ui,
     updateContact,
     user,
+    isTech,
 }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['whoIsPerPage']);
@@ -57,22 +60,35 @@ const WhoIsPage = ({
     const [whoIsData, setWhoIsData] = useState({});
     const [results, setResults] = useState(domains);
     const { uiElemSize } = ui;
-
     const paginatedDomains = [];
     const copied = [...results];
     const numOfChild = Math.ceil(copied.length / perPage);
+    const dispatch = useDispatch();
     for (let i = 0; i < numOfChild; i += 1) {
         paginatedDomains.push(copied.splice(0, perPage));
     }
 
+    const onSelectTech = React.useCallback((value) => {
+        dispatch(setSortByRoles(value));
+    }, []);
+
     useEffect(() => {
-        (async () => {
-            await fetchDomains(0, false);
-            await fetchContacts();
-            await fetchCompanies();
-            setIsLoading(false);
-        })();
-    }, [fetchCompanies, fetchContacts, fetchDomains]);
+        if (isTech) {
+            (async () => {
+                await fetchDomains(0, false, true);
+                await fetchContacts();
+                await fetchCompanies();
+                setIsLoading(false);
+            })();
+        } else {
+            (async () => {
+                await fetchDomains(0, false, false);
+                await fetchContacts();
+                await fetchCompanies();
+                setIsLoading(false);
+            })();
+        }
+    }, [fetchDomains, fetchContacts, fetchCompanies, isTech]);
 
     useEffect(() => {
         setWhoIsData(contacts);
@@ -170,6 +186,30 @@ const WhoIsPage = ({
         return <Loading />;
     }
 
+    const handleRole = (event, { name, value }) => {
+        if (value === 'domains.roles.regAndAdmRoles' && isTech) {
+            onSelectTech(false);
+        }
+        if (value === 'domains.roles.allRoles' && !isTech) {
+            onSelectTech(true);
+        }
+    };
+
+    const roleOptions = [
+        {
+            id: 'domains.roles.regAndAdmRoles',
+            key: 'domains.roles.regAndAdmRoles',
+            text: formatMessage({ id: 'domains.roles.regAndAdmRoles' }),
+            value: 'domains.roles.regAndAdmRoles',
+        },
+        {
+            id: 'domains.roles.allRoles',
+            key: 'domains.roles.allRoles',
+            text: formatMessage({ id: 'domains.roles.allRoles' }),
+            value: 'domains.roles.allRoles',
+        },
+    ];
+
     return (
         <MainLayout hasBackButton titleKey="whois.title">
             {!isLoading && message && <MessageModule message={message} />}
@@ -223,6 +263,22 @@ const WhoIsPage = ({
                                                 </Button>
                                             </MediaQuery>
                                         </div>
+                                    </div>
+                                    <div>
+                                        <FormattedMessage
+                                            id="domains.form.selectRole"
+                                            tagName="label"
+                                        />
+                                        <Dropdown
+                                            defaultValue={
+                                                isTech ? roleOptions[1].value : roleOptions[0].value
+                                            }
+                                            fluid
+                                            name="queryRole"
+                                            onChange={handleRole}
+                                            options={roleOptions}
+                                            selection
+                                        />
                                     </div>
                                 </Form>
                             </Container>
@@ -389,6 +445,7 @@ const mapStateToProps = (state) => {
         companies: state.companies.data,
         contacts: state.contacts.data,
         domains: state.domains.ids.map((id) => state.domains.data.domains[id]),
+        isTech: state.filters.isTech,
         ui: state.ui,
         user: state.user.data,
     };
@@ -398,4 +455,5 @@ export default connect(mapStateToProps, {
     ...contactsActions,
     fetchCompanies: fetchCompaniesAction,
     fetchDomains: fetchDomainsAction,
+    setSortByRoles: setSortByRolesAction,
 })(WhoIsPage);

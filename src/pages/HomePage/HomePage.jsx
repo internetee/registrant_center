@@ -2,18 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { bindActionCreators } from 'redux';
 import { DomainList, UserData, MainLayout, Loading } from '../../components';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
+import { setSortByRoles as setSortByRolesAction } from '../../redux/reducers/filters';
 
-const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount }) => {
+const HomePage = ({
+    totalDomains,
+    domains,
+    fetchDomains,
+    ui,
+    user,
+    absoluteCount,
+    isTech,
+    setSortByRoles,
+}) => {
     const { lang } = ui;
     moment.locale(lang);
     const [isLoading, setIsLoading] = useState(true);
     const { formatMessage } = useIntl();
-    const [isTech, setTech] = useState(false);
+    const dispatch = useDispatch();
+
+    const onSelectTech = React.useCallback((value) => {
+        dispatch(setSortByRoles(value));
+    }, []);
 
     useEffect(() => {
         if (isTech) {
@@ -28,11 +42,6 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
             })();
         }
     }, [fetchDomains, isTech]);
-
-    const checked = (cond = false) => {
-        setIsLoading(true);
-        setTech(cond);
-    };
 
     if (isLoading) return <Loading />;
 
@@ -86,12 +95,12 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
                     </Grid>
                 </div>
                 <DomainList
-                    checked={checked}
                     domainCount={totalDomains}
                     domains={domains}
                     domainTotal={absoluteCount}
                     isTech={isTech}
                     lang={lang}
+                    onSelectTech={onSelectTech}
                 />
                 <UserData isTech={isTech} lang={lang} />
             </div>
@@ -99,10 +108,11 @@ const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount
     );
 };
 
-const mapStateToProps = ({ domains, ui, user }) => {
+const mapStateToProps = ({ domains, ui, user, filters }) => {
     return {
         absoluteCount: domains.data.total,
         domains: Object.values(domains.data.domains),
+        isTech: filters.isTech,
         totalDomains: domains.data.count,
         ui,
         user: user.data,
@@ -113,6 +123,7 @@ const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
             fetchDomains: fetchDomainsAction,
+            setSortByRoles: setSortByRolesAction,
         },
         dispatch
     );
