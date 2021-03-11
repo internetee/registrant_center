@@ -56,6 +56,7 @@ const WhoIsPage = ({
     const [queryKeys, setQueryKeys] = useState('');
     const [whoIsData, setWhoIsData] = useState({});
     const [results, setResults] = useState(domains);
+    const [isTech, setTech] = useState(false);
     const { uiElemSize } = ui;
 
     const paginatedDomains = [];
@@ -65,34 +66,28 @@ const WhoIsPage = ({
         paginatedDomains.push(copied.splice(0, perPage));
     }
 
-    const [isTech, setTech] = useState(false);
     useEffect(() => {
         if (isTech) {
             (async () => {
-                await fetchDomains(0, true, true);
-                // setIsLoading(false);
+                await fetchDomains(0, false, true);
+                await fetchContacts();
+                await fetchCompanies();
+                setIsLoading(false);
             })();
         } else {
             (async () => {
-                await fetchDomains(0, true, false);
-                // setIsLoading(false);
+                await fetchDomains(0, false, false);
+                await fetchContacts();
+                await fetchCompanies();
+                setIsLoading(false);
             })();
         }
-    }, [fetchDomains, isTech]);
+    }, [fetchDomains, fetchContacts, fetchCompanies, isTech]);
 
     const checked = (cond = false) => {
-        // setIsLoading(true);
+        setIsLoading(true);
         setTech(cond);
     };
-
-    useEffect(() => {
-        (async () => {
-            await fetchDomains(0, false);
-            await fetchContacts();
-            await fetchCompanies();
-            setIsLoading(false);
-        })();
-    }, [fetchCompanies, fetchContacts, fetchDomains]);
 
     useEffect(() => {
         setWhoIsData(contacts);
@@ -190,7 +185,6 @@ const WhoIsPage = ({
         return <Loading />;
     }
 
-
     const handleRole = (event, { name, value }) => {
         if (value === 'domains.roles.regAndAdmRoles' && isTech) {
             checked(false);
@@ -214,7 +208,6 @@ const WhoIsPage = ({
             value: 'domains.roles.allRoles',
         },
     ];
-
 
     return (
         <MainLayout hasBackButton titleKey="whois.title">
