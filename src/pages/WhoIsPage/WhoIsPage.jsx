@@ -70,7 +70,7 @@ const WhoIsPage = ({
 
     const onSelectTech = React.useCallback((value) => {
         dispatch(setSortByRoles(value));
-  }, []);
+    }, []);
 
     useEffect(() => {
         if (isTech) {
@@ -193,7 +193,7 @@ const WhoIsPage = ({
         if (value === 'domains.roles.allRoles' && !isTech) {
             onSelectTech(true);
         }
-    }
+    };
 
     const roleOptions = [
         {

@@ -49,5 +49,5 @@ export const FETCH_COMPANIES_SUCCESS = 'FETCH_COMPANIES_SUCCESS';
 export const FETCH_COMPANIES_FAILURE = 'FETCH_COMPANIES_FAILURE';
 
 // Filter
-export const SET_TECH = 'SET_TECH'
-export const GET_TECH = 'GET_TECH'
+export const SET_TECH = 'SET_TECH';
+export const GET_TECH = 'GET_TECH';

@@ -9,16 +9,25 @@ import { DomainList, UserData, MainLayout, Loading } from '../../components';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 import { setSortByRoles as setSortByRolesAction } from '../../redux/reducers/filters';
 
-const HomePage = ({ totalDomains, domains, fetchDomains, ui, user, absoluteCount, isTech, setSortByRoles, }) => {
+const HomePage = ({
+    totalDomains,
+    domains,
+    fetchDomains,
+    ui,
+    user,
+    absoluteCount,
+    isTech,
+    setSortByRoles,
+}) => {
     const { lang } = ui;
     moment.locale(lang);
     const [isLoading, setIsLoading] = useState(true);
     const { formatMessage } = useIntl();
     const dispatch = useDispatch();
-    
+
     const onSelectTech = React.useCallback((value) => {
         dispatch(setSortByRoles(value));
-  }, []);
+    }, []);
 
     useEffect(() => {
         if (isTech) {
