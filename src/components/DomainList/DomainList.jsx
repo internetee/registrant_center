@@ -46,7 +46,7 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }) => {
+const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isTech }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -314,10 +314,10 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, checked, isTech }
 
     const handleRole = (event, { name, value }) => {
         if (value === 'domains.roles.regAndAdmRoles' && isTech) {
-            checked(false);
+            onSelectTech(false);
         }
         if (value === 'domains.roles.allRoles' && !isTech) {
-            checked(true);
+            onSelectTech(true);
         }
     };
 

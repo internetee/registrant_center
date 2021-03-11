@@ -11,7 +11,7 @@ import {
     Pagination,
     Dropdown,
 } from 'semantic-ui-react';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import MediaQuery from 'react-responsive';
 import {
@@ -25,6 +25,7 @@ import Domain from './Domain';
 import * as contactsActions from '../../redux/reducers/contacts';
 import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
+import { setSortByRoles as setSortByRolesAction } from '../../redux/reducers/filters';
 import Helpers from '../../utils/helpers';
 
 const perPageOptions = [
@@ -40,10 +41,12 @@ const WhoIsPage = ({
     fetchCompanies,
     fetchContacts,
     fetchDomains,
+    setSortByRoles,
     message,
     ui,
     updateContact,
     user,
+    isTech,
 }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['whoIsPerPage']);
@@ -56,14 +59,18 @@ const WhoIsPage = ({
     const [queryKeys, setQueryKeys] = useState('');
     const [whoIsData, setWhoIsData] = useState({});
     const [results, setResults] = useState(domains);
-    const [isTech, setTech] = useState(false);
     const { uiElemSize } = ui;
     const paginatedDomains = [];
     const copied = [...results];
     const numOfChild = Math.ceil(copied.length / perPage);
+    const dispatch = useDispatch();
     for (let i = 0; i < numOfChild; i += 1) {
         paginatedDomains.push(copied.splice(0, perPage));
     }
+
+    const onSelectTech = React.useCallback((value) => {
+        dispatch(setSortByRoles(value));
+  }, []);
 
     useEffect(() => {
         if (isTech) {
@@ -82,11 +89,6 @@ const WhoIsPage = ({
             })();
         }
     }, [fetchDomains, fetchContacts, fetchCompanies, isTech]);
-
-    const checked = (cond = false) => {
-        setIsLoading(true);
-        setTech(cond);
-    };
 
     useEffect(() => {
         setWhoIsData(contacts);
@@ -186,12 +188,12 @@ const WhoIsPage = ({
 
     const handleRole = (event, { name, value }) => {
         if (value === 'domains.roles.regAndAdmRoles' && isTech) {
-            checked(false);
+            onSelectTech(false);
         }
         if (value === 'domains.roles.allRoles' && !isTech) {
-            checked(true);
+            onSelectTech(true);
         }
-    };
+    }
 
     const roleOptions = [
         {
@@ -443,6 +445,7 @@ const mapStateToProps = (state) => {
         companies: state.companies.data,
         contacts: state.contacts.data,
         domains: state.domains.ids.map((id) => state.domains.data.domains[id]),
+        isTech: state.filters.isTech,
         ui: state.ui,
         user: state.user.data,
     };
@@ -452,4 +455,5 @@ export default connect(mapStateToProps, {
     ...contactsActions,
     fetchCompanies: fetchCompaniesAction,
     fetchDomains: fetchDomainsAction,
+    setSortByRoles: setSortByRolesAction,
 })(WhoIsPage);
