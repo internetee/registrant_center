@@ -277,7 +277,7 @@ const WhoIsPage = ({
                                             options={roleOptions}
                                             selection
                                         />
-                                        </div>
+                                    </div>
                                 </Form>
                             </Container>
                         </div>
