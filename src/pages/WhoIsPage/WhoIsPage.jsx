@@ -58,7 +58,6 @@ const WhoIsPage = ({
     const [results, setResults] = useState(domains);
     const [isTech, setTech] = useState(false);
     const { uiElemSize } = ui;
-
     const paginatedDomains = [];
     const copied = [...results];
     const numOfChild = Math.ceil(copied.length / perPage);
