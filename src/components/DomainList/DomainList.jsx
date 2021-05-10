@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useRef, useState } from 'react';
 import MediaQuery from 'react-responsive';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -22,6 +23,8 @@ import DomainGridItem from './GridItem';
 import DomainListItem from './ListItem';
 import PageMessage from '../PageMessage/PageMessage';
 import domainStatuses from '../../utils/domainStatuses.json';
+
+const LIMIT_DOMAIN_TOTAL = 3000;
 
 const masonryOptions = {
     columnWidth: '.domains-grid--item',
@@ -52,10 +55,12 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
     const { domainsIsGrid, domainsPerPage } = cookies;
     const [isGrid, setIsGrid] = useState(domainsIsGrid ? JSON.parse(domainsIsGrid) : true);
     const [isAdvSearchOpen, setIsAdvSearchOpen] = useState(false);
+    const [roleDropboxValue, setRoleDropboxValue] = useState(isTech);
+
     const [form, setForm] = useState({
         queryKeys: '',
         queryRegistrant: 'all',
-        queryRole: isTech,
+        queryRole: roleDropboxValue,
         queryStatus: 'all',
         queryValidToMax: null,
         queryValidToMin: null,
@@ -81,6 +86,14 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
     const masonry = useRef(null);
 
     useEffect(() => {
+        if (isTech === 'init') {
+            if (domainTotal < LIMIT_DOMAIN_TOTAL) {
+                setRoleDropboxValue(true);
+            } else {
+                setRoleDropboxValue(false);
+            }
+        }
+
         if (domains.length) {
             const { registrants, allStatuses, maxDate, minDate, sortedDomains } = domains.reduce(
                 (acc, domain) => ({
@@ -313,10 +326,10 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
     ];
 
     const handleRole = (event, { name, value }) => {
-        if (value === 'domains.roles.regAndAdmRoles' && isTech) {
+        if (value === 'domains.roles.regAndAdmRoles' && roleDropboxValue) {
             onSelectTech(false);
         }
-        if (value === 'domains.roles.allRoles' && !isTech) {
+        if (value === 'domains.roles.allRoles' && !roleDropboxValue) {
             onSelectTech(true);
         }
     };
@@ -464,7 +477,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
                                         />
                                         <Dropdown
                                             defaultValue={
-                                                isTech ? roleOptions[1].value : roleOptions[0].value
+                                                roleDropboxValue ? roleOptions[1].value : roleOptions[0].value
                                             }
                                             fluid
                                             name="queryRole"

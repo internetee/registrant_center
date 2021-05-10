@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { SET_TECH, GET_TECH } from '../actions';
 
 const setSortByRoles = (isTech) => ({
@@ -6,7 +7,7 @@ const setSortByRoles = (isTech) => ({
 });
 
 const initialState = {
-    isTech: false,
+    isTech: 'init',
 };
 
 export default function reducer(state = initialState, { payload, type }) {

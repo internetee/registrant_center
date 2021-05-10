@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable */
 import api from '../../utils/api';
 import {
     FETCH_DOMAIN_REQUEST,
@@ -151,16 +151,16 @@ const fetchRawDomainList = async (isTech) => {
     let res = await api.fetchDomains(null, offset, false, isTech);
     domains = domains.concat(res.data.domains);
     count = res.data.count;
-    if (domains.length !== count) {
+    if (offset < count) {
         offset += 200;
     } else {
         return domains;
     }
 
-    while (domains.length !== count) {
+    while (offset < count) {
         res = api.fetchDomains(null, offset, false);
         domains = domains.concat(res.data.domains);
-        if (domains.length !== count) {
+        if (offset < count) {
             offset += 200;
         }
     }
@@ -193,7 +193,7 @@ const fetchDomains = (offset = request.offset, simplify = false, tech = false) =
             request.data.domains = request.data.domains.concat(data.domains);
             request.data.count = data.count;
             request.data.total = data.total;
-            if (request.data.domains.length !== data.count) {
+            if (request.offset < data.count) {
                 request.offset += 200;
                 return dispatch(fetchDomains(request.offset, simplify, tech));
             }

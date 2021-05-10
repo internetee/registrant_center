@@ -1,4 +1,4 @@
-/* eslint-disable sort-keys */
+/* eslint-disable */
 import axios from 'axios';
 import https from 'https';
 
@@ -72,23 +72,18 @@ export default {
         });
     },
 
-    fetchDomains: (uuid = false, offset, simplify = true, tech = false) => {
+    fetchDomains: (uuid = false, offset = 0, simplify = true, tech = 'init') => {
         if (uuid) {
-            const d = instance.get(`/api/domains/${uuid}`);
-            return d;
+            return instance.get(`/api/domains/${uuid}`);
         }
         if (simplify) {
-            if (tech) {
-                const d = instance.get(`/api/domains?offset=${offset}&simple=true&tech=true`);
-                return d;
-            }
-            return instance.get(`/api/domains?offset=${offset}&simple=true`);
+            return instance.get(`/api/domains?offset=${offset}&simple=true&tech=${tech}`);
         }
-        if (!simplify && tech) {
-            return instance.get(`/api/domains?offset=${offset}&simple=false&tech=true`);
+        if (!simplify) {
+            return instance.get(`/api/domains?offset=${offset}&simple=false&tech=${tech}`);
         }
-        if (tech) return instance.get(`/api/domains?offset=${offset}&simple=true&tech=true`);
-        return instance.get(`/api/domains?offset=${offset}`);
+
+        return instance.get(`/api/domains?offset=init&tech=${tech}`);
     },
 
     fetchCompanies: (offset) => {

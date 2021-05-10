@@ -1,3 +1,4 @@
+/* eslint-disable */
 import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -116,7 +117,7 @@ export default {
                     () =>
                         API(session, res).get(
                             `/api/v1/registrant/domains${
-                                uuid ? `/${uuid}` : `?offset=${offset}&simple=true&tech=true`
+                                uuid ? `/${uuid}` : `?offset=${offset}&simple=true&tech=${tech}`
                             }`
                         ),
                     res
@@ -137,7 +138,7 @@ export default {
                 () =>
                     API(session, res).get(
                         `/api/v1/registrant/domains${
-                            uuid ? `/${uuid}` : `?offset=${offset}&simple=false&tech=true`
+                            uuid ? `/${uuid}` : `?offset=${offset}&simple=false&tech=${tech}`
                         }`
                     ),
                 res
@@ -146,7 +147,7 @@ export default {
         return handleResponse(
             () =>
                 API(session, res).get(
-                    `/api/v1/registrant/domains${uuid ? `/${uuid}` : `?offset=${offset}`}`
+                    `/api/v1/registrant/domains${uuid ? `/${uuid}` : `?offset=${offset}&tech=${tech}`}`
                 ),
             res
         );
