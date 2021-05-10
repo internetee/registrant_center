@@ -217,7 +217,7 @@ describe('Integration tests', () => {
     });
 
     it('Displays domains list', () => {
-        cy.get('.table tbody tr').should('have.length', 2);
+        cy.get('.table tbody tr').should('have.length', 4);
     });
 
     it('Opens domain detail info', () => {
