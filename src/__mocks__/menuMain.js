@@ -1,4 +1,4 @@
-/* eslint-disable sort-keys */
+/* eslint-disable */
 const menuMain = [
     {
         id: 2293795,

@@ -1,4 +1,4 @@
-/* eslint-disable camelcase,sort-keys */
+/* eslint-disable */
 import React, { useState } from 'react';
 import { Button, Grid, Icon, Container } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';

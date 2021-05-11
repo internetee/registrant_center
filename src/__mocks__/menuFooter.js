@@ -1,4 +1,4 @@
-/* eslint-disable sort-keys */
+/* eslint-disable */
 const menuFooter = [
     {
         id: 5586678,

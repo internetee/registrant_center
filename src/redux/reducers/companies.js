@@ -1,3 +1,4 @@
+/* eslint-disable */
 import api from '../../utils/api';
 import {
     FETCH_COMPANIES_REQUEST,
