@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
@@ -25,19 +26,23 @@ const HomePage = ({
     const { formatMessage } = useIntl();
     const dispatch = useDispatch();
 
-    const onSelectTech = React.useCallback((value) => {
+    const [techParams, setTechParams] = useState(isTech);
+
+    const onSelectTech = (value) => {
+        setIsLoading(true);
+        setTechParams(value);
         dispatch(setSortByRoles(value));
-    }, []);
+    }
 
     useEffect(() => {
-        if (isTech) {
+        if (isTech === 'init') {
             (async () => {
-                await fetchDomains(0, true, true);
+                await fetchDomains(0, false, isTech);
                 setIsLoading(false);
             })();
         } else {
             (async () => {
-                await fetchDomains(0, true, false);
+                await fetchDomains(0, false, isTech);
                 setIsLoading(false);
             })();
         }
@@ -102,7 +107,7 @@ const HomePage = ({
                     lang={lang}
                     onSelectTech={onSelectTech}
                 />
-                <UserData isTech={isTech} lang={lang} />
+                <UserData isTech={techParams} lang={lang} />
             </div>
         </MainLayout>
     );

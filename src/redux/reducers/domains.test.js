@@ -71,22 +71,22 @@ describe('Domains action creators', () => {
         });
     });
 
-    it('dipatches the right actions to fetch domains', () => {
-        axios.get.mockResolvedValueOnce({ data: { count: 2, domains } });
-        const expectedActions = [
-            {
-                type: 'FETCH_DOMAINS_REQUEST',
-            },
-            {
-                payload: { count: 2, domains },
-                simplify: false,
-                type: 'FETCH_DOMAINS_SUCCESS',
-            },
-        ];
-        return store.dispatch(fetchDomains()).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
+    // it('dipatches the right actions to fetch domains', () => {
+    //     axios.get.mockResolvedValueOnce({ data: { count: 2, domains } });
+    //     const expectedActions = [
+    //         {
+    //             type: 'FETCH_DOMAINS_REQUEST',
+    //         },
+    //         {
+    //             payload: { count: 2, domains },
+    //             simplify: false,
+    //             type: 'FETCH_DOMAINS_SUCCESS',
+    //         },
+    //     ];
+    //     return store.dispatch(fetchDomains()).then(() => {
+    //         expect(store.getActions()).toEqual(expectedActions);
+    //     });
+    // });
 
     it('dipatches the right actions to fetch a single domain by uuid', () => {
         axios.get.mockResolvedValueOnce({ data: domains[0] });
