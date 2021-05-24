@@ -35,16 +35,20 @@ const HomePage = ({
     }
 
     useEffect(() => {
-        if (isTech === 'init') {
-            (async () => {
-                await fetchDomains(0, false, isTech);
-                setIsLoading(false);
-            })();
+        if (domains.length === 0) {
+            if (isTech === 'init') {
+                (async () => {
+                    await fetchDomains(0, false, isTech);
+                    setIsLoading(false);
+                })();
+            } else {
+                (async () => {
+                    await fetchDomains(0, false, isTech);
+                    setIsLoading(false);
+                })();
+            }
         } else {
-            (async () => {
-                await fetchDomains(0, false, isTech);
-                setIsLoading(false);
-            })();
+            setIsLoading(false);
         }
     }, [fetchDomains, isTech]);
 
