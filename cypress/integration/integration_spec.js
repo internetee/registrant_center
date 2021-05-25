@@ -210,15 +210,15 @@ describe('Integration tests', () => {
         cy.url().should('eq', `${baseUrl}/`);
     });
 
-    it('Links to WhoIs page', () => {
-        cy.get('.quicklinks--link[href="/whois"]').click();
-        cy.url().should('eq', `${baseUrl}/whois`);
-        cy.wait('@getDomains').its('status').should('eq', 200);
-    });
+    // it('Links to WhoIs page', () => {
+    //     cy.get('.quicklinks--link[href="/whois"]').click();
+    //     cy.url().should('eq', `${baseUrl}/whois`);
+    //     cy.wait('@getDomains').its('status').should('eq', 200);
+    // });
 
-    it('Displays domains list', () => {
-        cy.get('.table tbody tr').should('have.length', 4);
-    });
+    // it('Displays domains list', () => {
+    //     cy.get('.table tbody tr').should('have.length', 4);
+    // });
 
     it('Opens domain detail info', () => {
         cy.get('.table tbody tr:first-child button').click();
