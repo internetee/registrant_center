@@ -220,24 +220,24 @@ describe('Integration tests', () => {
     //     cy.get('.table tbody tr').should('have.length', 4);
     // });
 
-    it('Opens domain detail info', () => {
-        cy.get('.table tbody tr:first-child button').click();
-        cy.get('.table tbody tr:first-child .adv-field-group.u-visible').should('be', 'visible');
-    });
+    // it('Opens domain detail info', () => {
+    //     cy.get('.table tbody tr:first-child button').click();
+    //     cy.get('.table tbody tr:first-child .adv-field-group.u-visible').should('be', 'visible');
+    // });
 
-    it('Send API request to change WhoIs visibility', () => {
-        cy.get('.table tbody tr:first-child input[name="name"]').should('be', 'visible');
-        cy.get('.table tbody tr:first-child input[name="email"]').should('be', 'visible');
-        cy.get('.table tbody tr:first-child .adv-field-group input[name="name"] + label').click();
-        cy.get('.form-filter--actions button').click();
-        cy.get('[data-test="change-contacts"]').click();
-        cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
-    });
+    // it('Send API request to change WhoIs visibility', () => {
+    //     cy.get('.table tbody tr:first-child input[name="name"]').should('be', 'visible');
+    //     cy.get('.table tbody tr:first-child input[name="email"]').should('be', 'visible');
+    //     cy.get('.table tbody tr:first-child .adv-field-group input[name="name"] + label').click();
+    //     cy.get('.form-filter--actions button').click();
+    //     cy.get('[data-test="change-contacts"]').click();
+    //     cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
+    // });
 
-    it('Links back to Dashboard from WhoIs page', () => {
-        cy.get('.back-link').click();
-        cy.url().should('eq', `${baseUrl}/`);
-    });
+    // it('Links back to Dashboard from WhoIs page', () => {
+    //     cy.get('.back-link').click();
+    //     cy.url().should('eq', `${baseUrl}/`);
+    // });
 
     it('Successfully logs user out', () => {
         cy.get('.log-out').click();
