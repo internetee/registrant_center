@@ -73,20 +73,24 @@ const WhoIsPage = ({
     }, []);
 
     useEffect(() => {
-        if (isTech) {
-            (async () => {
-                await fetchDomains(0, false, true);
-                await fetchContacts();
-                await fetchCompanies();
-                setIsLoading(false);
-            })();
+        if (domains.length === 0) {
+            if (isTech) {
+                (async () => {
+                    await fetchDomains(0, false, true);
+                    await fetchContacts();
+                    await fetchCompanies();
+                    setIsLoading(false);
+                })();
+            } else {
+                (async () => {
+                    await fetchDomains(0, false, false);
+                    await fetchContacts();
+                    await fetchCompanies();
+                    setIsLoading(false);
+                })();
+            }
         } else {
-            (async () => {
-                await fetchDomains(0, false, false);
-                await fetchContacts();
-                await fetchCompanies();
-                setIsLoading(false);
-            })();
+            setIsLoading(false);
         }
     }, [fetchDomains, fetchContacts, fetchCompanies, isTech]);
 
