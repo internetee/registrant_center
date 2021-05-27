@@ -188,12 +188,13 @@ export default WhoIsEdit;
 WhoIsEdit.propTypes = {
     isOpen: PropTypes.bool,
     checkAll: PropTypes.bool,
+    onChange: PropTypes.func,
     contacts: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
     domain: PropTypes.object.isRequired,
 };
 
 WhoIsEdit.defaultProps = {
     isOpen: false,
     checkAll: false,
+    onChange: () => {},
 };
