@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import PropTypes, { func } from 'prop-types';
 import {
     Button,
     Form,
@@ -457,3 +458,25 @@ export default connect(mapStateToProps, {
     fetchDomains: fetchDomainsAction,
     setSortByRoles: setSortByRolesAction,
 })(WhoIsPage);
+
+WhoIsPage.propTypes = {
+    companies: PropTypes.object,
+    contacts: PropTypes.object,
+    domains: PropTypes.array,
+    message: PropTypes.bool,
+    setSortByRoles: PropTypes.func.isRequired,
+    fetchCompanies: PropTypes.func.isRequired,
+    fetchContacts: PropTypes.func.isRequired,
+    fetchDomains: PropTypes.func.isRequired,
+    ui: PropTypes.object.isRequired,
+    updateContact: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired,
+    isTech: PropTypes.string.isRequired,
+};
+
+WhoIsPage.defaultProps = {
+    companies: [],
+    contacts: [],
+    domains: {},
+    message: false,
+};

@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Icon, Label, Table, Transition } from 'semantic-ui-react';
 import moment from 'moment';
+
+import PropTypes from 'prop-types';
+
 import 'moment/locale/et';
 import 'moment/locale/ru';
 import domainStatuses from '../../../utils/domainStatuses.json';
@@ -188,3 +191,9 @@ const DomainRegistrant = ({ contact }) => (
 );
 
 export default DomainGridItem;
+
+// domain, lang
+DomainGridItem.propTypes = {
+    domain: PropTypes.object.isRequired,
+    lang: PropTypes.string.isRequired,
+};

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button, Grid, Icon, Container } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { CSVDownload } from 'react-csv';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { connect } from 'react-redux';
@@ -521,3 +522,13 @@ const mapStateToProps = ({ domains }) => {
 };
 
 export default connect(mapStateToProps)(UserData);
+
+UserData.propTypes = {
+    domains: PropTypes.array,
+    isTech: PropTypes.string,
+};
+
+UserData.defaultProps = {
+    domains: [],
+    isTech: '',
+};

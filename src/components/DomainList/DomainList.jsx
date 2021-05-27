@@ -1,6 +1,6 @@
-/* eslint-disable */
 import React, { useEffect, useRef, useState } from 'react';
 import MediaQuery from 'react-responsive';
+import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
     Table,
@@ -477,7 +477,9 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
                                         />
                                         <Dropdown
                                             defaultValue={
-                                                roleDropboxValue ? roleOptions[1].value : roleOptions[0].value
+                                                roleDropboxValue
+                                                    ? roleOptions[1].value
+                                                    : roleOptions[0].value
                                             }
                                             fluid
                                             name="queryRole"
@@ -641,3 +643,11 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
 };
 
 export default DomainList;
+
+DomainList.propTypes = {
+    domainCount: PropTypes.number.isRequired,
+    domainTotal: PropTypes.number.isRequired,
+    isTech: PropTypes.any.isRequired,
+    lang: PropTypes.string.isRequired,
+    onSelectTech: PropTypes.func.isRequired,
+};

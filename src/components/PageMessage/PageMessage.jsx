@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Header, Icon, Segment } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
 function PageMessage({ children, headerContent, icon }) {
     return (
@@ -15,3 +16,14 @@ function PageMessage({ children, headerContent, icon }) {
     );
 }
 export default PageMessage;
+
+PageMessage.propTypes = {
+    children: PropTypes.node,
+    headerContent: PropTypes.object.isRequired,
+    icon: PropTypes.string,
+};
+
+PageMessage.defaultProps = {
+    icon: '',
+    children: '',
+};

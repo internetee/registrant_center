@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from 'semantic-ui-react';
 import { Link, useHistory } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
+import PropTypes from 'prop-types';
 
 const MainMenu = ({ items, lang, user, closeMainMenu }) => {
     const [menu, setMenu] = useState([]);
@@ -100,3 +101,10 @@ const MainMenu = ({ items, lang, user, closeMainMenu }) => {
 };
 
 export default MainMenu;
+
+MainMenu.propTypes = {
+    items: PropTypes.array.isRequired,
+    lang: PropTypes.string.isRequired,
+    user: PropTypes.object.isRequired,
+    closeMainMenu: PropTypes.func.isRequired,
+};

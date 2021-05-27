@@ -3,6 +3,7 @@ import { Icon } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import PropTypes from 'prop-types';
 
 import MainFooter from '../MainFooter/MainFooter';
 import MainHeader from '../MainHeader/MainHeader';
@@ -57,3 +58,27 @@ const MainLayout = ({
 };
 
 export default MainLayout;
+
+MainLayout.propTypes = {
+    children: PropTypes.node,
+    title: PropTypes.string,
+    heroValues: PropTypes.string,
+    hasBackButton: PropTypes.bool,
+    htmlTitleValues: PropTypes.string,
+    heroKey: PropTypes.string,
+    htmlTitleKey: PropTypes.string,
+    titleValues: PropTypes.object,
+    titleKey: PropTypes.string,
+};
+
+MainLayout.defaultProps = {
+    children: '',
+    title: '',
+    heroValues: '',
+    hasBackButton: true,
+    htmlTitleValues: '',
+    heroKey: '',
+    htmlTitleKey: '',
+    titleValues: {},
+    titleKey: '',
+};

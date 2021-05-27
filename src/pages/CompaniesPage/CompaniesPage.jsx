@@ -10,6 +10,7 @@ import {
     Table,
     Input,
 } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { useCookies } from 'react-cookie';
 import { bindActionCreators } from 'redux';
@@ -250,3 +251,8 @@ const mapDispatchToProps = (dispatch) =>
     );
 
 export default connect(mapStateToProps, mapDispatchToProps)(CompaniesPage);
+
+CompaniesPage.propTypes = {
+    companies: PropTypes.array.isRequired,
+    fetchCompanies: PropTypes.func.isRequired,
+};

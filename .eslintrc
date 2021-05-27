@@ -40,7 +40,8 @@
     "react/jsx-sort-props": ["error"],
     "react/prop-types": 0,
     "react/sort-comp": ["error"],
-    "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false }]
+    // "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false }],
+    "object-literal-sort-keys": 0
   },
   "ignorePatterns": ["**/build/*"]
 }

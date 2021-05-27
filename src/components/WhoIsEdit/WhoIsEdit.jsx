@@ -2,6 +2,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 import Roles from '../Roles/Roles';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
@@ -183,3 +184,16 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 }
 
 export default WhoIsEdit;
+
+WhoIsEdit.propTypes = {
+    isOpen: PropTypes.bool,
+    checkAll: PropTypes.bool,
+    contacts: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    domain: PropTypes.object.isRequired,
+};
+
+WhoIsEdit.defaultProps = {
+    isOpen: false,
+    checkAll: false,
+};
