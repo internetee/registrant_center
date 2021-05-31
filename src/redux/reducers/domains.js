@@ -149,8 +149,8 @@ const fetchRawDomainList = async (isTech) => {
     let count = 0;
 
     let res = await api.fetchDomains(null, offset, false, isTech);
-    domains = domains.concat(res.data.domains);
     count = res.data.count;
+    domains = domains.concat(res.data.domains);
     if (offset < count) {
         offset += 200;
     } else {
@@ -158,7 +158,8 @@ const fetchRawDomainList = async (isTech) => {
     }
 
     while (offset < count) {
-        res = api.fetchDomains(null, offset, false);
+        res = await api.fetchDomains(null, offset, false);
+        console.log('res in while ', res)
         domains = domains.concat(res.data.domains);
         if (offset < count) {
             offset += 200;
