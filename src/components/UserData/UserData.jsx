@@ -7,7 +7,6 @@ import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { connect } from 'react-redux';
 import vfs from '../../utils/vfs_fonts';
-import { fetchRawDomainList } from '../../redux/reducers/domains';
 
 pdfMake.vfs = vfs;
 pdfMake.fonts = {
@@ -26,15 +25,15 @@ const UserData = ({ domains, isTech }) => {
     const [userCSV, setUserCSV] = useState(null);
     const { formatMessage } = useIntl();
 
-    const savePDF = async () => {
+    const savePDF = () => {
         setIsLoadingPDF(true);
-        const domainList = await fetchRawDomainList(isTech);
         const paginatedDomains = [];
-        const copied = [...domainList];
-        const numOfChild = Math.ceil(copied.length / 500);
-        for (let i = 0; i < numOfChild; i += 1) {
-            paginatedDomains.push(copied.splice(0, 500));
-        }
+        const copied = [...domains];
+        // const numOfChild = Math.ceil(copied.length / 500);
+        // for (let i = 0; i < numOfChild; i += 1) {
+        //     paginatedDomains.push(copied.splice(0, 500));
+        // }
+        paginatedDomains.push(copied);
         paginatedDomains.forEach((chunk, index) => {
             const doc = {
                 defaultStyle: {
@@ -374,6 +373,7 @@ const UserData = ({ domains, isTech }) => {
                     }),
                 ],
             };
+
             pdfMake.createPdf(doc).download(`domeenid_chunk_${index}.pdf`);
         });
         setIsLoadingPDF(false);
@@ -381,8 +381,7 @@ const UserData = ({ domains, isTech }) => {
 
     const handleCsvData = async () => {
         setIsLoadingCSV(true);
-        const domainList = await fetchRawDomainList(isTech);
-        const csv = domainList.map((item) => {
+        const csv = domains.map((item) => {
             return {
                 [formatMessage({ id: 'domain.name' })]: item.name ? item.name : '',
                 [formatMessage({ id: 'domain.transfer_code' })]: item.transfer_code
