@@ -2,8 +2,7 @@ import { Button, Confirm, List, Modal } from 'semantic-ui-react';
 import { FormattedMessage } from 'react-intl';
 import React from 'react';
 import { connect } from 'react-redux';
-
-import Roles from '../Roles/Roles';
+import PropTypes from 'prop-types';
 import * as contactsActions from '../../redux/reducers/contacts';
 import Helpers from '../../utils/helpers';
 
@@ -71,3 +70,12 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
     ...contactsActions,
 })(WhoIsConfirmDialog);
+
+WhoIsConfirmDialog.propTypes = {
+    contacts: PropTypes.object.isRequired,
+    domains: PropTypes.object.isRequired,
+    onConfirm: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired,
+    ui: PropTypes.object.isRequired,
+};

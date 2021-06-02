@@ -3,6 +3,8 @@ import { Icon } from 'semantic-ui-react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 
+import PropTypes from 'prop-types';
+
 const MainFooter = ({ ui }) => {
     const { lang, menus: { footer = [] } = [] } = ui;
     const menu = footer.reduce((acc, item) => {
@@ -94,3 +96,7 @@ const mapStateToProps = ({ ui }) => ({
 });
 
 export default connect(mapStateToProps)(MainFooter);
+
+MainFooter.propTypes = {
+    ui: PropTypes.object.isRequired,
+};

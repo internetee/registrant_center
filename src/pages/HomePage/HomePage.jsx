@@ -1,8 +1,8 @@
-/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { bindActionCreators } from 'redux';
@@ -32,7 +32,7 @@ const HomePage = ({
         setIsLoading(true);
         setTechParams(value);
         dispatch(setSortByRoles(value));
-    }
+    };
 
     useEffect(() => {
         if (domains.length === 0) {
@@ -138,3 +138,19 @@ const mapDispatchToProps = (dispatch) =>
     );
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+
+HomePage.propTypes = {
+    absoluteCount: PropTypes.number,
+    domains: PropTypes.array,
+    totalDomains: PropTypes.number.isRequired,
+    fetchDomains: PropTypes.func.isRequired,
+    ui: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
+    isTech: PropTypes.any.isRequired,
+    setSortByRoles: PropTypes.func.isRequired,
+};
+
+HomePage.defaultProps = {
+    absoluteCount: 0,
+    domains: [],
+};

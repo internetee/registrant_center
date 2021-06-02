@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const ScrollToTop = ({ children }) => {
     useEffect(() => {
@@ -8,3 +9,7 @@ const ScrollToTop = ({ children }) => {
 };
 
 export default ScrollToTop;
+
+ScrollToTop.propTypes = {
+    children: PropTypes.node.isRequired,
+};

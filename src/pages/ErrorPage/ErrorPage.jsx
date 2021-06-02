@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { Redirect, useParams } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
-
+import PropTypes from 'prop-types';
 import { MainLayout, PageMessage } from '../../components';
 import { setLang as setLangAction } from '../../redux/reducers/ui';
 
@@ -41,3 +41,7 @@ const mapDispatchToProps = (dispatch) =>
     );
 
 export default connect(null, mapDispatchToProps)(ErrorPage);
+
+ErrorPage.propTypes = {
+    setLang: PropTypes.func.isRequired,
+};

@@ -3,6 +3,9 @@ import { Icon, Label, Table } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
+
+import PropTypes from 'prop-types';
+
 import 'moment/locale/et';
 import 'moment/locale/ru';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -71,3 +74,8 @@ const DomainListItem = ({ domain, lang }) => {
 };
 
 export default DomainListItem;
+
+DomainListItem.propTypes = {
+    domain: PropTypes.object.isRequired,
+    lang: PropTypes.string.isRequired,
+};

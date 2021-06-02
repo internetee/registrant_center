@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Form, Input, Container, Card, Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import PropTypes from 'prop-types';
 import {
     WhoIsEdit,
     MessageModule,
@@ -322,3 +323,22 @@ const mapDispatchToProps = (dispatch) =>
     );
 
 export default connect(mapStateToProps, mapDispatchToProps)(DomainEditPage);
+
+DomainEditPage.propTypes = {
+    companies: PropTypes.object,
+    contacts: PropTypes.object,
+    domain: PropTypes.object,
+    fetchCompanies: PropTypes.func.isRequired,
+    fetchDomain: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    match: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
+    updateContact: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired,
+};
+
+DomainEditPage.defaultProps = {
+    companies: {},
+    contacts: {},
+    domain: {},
+}

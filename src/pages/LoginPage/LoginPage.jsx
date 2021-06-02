@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { Button, Container, Icon, Form } from 'semantic-ui-react';
-
+import PropTypes from 'prop-types';
 import { MainLayout, MessageModule } from '../../components';
 
 const { REACT_APP_SERVER_PORT, REACT_APP_URL } = process.env;
@@ -62,3 +62,8 @@ const mapStateToProps = ({ ui, user }) => ({
 });
 
 export default connect(mapStateToProps)(LoginPage);
+
+LoginPage.propTypes = {
+    ui: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
+};

@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Message, Container, Icon } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
 function MessageModule({ message, formMessage }) {
     if (message) {
@@ -40,3 +41,12 @@ function MessageModule({ message, formMessage }) {
 }
 
 export default MessageModule;
+
+MessageModule.propTypes = {
+    formMessage: PropTypes.bool,
+    message: PropTypes.object.isRequired,
+};
+
+MessageModule.defaultProps = {
+    formMessage: false,
+};

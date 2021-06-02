@@ -1,4 +1,5 @@
 import { useIntl } from 'react-intl';
+import PropTypes from 'prop-types';
 
 const Roles = ({ roles = [] }) => {
     const { formatMessage } = useIntl();
@@ -17,3 +18,7 @@ const Roles = ({ roles = [] }) => {
 };
 
 export default Roles;
+
+Roles.propTypes = {
+    roles: PropTypes.array.isRequired,
+};

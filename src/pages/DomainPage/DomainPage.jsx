@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import PropTypes from 'prop-types';
 import {
     Popup,
     Button,
@@ -56,7 +57,6 @@ const DomainPage = ({
     const [isDomainLockModalOpen, setIsDomainLockModalOpen] = useState(false);
     const [userContacts, setUserContacts] = useState({});
     const [message, setMessage] = useState(null);
-    // const [isCompany, ] = useState(null);
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
@@ -673,3 +673,24 @@ const mapDispatchToProps = (dispatch) =>
     );
 
 export default connect(mapStateToProps, mapDispatchToProps)(DomainPage);
+
+DomainPage.propTypes = {
+    companies: PropTypes.object,
+    contacts: PropTypes.object,
+    domains: PropTypes.object,
+    fetchCompanies: PropTypes.func.isRequired,
+    fetchDomain: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    lockDomain: PropTypes.func.isRequired,
+    match: PropTypes.object.isRequired,
+    ui: PropTypes.object.isRequired,
+    unlockDomain: PropTypes.func.isRequired,
+    updateContact: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired,
+};
+
+DomainPage.defaultProps = {
+    companies: [],
+    contacts: [],
+    domains: [],
+};

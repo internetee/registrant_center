@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useCookies } from 'react-cookie';
 import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
+import PropTypes from 'prop-types';
 import MainMenu from '../MainMenu/MainMenu';
 import {
     closeMainMenu as closeMainMenuAction,
@@ -245,3 +246,11 @@ const mapDispatchToProps = (dispatch) =>
     );
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainHeader);
+MainHeader.propTypes = {
+    closeMainMenu: PropTypes.func.isRequired,
+    logoutUser: PropTypes.func.isRequired,
+    setLang: PropTypes.func.isRequired,
+    toggleMainMenu: PropTypes.func.isRequired,
+    ui: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
+};
