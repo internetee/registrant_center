@@ -261,10 +261,8 @@ const menuMain = [
     },
     {
         id: 2293800,
-        title:
-            'General domains and procedure for registration of sub-domains under general domains',
-        path:
-            'domains/general-domains-and-procedure-for-registration-of-sub-domains-under-general-domains',
+        title: 'General domains and procedure for registration of sub-domains under general domains',
+        path: 'domains/general-domains-and-procedure-for-registration-of-sub-domains-under-general-domains',
         created_at: '2015-03-19T11:46:31.000Z',
         updated_at: '2018-08-07T06:29:19.000Z',
         content_type: 'page',

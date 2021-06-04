@@ -1,47 +1,64 @@
 {
-  "parser": "babel-eslint",
-  "extends": [
-    "plugin:react/recommended",
-    "airbnb",
-    "prettier",
-    "prettier/react",
-    "react-app"
-  ],
-  "plugins": ["prettier"],
-  "env": {
-    "browser": true,
-    "es6": true,
-    "jest": true,
-    "node": true
-  },
-  "parserOptions": {
-    "defaultParams": true,
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 2018,
-    "optionalChaining": true
-  },
-  "rules": {
-    "camelcase": 0,
-    "react/style-prop-object": 0,
-    "global-require": 0,
-    "import/newline-after-import": 0,
-    "import/no-dynamic-require": 0,
-    "import/no-extraneous-dependencies": 0,
-    "jsx-a11y/anchor-is-valid": ["error"],
-    "no-console": 0,
-    "no-duplicate-imports": 0,
-    "one-var": 0,
-    "prettier/prettier": ["error"],
-    "react/forbid-prop-types": [0, { "checkChildContextTypes": false }],
-    "react/jsx-filename-extension": 0,
-    "react/jsx-props-no-spreading": 0,
-    "react/jsx-sort-props": ["error"],
-    "react/prop-types": 0,
-    "react/sort-comp": ["error"],
-    // "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false }],
-    "object-literal-sort-keys": 0
-  },
-  "ignorePatterns": ["**/build/*"]
+	"parser": "babel-eslint",
+	"extends": [
+		"plugin:react/recommended",
+		"airbnb",
+		"prettier",
+		"prettier/react",
+		"react-app"
+	],
+	"plugins": [
+		"prettier"
+	],
+	"env": {
+		"browser": true,
+		"es6": true,
+		"jest": true,
+		"node": true
+	},
+	"parserOptions": {
+		"defaultParams": true,
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": 2018,
+		"optionalChaining": true
+	},
+	"rules": {
+		"camelcase": 0,
+		"react/style-prop-object": 0,
+		"global-require": 0,
+		"import/newline-after-import": 0,
+		"import/no-dynamic-require": 0,
+		"import/no-extraneous-dependencies": 0,
+		"jsx-a11y/anchor-is-valid": [
+			"error"
+		],
+		"no-console": 0,
+		"no-duplicate-imports": 0,
+		"one-var": 0,
+		"prettier/prettier": [
+			"error"
+		],
+		"react/forbid-prop-types": [
+			0,
+			{
+				"checkChildContextTypes": false
+			}
+		],
+		"react/jsx-filename-extension": 0,
+		"react/jsx-props-no-spreading": 0,
+		"react/jsx-sort-props": [
+			"error"
+		],
+		"react/prop-types": 0,
+		"react/sort-comp": [
+			"error"
+		],
+		// "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false }],
+		"object-literal-sort-keys": 0
+	},
+	"ignorePatterns": [
+		"**/build/*"
+	]
 }

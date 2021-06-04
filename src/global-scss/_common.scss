@@ -237,7 +237,7 @@ strong {
 }
 
 .clearfix {
-  zoom: 1;
+  transform: scale(0.5);
   clear: both;
   
   &:before,

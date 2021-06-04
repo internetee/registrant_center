@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys */
 const contacts = [
     {
         id: 'cfbfbb76-aed8-497a-91c1-48d82cbc4588',
