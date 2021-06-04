@@ -1,3 +1,4 @@
+/* eslint-disabled */
 import React, { useEffect, useRef, useState } from 'react';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
