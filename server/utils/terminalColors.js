@@ -1,3 +1,4 @@
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 /* eslint-disable sort-keys */
 export default {
     // background color

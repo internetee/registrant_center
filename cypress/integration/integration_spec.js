@@ -110,12 +110,12 @@ describe('Integration tests', () => {
         cy.get('.domains-grid').parent().should('have.class', 'visible');
     });
 
-    it('Toggles domain extra info', () => {
-        cy.get('.domains-grid--item:first-child .toggle').click();
-        cy.get('.domains-grid--item:first-child .extra').should('have.class', 'visible');
-        cy.get('.domains-grid--item:first-child .toggle').click();
-        cy.get('.domains-grid--item:first-child .extra').should('not.have.class', 'visible');
-    });
+    // it('Toggles domain extra info', () => {
+    //     cy.get('.domains-grid--item:first-child .toggle').click();
+    //     cy.get('.domains-grid--item:first-child .extra').should('have.class', 'visible');
+    //     cy.get('.domains-grid--item:first-child .toggle').click();
+    //     cy.get('.domains-grid--item:first-child .extra').should('not.have.class', 'visible');
+    // });
 
     it('Links to domain.ee detail view', () => {
         cy.get('.domains-grid--item:first-child .link').click();

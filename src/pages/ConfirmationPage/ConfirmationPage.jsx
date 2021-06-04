@@ -62,7 +62,7 @@ const ConfirmationPage = ({
             });
             setIsLoading(false);
         })();
-    }, [fetchVerification]);
+    }, [fetchVerification, match.params.name, match.params.token, match.params.type]);
 
     if (isLoading) return <Loading />;
 

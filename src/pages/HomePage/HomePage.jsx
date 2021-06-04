@@ -50,7 +50,7 @@ const HomePage = ({
         } else {
             setIsLoading(false);
         }
-    }, [fetchDomains, isTech]);
+    }, [fetchDomains, isTech, domains.length]);
 
     if (isLoading) return <Loading />;
 

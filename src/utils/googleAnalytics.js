@@ -57,6 +57,7 @@ const init = (options = {}) => {
     return false;
 };
 
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
     GoogleAnalytics,
     init,
