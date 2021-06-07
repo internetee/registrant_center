@@ -2,8 +2,11 @@ import React from 'react';
 import { Icon } from 'semantic-ui-react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
+import dompurify from 'dompurify';
 
 import PropTypes from 'prop-types';
+
+const sanitizer = dompurify.sanitize;
 
 const MainFooter = ({ ui }) => {
     const { lang, menus: { footer = [] } = [] } = ui;
@@ -54,7 +57,7 @@ const MainFooter = ({ ui }) => {
                         <div
                             key={item.id}
                             className="column"
-                            dangerouslySetInnerHTML={{ __html: item.body }}
+                            dangerouslySetInnerHTML={{ __html: sanitizer(item.body) }}
                         />
                     ))}
                 </nav>
