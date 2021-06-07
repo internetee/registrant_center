@@ -50,6 +50,7 @@ const HomePage = ({
         } else {
             setIsLoading(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchDomains, isTech]);
 
     if (isLoading) return <Loading />;

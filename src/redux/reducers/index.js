@@ -9,13 +9,13 @@ import verification from './verification';
 import filters from './filters';
 
 export default withReduxStateSync(
-    combineReducers({
-        companies,
-        contacts,
-        domains,
-        filters,
-        ui,
-        user,
-        verification,
-    })
+	combineReducers({
+		companies,
+		contacts,
+		domains,
+		filters,
+		ui,
+		user,
+		verification,
+	})
 );
