@@ -1,8 +1,8 @@
-/* eslint-disable camelcase,sort-keys */
+/* eslint-disable */
 import React, { useState } from 'react';
 import { Button, Grid, Icon, Container } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { CSVDownload } from 'react-csv';
+import { CSVDownload, CSVLink } from 'react-csv';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
@@ -23,7 +23,7 @@ const UserData = ({ domains, isTech }) => {
     const hasDomains = !!Object.keys(domains).length;
     const [isLoadingCSV, setIsLoadingCSV] = useState(false);
     const [isLoadingPDF, setIsLoadingPDF] = useState(false);
-    const [userCSV, setUserCSV] = useState(null);
+    const [userCSV, setUserCSV] = useState('');
     const { formatMessage } = useIntl();
 
     const savePDF = () => {
@@ -459,8 +459,8 @@ const UserData = ({ domains, isTech }) => {
             };
         });
 
-        setIsLoadingCSV(false);
         setUserCSV(csv);
+        setIsLoadingCSV(false);
     };
 
     return (
@@ -483,8 +483,10 @@ const UserData = ({ domains, isTech }) => {
                                         <Icon name="table" />
                                         CSV
                                     </Button.Content>
-                                    <Button.Content hidden>
+																		<Button.Content hidden>
+																			<CSVLink id="csvLink" data={userCSV} filename="eis_andmed.csv">
                                         <Icon name="download" />
+																			</CSVLink>
                                     </Button.Content>
                                 </Button>
                                 <Button.Or text="või" />
@@ -505,7 +507,6 @@ const UserData = ({ domains, isTech }) => {
                                     </Button.Content>
                                 </Button>
                             </Button.Group>
-                            {userCSV && <CSVDownload data={userCSV} filename="eis_andmed.csv" />}
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>
