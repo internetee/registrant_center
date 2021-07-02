@@ -22,24 +22,22 @@ const failedVerification = () => ({
     type: FETCH_DOMAIN_REGISTRANT_UPDATE_FAILED,
 });
 
-const fetchVerification =
-    ({ domain, token, type }) =>
-    (dispatch) => {
-        dispatch(requestVerification());
-        return api
-            .fetchVerification(domain, token, type)
-            .then(
-                (res) => {
-                    dispatch(receiveVerification(res.data));
-                },
-                (_err) => {
-                    dispatch(failedVerification());
-                }
-            )
-            .catch((_err) => {
+const fetchVerification = ({ domain, token, type }) => (dispatch) => {
+    dispatch(requestVerification());
+    return api
+        .fetchVerification(domain, token, type)
+        .then(
+            (res) => {
+                dispatch(receiveVerification(res.data));
+            },
+            (_err) => {
                 dispatch(failedVerification());
-            });
-    };
+            }
+        )
+        .catch((_err) => {
+            dispatch(failedVerification());
+        });
+};
 
 const requestVerificationResponse = () => ({
     type: RESPOND_REGISTRANT_CHANGE_REQUEST,

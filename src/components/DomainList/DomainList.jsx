@@ -65,8 +65,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
         queryValidToMax: null,
         queryValidToMin: null,
     });
-    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax, queryRole } =
-        form;
+    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax } = form;
     const [minValidToDate, setMinValidToDate] = useState(null);
     const [maxValidToDate, setMaxValidToDate] = useState(null);
     const [filteredDomains, setFilteredDomains] = useState([]);
