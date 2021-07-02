@@ -31,25 +31,27 @@ const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
         (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
     );
 
-    const contacts = (simplify
-        ? [
-              ...(registrant && [
-                  {
-                      ...registrant,
-                      roles: ['registrant'],
-                  },
-              ]),
-          ]
-        : [
-              ...(admin_contacts && admin_contacts.map((item) => ({ ...item, roles: ['admin'] }))),
-              ...(tech_contacts && tech_contacts.map((item) => ({ ...item, roles: ['tech'] }))),
-              ...(registrant && [
-                  {
-                      ...registrant,
-                      roles: ['registrant'],
-                  },
-              ]),
-          ]
+    const contacts = (
+        simplify
+            ? [
+                  ...(registrant && [
+                      {
+                          ...registrant,
+                          roles: ['registrant'],
+                      },
+                  ]),
+              ]
+            : [
+                  ...(admin_contacts &&
+                      admin_contacts.map((item) => ({ ...item, roles: ['admin'] }))),
+                  ...(tech_contacts && tech_contacts.map((item) => ({ ...item, roles: ['tech'] }))),
+                  ...(registrant && [
+                      {
+                          ...registrant,
+                          roles: ['registrant'],
+                      },
+                  ]),
+              ]
     ).flat();
 
     return {
@@ -68,11 +70,9 @@ const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
         isLockable: ['pendingDelete', 'serverHold'].every((status) => !statuses.includes(status)),
         isLocked:
             domain.locked_by_registrant_at &&
-            [
-                'serverUpdateProhibited',
-                'serverDeleteProhibited',
-                'serverTransferProhibited',
-            ].every((r) => statuses.includes(r)),
+            ['serverUpdateProhibited', 'serverDeleteProhibited', 'serverTransferProhibited'].every(
+                (r) => statuses.includes(r)
+            ),
         shouldFetchContacts,
     };
 };
@@ -183,25 +183,27 @@ const fetchDomain = (uuid) => (dispatch) => {
         });
 };
 
-const fetchDomains = (offset = request.offset, simplify = false, tech = false) => (dispatch) => {
-    dispatch(requestDomains());
-    return api
-        .fetchDomains(null, offset, simplify, tech)
-        .then((res) => res.data)
-        .then((data) => {
-            request.data.domains = request.data.domains.concat(data.domains);
-            request.data.count = data.count;
-            request.data.total = data.total;
-            if (request.offset < data.count) {
-                request.offset += 200;
-                return dispatch(fetchDomains(request.offset, simplify, tech));
-            }
-            return dispatch(receiveDomains(request.data, simplify, tech));
-        })
-        .catch(() => {
-            dispatch(failDomains());
-        });
-};
+const fetchDomains =
+    (offset = request.offset, simplify = false, tech = false) =>
+    (dispatch) => {
+        dispatch(requestDomains());
+        return api
+            .fetchDomains(null, offset, simplify, tech)
+            .then((res) => res.data)
+            .then((data) => {
+                request.data.domains = request.data.domains.concat(data.domains);
+                request.data.count = data.count;
+                request.data.total = data.total;
+                if (request.offset < data.count) {
+                    request.offset += 200;
+                    return dispatch(fetchDomains(request.offset, simplify, tech));
+                }
+                return dispatch(receiveDomains(request.data, simplify, tech));
+            })
+            .catch(() => {
+                dispatch(failDomains());
+            });
+    };
 
 const lockDomain = (uuid) => (dispatch) => {
     dispatch(requestDomainLock());
