@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Form, Input, Container, Card, Grid } from 'semantic-ui-react';
@@ -125,8 +124,8 @@ const DomainEditPage = ({
                 }
                 return updateContact(contact.id, {
                     disclosed_attributes: [...contact.disclosed_attributes],
-                        email: contact.email,
-                        phone: contact.phone,
+                    email: contact.email,
+                    phone: contact.phone,
                 });
             })
         );
@@ -341,4 +340,4 @@ DomainEditPage.defaultProps = {
     companies: {},
     contacts: {},
     domain: {},
-}
+};

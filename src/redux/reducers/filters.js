@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { SET_TECH, GET_TECH } from '../actions';
+import { SET_TECH } from '../actions';
 
 const setSortByRoles = (isTech) => ({
     payload: isTech,

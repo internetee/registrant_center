@@ -1,4 +1,3 @@
-/* eslint-disable */
 import api from '../../utils/api';
 import {
     FETCH_DOMAIN_REQUEST,
