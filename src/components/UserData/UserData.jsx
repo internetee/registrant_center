@@ -29,10 +29,6 @@ const UserData = ({ domains, isTech }) => {
         setIsLoadingPDF(true);
         const paginatedDomains = [];
         const copied = [...domains];
-        // const numOfChild = Math.ceil(copied.length / 500);
-        // for (let i = 0; i < numOfChild; i += 1) {
-        //     paginatedDomains.push(copied.splice(0, 500));
-        // }
         paginatedDomains.push(copied);
         paginatedDomains.forEach((chunk, index) => {
             const doc = {
