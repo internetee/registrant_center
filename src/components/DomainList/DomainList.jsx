@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react"
 import MediaQuery from "react-responsive"
 import PropTypes from "prop-types"
 import { FormattedMessage, useIntl } from "react-intl"
+
 import {
     Table,
     Button,

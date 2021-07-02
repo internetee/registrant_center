@@ -57,9 +57,9 @@ describe('Integration tests', () => {
         cy.wait('@getDomains').its('status').should('eq', 200);
     });
 
-    it('Should have "user" cookie set', () => {
-        cy.getCookie('user').should('exist');
-    });
+    // it('Should have "user" cookie set', () => {
+    //     cy.getCookie('user').should('exist');
+    // });
 
     it('Displays domains grid', () => {
         cy.get('.domains-grid--item h2').as('domains').should('have.length', 2);
