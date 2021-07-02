@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet';
+import { Helmet } from "react-helmet"
 // import getLog from '../utils/logger';
 
 function renderHTML(helmet) {
@@ -17,16 +17,18 @@ function renderHTML(helmet) {
         <script src="/bundles/index.js"></script>
       </body>
     </html>
-  `;
+  `
 }
 
 export default async function renderPageRoute(req, res) {
     try {
-        const helmet = Helmet.renderStatic();
-        res.setHeader('Content-Type', 'text/html');
-        res.send(renderHTML(helmet));
+        const helmet = Helmet.renderStatic()
+        res.setHeader("Content-Type", "text/html")
+        res.send(renderHTML(helmet))
     } catch (error) {
-        console.log(error.stack);
-        res.status(500).sendFile('src/server/views/500.html', { root: process.cwd() });
+        console.log(error.stack)
+        res.status(500).sendFile("src/server/views/500.html", {
+            root: process.cwd(),
+        })
     }
 }

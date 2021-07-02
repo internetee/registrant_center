@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useEffect } from "react"
+import PropTypes from "prop-types"
 
 const ScrollToTop = ({ children }) => {
     useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-    return children;
-};
+        window.scrollTo(0, 0)
+    }, [])
+    return children
+}
 
-export default ScrollToTop;
+export default ScrollToTop
 
 ScrollToTop.propTypes = {
     children: PropTypes.node.isRequired,
-};
+}

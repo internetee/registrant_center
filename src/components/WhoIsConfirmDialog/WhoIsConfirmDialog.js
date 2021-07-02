@@ -1,39 +1,69 @@
-import { Button, Confirm, List, Modal } from 'semantic-ui-react';
-import { FormattedMessage } from 'react-intl';
-import React from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import * as contactsActions from '../../redux/reducers/contacts';
-import Helpers from '../../utils/helpers';
+import { Button, Confirm, List, Modal } from "semantic-ui-react"
+import { FormattedMessage } from "react-intl"
+import React from "react"
+import { connect } from "react-redux"
+import PropTypes from "prop-types"
+import * as contactsActions from "../../redux/reducers/contacts"
+import Helpers from "../../utils/helpers"
 
-function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }) {
-    const changedDomains = Helpers.getChangedUserContactsByDomain(domains.domains, contacts);
-    const { uiElemSize } = ui;
+function WhoIsConfirmDialog({
+    contacts,
+    domains,
+    onConfirm,
+    onCancel,
+    open,
+    ui,
+}) {
+    const changedDomains = Helpers.getChangedUserContactsByDomain(
+        domains.domains,
+        contacts
+    )
+    const { uiElemSize } = ui
 
     return (
         <Confirm
             cancelButton={
-                <Button data-test="close-change-contacts-modal" secondary size={uiElemSize}>
-                    <FormattedMessage defaultMessage="Ei" id="actions.confirm.no" />
+                <Button
+                    data-test='close-change-contacts-modal'
+                    secondary
+                    size={uiElemSize}
+                >
+                    <FormattedMessage
+                        defaultMessage='Ei'
+                        id='actions.confirm.no'
+                    />
                 </Button>
             }
             closeOnEscape
             confirmButton={
-                <Button data-test="change-contacts" primary size={uiElemSize}>
-                    <FormattedMessage defaultMessage="Jah" id="actions.confirm.yes" />
+                <Button data-test='change-contacts' primary size={uiElemSize}>
+                    <FormattedMessage
+                        defaultMessage='Jah'
+                        id='actions.confirm.yes'
+                    />
                 </Button>
             }
             content={
-                <Modal.Content className="center">
-                    <FormattedMessage id="whois.confirmModal.description.title" tagName="h3" />
-                    <List className="changed-domains-list" divided relaxed size="small">
+                <Modal.Content className='center'>
+                    <FormattedMessage
+                        id='whois.confirmModal.description.title'
+                        tagName='h3'
+                    />
+                    <List
+                        className='changed-domains-list'
+                        divided
+                        relaxed
+                        size='small'
+                    >
                         {changedDomains.map((item) => (
                             <List.Item key={item.id}>
                                 <List.Content>
                                     <List.Header
-                                        as="a"
-                                        href={`/domain/${encodeURIComponent(item.id)}`}
-                                        target="_blank"
+                                        as='a'
+                                        href={`/domain/${encodeURIComponent(
+                                            item.id
+                                        )}`}
+                                        target='_blank'
                                     >
                                         {item.name}
                                     </List.Header>
@@ -43,33 +73,39 @@ function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }
                     </List>
 
                     {changedDomains.length > 10 && (
-                        <FormattedMessage id="whois.confirmModal.not_full_list" tagName="p" />
+                        <FormattedMessage
+                            id='whois.confirmModal.not_full_list'
+                            tagName='p'
+                        />
                     )}
                 </Modal.Content>
             }
             header={
                 <Modal.Header>
-                    <FormattedMessage id="whois.confirmModal.title" tagName="h2" />
+                    <FormattedMessage
+                        id='whois.confirmModal.title'
+                        tagName='h2'
+                    />
                 </Modal.Header>
             }
             onCancel={onCancel}
             onConfirm={onConfirm}
             open={open}
-            size="large"
+            size='large'
         />
-    );
+    )
 }
 
 const mapStateToProps = (state) => {
     return {
         domains: state.domains.data,
         ui: state.ui,
-    };
-};
+    }
+}
 
 export default connect(mapStateToProps, {
     ...contactsActions,
-})(WhoIsConfirmDialog);
+})(WhoIsConfirmDialog)
 
 WhoIsConfirmDialog.propTypes = {
     contacts: PropTypes.object.isRequired,
@@ -78,4 +114,4 @@ WhoIsConfirmDialog.propTypes = {
     onCancel: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
     ui: PropTypes.object.isRequired,
-};
+}

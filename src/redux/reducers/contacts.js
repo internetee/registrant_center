@@ -1,4 +1,4 @@
-import api from '../../utils/api';
+import api from "../../utils/api"
 import {
     FETCH_CONTACT_REQUEST,
     FETCH_CONTACT_SUCCESS,
@@ -10,106 +10,106 @@ import {
     UPDATE_CONTACT_SUCCESS,
     UPDATE_CONTACT_FAILURE,
     LOGOUT_USER,
-} from '../actions';
+} from "../actions"
 
 let request = {
     data: [],
     offset: 0,
-};
+}
 
 const requestContact = () => ({
     type: FETCH_CONTACT_REQUEST,
-});
+})
 
 const receiveContact = (payload) => ({
     payload,
     type: FETCH_CONTACT_SUCCESS,
-});
+})
 
 const requestContacts = () => ({
     type: FETCH_CONTACTS_REQUEST,
-});
+})
 
 const receiveContacts = (payload) => {
     request = {
         data: [],
         offset: 0,
-    };
+    }
     return {
         payload,
         type: FETCH_CONTACTS_SUCCESS,
-    };
-};
+    }
+}
 
 const requestContactUpdate = () => ({
     type: UPDATE_CONTACT_REQUEST,
-});
+})
 
 const receiveContactUpdate = (payload) => ({
     payload,
     type: UPDATE_CONTACT_SUCCESS,
-});
+})
 
 const failContactUpdate = (payload) => ({
     payload,
     type: UPDATE_CONTACT_FAILURE,
-});
+})
 
 const invalidateContacts = () => ({
     type: FETCH_CONTACTS_FAILURE,
-});
+})
 
 const invalidateContact = () => ({
     type: FETCH_CONTACT_FAILURE,
-});
+})
 
 const fetchContact = (uuid) => (dispatch) => {
-    dispatch(requestContact());
+    dispatch(requestContact())
     return api
         .fetchContacts(uuid, false)
         .then((res) => res.data)
         .then((data) => {
-            return dispatch(receiveContact(data));
+            return dispatch(receiveContact(data))
         })
         .catch(() => {
-            return dispatch(invalidateContact());
-        });
-};
+            return dispatch(invalidateContact())
+        })
+}
 
 const fetchContacts =
     (uuid, offset = request.offset) =>
     (dispatch) => {
         if (uuid) {
-            dispatch(requestContact());
+            dispatch(requestContact())
             return api
                 .fetchContacts(uuid, offset, true)
                 .then((res) => res.data)
                 .then(async (data) => {
-                    return dispatch(receiveContact(data));
+                    return dispatch(receiveContact(data))
                 })
                 .catch(() => {
-                    return dispatch(invalidateContact());
-                });
+                    return dispatch(invalidateContact())
+                })
         }
-        dispatch(requestContacts());
+        dispatch(requestContacts())
         return api
             .fetchContacts(null, offset)
             .then((res) => res.data)
             .then((data) => {
-                request.data = request.data.concat(data);
+                request.data = request.data.concat(data)
                 if (data.length === 200) {
-                    request.offset += 200;
-                    return dispatch(fetchContacts(null, request.offset));
+                    request.offset += 200
+                    return dispatch(fetchContacts(null, request.offset))
                 }
-                return dispatch(receiveContacts(request.data));
+                return dispatch(receiveContacts(request.data))
             })
             .catch(() => {
-                return dispatch(invalidateContacts());
-            });
-    };
+                return dispatch(invalidateContacts())
+            })
+    }
 
 const updateContact = (uuid, form) => (dispatch) => {
-    dispatch(requestContactUpdate());
+    dispatch(requestContactUpdate())
     return api
         .updateContact(uuid, form)
         .then((res) => {
@@ -118,45 +118,45 @@ const updateContact = (uuid, form) => (dispatch) => {
                     failContactUpdate({
                         ...res.data,
                         code: res.status,
-                        type: 'whois',
+                        type: "whois",
                     })
-                );
+                )
             }
-            return dispatch(receiveContactUpdate(res.data));
+            return dispatch(receiveContactUpdate(res.data))
         })
         .catch((error) => {
             return dispatch(
                 failContactUpdate({
                     code: error.response.status,
-                    type: 'whois',
+                    type: "whois",
                 })
-            );
-        });
-};
+            )
+        })
+}
 
 const initialState = {
     data: {},
     ids: [],
     isLoading: false,
     message: null,
-};
+}
 
 export default function reducer(state = initialState, { payload, type }) {
     switch (type) {
         case LOGOUT_USER:
-            return initialState;
+            return initialState
 
         case FETCH_CONTACTS_FAILURE:
             return {
                 ...state,
                 isLoading: false,
-            };
+            }
 
         case FETCH_CONTACTS_REQUEST:
             return {
                 ...state,
                 isLoading: true,
-            };
+            }
 
         case FETCH_CONTACTS_SUCCESS:
             return {
@@ -171,19 +171,19 @@ export default function reducer(state = initialState, { payload, type }) {
                 ids: payload.map((item) => item.id),
                 isLoading: false,
                 message: null,
-            };
+            }
 
         case FETCH_CONTACT_FAILURE:
             return {
                 ...state,
                 isLoading: false,
-            };
+            }
 
         case FETCH_CONTACT_REQUEST:
             return {
                 ...state,
                 isLoading: true,
-            };
+            }
 
         case FETCH_CONTACT_SUCCESS:
             return {
@@ -192,16 +192,18 @@ export default function reducer(state = initialState, { payload, type }) {
                     ...state.data,
                     [payload.id]: payload,
                 },
-                ids: state.ids.includes(payload.id) ? state.ids : [...state.ids, payload.id],
+                ids: state.ids.includes(payload.id)
+                    ? state.ids
+                    : [...state.ids, payload.id],
                 isLoading: false,
                 message: null,
-            };
+            }
 
         case UPDATE_CONTACT_REQUEST:
             return {
                 ...state,
                 isLoading: true,
-            };
+            }
 
         case UPDATE_CONTACT_SUCCESS:
             return {
@@ -210,20 +212,26 @@ export default function reducer(state = initialState, { payload, type }) {
                 isLoading: false,
                 message: {
                     code: 200,
-                    type: 'whois',
+                    type: "whois",
                 },
-            };
+            }
 
         case UPDATE_CONTACT_FAILURE:
             return {
                 ...state,
                 isLoading: false,
                 message: payload,
-            };
+            }
 
         default:
-            return state;
+            return state
     }
 }
 
-export { initialState, fetchContact, fetchContacts, updateContact, receiveContacts };
+export {
+    initialState,
+    fetchContact,
+    fetchContacts,
+    updateContact,
+    receiveContacts,
+}

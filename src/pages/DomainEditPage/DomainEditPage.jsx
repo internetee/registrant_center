@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Button, Form, Input, Container, Card, Grid } from 'semantic-ui-react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from "react"
+import { FormattedMessage } from "react-intl"
+import { Button, Form, Input, Container, Card, Grid } from "semantic-ui-react"
+import { connect } from "react-redux"
+import { bindActionCreators } from "redux"
+import PropTypes from "prop-types"
 import {
     WhoIsEdit,
     MessageModule,
@@ -12,11 +12,11 @@ import {
     MainLayout,
     WhoIsConfirmDialog,
     Loading,
-} from '../../components';
-import Helpers from '../../utils/helpers';
-import { fetchDomain as fetchDomainAction } from '../../redux/reducers/domains';
-import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
-import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
+} from "../../components"
+import Helpers from "../../utils/helpers"
+import { fetchDomain as fetchDomainAction } from "../../redux/reducers/domains"
+import { fetchCompanies as fetchCompaniesAction } from "../../redux/reducers/companies"
+import { updateContact as updateContactAction } from "../../redux/reducers/contacts"
 
 const DomainEditPage = ({
     companies,
@@ -31,140 +31,158 @@ const DomainEditPage = ({
     updateContact,
     user,
 }) => {
-    const { uiElemSize } = ui;
-    const [isDirty, setIsDirty] = useState([]);
-    const [isSaving, setIsSaving] = useState([]);
-    const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
-    const [formData, setFormData] = useState({});
-    const [stageData, setStageData] = useState({});
+    const { uiElemSize } = ui
+    const [isDirty, setIsDirty] = useState([])
+    const [isSaving, setIsSaving] = useState([])
+    const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] =
+        useState(false)
+    const [formData, setFormData] = useState({})
+    const [stageData, setStageData] = useState({})
 
     useEffect(() => {
-        (async () => {
+        ;(async () => {
             if ((!domain || !domain?.tech_contacts) && !isLoading) {
-                await fetchDomain(match.params.id);
+                await fetchDomain(match.params.id)
                 if (companies.isLoading === null) {
-                    fetchCompanies();
+                    fetchCompanies()
                 }
             }
-        })();
-    }, [domain, fetchDomain, isLoading, match]);
+        })()
+    }, [domain, fetchDomain, isLoading, match])
 
     useEffect(() => {
         if (domain) {
-            const registrant = contacts[domain.registrant.id];
-            if (registrant && registrant.ident.type === 'org') {
+            const registrant = contacts[domain.registrant.id]
+            if (registrant && registrant.ident.type === "org") {
                 if (companies.isLoading === null) {
-                    (async () => {
-                        await fetchCompanies();
-                    })();
+                    ;(async () => {
+                        await fetchCompanies()
+                    })()
                 }
             }
-            setFormData(Helpers.parseDomainContacts(user, domain, contacts, companies.data));
+            setFormData(
+                Helpers.parseDomainContacts(
+                    user,
+                    domain,
+                    contacts,
+                    companies.data
+                )
+            )
         }
-    }, [companies, contacts, domain, fetchCompanies, user]);
+    }, [companies, contacts, domain, fetchCompanies, user])
 
     const handleChange = (e, id) => {
-        const { name, value } = e.target;
+        const { name, value } = e.target
         setFormData((prevState) => ({
             ...prevState,
             [id]: {
                 ...prevState[id],
                 [name]: value,
             },
-        }));
+        }))
         if (!isDirty.includes(id)) {
-            isDirty.push(id);
-            setIsDirty(isDirty);
+            isDirty.push(id)
+            setIsDirty(isDirty)
         }
-    };
+    }
 
     const handleWhoIsChange = (data) => {
-        setFormData({ ...formData, ...data });
+        setFormData({ ...formData, ...data })
         if (!isDirty.includes(Object.keys(data)[0])) {
-            isDirty.push(Object.keys(data)[0]);
-            setIsDirty(isDirty);
+            isDirty.push(Object.keys(data)[0])
+            setIsDirty(isDirty)
         }
-    };
+    }
 
     const toggleSubmitConfirmModal = () => {
-        setIsSubmitConfirmModalOpen(!isSubmitConfirmModalOpen);
-    };
+        setIsSubmitConfirmModalOpen(!isSubmitConfirmModalOpen)
+    }
 
     const stageContactUpdate = (item) => {
-        setStageData({ [item.id]: formData[item.id] });
-        toggleSubmitConfirmModal();
-    };
+        setStageData({ [item.id]: formData[item.id] })
+        toggleSubmitConfirmModal()
+    }
     const handleSubmit = async () => {
         if (!isSaving.includes(Object.keys(stageData)[0])) {
-            isSaving.push(Object.keys(stageData)[0]);
-            setIsSaving(isSaving);
+            isSaving.push(Object.keys(stageData)[0])
+            setIsSaving(isSaving)
         }
-        setIsSubmitConfirmModalOpen(false);
+        setIsSubmitConfirmModalOpen(false)
         await Promise.all(
             Object.values(stageData).map((contact) => {
-                const registrant = stageData[domain.registrant.id];
-                if (registrant && registrant.ident.type === 'org') {
+                const registrant = stageData[domain.registrant.id]
+                if (registrant && registrant.ident.type === "org") {
                     return updateContact(contact.id, {
                         email: contact.email,
                         phone: contact.phone,
-                    });
+                    })
                 }
                 if (contact.ident.code === user.ident) {
                     return updateContact(contact.id, {
                         disclosed_attributes: [...contact.disclosed_attributes],
                         email: contact.email,
                         phone: contact.phone,
-                    });
+                    })
                 }
-                if (contact.ident.type === 'org') {
+                if (contact.ident.type === "org") {
                     return updateContact(contact.id, {
                         email: contact.email,
                         phone: contact.phone,
-                    });
+                    })
                 }
                 return updateContact(contact.id, {
                     disclosed_attributes: [...contact.disclosed_attributes],
                     email: contact.email,
                     phone: contact.phone,
-                });
+                })
             })
-        );
+        )
         if (isDirty.includes(Object.keys(stageData)[0])) {
-            setIsDirty(isDirty.filter((r) => r !== Object.keys(stageData)[0]));
+            setIsDirty(isDirty.filter((r) => r !== Object.keys(stageData)[0]))
         }
         if (isSaving.includes(Object.keys(stageData)[0])) {
-            setIsSaving(isSaving.filter((id) => id !== Object.keys(stageData)[0]));
+            setIsSaving(
+                isSaving.filter((id) => id !== Object.keys(stageData)[0])
+            )
         }
-    };
+    }
 
     if (isLoading) {
-        return <Loading />;
+        return <Loading />
     }
 
     if (!domain) {
         return (
-            <MainLayout hasBackButton titleKey="domain.404.title">
+            <MainLayout hasBackButton titleKey='domain.404.title'>
                 <PageMessage
-                    headerContent={<FormattedMessage id="domain.404.message.title" />}
-                    icon="frown outline"
+                    headerContent={
+                        <FormattedMessage id='domain.404.message.title' />
+                    }
+                    icon='frown outline'
                 >
-                    <FormattedMessage id="domain.none.message.text" tagName="p" />
+                    <FormattedMessage
+                        id='domain.none.message.text'
+                        tagName='p'
+                    />
                 </PageMessage>
             </MainLayout>
-        );
+        )
     }
 
     return (
         <MainLayout hasBackButton title={domain.name}>
-            <div className="page page--domain-edit">
-                <div className="page--header">
-                    <Container textAlign="center">
+            <div className='page page--domain-edit'>
+                <div className='page--header'>
+                    <Container textAlign='center'>
                         <h2>
-                            <FormattedMessage id="domainEdit.title" tagName="label" />
+                            <FormattedMessage
+                                id='domainEdit.title'
+                                tagName='label'
+                            />
                         </h2>
                     </Container>
                 </div>
-                <Grid textAlign="center">
+                <Grid textAlign='center'>
                     <Grid.Row>
                         {Object.values(formData).map((item) => (
                             <Grid.Column
@@ -177,37 +195,48 @@ const DomainEditPage = ({
                                 <Card centered>
                                     <Card.Content>
                                         {!isSaving.includes(item.id) &&
-                                            Object.keys(stageData).includes(item.id) &&
+                                            Object.keys(stageData).includes(
+                                                item.id
+                                            ) &&
                                             message && (
-                                                <MessageModule formMessage message={message} />
+                                                <MessageModule
+                                                    formMessage
+                                                    message={message}
+                                                />
                                             )}
-                                        <Form onSubmit={(_e) => stageContactUpdate(item)}>
+                                        <Form
+                                            onSubmit={(_e) =>
+                                                stageContactUpdate(item)
+                                            }
+                                        >
                                             <Form.Group grouped>
                                                 <h4>
                                                     <Roles roles={item.roles} />
                                                 </h4>
                                                 <Form.Field>
                                                     <FormattedMessage
-                                                        id="domain.registrant.name"
-                                                        tagName="label"
+                                                        id='domain.registrant.name'
+                                                        tagName='label'
                                                     />
                                                     <Input
                                                         defaultValue={item.name}
                                                         disabled
                                                         size={uiElemSize}
-                                                        type="text"
+                                                        type='text'
                                                     />
                                                 </Form.Field>
                                                 <Form.Field>
                                                     <FormattedMessage
-                                                        id="domain.registrant.ident.code"
-                                                        tagName="label"
+                                                        id='domain.registrant.ident.code'
+                                                        tagName='label'
                                                     />
                                                     <Input
-                                                        defaultValue={item.ident.code}
+                                                        defaultValue={
+                                                            item.ident.code
+                                                        }
                                                         disabled
                                                         size={uiElemSize}
-                                                        type="text"
+                                                        type='text'
                                                     />
                                                 </Form.Field>
                                                 <Form.Field
@@ -215,20 +244,28 @@ const DomainEditPage = ({
                                                         message &&
                                                         message.errors &&
                                                         message.errors.email &&
-                                                        message.errors.email.length
+                                                        message.errors.email
+                                                            .length
                                                     }
                                                 >
                                                     <FormattedMessage
-                                                        id="domain.registrant.email"
-                                                        tagName="label"
+                                                        id='domain.registrant.email'
+                                                        tagName='label'
                                                     />
                                                     <Input
-                                                        defaultValue={item.email}
-                                                        name="email"
-                                                        onChange={(e) => handleChange(e, item.id)}
+                                                        defaultValue={
+                                                            item.email
+                                                        }
+                                                        name='email'
+                                                        onChange={(e) =>
+                                                            handleChange(
+                                                                e,
+                                                                item.id
+                                                            )
+                                                        }
                                                         required
                                                         size={uiElemSize}
-                                                        type="email"
+                                                        type='email'
                                                     />
                                                 </Form.Field>
                                                 <Form.Field
@@ -236,47 +273,64 @@ const DomainEditPage = ({
                                                         message &&
                                                         message.errors &&
                                                         message.errors.phone &&
-                                                        message.errors.phone.length
+                                                        message.errors.phone
+                                                            .length
                                                     }
                                                 >
                                                     <FormattedMessage
-                                                        id="domain.registrant.phone"
-                                                        tagName="label"
+                                                        id='domain.registrant.phone'
+                                                        tagName='label'
                                                     />
                                                     <Input
-                                                        defaultValue={item.phone}
-                                                        name="phone"
-                                                        onChange={(e) => handleChange(e, item.id)}
+                                                        defaultValue={
+                                                            item.phone
+                                                        }
+                                                        name='phone'
+                                                        onChange={(e) =>
+                                                            handleChange(
+                                                                e,
+                                                                item.id
+                                                            )
+                                                        }
                                                         required
                                                         size={uiElemSize}
-                                                        type="tel"
+                                                        type='tel'
                                                     />
                                                 </Form.Field>
                                             </Form.Group>
                                             <>
                                                 <FormattedMessage
-                                                    id="domain.contactsVisibility"
-                                                    tagName="h3"
+                                                    id='domain.contactsVisibility'
+                                                    tagName='h3'
                                                 />
                                                 <WhoIsEdit
                                                     checkAll
-                                                    contacts={{ [item.id]: formData[item.id] }}
+                                                    contacts={{
+                                                        [item.id]:
+                                                            formData[item.id],
+                                                    }}
                                                     domain={domain}
                                                     onChange={handleWhoIsChange}
                                                 />
                                             </>
-                                            <div className="form-actions">
+                                            <div className='form-actions'>
                                                 <Button
-                                                    disabled={!isDirty.includes(item.id)}
-                                                    loading={isSaving.includes(item.id)}
+                                                    disabled={
+                                                        !isDirty.includes(
+                                                            item.id
+                                                        )
+                                                    }
+                                                    loading={isSaving.includes(
+                                                        item.id
+                                                    )}
                                                     primary
                                                     size={uiElemSize}
-                                                    type="submit"
+                                                    type='submit'
                                                 >
                                                     <FormattedMessage
-                                                        defaultMessage="Salvesta"
-                                                        id="actions.save"
-                                                        tagName="span"
+                                                        defaultMessage='Salvesta'
+                                                        id='actions.save'
+                                                        tagName='span'
                                                     />
                                                 </Button>
                                             </div>
@@ -296,8 +350,8 @@ const DomainEditPage = ({
                 open={isSubmitConfirmModalOpen}
             />
         </MainLayout>
-    );
-};
+    )
+}
 
 const mapStateToProps = (state, { match }) => {
     return {
@@ -308,8 +362,8 @@ const mapStateToProps = (state, { match }) => {
         message: state.contacts.message,
         ui: state.ui,
         user: state.user.data,
-    };
-};
+    }
+}
 
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
@@ -319,9 +373,9 @@ const mapDispatchToProps = (dispatch) =>
             updateContact: updateContactAction,
         },
         dispatch
-    );
+    )
 
-export default connect(mapStateToProps, mapDispatchToProps)(DomainEditPage);
+export default connect(mapStateToProps, mapDispatchToProps)(DomainEditPage)
 
 DomainEditPage.propTypes = {
     companies: PropTypes.object,
@@ -334,10 +388,10 @@ DomainEditPage.propTypes = {
     ui: PropTypes.object.isRequired,
     updateContact: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
-};
+}
 
 DomainEditPage.defaultProps = {
     companies: {},
     contacts: {},
     domain: {},
-};
+}

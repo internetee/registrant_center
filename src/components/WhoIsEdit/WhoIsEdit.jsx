@@ -1,14 +1,16 @@
 /* eslint-disable camelcase */
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Form, Checkbox } from 'semantic-ui-react';
-import PropTypes from 'prop-types';
-import Roles from '../Roles/Roles';
+import React from "react"
+import { FormattedMessage } from "react-intl"
+import { Form, Checkbox } from "semantic-ui-react"
+import PropTypes from "prop-types"
+import Roles from "../Roles/Roles"
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
-    const contactsList = Object.values(contacts);
+    const contactsList = Object.values(contacts)
     const isCompany =
-        contactsList.find(({ ident }) => ident.type === 'org' || domain.registrant.org) != null;
+        contactsList.find(
+            ({ ident }) => ident.type === "org" || domain.registrant.org
+        ) != null
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
         (acc, { ident, disclosed_attributes }) => ({
@@ -16,15 +18,16 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 acc.checkedCount +
                 (function () {
                     if (domain.registrant.org) {
-                        return 2;
+                        return 2
                     }
-                    if (ident.type === 'org') {
-                        return 2;
+                    if (ident.type === "org") {
+                        return 2
                     }
-                    return disclosed_attributes.size;
+                    return disclosed_attributes.size
                 })(),
             isCheckedAll:
-                domain.registrant.org || disclosed_attributes.size === contactsList.length * 2,
+                domain.registrant.org ||
+                disclosed_attributes.size === contactsList.length * 2,
             totalCount: acc.totalCount + 2,
         }),
         {
@@ -32,71 +35,71 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
             isCheckedAll: false,
             totalCount: 0,
         }
-    );
+    )
 
-    const indeterminate = checkedCount > 0 && checkedCount < totalCount;
+    const indeterminate = checkedCount > 0 && checkedCount < totalCount
 
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {
-            const { disclosed_attributes } = contacts[id];
-            const attributes = new Set(disclosed_attributes);
+            const { disclosed_attributes } = contacts[id]
+            const attributes = new Set(disclosed_attributes)
             type.forEach((attr) => {
                 if (checked) {
-                    attributes.add(attr);
+                    attributes.add(attr)
                 } else {
-                    attributes.delete(attr);
+                    attributes.delete(attr)
                 }
-            });
+            })
             return {
                 ...acc,
                 [id]: {
                     ...contacts[id],
                     disclosed_attributes: attributes,
                 },
-            };
-        }, {});
-        onChange(changedContacts);
-    };
+            }
+        }, {})
+        onChange(changedContacts)
+    }
 
     const CheckAllLabel = () => {
         if (indeterminate) {
             return (
                 <FormattedMessage
-                    id="whois.edit.checkSome"
-                    tagName="label"
+                    id='whois.edit.checkSome'
+                    tagName='label'
                     values={{
                         count: checkedCount,
                         countOf: totalCount,
                     }}
                 />
-            );
+            )
         }
         if (isCheckedAll) {
             return (
                 <FormattedMessage
-                    id="whois.edit.checkAll"
-                    tagName="label"
+                    id='whois.edit.checkAll'
+                    tagName='label'
                     values={{
                         count: checkedCount,
                         countOf: totalCount,
                     }}
                 />
-            );
+            )
         }
         return (
             <FormattedMessage
-                id="whois.edit.checkNone"
-                tagName="label"
+                id='whois.edit.checkNone'
+                tagName='label'
                 values={{
                     count: checkedCount,
                     countOf: totalCount,
                 }}
             />
-        );
-    };
+        )
+    }
 
     if (!contactsList.length) {
-        return null;
+        return null
     }
 
     return (
@@ -105,25 +108,33 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 <Form.Field>
                     <Checkbox
                         checked={isCheckedAll || isCompany}
-                        className="large"
+                        className='large'
                         disabled={isCompany}
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
-                            handleChange(elem.checked, Object.keys(contacts), ['name', 'email']);
+                            handleChange(elem.checked, Object.keys(contacts), [
+                                "name",
+                                "email",
+                            ])
                         }}
                     />
                 </Form.Field>
             )}
             <Form.Group
-                className={isOpen ? 'adv-field-group u-visible' : 'adv-field-group'}
+                className={
+                    isOpen ? "adv-field-group u-visible" : "adv-field-group"
+                }
                 grouped
             >
                 {contactsList.map((item) => (
                     <React.Fragment key={item.id}>
                         {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                         <label htmlFor={item.id}>
-                            <FormattedMessage id="domain.role" tagName="strong" />
+                            <FormattedMessage
+                                id='domain.role'
+                                tagName='strong'
+                            />
                             <strong>
                                 <Roles roles={item.roles} />
                             </strong>
@@ -132,22 +143,29 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                             <Checkbox
                                 checked={
                                     domain.registrant.org ||
-                                    item.ident.type === 'org' ||
-                                    item.disclosed_attributes.has('name')
+                                    item.ident.type === "org" ||
+                                    item.disclosed_attributes.has("name")
                                 }
-                                disabled={item.ident.type === 'org' || domain.registrant.org}
+                                disabled={
+                                    item.ident.type === "org" ||
+                                    domain.registrant.org
+                                }
                                 label={
                                     <FormattedMessage
-                                        id="whois.edit.name"
-                                        tagName="label"
+                                        id='whois.edit.name'
+                                        tagName='label'
                                         values={{
                                             contactName: item.initialName,
                                         }}
                                     />
                                 }
-                                name="name"
+                                name='name'
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], ['name'])
+                                    handleChange(
+                                        elem.checked,
+                                        [item.id],
+                                        ["name"]
+                                    )
                                 }
                                 value={item.name}
                             />
@@ -156,22 +174,29 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                             <Checkbox
                                 checked={
                                     domain.registrant.org ||
-                                    item.ident.type === 'org' ||
-                                    item.disclosed_attributes.has('email')
+                                    item.ident.type === "org" ||
+                                    item.disclosed_attributes.has("email")
                                 }
-                                disabled={item.ident.type === 'org' || domain.registrant.org}
+                                disabled={
+                                    item.ident.type === "org" ||
+                                    domain.registrant.org
+                                }
                                 label={
                                     <FormattedMessage
-                                        id="whois.edit.email"
-                                        tagName="label"
+                                        id='whois.edit.email'
+                                        tagName='label'
                                         values={{
                                             contactEmail: item.initialEmail,
                                         }}
                                     />
                                 }
-                                name="email"
+                                name='email'
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], ['email'])
+                                    handleChange(
+                                        elem.checked,
+                                        [item.id],
+                                        ["email"]
+                                    )
                                 }
                                 value={item.email}
                             />
@@ -180,10 +205,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 ))}
             </Form.Group>
         </>
-    );
+    )
 }
 
-export default WhoIsEdit;
+export default WhoIsEdit
 
 WhoIsEdit.propTypes = {
     isOpen: PropTypes.bool,
@@ -191,10 +216,10 @@ WhoIsEdit.propTypes = {
     onChange: PropTypes.func,
     contacts: PropTypes.object.isRequired,
     domain: PropTypes.object.isRequired,
-};
+}
 
 WhoIsEdit.defaultProps = {
     isOpen: false,
     checkAll: false,
     onChange: () => {},
-};
+}

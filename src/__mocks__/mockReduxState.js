@@ -1,14 +1,14 @@
-import thunk from 'redux-thunk';
-import configureStore from 'redux-mock-store';
-import user from './user';
-import domains from './domains';
-import contacts from './contacts';
-import footer from './menuFooter';
-import main from './menuMain';
-import { parseDomain } from '../redux/reducers/domains';
+import thunk from "redux-thunk"
+import configureStore from "redux-mock-store"
+import user from "./user"
+import domains from "./domains"
+import contacts from "./contacts"
+import footer from "./menuFooter"
+import main from "./menuMain"
+import { parseDomain } from "../redux/reducers/domains"
 
-const middlewares = [thunk];
-const mockStore = configureStore(middlewares);
+const middlewares = [thunk]
+const mockStore = configureStore(middlewares)
 
 export default mockStore({
     contacts: {
@@ -35,7 +35,7 @@ export default mockStore({
         isLoading: false,
     },
     ui: {
-        lang: 'et',
+        lang: "et",
         mainMenu: {
             isOpen: false,
         },
@@ -43,7 +43,7 @@ export default mockStore({
             footer,
             main,
         },
-        uiElemSize: 'big',
+        uiElemSize: "big",
     },
     user: {
         data: {
@@ -52,4 +52,4 @@ export default mockStore({
         },
         status: 200,
     },
-});
+})

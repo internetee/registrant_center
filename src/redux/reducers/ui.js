@@ -1,43 +1,44 @@
-import Cookies from 'universal-cookie';
-import api from '../../utils/api';
+import Cookies from "universal-cookie"
+import api from "../../utils/api"
 
-const cookies = new Cookies();
-const SET_LANG = 'SET_LANG';
-const TOGGLE_MAIN_MENU = 'TOGGLE_MAIN_MENU';
-const CLOSE_MAIN_MENU = 'CLOSE_MAIN_MENU';
-const GET_DEVICE_TYPE = 'GET_DEVICE_TYPE';
+const cookies = new Cookies()
+const SET_LANG = "SET_LANG"
+const TOGGLE_MAIN_MENU = "TOGGLE_MAIN_MENU"
+const CLOSE_MAIN_MENU = "CLOSE_MAIN_MENU"
+const GET_DEVICE_TYPE = "GET_DEVICE_TYPE"
 
-const fetchMenuAction = (menu, type) => `FETCH_MENU_${menu.toUpperCase()}_${type.toUpperCase()}`;
+const fetchMenuAction = (menu, type) =>
+    `FETCH_MENU_${menu.toUpperCase()}_${type.toUpperCase()}`
 
 const getUiElementSize = (width) => {
-    const isMobile = width < 480;
-    const isTablet = width >= 480 && width < 1224;
+    const isMobile = width < 480
+    const isTablet = width >= 480 && width < 1224
     if (isMobile) {
-        return 'tiny';
+        return "tiny"
     }
     if (isTablet) {
-        return 'medium';
+        return "medium"
     }
-    return 'big';
-};
+    return "big"
+}
 
 const setLang = (lang) => (dispatch) => {
-    cookies.remove('locale');
-    cookies.set('locale', lang, { path: '/' });
+    cookies.remove("locale")
+    cookies.set("locale", lang, { path: "/" })
     dispatch({
         lang,
         type: SET_LANG,
-    });
-};
+    })
+}
 
 const requestMenu = (menu) => (dispatch, getState) => {
     dispatch({
         isInvalidated: false,
         isLoading: true,
         status: null,
-        type: fetchMenuAction(menu, 'request'),
-    });
-};
+        type: fetchMenuAction(menu, "request"),
+    })
+}
 
 const receiveMenu = (menu, data) => (dispatch, getState) => {
     dispatch({
@@ -47,9 +48,9 @@ const receiveMenu = (menu, data) => (dispatch, getState) => {
             [menu]: data,
         },
         status: 200,
-        type: fetchMenuAction(menu, 'success'),
-    });
-};
+        type: fetchMenuAction(menu, "success"),
+    })
+}
 
 const invalidateMenuRequest = (menu, status) => {
     return {
@@ -59,51 +60,51 @@ const invalidateMenuRequest = (menu, status) => {
             [menu]: null,
         },
         status,
-        type: fetchMenuAction(menu, 'failure'),
-    };
-};
+        type: fetchMenuAction(menu, "failure"),
+    }
+}
 
 const fetchMenu = (menu) => (dispatch) => {
-    dispatch(requestMenu(menu));
+    dispatch(requestMenu(menu))
     return api
         .fetchMenu(menu)
         .then((res) => res.data)
         .then(async (data) => {
-            dispatch(receiveMenu(menu, data));
+            dispatch(receiveMenu(menu, data))
         })
         .catch((error) => {
-            dispatch(invalidateMenuRequest(menu, error.response.status));
-        });
-};
+            dispatch(invalidateMenuRequest(menu, error.response.status))
+        })
+}
 
 const toggleMainMenu = () => (dispatch) => {
     dispatch({
         type: TOGGLE_MAIN_MENU,
-    });
-};
+    })
+}
 
 const closeMainMenu = () => (dispatch) => {
     dispatch({
         type: CLOSE_MAIN_MENU,
-    });
-};
+    })
+}
 
 const getDeviceType = (width) => (dispatch) => {
     dispatch({
         type: GET_DEVICE_TYPE,
         uiElemSize: getUiElementSize(width),
-    });
-};
+    })
+}
 
 const initialState = {
     isMainMenuOpen: false,
-    lang: cookies.get('locale') || 'et',
+    lang: cookies.get("locale") || "et",
     menus: {},
-    uiElemSize: 'big',
-};
+    uiElemSize: "big",
+}
 
 export default function reducer(state = initialState, action) {
-    if (action.type && action.type.startsWith('FETCH_MENU')) {
+    if (action.type && action.type.startsWith("FETCH_MENU")) {
         return {
             ...state,
             isInvalidated: action.isInvalidated,
@@ -113,7 +114,7 @@ export default function reducer(state = initialState, action) {
                 ...action.payload,
             },
             status: action.status,
-        };
+        }
     }
 
     switch (action.type) {
@@ -121,29 +122,36 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 isMainMenuOpen: !state.isMainMenuOpen,
-            };
+            }
 
         case CLOSE_MAIN_MENU:
             return {
                 ...state,
                 isMainMenuOpen: false,
-            };
+            }
 
         case GET_DEVICE_TYPE:
             return {
                 ...state,
                 uiElemSize: action.uiElemSize,
-            };
+            }
 
         case SET_LANG:
             return {
                 ...state,
                 lang: action.lang,
-            };
+            }
 
         default:
-            return state;
+            return state
     }
 }
 
-export { initialState, fetchMenu, setLang, toggleMainMenu, closeMainMenu, getDeviceType };
+export {
+    initialState,
+    fetchMenu,
+    setLang,
+    toggleMainMenu,
+    closeMainMenu,
+    getDeviceType,
+}

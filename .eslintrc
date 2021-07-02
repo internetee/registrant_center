@@ -38,7 +38,18 @@
 		"no-duplicate-imports": 0,
 		"one-var": 0,
 		"prettier/prettier": [
-			"error"
+			"error",
+			{
+				"endOfLine": "auto",
+				"printWidth": 80,
+				"trailingComma": "es5",
+				"semi": false,
+				"doubleQuote": true,
+				"jsxSingleQuote": true,
+				"singleQuote": false,
+				"useTabs": false,
+				"tabWidth": 4
+			}
 		],
 		"react/forbid-prop-types": [
 			0,

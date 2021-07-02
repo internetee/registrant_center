@@ -1,22 +1,22 @@
-import { SET_TECH } from '../actions';
+import { SET_TECH } from "../actions"
 
 const setSortByRoles = (isTech) => ({
     payload: isTech,
     type: SET_TECH,
-});
+})
 
 const initialState = {
-    isTech: 'init',
-};
+    isTech: "init",
+}
 
 export default function reducer(state = initialState, { payload, type }) {
-    if (type === 'SET_TECH') {
+    if (type === "SET_TECH") {
         return {
             ...state,
             isTech: payload,
-        };
+        }
     }
-    return state;
+    return state
 }
 
-export { initialState, setSortByRoles };
+export { initialState, setSortByRoles }

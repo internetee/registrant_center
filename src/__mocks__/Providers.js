@@ -1,12 +1,12 @@
-import { CookiesProvider } from 'react-cookie';
-import { IntlProvider } from 'react-intl';
-import { Provider } from 'react-redux';
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import translations from '../translations';
-import state from './mockReduxState';
+import { CookiesProvider } from "react-cookie"
+import { IntlProvider } from "react-intl"
+import { Provider } from "react-redux"
+import React from "react"
+import { BrowserRouter } from "react-router-dom"
+import translations from "../translations"
+import state from "./mockReduxState"
 
-const lang = 'et';
+const lang = "et"
 
 export default function Providers({ children }) {
     return (
@@ -15,7 +15,7 @@ export default function Providers({ children }) {
                 <CookiesProvider>
                     <IntlProvider
                         key={lang}
-                        defaultLocale="et"
+                        defaultLocale='et'
                         locale={lang}
                         messages={translations[lang]}
                     >
@@ -24,5 +24,5 @@ export default function Providers({ children }) {
                 </CookiesProvider>
             </Provider>
         </BrowserRouter>
-    );
+    )
 }
