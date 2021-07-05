@@ -26,17 +26,17 @@ const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const {
-	AUTH_PATH,
-	CLIENT_ID,
-	CLIENT_SECRET,
-	HOST,
-	ISSUER_URL,
-	JWKS_PATH,
-	NODE_ENV,
-	REACT_APP_SERVER_PORT,
-	REDIRECT_URL,
-	SESSION_SECRET,
-	TOKEN_PATH,
+    AUTH_PATH,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    HOST,
+    ISSUER_URL,
+    JWKS_PATH,
+    NODE_ENV,
+    REACT_APP_SERVER_PORT,
+    REDIRECT_URL,
+    SESSION_SECRET,
+    TOKEN_PATH,
 } = process.env;
 
 let publicKey = '';
@@ -60,66 +60,66 @@ app.use(compression()); // GZip compress responses
 
 // static files
 if (NODE_ENV !== 'development') {
-	app.use(express.static(path.join(__dirname, 'build')));
+    app.use(express.static(path.join(__dirname, 'build')));
 }
 app.use(favicon(path.join(__dirname, '../public/favicon.ico')));
 
 app.use(
-	session({
-		httpOnly: true,
-		maxAge: 7200000,
-		secret: SESSION_SECRET,
-		secure: true,
-	})
+    session({
+        httpOnly: true,
+        maxAge: 7200000,
+        secret: SESSION_SECRET,
+        secure: true,
+    })
 );
 
 (async () => {
-	try {
-		const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
-		console.log('Received public key from TARA'); // eslint-disable-line no-console
-		publicKey = data.keys[0]; // eslint-disable-line prefer-destructuring
-	} catch (e) {
-		console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
-	}
+    try {
+        const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
+        console.log('Received public key from TARA'); // eslint-disable-line no-console
+        publicKey = data.keys[0]; // eslint-disable-line prefer-destructuring
+    } catch (e) {
+        console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
+    }
 })();
 
 // middlewares
 let LOCALE = 'et';
 app.use((req, res, next) => {
-	LOCALE = req.cookies.locale || 'et';
-	next();
+    LOCALE = req.cookies.locale || 'et';
+    next();
 });
 
 const redirect_uri =
-	NODE_ENV === 'development'
-		? `https://${HOST}:${REACT_APP_SERVER_PORT}${REDIRECT_URL}`
-		: `https://${HOST}${REDIRECT_URL}`;
+    NODE_ENV === 'development'
+        ? `https://${HOST}:${REACT_APP_SERVER_PORT}${REDIRECT_URL}`
+        : `https://${HOST}${REDIRECT_URL}`;
 
 // grant auth
 app.use(
-	grant({
-		defaults: {
-			protocol: 'https',
-			host: HOST,
-			state: true,
-			callback: '/auth/callback',
-			transport: 'querystring',
-		},
-		openid: {
-			authorize_url: ISSUER_URL + AUTH_PATH,
-			access_url: ISSUER_URL + TOKEN_PATH,
-			oauth: 2,
-			key: CLIENT_ID,
-			secret: CLIENT_SECRET,
-			scope: 'openid',
-			redirect_uri,
-			response_type: 'code',
-			callback: REDIRECT_URL,
-			custom_params: {
-				ui_locales: LOCALE,
-			},
-		},
-	})
+    grant({
+        defaults: {
+            protocol: 'https',
+            host: HOST,
+            state: true,
+            callback: '/auth/callback',
+            transport: 'querystring',
+        },
+        openid: {
+            authorize_url: ISSUER_URL + AUTH_PATH,
+            access_url: ISSUER_URL + TOKEN_PATH,
+            oauth: 2,
+            key: CLIENT_ID,
+            secret: CLIENT_SECRET,
+            scope: 'openid',
+            redirect_uri,
+            response_type: 'code',
+            callback: REDIRECT_URL,
+            custom_params: {
+                ui_locales: LOCALE,
+            },
+        },
+    })
 );
 
 app.use(helmet());
@@ -145,14 +145,14 @@ app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).t
 app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'build', 'index.html')));
 
 const server = https
-	.createServer(credentials, app)
-	.listen(NODE_ENV === 'test' ? 4000 : REACT_APP_SERVER_PORT, () => {
-		banner();
-		// eslint-disable-next-line no-console
-		console.log(`Environment: ${NODE_ENV}`);
-		// 'ready' is a hook used by the e2e (integration) tests (see node-while)
-		server.emit('ready');
-	});
+    .createServer(credentials, app)
+    .listen(NODE_ENV === 'test' ? 4000 : REACT_APP_SERVER_PORT, () => {
+        banner();
+        // eslint-disable-next-line no-console
+        console.log(`Environment: ${NODE_ENV}`);
+        // 'ready' is a hook used by the e2e (integration) tests (see node-while)
+        server.emit('ready');
+    });
 
 // export server instance so we can hook into it in e2e tests etc
 export default server;

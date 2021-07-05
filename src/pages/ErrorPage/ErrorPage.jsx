@@ -10,38 +10,38 @@ import { setLang as setLangAction } from '../../redux/reducers/ui';
 const langs = ['et', 'en'];
 
 const ErrorPage = ({ setLang }) => {
-	const { lang } = useParams();
+    const { lang } = useParams();
 
-	useEffect(() => {
-		if (langs.includes(lang)) {
-			setLang(lang);
-		}
-	}, [lang, setLang]);
+    useEffect(() => {
+        if (langs.includes(lang)) {
+            setLang(lang);
+        }
+    }, [lang, setLang]);
 
-	if (langs.includes(lang)) {
-		return <Redirect to="/" />;
-	}
+    if (langs.includes(lang)) {
+        return <Redirect to="/" />;
+    }
 
-	return (
-		<MainLayout hasBackButton titleKey="errorpage.title">
-			<PageMessage
-				headerContent={<FormattedMessage id="errorpage.none.message.title" />}
-				icon="times circle outline"
-			/>
-		</MainLayout>
-	);
+    return (
+        <MainLayout hasBackButton titleKey="errorpage.title">
+            <PageMessage
+                headerContent={<FormattedMessage id="errorpage.none.message.title" />}
+                icon="times circle outline"
+            />
+        </MainLayout>
+    );
 };
 
 const mapDispatchToProps = (dispatch) =>
-	bindActionCreators(
-		{
-			setLang: setLangAction,
-		},
-		dispatch
-	);
+    bindActionCreators(
+        {
+            setLang: setLangAction,
+        },
+        dispatch
+    );
 
 export default connect(null, mapDispatchToProps)(ErrorPage);
 
 ErrorPage.propTypes = {
-	setLang: PropTypes.func.isRequired,
+    setLang: PropTypes.func.isRequired,
 };

@@ -11,45 +11,45 @@ const middlewares = [thunk];
 const mockStore = configureStore(middlewares);
 
 export default mockStore({
-	contacts: {
-		data: contacts.reduce(
-			(acc, item) => ({
-				...acc,
-				[item.id]: item,
-			}),
-			{}
-		),
-		ids: contacts.map((item) => item.id),
-		isLoading: false,
-		message: null,
-	},
-	domains: {
-		data: domains.reduce(
-			(acc, item) => ({
-				...acc,
-				[item.id]: parseDomain(item),
-			}),
-			{}
-		),
-		ids: domains.map((item) => item.id),
-		isLoading: false,
-	},
-	ui: {
-		lang: 'et',
-		mainMenu: {
-			isOpen: false,
-		},
-		menus: {
-			footer,
-			main,
-		},
-		uiElemSize: 'big',
-	},
-	user: {
-		data: {
-			...user,
-			name: `${user.first_name} ${user.last_name}`,
-		},
-		status: 200,
-	},
+    contacts: {
+        data: contacts.reduce(
+            (acc, item) => ({
+                ...acc,
+                [item.id]: item,
+            }),
+            {}
+        ),
+        ids: contacts.map((item) => item.id),
+        isLoading: false,
+        message: null,
+    },
+    domains: {
+        data: domains.reduce(
+            (acc, item) => ({
+                ...acc,
+                [item.id]: parseDomain(item),
+            }),
+            {}
+        ),
+        ids: domains.map((item) => item.id),
+        isLoading: false,
+    },
+    ui: {
+        lang: 'et',
+        mainMenu: {
+            isOpen: false,
+        },
+        menus: {
+            footer,
+            main,
+        },
+        uiElemSize: 'big',
+    },
+    user: {
+        data: {
+            ...user,
+            name: `${user.first_name} ${user.last_name}`,
+        },
+        status: 200,
+    },
 });

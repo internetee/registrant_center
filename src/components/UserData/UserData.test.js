@@ -7,12 +7,12 @@ import contacts from '../../__mocks__/contacts';
 import domains from '../../__mocks__/domains';
 
 describe('components/UserData', () => {
-	it('should show content', () => {
-		const cmp = shallow(
-			<Providers>
-				<UserData contacts={contacts} domains={domains} />
-			</Providers>
-		);
-		expect(cmp).toMatchSnapshot();
-	});
+    it('should show content', () => {
+        const cmp = shallow(
+            <Providers>
+                <UserData contacts={contacts} domains={domains} />
+            </Providers>
+        );
+        expect(cmp).toMatchSnapshot();
+    });
 });

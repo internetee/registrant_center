@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet';
 // import getLog from '../utils/logger';
 
 function renderHTML(helmet) {
-	return `
+    return `
     <!doctype html>
     <html ${helmet.htmlAttributes.toString()}>
       <head>
@@ -21,12 +21,12 @@ function renderHTML(helmet) {
 }
 
 export default async function renderPageRoute(req, res) {
-	try {
-		const helmet = Helmet.renderStatic();
-		res.setHeader('Content-Type', 'text/html');
-		res.send(renderHTML(helmet));
-	} catch (error) {
-		console.log(error.stack);
-		res.status(500).sendFile('src/server/views/500.html', { root: process.cwd() });
-	}
+    try {
+        const helmet = Helmet.renderStatic();
+        res.setHeader('Content-Type', 'text/html');
+        res.send(renderHTML(helmet));
+    } catch (error) {
+        console.log(error.stack);
+        res.status(500).sendFile('src/server/views/500.html', { root: process.cwd() });
+    }
 }

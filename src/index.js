@@ -16,28 +16,28 @@ import './index.scss';
 import GA from './utils/googleAnalytics';
 
 const stateSyncConfig = {
-	whitelist: ['LOGOUT_USER'],
+    whitelist: ['LOGOUT_USER'],
 };
 
 const store = createStore(
-	reducers,
-	composeWithDevTools(
-		applyMiddleware(thunkMiddleware, createStateSyncMiddleware(stateSyncConfig))
-	)
+    reducers,
+    composeWithDevTools(
+        applyMiddleware(thunkMiddleware, createStateSyncMiddleware(stateSyncConfig))
+    )
 );
 
 render(
-	<React.StrictMode>
-		<Provider store={store}>
-			<CookiesProvider>
-				<BrowserRouter>
-					{GA.init() && <GA.RouteTracker />}
-					<App />
-				</BrowserRouter>
-			</CookiesProvider>
-		</Provider>
-	</React.StrictMode>,
-	document.getElementById('root')
+    <React.StrictMode>
+        <Provider store={store}>
+            <CookiesProvider>
+                <BrowserRouter>
+                    {GA.init() && <GA.RouteTracker />}
+                    <App />
+                </BrowserRouter>
+            </CookiesProvider>
+        </Provider>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

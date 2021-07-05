@@ -9,20 +9,20 @@ import state from './mockReduxState';
 const lang = 'et';
 
 export default function Providers({ children }) {
-	return (
-		<BrowserRouter>
-			<Provider store={state}>
-				<CookiesProvider>
-					<IntlProvider
-						key={lang}
-						defaultLocale="et"
-						locale={lang}
-						messages={translations[lang]}
-					>
-						{children}
-					</IntlProvider>
-				</CookiesProvider>
-			</Provider>
-		</BrowserRouter>
-	);
+    return (
+        <BrowserRouter>
+            <Provider store={state}>
+                <CookiesProvider>
+                    <IntlProvider
+                        key={lang}
+                        defaultLocale="et"
+                        locale={lang}
+                        messages={translations[lang]}
+                    >
+                        {children}
+                    </IntlProvider>
+                </CookiesProvider>
+            </Provider>
+        </BrowserRouter>
+    );
 }
