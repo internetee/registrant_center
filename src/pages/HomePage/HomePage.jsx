@@ -42,19 +42,17 @@ const HomePage = ({
                 await fetchDomains(0, false, isTech);
                 setIsLoading(false);
             })();
-                 }
+                }
         else if (previousTechParams !== isTech) {
             (async () => {
                 await fetchDomains(0, false, isTech);
                 setIsLoading(false);
             })();
-                 }
+                }
         else {
             setIsLoading(false);
         }
     }, [fetchDomains, isTech]);
-
-    console.log(totalDomains);
 
     if (isLoading) return <Loading />;
 
