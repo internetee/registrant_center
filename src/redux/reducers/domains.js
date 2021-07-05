@@ -143,30 +143,6 @@ const failDomainUnlock = (payload) => ({
     type: UNLOCK_DOMAIN_FAILURE,
 });
 
-// const fetchRawDomainList = async (isTech) => {
-//     let offset = 0;
-//     let domains = [];
-//     let count = 0;
-
-//     let res = await api.fetchDomains(null, offset, false, isTech);
-//     domains = domains.concat(res.data.domains);
-//     count = res.data.count;
-//     if (offset < count) {
-//         offset += 200;
-//     } else {
-//         return domains;
-//     }
-
-//     while (offset < count) {
-//         res = api.fetchDomains(null, offset, false);
-//         domains = domains.concat(res.data.domains);
-//         if (offset < count) {
-//             offset += 200;
-//         }
-//     }
-//     return domains;
-// };
-
 const fetchDomain = (uuid) => (dispatch) => {
     dispatch(requestDomain());
     return api
@@ -368,5 +344,4 @@ export {
     lockDomain,
     parseDomain,
     unlockDomain,
-    // fetchRawDomainList,
 };
