@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import PropTypes, { func } from 'prop-types';
+import PropTypes from 'prop-types';
 import {
     Button,
     Form,
@@ -71,6 +71,7 @@ const WhoIsPage = ({
 
     const onSelectTech = React.useCallback((value) => {
         dispatch(setSortByRoles(value));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -93,6 +94,7 @@ const WhoIsPage = ({
         } else {
             setIsLoading(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchDomains, fetchContacts, fetchCompanies, isTech]);
 
     useEffect(() => {

@@ -14,6 +14,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
         (acc, { ident, disclosed_attributes }) => ({
             checkedCount:
                 acc.checkedCount +
+                // eslint-disable-next-line func-names
                 (function () {
                     if (domain.registrant.org) {
                         return 2;
@@ -189,7 +190,7 @@ WhoIsEdit.propTypes = {
     isOpen: PropTypes.bool,
     checkAll: PropTypes.bool,
     onChange: PropTypes.func,
-    contacts: PropTypes.object.isRequired,
+    contacts: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
     domain: PropTypes.object.isRequired,
 };
 
@@ -197,4 +198,5 @@ WhoIsEdit.defaultProps = {
     isOpen: false,
     checkAll: false,
     onChange: () => {},
+    contacts: [],
 };

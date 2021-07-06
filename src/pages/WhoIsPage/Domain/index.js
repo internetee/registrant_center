@@ -9,6 +9,7 @@ export default function Domain({ id, name, contacts, onChange, domains }) {
     const [isOpen, setIsOpen] = useState(false);
 
     let index = 0;
+    // eslint-disable-next-line array-callback-return
     domains.find((o, i) => {
         if (o.id === id) index = i;
     });

@@ -27,6 +27,7 @@ const HomePage = ({
     const dispatch = useDispatch();
 
     const [techParams, setTechParams] = useState(isTech);
+    const [previousTechParams, setPreviousTechParams] = useState(isTech);
 
     const onSelectTech = (value) => {
         setIsLoading(true);
@@ -36,18 +37,18 @@ const HomePage = ({
 
     useEffect(() => {
         if (domains.length === 0) {
-            if (isTech === 'init') {
-                (async () => {
-                    await fetchDomains(0, false, isTech);
-                    setIsLoading(false);
-                })();
-            } else {
-                (async () => {
-                    await fetchDomains(0, false, isTech);
-                    setIsLoading(false);
-                })();
-            }
-        } else {
+            (async () => {
+                await fetchDomains(0, false, isTech);
+                setIsLoading(false);
+            })();
+                }
+        else if (previousTechParams !== isTech) {
+            (async () => {
+                await fetchDomains(0, false, isTech);
+                setIsLoading(false);
+            })();
+                }
+        else {
             setIsLoading(false);
         }
     }, [fetchDomains, isTech]);

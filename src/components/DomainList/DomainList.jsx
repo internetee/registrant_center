@@ -66,14 +66,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
         queryValidToMax: null,
         queryValidToMin: null,
     });
-    const {
-        queryKeys,
-        queryRegistrant,
-        queryStatus,
-        queryValidToMin,
-        queryValidToMax,
-        queryRole,
-    } = form;
+    const { queryKeys, queryRegistrant, queryStatus, queryValidToMin, queryValidToMax } = form;
     const [minValidToDate, setMinValidToDate] = useState(null);
     const [maxValidToDate, setMaxValidToDate] = useState(null);
     const [filteredDomains, setFilteredDomains] = useState([]);
@@ -171,7 +164,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
 
             const reg_list = Object.values(registrants);
             reg_list.some(
-                (i, idx) => i.value == 'all' && reg_list.unshift(reg_list.splice(idx, 1)[0])
+                (i, idx) => i.value === 'all' && reg_list.unshift(reg_list.splice(idx, 1)[0])
             );
 
             setRegistrantsOptions(reg_list);
@@ -180,6 +173,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
             setMinValidToDate(new Date(minDate));
             setMaxValidToDate(new Date(maxDate));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [domains, formatMessage, lang]);
 
     // Set valid_to date range datepicker options
@@ -646,9 +640,17 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
 export default DomainList;
 
 DomainList.propTypes = {
-    domainCount: PropTypes.number.isRequired,
-    domainTotal: PropTypes.number.isRequired,
-    isTech: PropTypes.any.isRequired,
-    lang: PropTypes.string.isRequired,
-    onSelectTech: PropTypes.func.isRequired,
+    domainCount: PropTypes.number,
+    domainTotal: PropTypes.number,
+    isTech: PropTypes.any,
+    lang: PropTypes.string,
+    onSelectTech: PropTypes.func,
+};
+
+DomainList.defaultProps = {
+    domainCount: 0,
+    domainTotal: 0,
+    isTech: 'init',
+    lang: 'et',
+    onSelectTech: () => {},
 };

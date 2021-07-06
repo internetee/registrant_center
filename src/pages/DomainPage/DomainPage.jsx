@@ -69,6 +69,7 @@ const DomainPage = ({
                 }
             }
         })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [domain, fetchDomain, isLoading, match]);
 
     useEffect(() => {

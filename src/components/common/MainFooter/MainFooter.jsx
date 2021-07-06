@@ -57,6 +57,7 @@ const MainFooter = ({ ui }) => {
                         <div
                             key={item.id}
                             className="column"
+                            // eslint-disable-next-line react/no-danger
                             dangerouslySetInnerHTML={{ __html: sanitizer(item.body) }}
                         />
                     ))}
