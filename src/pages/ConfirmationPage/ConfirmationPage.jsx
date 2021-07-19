@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Container, Table } from 'semantic-ui-react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+
 import { bindActionCreators } from 'redux';
 import { Loading, MainLayout, PageMessage, MessageModule } from '../../components';
 import {
@@ -62,7 +62,6 @@ const ConfirmationPage = ({
             });
             setIsLoading(false);
         })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchVerification]);
 
     if (isLoading) return <Loading />;
@@ -311,11 +310,3 @@ export default connect(
             dispatch
         )
 )(ConfirmationPage);
-
-ConfirmationPage.propTypes = {
-    match: PropTypes.object.isRequired,
-    ui: PropTypes.object.isRequired,
-    message: PropTypes.string.isRequired,
-    fetchVerification: PropTypes.func.isRequired,
-    verification: PropTypes.bool.isRequired,
-};
