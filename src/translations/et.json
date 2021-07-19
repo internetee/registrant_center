@@ -110,6 +110,8 @@
   "domain.status.pendingUpdate.description": "Oodatakse registreerija kinnitust registreerija vahetuse päringule",
   "domain.status.serverAdminChangeProhibited": "Halduskontakti vahetus keelatud",
   "domain.status.serverAdminChangeProhibited.description": "Domeeni halduskontakti(de) muutmine on keelatud",
+  "domain.status.serverReleaseProhibited": "serverReleaseProhibited",
+  "domain.status.serverReleaseProhibited.description": "Domeeni ei vabastata uuesti registreerimiseks",
   "domain.status.serverDeleteProhibited": "Kustutamine keelatud",
   "domain.status.serverDeleteProhibited.description": "Registreeringut ei ole võimalik kustutada.",
   "domain.status.serverForceDelete": "Kustutusmenetlus",

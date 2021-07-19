@@ -110,6 +110,8 @@
   "domain.status.pendingUpdate.description": "Update command has been processed for the domain registration, but the action has not been completed by the server.",
   "domain.status.serverAdminChangeProhibited": "serverAdminChangeProhibited",
   "domain.status.serverAdminChangeProhibited.description": "Requests to replace admin contacts are rejected.",
+  "domain.status.serverReleaseProhibited": "serverReleaseProhibited",
+  "domain.status.serverReleaseProhibited.description": "Domain cannot be released",
   "domain.status.serverDeleteProhibited": "serverDeleteProhibited",
   "domain.status.serverDeleteProhibited.description": "Requests to delete the registration are rejected",
   "domain.status.serverForceDelete": "serverForceDelete",
