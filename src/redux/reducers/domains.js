@@ -32,6 +32,8 @@ const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
         (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
     );
 
+    console.log(statuses);
+
     const contacts = (simplify
         ? [
               ...(registrant && [
@@ -95,21 +97,11 @@ const requestDomains = () => ({
     type: FETCH_DOMAINS_REQUEST,
 });
 
-const receiveDomains = (payload, simplify = false) => {
-    request = {
-        data: {
-            count: 0,
-            domains: [],
-            total: 0,
-        },
-        offset: 0,
-    };
-    return {
+const receiveDomains = (payload, simplify = false) => ({
         payload,
         simplify,
         type: FETCH_DOMAINS_SUCCESS,
-    };
-};
+    });
 
 const failDomains = () => ({
     type: FETCH_DOMAINS_FAILURE,
@@ -279,6 +271,15 @@ export default function reducer(state = initialState, { payload, type, simplify 
             };
 
         case FETCH_DOMAINS_SUCCESS:
+            // console.log(payload.count);
+            // console.log(payload.domains);
+            let d = {
+            dod: payload.domains.forEach(domain => {
+                parseDomain(domain, true, simplify)
+            }) }
+
+            console.log(d);
+
             return {
                 ...state,
                 data: {
