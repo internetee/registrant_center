@@ -177,18 +177,19 @@ describe('Integration tests', () => {
         cy.wait('@getRegistrant').its('status').should('eq', 200);
     });
 
-    it('Shows & closes domain unlock modal', () => {
-        cy.get('[data-test="open-unlock-modal"]').click();
-        cy.get('[data-test="lock-domain"]').should('be.visible');
-        cy.get('[data-test="close-lock-modal"]').click();
-        cy.get('[data-test="lock-domain"]').should('not.exist');
-    });
+    // Uncomment these tests when new statuses (objUpdateProhibited and extensionUpdateProhibited) will be in production
+    // it('Shows & closes domain unlock modal', () => {
+    //     cy.get('[data-test="open-unlock-modal"]').click();
+    //     cy.get('[data-test="lock-domain"]').should('be.visible');
+    //     cy.get('[data-test="close-lock-modal"]').click();
+    //     cy.get('[data-test="lock-domain"]').should('not.exist');
+    // });
 
-    it('Sends API request to delete domain lock', () => {
-        cy.get('[data-test="open-unlock-modal"]').click();
-        cy.get('[data-test="lock-domain"]').click();
-        cy.wait('@deleteDomainLock').its('status').should('eq', 200);
-    });
+    // it('Sends API request to delete domain lock', () => {
+    //     cy.get('[data-test="open-unlock-modal"]').click();
+    //     cy.get('[data-test="lock-domain"]').click();
+    //     cy.wait('@deleteDomainLock').its('status').should('eq', 200);
+    // });
 
     it('Links back to Dashboard from lockeddomain.ee detail view', () => {
         cy.get('.back-link').click();
