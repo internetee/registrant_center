@@ -79,18 +79,6 @@
     "priority": 19,
     "color": "pink"
   },
-	"serverReleaseProhibited": {
-		"priority": 19,
-		"color": "rose"
-	},
-  "serverExtensionUpdateProhibited": {
-		"priority": 19,
-		"color": "rose"
-	},
-  "serverObjUpdateProhibited": {
-		"priority": 19,
-		"color": "rose"
-	},
   "clientDeleteProhibited": {
     "priority": 20,
     "color": "pink"
@@ -118,5 +106,17 @@
   "clientHold": {
     "priority": 26,
     "color": "black"
-  }
+  },
+  "serverReleaseProhibited": {
+		"priority": 27,
+		"color": "rose"
+	},
+  "serverExtensionUpdateProhibited": {
+		"priority": 28,
+		"color": "olive"
+	},
+  "serverObjUpdateProhibited": {
+		"priority": 29,
+		"color": "yellow"
+	}
 }
