@@ -83,6 +83,14 @@
 		"priority": 19,
 		"color": "rose"
 	},
+  "serverExtensionUpdateProhibited": {
+		"priority": 19,
+		"color": "rose"
+	},
+  "serverObjUpdateProhibited": {
+		"priority": 19,
+		"color": "rose"
+	},
   "clientDeleteProhibited": {
     "priority": 20,
     "color": "pink"
