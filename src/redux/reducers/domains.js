@@ -72,7 +72,7 @@ const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
         isLocked:
             domain.locked_by_registrant_at &&
             [
-                'serverUpdateProhibited',
+                'serverObjUpdateProhibited',
                 'serverDeleteProhibited',
                 'serverTransferProhibited',
             ].every((r) => statuses.includes(r)),
