@@ -261,10 +261,11 @@ export default {
         );
     },
 
-    setDomainRegistryLock: async ({ params, session }, res) => {
+    setDomainRegistryLock: async ({query, params, session }, res) => {
         const { uuid } = params;
+        const { extensionsProhibited } = query
         return handleResponse(
-            () => API(session).post(`/api/v1/registrant/domains/${uuid}/registry_lock`),
+            () => API(session).post(`/api/v1/registrant/domains/${uuid}/registry_lock?extensionsProhibited=${extensionsProhibited}`),
             res
         );
     },

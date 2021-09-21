@@ -132,11 +132,11 @@ describe('Integration tests', () => {
         cy.get('[data-test="lock-domain"]').should('not.exist');
     });
 
-    it('Sends API request to set domain lock', () => {
-        cy.get('[data-test="open-lock-modal"]').click();
-        cy.get('[data-test="lock-domain"]').click();
-        cy.wait('@setDomainLock').its('status').should('eq', 200);
-    });
+    // it('Sends API request to set domain lock', () => {
+    //     cy.get('[data-test="open-lock-modal"]').click();
+    //     cy.get('[data-test="lock-domain"]').click();
+    //     cy.wait('@setDomainLock').its('status').should('eq', 200);
+    // });
 
     it('Sends API request to change WhoIs visibility', () => {
         cy.get('.adv-field-group input[name="name"] + label').click();

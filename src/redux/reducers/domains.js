@@ -196,10 +196,10 @@ const fetchDomains = (offset = request.offset, simplify = false, tech = false) =
         });
 };
 
-const lockDomain = (uuid) => (dispatch) => {
+const lockDomain = (uuid, extensionsProhibited) => (dispatch) => {
     dispatch(requestDomainLock());
     return api
-        .setDomainRegistryLock(uuid)
+        .setDomainRegistryLock(uuid, extensionsProhibited)
         .then((res) => res.data)
         .then((data) => {
             return dispatch(receiveDomainLock(data));

@@ -11,6 +11,7 @@ import {
     Container,
     Table,
     Modal,
+    Checkbox,
     Confirm,
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
@@ -57,6 +58,7 @@ const DomainPage = ({
     const [isDomainLockModalOpen, setIsDomainLockModalOpen] = useState(false);
     const [userContacts, setUserContacts] = useState({});
     const [message, setMessage] = useState(null);
+    const [extensionsProhibited, setExtensionsProhibited] = useState(false);
     const [registrantContacts, setRegistrantContacts] = useState(null);
     const { isLocked } = domain || {};
 
@@ -164,7 +166,7 @@ const DomainPage = ({
             if (isLocked) {
                 await unlockDomain(uuid);
             } else {
-                await lockDomain(uuid);
+                await lockDomain(uuid, extensionsProhibited);
             }
             setMessage({
                 code: 200,
@@ -178,6 +180,10 @@ const DomainPage = ({
         }
         setIsSaving(false);
     };
+
+    const handleChangeExtensions = (mode) => {
+        setExtensionsProhibited(mode)
+    }
 
     if (isLoading) {
         return <Loading />;
@@ -560,6 +566,7 @@ const DomainPage = ({
                     </Container>
                 </div>
             </div>
+
             <Confirm
                 cancelButton={
                     <Button data-test="close-lock-modal" secondary size={uiElemSize}>
@@ -574,6 +581,16 @@ const DomainPage = ({
                 }
                 content={
                     <Modal.Content className="center">
+                                     {isLocked ? ('') : (
+                                         <Checkbox
+                                         name="name"
+                                         onChange={(e, elem) =>
+                                             handleChangeExtensions(elem.checked)
+                                         }
+                                         label="sone"
+                                         value="some"
+                                     />
+                                     )}
                         {isLocked ? (
                             <FormattedMessage id="domain.unlock.description" tagName="p" />
                         ) : (
