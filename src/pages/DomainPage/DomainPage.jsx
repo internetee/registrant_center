@@ -582,14 +582,21 @@ const DomainPage = ({
                 content={
                     <Modal.Content className="center">
                                      {isLocked ? ('') : (
-                                         <Checkbox
-                                         name="name"
-                                         onChange={(e, elem) =>
-                                             handleChangeExtensions(elem.checked)
-                                         }
-                                         label="sone"
-                                         value="some"
-                                     />
+                                         <div className="fs-18">
+                                            <Checkbox
+                                            name="name"
+                                            onChange={(e, elem) =>
+                                                handleChangeExtensions(elem.checked)
+                                            }
+                                            value="some"
+                                            className="mr-1"
+                                        />
+                                            <FormattedMessage id="domain.lock.extenstionsProhibited.name" tagName="span" />
+                                            <div >
+                                            <FormattedMessage id="domain.lock.extenstionsProhibited.description" tagName="p"/>
+                                            </div>
+                                            <div class="mb-1"></div>
+                                     </div>
                                      )}
                         {isLocked ? (
                             <FormattedMessage id="domain.unlock.description" tagName="p" />

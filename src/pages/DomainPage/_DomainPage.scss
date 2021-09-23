@@ -1,4 +1,8 @@
 .page--domain {
+  .padding {
+    padding: 10px !important;
+    margin-left: 1em !important;
+  }
   .ui.form {
     .grouped.fields {
       > label {
@@ -16,4 +20,24 @@
       padding-bottom: 40px;
     }
   }
+}
+
+.mb-1 {
+  margin-bottom: 1em !important;
+}
+
+.ml-1 {
+  margin-left: .5em !important;
+}
+
+.mr-1 {
+  margin-right: .5em !important;
+}
+
+.pl-1 {
+  padding-left: .5em !important;
+}
+
+.fs-18 {
+  font-size: 14px !important;
 }
