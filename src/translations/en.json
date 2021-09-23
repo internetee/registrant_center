@@ -138,6 +138,8 @@
   "domain.statuses.tooltip": "A domain object MUST always have at least one associated status value. Status values can be set only by the client that sponsors a domain object and by the server on which the object resides. A client can not alter status values set by the server. A server can alter or override status values set by a client.",
   "domain.tech_contacts": "Technical contacts",
   "domain.transfer_code": "Transfer code",
+  "domain.lock.extenstionsProhibited.name": "Lock dnssec keys!",
+  "domain.lock.extenstionsProhibited.description" : "NB: This will make it impossible for the registrar to manage DNSSEC keys. Use this if your registrar is not your DNSSEC provider.",
   "domain.unlock": "Unlock",
   "domain.unlock.description": "Removing registry lock enables all transform operations by responsible registrar",
   "domain.unlock.title": "Are you sure you want to remove the registry lock",
