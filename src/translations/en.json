@@ -228,7 +228,7 @@
   "test.404": "Test 404",
   "userData.title": "Download my data",
   "whois.200": "Saved!",
-  "whois.400": "Invalid data.",
+  "whois.400": "Error in new data. Please check entered values, ie does phone nr have correct format +XXX.YYYYYYY (notice the '+' sign in front and '.' between area code and the number)",
   "whois.500": "Something went wrong. Please try again.",
   "whois.confirm_modal.description.roles": "Role:",
   "whois.confirmModal.description.title": "Your changes also apply to these domains:",

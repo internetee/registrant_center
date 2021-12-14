@@ -228,7 +228,7 @@
   "test.404": "Test 404",
   "userData.title": "Minu andmete allalaadimine",
   "whois.200": "Salvestatud!",
-  "whois.400": "Sisestatud andmed ei ole õiged.",
+  "whois.400": "Viga sisestatud andmetes. Palun vaata üle lisatud väärtused, näiteks kas telefoni number on formaadis +XXX.YYYYYYY (pane tähele plussi alguses ning punkti suunakoodi ja numbri vahel).",
   "whois.500": "Tekkis viga! Proovige uuesti.",
   "whois.confirm_modal.description.roles": "Roll:",
   "whois.confirmModal.description.title": "Teie muudatused kajastuvad järgmiste domeenide puhul:",
