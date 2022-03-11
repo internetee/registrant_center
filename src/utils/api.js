@@ -72,6 +72,29 @@ export default {
         });
     },
 
+    fetchUpdateCompanyContacts: (uuid) => {
+        return instance.get(`/api/contacts/${uuid}/do_need_update_contact`, {
+            credentials: 'include',
+            method: 'GET',
+            timeout: 4000,
+        });
+    },
+
+    updateCompanyContacts: (uuid) => {
+        return axios.post(
+            `/api/contacts/${uuid}/update_company_contacts`,
+            {},
+            {
+                credentials: 'include',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                httpsAgent: agent,
+            }
+        );
+    },
+
     fetchDomains: (uuid = false, offset = 0, simplify = true, tech = 'init') => {
         if (uuid) {
             return instance.get(`/api/domains/${uuid}`);

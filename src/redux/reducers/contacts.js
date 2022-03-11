@@ -1,5 +1,7 @@
 import api from '../../utils/api';
 import {
+    DO_UPDATE_COMPANY_CONTACTS_REQUEST,
+    DO_UPDATE_COMPANY_CONTACTS_SUCCESS,
     FETCH_CONTACT_REQUEST,
     FETCH_CONTACT_SUCCESS,
     FETCH_CONTACT_FAILURE,
@@ -9,6 +11,8 @@ import {
     UPDATE_CONTACT_REQUEST,
     UPDATE_CONTACT_SUCCESS,
     UPDATE_CONTACT_FAILURE,
+    UPDATE_COMPANY_CONTACTS_REQUEST,
+    UPDATE_COMPANY_CONTACTS_SUCCESS,
     LOGOUT_USER,
 } from '../actions';
 
@@ -62,6 +66,46 @@ const invalidateContacts = () => ({
 const invalidateContact = () => ({
     type: FETCH_CONTACT_FAILURE,
 });
+
+const doUpdateCompanyContacts = (payload) => ({
+    payload,
+    type: DO_UPDATE_COMPANY_CONTACTS_REQUEST,
+});
+
+const receiveUpdateCompanyContact = (payload) => ({
+    payload,
+    type: DO_UPDATE_COMPANY_CONTACTS_SUCCESS,
+});
+
+const requestUpdateCompanyContacts = (payload) => ({
+    payload,
+    type: UPDATE_COMPANY_CONTACTS_REQUEST,
+});
+
+const updateCompanyContacts = (payload) => ({
+    payload,
+    type: UPDATE_COMPANY_CONTACTS_SUCCESS,
+});
+
+const fetchUpdateCompanyContacts = (uuid) => (dispatch) => {
+    dispatch(doUpdateCompanyContacts());
+    return api
+        .fetchUpdateCompanyContacts(uuid, false)
+        .then((res) => res.data)
+        .then((data) => {
+            return dispatch(receiveUpdateCompanyContact(data));
+        });
+};
+
+const updateCompanyContactsConfirm = (uuid) => (dispatch) => {
+    dispatch(requestUpdateCompanyContacts());
+    return api
+        .updateCompanyContacts(uuid, false)
+        .then((res) => res.data)
+        .then((data) => {
+            return dispatch(updateCompanyContacts(data));
+        });
+};
 
 const fetchContact = (uuid) => (dispatch) => {
     dispatch(requestContact());
@@ -146,6 +190,38 @@ export default function reducer(state = initialState, { payload, type }) {
         case LOGOUT_USER:
             return initialState;
 
+        case DO_UPDATE_COMPANY_CONTACTS_REQUEST:
+            return {
+                ...state,
+                isLoading: true,
+            }
+
+        case DO_UPDATE_COMPANY_CONTACTS_SUCCESS:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                },
+                isLoading: false,
+                message: null,
+            };
+
+        case UPDATE_COMPANY_CONTACTS_REQUEST:
+            return {
+                ...state,
+                isLoading: true,
+            }
+
+        case UPDATE_COMPANY_CONTACTS_SUCCESS:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                },
+                isLoading: false,
+                message: null,
+            };
+
         case FETCH_CONTACTS_FAILURE:
             return {
                 ...state,
@@ -226,4 +302,4 @@ export default function reducer(state = initialState, { payload, type }) {
     }
 }
 
-export { initialState, fetchContact, fetchContacts, updateContact, receiveContacts };
+export { initialState, fetchContact, fetchContacts, updateContact, receiveContacts, receiveUpdateCompanyContact, fetchUpdateCompanyContacts, updateCompanyContactsConfirm };

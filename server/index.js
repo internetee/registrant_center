@@ -134,6 +134,8 @@ app.get('/api/domains', API.getDomains);
 app.get('/api/domains/:uuid', API.getDomain);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
 app.delete('/api/domains/:uuid/registry_lock', API.deleteDomainRegistryLock);
+app.get('/api/contacts/:uuid/do_need_update_contact', API.doNeedUpdateCompanyContacts);
+app.post('/api/contacts/:uuid/update_company_contacts', API.updateCompanyContacts);
 app.get('/api/companies', API.getCompanies);
 app.get('/api/contacts', API.getContacts);
 app.get('/api/contacts/:uuid', API.getContacts);
