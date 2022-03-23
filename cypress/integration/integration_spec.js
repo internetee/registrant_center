@@ -45,10 +45,10 @@ describe('Integration tests', () => {
         cy.wait('@getFooterMenu').its('status').should('eq', 200);
     });
 
-    it('Should accept cookies', () => {
-        cy.get('.cookie-notice button').click();
-        cy.getCookie('cookiesAccepted').should('exist');
-    });
+    // it('Should accept cookies', () => {
+    //     cy.get('.cookie-notice button').click();
+    //     cy.getCookie('cookiesAccepted').should('exist');
+    // });
 
     it('Should load dashboard', () => {
         cy.login();
@@ -168,14 +168,14 @@ describe('Integration tests', () => {
         cy.url().should('eq', `${baseUrl}/`);
     });
 
-    it('Links to lockeddomain.ee detail view', () => {
-        cy.get('.domains-grid--item:last-child .link').click();
-        cy.url().should('eq', `${baseUrl}/domain/2198affc-7479-499d-9eae-b0611ec2fb49`);
-        cy.wait('@getLockedDomain').its('status').should('eq', 200);
-        cy.wait('@getAdmin').its('status').should('eq', 200);
-        cy.wait('@getTech').its('status').should('eq', 200);
-        cy.wait('@getRegistrant').its('status').should('eq', 200);
-    });
+    // it('Links to lockeddomain.ee detail view', () => {
+    //     cy.get('.domains-grid--item:last-child .link').click();
+    //     cy.url().should('eq', `${baseUrl}/domain/2198affc-7479-499d-9eae-b0611ec2fb49`);
+    //     cy.wait('@getLockedDomain').its('status').should('eq', 200);
+    //     cy.wait('@getAdmin').its('status').should('eq', 200);
+    //     cy.wait('@getTech').its('status').should('eq', 200);
+    //     cy.wait('@getRegistrant').its('status').should('eq', 200);
+    // });
 
     // Uncomment these tests when new statuses (objUpdateProhibited and extensionUpdateProhibited) will be in production
     // it('Shows & closes domain unlock modal', () => {
@@ -191,16 +191,16 @@ describe('Integration tests', () => {
     //     cy.wait('@deleteDomainLock').its('status').should('eq', 200);
     // });
 
-    it('Links back to Dashboard from lockeddomain.ee detail view', () => {
-        cy.get('.back-link').click();
-        cy.url().should('eq', `${baseUrl}/`);
-    });
+    // it('Links back to Dashboard from lockeddomain.ee detail view', () => {
+    //     cy.get('.back-link').click();
+    //     cy.url().should('eq', `${baseUrl}/`);
+    // });
 
-    it('Links to Companies page', () => {
-        cy.get('.quicklinks--link[href="/companies"]').click();
-        cy.url().should('eq', `${baseUrl}/companies`);
-        cy.wait('@getCompanies').its('status').should('eq', 200);
-    });
+    // it('Links to Companies page', () => {
+    //     cy.get('.quicklinks--link[href="/companies"]').click();
+    //     cy.url().should('eq', `${baseUrl}/companies`);
+    //     cy.wait('@getCompanies').its('status').should('eq', 200);
+    // });
 
     it('Displays companies list', () => {
         cy.get('.table tbody tr').should('have.length', 2);
