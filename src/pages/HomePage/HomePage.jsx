@@ -18,6 +18,7 @@ const HomePage = ({
     user,
     absoluteCount,
     isTech,
+    isUpdateContact,
     setSortByRoles,
 }) => {
     const { lang } = ui;
@@ -109,6 +110,7 @@ const HomePage = ({
                     domains={domains}
                     domainTotal={absoluteCount}
                     isTech={isTech}
+                    isUpdateContact={isUpdateContact}
                     lang={lang}
                     onSelectTech={onSelectTech}
                 />
@@ -126,6 +128,7 @@ const mapStateToProps = ({ domains, ui, user, filters }) => {
         totalDomains: domains.data.count,
         ui,
         user: user.data,
+        isUpdateContact: true
     };
 };
 

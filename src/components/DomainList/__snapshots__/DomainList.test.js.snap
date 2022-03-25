@@ -1,11 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/DomainList should render DomainsList 1`] = `ShallowWrapper {}`;
-
-exports[`components/DomainList should show domain extra info on link click 1`] = `ReactWrapper {}`;
-
-exports[`components/DomainList should show domains filters on link click 1`] = `ReactWrapper {}`;
-
-exports[`components/DomainList should show domains grid on link click 1`] = `ReactWrapper {}`;
-
-exports[`components/DomainList should show domains list on link click 1`] = `ReactWrapper {}`;

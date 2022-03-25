@@ -1,5 +1,6 @@
 /* eslint-disabled */
 import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -24,6 +25,10 @@ import DomainGridItem from './GridItem';
 import DomainListItem from './ListItem';
 import PageMessage from '../PageMessage/PageMessage';
 import domainStatuses from '../../utils/domainStatuses.json';
+import {
+    fetchUpdateCompanyContacts,
+    updateCompanyContactsConfirm,
+} from '../../redux/reducers/contacts';
 
 const LIMIT_DOMAIN_TOTAL = 3000;
 
@@ -50,7 +55,7 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isTech }) => {
+const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isTech, isUpdateContact }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -329,6 +334,34 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
         }
     };
 
+    const [contactUpdate, setContactUpdate] = useState(isUpdateContact)
+    const [contactUpdateCount, setContactUpdateCount] = useState("0")
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        let data = dispatch(fetchUpdateCompanyContacts()).then(response => { 
+            console.log(response);
+            setContactUpdate(response.payload.update_contacts);
+            setContactUpdateCount(response.payload.counter)
+        });
+        console.log(data);
+    }, []);
+
+    const updateCompanyContacts = () => {
+        dispatch(updateCompanyContactsConfirm()).then(response => {
+            console.log(response);
+            setContactUpdate(!contactUpdate);
+        })
+    }
+
+    const ConfirmUpdateContacts = () => {
+    return (
+        <div className='dialog-company-contacts-box'>
+            We have found that the contact data does not match the data from the business registry. Please confirm to update {contactUpdateCount} records
+            <Button onClick={updateCompanyContacts}>Update contacts</Button>
+        </div>
+    )}
+
     return (
         <div className="domains-list--wrap">
             <div className="page--header">
@@ -346,6 +379,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
                                 userTotalDomains: totalDomains,
                             }}
                         />
+                        { contactUpdate ? <ConfirmUpdateContacts /> : <></>  }
                     </div>
                     <Form className="form-filter" onSubmit={handleSubmit}>
                         <div className="form-filter--search">
@@ -645,12 +679,14 @@ DomainList.propTypes = {
     isTech: PropTypes.any,
     lang: PropTypes.string,
     onSelectTech: PropTypes.func,
+    isUpdateContact: PropTypes.any
 };
 
 DomainList.defaultProps = {
     domainCount: 0,
     domainTotal: 0,
     isTech: 'init',
+    isUpdateContact: true,
     lang: 'et',
     onSelectTech: () => {},
 };

@@ -58,6 +58,22 @@ export default {
         return res.status(401).json({});
     },
 
+    doNeedUpdateCompanyContacts: async ({ params, session }, res) => {
+        const { uuid } = params;
+        return handleResponse(
+            () => API(session).get(`api/v1/registrant/contacts/${uuid}/do_need_update_contact`),
+            res
+        );
+    },
+
+    updateCompanyContacts: async ({ params, session }, res) => {
+        const { uuid } = params;
+        return handleResponse(
+            () => API(session).post(`api/v1/registrant/contacts/${uuid}/update_company_contacts`),
+            res
+        );
+    },
+
     deleteDomainRegistryLock: async ({ params, session }, res) => {
         const { uuid } = params;
         return handleResponse(
