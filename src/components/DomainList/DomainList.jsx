@@ -26,8 +26,8 @@ import DomainListItem from './ListItem';
 import PageMessage from '../PageMessage/PageMessage';
 import domainStatuses from '../../utils/domainStatuses.json';
 import {
-    fetchUpdateCompanyContacts,
-    updateCompanyContactsConfirm,
+    fetchUpdateContacts,
+    updateContactsConfirm,
 } from '../../redux/reducers/contacts';
 
 const LIMIT_DOMAIN_TOTAL = 3000;
@@ -339,17 +339,17 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
 
     const dispatch = useDispatch();
     useEffect(() => {
-        let data = dispatch(fetchUpdateCompanyContacts()).then(response => { 
-            console.log(response);
+        let data = dispatch(fetchUpdateContacts()).then(response => { 
+            // console.log(response);
             setContactUpdate(response.payload.update_contacts);
             setContactUpdateCount(response.payload.counter)
         });
         console.log(data);
     }, []);
 
-    const updateCompanyContacts = () => {
-        dispatch(updateCompanyContactsConfirm()).then(response => {
-            console.log(response);
+    const updateContacts = () => {
+        dispatch(updateContactsConfirm()).then(response => {
+            // console.log(response);
             setContactUpdate(!contactUpdate);
         })
     }
@@ -357,8 +357,8 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
     const ConfirmUpdateContacts = () => {
     return (
         <div className='dialog-company-contacts-box'>
-            We have found that the contact data does not match the data from the business registry. Please confirm to update {contactUpdateCount} records
-            <Button onClick={updateCompanyContacts}>Update contacts</Button>
+            Found mismatches in .ee registry between contact names and business/citizenship registries. Please confirm to update {contactUpdateCount} contact records for your .ee domain registrations
+            <Button onClick={updateContacts}>Update contacts</Button>
         </div>
     )}
 

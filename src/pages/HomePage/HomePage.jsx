@@ -128,7 +128,7 @@ const mapStateToProps = ({ domains, ui, user, filters }) => {
         totalDomains: domains.data.count,
         ui,
         user: user.data,
-        isUpdateContact: true
+        isUpdateContact: false
     };
 };
 
