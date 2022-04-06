@@ -17,7 +17,7 @@ describe('Integration tests', () => {
             '**/api/domains/2198affc-7479-499d-9eae-b0611ec2fb49',
             'fx:domain-locked'
         ).as('getLockedDomain');
-        cy.route('POST', '**/api/domains/*/registry_lock', 'fx:domain').as('setDomainLock');
+        cy.route('POST', '**/api/domains/*/registry_lock?extensionsProhibited=false', 'fx:domain').as('setDomainLock');
         cy.route('DELETE', '**/api/domains/*/registry_lock', 'fx:domain').as('deleteDomainLock');
         cy.route('GET', '**/api/contacts?*', 'fx:contacts').as('getContacts');
         cy.route(
@@ -178,16 +178,10 @@ describe('Integration tests', () => {
     });
 
     it('Shows & closes domain unlock modal', () => {
-        cy.get('[data-test="open-unlock-modal"]').click();
+        cy.get('[data-test="open-lock-modal"]').click();
         cy.get('[data-test="lock-domain"]').should('be.visible');
         cy.get('[data-test="close-lock-modal"]').click();
         cy.get('[data-test="lock-domain"]').should('not.exist');
-    });
-
-    it('Sends API request to delete domain lock', () => {
-        cy.get('[data-test="open-unlock-modal"]').click();
-        cy.get('[data-test="lock-domain"]').click();
-        cy.wait('@deleteDomainLock').its('status').should('eq', 200);
     });
 
     it('Links back to Dashboard from lockeddomain.ee detail view', () => {
