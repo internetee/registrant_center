@@ -55,7 +55,15 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isTech, isUpdateContact }) => {
+const DomainList = ({
+    domainCount,
+    domainTotal,
+    domains,
+    lang,
+    onSelectTech,
+    isTech,
+    isUpdateContact,
+}) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -334,33 +342,35 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
         }
     };
 
-    const [contactUpdate, setContactUpdate] = useState(isUpdateContact)
-    const [contactUpdateCount, setContactUpdateCount] = useState("0")
+    const [contactUpdate, setContactUpdate] = useState(isUpdateContact);
+    const [contactUpdateCount, setContactUpdateCount] = useState('0');
 
     const dispatch = useDispatch();
     useEffect(() => {
-        let data = dispatch(fetchUpdateCompanyContacts()).then(response => { 
+        const data = dispatch(fetchUpdateCompanyContacts()).then((response) => {
             console.log(response);
             setContactUpdate(response.payload.update_contacts);
-            setContactUpdateCount(response.payload.counter)
+            setContactUpdateCount(response.payload.counter);
         });
         console.log(data);
     }, []);
 
     const updateCompanyContacts = () => {
-        dispatch(updateCompanyContactsConfirm()).then(response => {
+        dispatch(updateCompanyContactsConfirm()).then((response) => {
             console.log(response);
             setContactUpdate(!contactUpdate);
-        })
-    }
+        });
+    };
 
     const ConfirmUpdateContacts = () => {
-    return (
-        <div className='dialog-company-contacts-box'>
-            We have found that the contact data does not match the data from the business registry. Please confirm to update {contactUpdateCount} records
-            <Button onClick={updateCompanyContacts}>Update contacts</Button>
-        </div>
-    )}
+        return (
+            <div className="dialog-company-contacts-box">
+                We have found that the contact data does not match the data from the business
+                registry. Please confirm to update {contactUpdateCount} records
+                <Button onClick={updateCompanyContacts}>Update contacts</Button>
+            </div>
+        );
+    };
 
     return (
         <div className="domains-list--wrap">
@@ -379,7 +389,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
                                 userTotalDomains: totalDomains,
                             }}
                         />
-                        { contactUpdate ? <ConfirmUpdateContacts /> : <></>  }
+                        {contactUpdate ? <ConfirmUpdateContacts /> : <></>}
                     </div>
                     <Form className="form-filter" onSubmit={handleSubmit}>
                         <div className="form-filter--search">
@@ -679,7 +689,7 @@ DomainList.propTypes = {
     isTech: PropTypes.any,
     lang: PropTypes.string,
     onSelectTech: PropTypes.func,
-    isUpdateContact: PropTypes.any
+    isUpdateContact: PropTypes.any,
 };
 
 DomainList.defaultProps = {

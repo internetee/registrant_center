@@ -182,8 +182,8 @@ const DomainPage = ({
     };
 
     const handleChangeExtensions = (mode) => {
-        setExtensionsProhibited(mode)
-    }
+        setExtensionsProhibited(mode);
+    };
 
     if (isLoading) {
         return <Loading />;
@@ -581,23 +581,29 @@ const DomainPage = ({
                 }
                 content={
                     <Modal.Content className="center">
-                                     {isLocked ? ('') : (
-                                         <div className="fs-18">
-                                            <Checkbox
-                                            name="name"
-                                            onChange={(e, elem) =>
-                                                handleChangeExtensions(elem.checked)
-                                            }
-                                            value="some"
-                                            className="mr-1"
-                                        />
-                                            <FormattedMessage id="domain.lock.extenstionsProhibited.name" tagName="span" />
-                                            <div >
-                                            <FormattedMessage id="domain.lock.extenstionsProhibited.description" tagName="p"/>
-                                            </div>
-                                            <div class="mb-1"></div>
-                                     </div>
-                                     )}
+                        {isLocked ? (
+                            ''
+                        ) : (
+                            <div className="fs-18">
+                                <Checkbox
+                                    className="mr-1"
+                                    name="name"
+                                    onChange={(e, elem) => handleChangeExtensions(elem.checked)}
+                                    value="some"
+                                />
+                                <FormattedMessage
+                                    id="domain.lock.extenstionsProhibited.name"
+                                    tagName="span"
+                                />
+                                <div>
+                                    <FormattedMessage
+                                        id="domain.lock.extenstionsProhibited.description"
+                                        tagName="p"
+                                    />
+                                </div>
+                                <div className="mb-1" />
+                            </div>
+                        )}
                         {isLocked ? (
                             <FormattedMessage id="domain.unlock.description" tagName="p" />
                         ) : (

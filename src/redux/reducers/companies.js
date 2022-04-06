@@ -31,25 +31,23 @@ const invalidateCompanies = () => ({
     type: FETCH_COMPANIES_FAILURE,
 });
 
-const fetchCompanies =
-    (offset = request.offset) =>
-    (dispatch) => {
-        dispatch(requestCompanies());
-        return api
-            .fetchCompanies(offset)
-            .then((res) => res.data)
-            .then(({ companies }) => {
-                request.data = request.data.concat(companies);
-                if (companies.length === 200) {
-                    request.offset += 200;
-                    return dispatch(fetchCompanies(request.offset));
-                }
-                return dispatch(receiveCompanies(request.data));
-            })
-            .catch(() => {
-                return dispatch(invalidateCompanies());
-            });
-    };
+const fetchCompanies = (offset = request.offset) => (dispatch) => {
+    dispatch(requestCompanies());
+    return api
+        .fetchCompanies(offset)
+        .then((res) => res.data)
+        .then(({ companies }) => {
+            request.data = request.data.concat(companies);
+            if (companies.length === 200) {
+                request.offset += 200;
+                return dispatch(fetchCompanies(request.offset));
+            }
+            return dispatch(receiveCompanies(request.data));
+        })
+        .catch(() => {
+            return dispatch(invalidateCompanies());
+        });
+};
 
 const initialState = {
     data: {},
