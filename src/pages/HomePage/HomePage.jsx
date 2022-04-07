@@ -32,6 +32,7 @@ const HomePage = ({
 
     const onSelectTech = (value) => {
         setIsLoading(true);
+        setPreviousTechParams(isTech);
         setTechParams(value);
         dispatch(setSortByRoles(value));
     };
