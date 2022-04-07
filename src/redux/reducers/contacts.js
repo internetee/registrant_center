@@ -1,7 +1,7 @@
 import api from '../../utils/api';
 import {
-    DO_UPDATE_COMPANY_CONTACTS_REQUEST,
-    DO_UPDATE_COMPANY_CONTACTS_SUCCESS,
+    DO_UPDATE_CONTACTS_REQUEST,
+    DO_UPDATE_CONTACTS_SUCCESS,
     FETCH_CONTACT_REQUEST,
     FETCH_CONTACT_SUCCESS,
     FETCH_CONTACT_FAILURE,
@@ -11,8 +11,8 @@ import {
     UPDATE_CONTACT_REQUEST,
     UPDATE_CONTACT_SUCCESS,
     UPDATE_CONTACT_FAILURE,
-    UPDATE_COMPANY_CONTACTS_REQUEST,
-    UPDATE_COMPANY_CONTACTS_SUCCESS,
+    UPDATE_CONTACTS_REQUEST,
+    UPDATE_CONTACTS_SUCCESS,
     LOGOUT_USER,
 } from '../actions';
 
@@ -67,43 +67,43 @@ const invalidateContact = () => ({
     type: FETCH_CONTACT_FAILURE,
 });
 
-const doUpdateCompanyContacts = (payload) => ({
+const doUpdateContacts = (payload) => ({
     payload,
-    type: DO_UPDATE_COMPANY_CONTACTS_REQUEST,
+    type: DO_UPDATE_CONTACTS_REQUEST,
 });
 
-const receiveUpdateCompanyContact = (payload) => ({
+const receiveUpdateContact = (payload) => ({
     payload,
-    type: DO_UPDATE_COMPANY_CONTACTS_SUCCESS,
+    type: DO_UPDATE_CONTACTS_SUCCESS,
 });
 
-const requestUpdateCompanyContacts = (payload) => ({
+const requestUpdateContacts = (payload) => ({
     payload,
-    type: UPDATE_COMPANY_CONTACTS_REQUEST,
+    type: UPDATE_CONTACTS_REQUEST,
 });
 
-const updateCompanyContacts = (payload) => ({
+const updateContacts = (payload) => ({
     payload,
-    type: UPDATE_COMPANY_CONTACTS_SUCCESS,
+    type: UPDATE_CONTACTS_SUCCESS,
 });
 
-const fetchUpdateCompanyContacts = (uuid) => (dispatch) => {
-    dispatch(doUpdateCompanyContacts());
+const fetchUpdateContacts = (uuid) => (dispatch) => {
+    dispatch(doUpdateContacts());
     return api
-        .fetchUpdateCompanyContacts(uuid, false)
+        .fetchUpdateContacts(uuid, false)
         .then((res) => res.data)
         .then((data) => {
-            return dispatch(receiveUpdateCompanyContact(data));
+            return dispatch(receiveUpdateContact(data));
         });
 };
 
-const updateCompanyContactsConfirm = (uuid) => (dispatch) => {
-    dispatch(requestUpdateCompanyContacts());
+const updateContactsConfirm = (uuid) => (dispatch) => {
+    dispatch(requestUpdateContacts());
     return api
-        .updateCompanyContacts(uuid, false)
+        .updateContacts(uuid, false)
         .then((res) => res.data)
         .then((data) => {
-            return dispatch(updateCompanyContacts(data));
+            return dispatch(updateContacts(data));
         });
 };
 
@@ -190,13 +190,13 @@ export default function reducer(state = initialState, { payload, type }) {
         case LOGOUT_USER:
             return initialState;
 
-        case DO_UPDATE_COMPANY_CONTACTS_REQUEST:
+        case DO_UPDATE_CONTACTS_REQUEST:
             return {
                 ...state,
                 isLoading: true,
             }
 
-        case DO_UPDATE_COMPANY_CONTACTS_SUCCESS:
+        case DO_UPDATE_CONTACTS_SUCCESS:
             return {
                 ...state,
                 data: {
@@ -206,13 +206,13 @@ export default function reducer(state = initialState, { payload, type }) {
                 message: null,
             };
 
-        case UPDATE_COMPANY_CONTACTS_REQUEST:
+        case UPDATE_CONTACTS_REQUEST:
             return {
                 ...state,
                 isLoading: true,
             }
 
-        case UPDATE_COMPANY_CONTACTS_SUCCESS:
+        case UPDATE_CONTACTS_SUCCESS:
             return {
                 ...state,
                 data: {
@@ -302,4 +302,4 @@ export default function reducer(state = initialState, { payload, type }) {
     }
 }
 
-export { initialState, fetchContact, fetchContacts, updateContact, receiveContacts, receiveUpdateCompanyContact, fetchUpdateCompanyContacts, updateCompanyContactsConfirm };
+export { initialState, fetchContact, fetchContacts, updateContact, receiveContacts, receiveUpdateContact, fetchUpdateContacts, updateContactsConfirm };
