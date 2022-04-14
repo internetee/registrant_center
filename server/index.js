@@ -37,6 +37,8 @@ const {
     REDIRECT_URL,
     SESSION_SECRET,
     TOKEN_PATH,
+    SCOPE,
+    RESPONSE_TYPE
 } = process.env;
 
 let publicKey = '';
@@ -111,9 +113,9 @@ app.use(
             oauth: 2,
             key: CLIENT_ID,
             secret: CLIENT_SECRET,
-            scope: 'openid',
+            scope: SCOPE,
             redirect_uri,
-            response_type: 'code',
+            response_type: RESPONSE_TYPE,
             callback: REDIRECT_URL,
             custom_params: {
                 ui_locales: LOCALE,
