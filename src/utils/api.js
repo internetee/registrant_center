@@ -72,17 +72,17 @@ export default {
         });
     },
 
-    fetchUpdateCompanyContacts: (uuid) => {
-        return instance.get(`/api/contacts/${uuid}/do_need_update_contact`, {
+    fetchUpdateContacts: (uuid) => {
+        return instance.get(`/api/contacts/${uuid}/do_need_update_contacts`, {
             credentials: 'include',
             method: 'GET',
             timeout: 4000,
         });
     },
 
-    updateCompanyContacts: (uuid) => {
+    updateContacts: (uuid) => {
         return axios.post(
-            `/api/contacts/${uuid}/update_company_contacts`,
+            `/api/contacts/${uuid}/update_contacts`,
             {},
             {
                 credentials: 'include',

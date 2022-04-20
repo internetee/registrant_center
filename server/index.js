@@ -37,6 +37,8 @@ const {
     REDIRECT_URL,
     SESSION_SECRET,
     TOKEN_PATH,
+    SCOPE,
+    RESPONSE_TYPE
 } = process.env;
 
 let publicKey = '';
@@ -111,9 +113,9 @@ app.use(
             oauth: 2,
             key: CLIENT_ID,
             secret: CLIENT_SECRET,
-            scope: 'openid',
+            scope: SCOPE,
             redirect_uri,
-            response_type: 'code',
+            response_type: RESPONSE_TYPE,
             callback: REDIRECT_URL,
             custom_params: {
                 ui_locales: LOCALE,
@@ -134,8 +136,8 @@ app.get('/api/domains', API.getDomains);
 app.get('/api/domains/:uuid', API.getDomain);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
 app.delete('/api/domains/:uuid/registry_lock', API.deleteDomainRegistryLock);
-app.get('/api/contacts/:uuid/do_need_update_contact', API.doNeedUpdateCompanyContacts);
-app.post('/api/contacts/:uuid/update_company_contacts', API.updateCompanyContacts);
+app.get('/api/contacts/:uuid/do_need_update_contacts', API.doNeedUpdateContacts);
+app.post('/api/contacts/:uuid/update_contacts', API.updateContacts);
 app.get('/api/companies', API.getCompanies);
 app.get('/api/contacts', API.getContacts);
 app.get('/api/contacts/:uuid', API.getContacts);
