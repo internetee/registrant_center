@@ -3,5 +3,6 @@
   "viewportWidth": 1280,
   "viewportHeight": 720,
   "videoCompression": false,
-  "pageLoadTimeout": 5000
+  "pageLoadTimeout": 5000,
+  "trashAssetsBeforeRuns": true
 }

@@ -17,7 +17,7 @@ describe('Integration tests', () => {
             '**/api/domains/2198affc-7479-499d-9eae-b0611ec2fb49',
             'fx:domain-locked'
         ).as('getLockedDomain');
-        cy.route('POST', '**/api/domains/*/registry_lock', 'fx:domain').as('setDomainLock');
+        cy.route('POST', '**/api/domains/*/registry_lock?extensionsProhibited=false', 'fx:domain').as('setDomainLock');
         cy.route('DELETE', '**/api/domains/*/registry_lock', 'fx:domain').as('deleteDomainLock');
         cy.route('GET', '**/api/contacts?*', 'fx:contacts').as('getContacts');
         cy.route(
@@ -45,10 +45,10 @@ describe('Integration tests', () => {
         cy.wait('@getFooterMenu').its('status').should('eq', 200);
     });
 
-    // it('Should accept cookies', () => {
-    //     cy.get('.cookie-notice button').click();
-    //     cy.getCookie('cookiesAccepted').should('exist');
-    // });
+    it('Should accept cookies', () => {
+        cy.get('.cookie-notice button').click();
+        cy.getCookie('cookiesAccepted').should('exist');
+    });
 
     it('Should load dashboard', () => {
         cy.login();
@@ -57,9 +57,9 @@ describe('Integration tests', () => {
         cy.wait('@getDomains').its('status').should('eq', 200);
     });
 
-    // it('Should have "user" cookie set', () => {
-    //     cy.getCookie('user').should('exist');
-    // });
+    it('Should have "user" cookie set', () => {
+        cy.getCookie('user').should('exist');
+    });
 
     it('Displays domains grid', () => {
         cy.get('.domains-grid--item h2').as('domains').should('have.length', 2);
@@ -110,12 +110,12 @@ describe('Integration tests', () => {
         cy.get('.domains-grid').parent().should('have.class', 'visible');
     });
 
-    // it('Toggles domain extra info', () => {
-    //     cy.get('.domains-grid--item:first-child .toggle').click();
-    //     cy.get('.domains-grid--item:first-child .extra').should('have.class', 'visible');
-    //     cy.get('.domains-grid--item:first-child .toggle').click();
-    //     cy.get('.domains-grid--item:first-child .extra').should('not.have.class', 'visible');
-    // });
+    it('Toggles domain extra info', () => {
+        cy.get('.domains-grid--item:first-child .toggle').click();
+        cy.get('.domains-grid--item:first-child .slide').should('exist');
+        cy.get('.domains-grid--item:first-child .toggle').click();
+        cy.get('.domains-grid--item:first-child .slide').should('not.exist');
+    });
 
     it('Links to domain.ee detail view', () => {
         cy.get('.domains-grid--item:first-child .link').click();
@@ -132,11 +132,11 @@ describe('Integration tests', () => {
         cy.get('[data-test="lock-domain"]').should('not.exist');
     });
 
-    // it('Sends API request to set domain lock', () => {
-    //     cy.get('[data-test="open-lock-modal"]').click();
-    //     cy.get('[data-test="lock-domain"]').click();
-    //     cy.wait('@setDomainLock').its('status').should('eq', 200);
-    // });
+    it('Sends API request to set domain lock', () => {
+        cy.get('[data-test="open-lock-modal"]').click();
+        cy.get('[data-test="lock-domain"]').click();
+        cy.wait('@setDomainLock').its('status').should('eq', 200);
+    });
 
     it('Sends API request to change WhoIs visibility', () => {
         cy.get('.adv-field-group input[name="name"] + label').click();
@@ -168,39 +168,32 @@ describe('Integration tests', () => {
         cy.url().should('eq', `${baseUrl}/`);
     });
 
-    // it('Links to lockeddomain.ee detail view', () => {
-    //     cy.get('.domains-grid--item:last-child .link').click();
-    //     cy.url().should('eq', `${baseUrl}/domain/2198affc-7479-499d-9eae-b0611ec2fb49`);
-    //     cy.wait('@getLockedDomain').its('status').should('eq', 200);
-    //     cy.wait('@getAdmin').its('status').should('eq', 200);
-    //     cy.wait('@getTech').its('status').should('eq', 200);
-    //     cy.wait('@getRegistrant').its('status').should('eq', 200);
-    // });
+    it('Links to lockeddomain.ee detail view', () => {
+        cy.get('.domains-grid--item:last-child .link').click();
+        cy.url().should('eq', `${baseUrl}/domain/2198affc-7479-499d-9eae-b0611ec2fb49`);
+        cy.wait('@getLockedDomain').its('status').should('eq', 200);
+        cy.wait('@getAdmin').its('status').should('eq', 200);
+        cy.wait('@getTech').its('status').should('eq', 200);
+        cy.wait('@getRegistrant').its('status').should('eq', 200);
+    });
 
-    // Uncomment these tests when new statuses (objUpdateProhibited and extensionUpdateProhibited) will be in production
-    // it('Shows & closes domain unlock modal', () => {
-    //     cy.get('[data-test="open-unlock-modal"]').click();
-    //     cy.get('[data-test="lock-domain"]').should('be.visible');
-    //     cy.get('[data-test="close-lock-modal"]').click();
-    //     cy.get('[data-test="lock-domain"]').should('not.exist');
-    // });
+    it('Shows & closes domain unlock modal', () => {
+        cy.get('[data-test="open-lock-modal"]').click();
+        cy.get('[data-test="lock-domain"]').should('be.visible');
+        cy.get('[data-test="close-lock-modal"]').click();
+        cy.get('[data-test="lock-domain"]').should('not.exist');
+    });
 
-    // it('Sends API request to delete domain lock', () => {
-    //     cy.get('[data-test="open-unlock-modal"]').click();
-    //     cy.get('[data-test="lock-domain"]').click();
-    //     cy.wait('@deleteDomainLock').its('status').should('eq', 200);
-    // });
+    it('Links back to Dashboard from lockeddomain.ee detail view', () => {
+        cy.get('.back-link').click();
+        cy.url().should('eq', `${baseUrl}/`);
+    });
 
-    // it('Links back to Dashboard from lockeddomain.ee detail view', () => {
-    //     cy.get('.back-link').click();
-    //     cy.url().should('eq', `${baseUrl}/`);
-    // });
-
-    // it('Links to Companies page', () => {
-    //     cy.get('.quicklinks--link[href="/companies"]').click();
-    //     cy.url().should('eq', `${baseUrl}/companies`);
-    //     cy.wait('@getCompanies').its('status').should('eq', 200);
-    // });
+    it('Links to Companies page', () => {
+        cy.get('.quicklinks--link[href="/companies"]').click();
+        cy.url().should('eq', `${baseUrl}/companies`);
+        cy.wait('@getCompanies').its('status').should('eq', 200);
+    });
 
     it('Displays companies list', () => {
         cy.get('.table tbody tr').should('have.length', 2);
@@ -211,34 +204,34 @@ describe('Integration tests', () => {
         cy.url().should('eq', `${baseUrl}/`);
     });
 
-    // it('Links to WhoIs page', () => {
-    //     cy.get('.quicklinks--link[href="/whois"]').click();
-    //     cy.url().should('eq', `${baseUrl}/whois`);
-    //     cy.wait('@getDomains').its('status').should('eq', 200);
-    // });
+    it('Links to WhoIs page', () => {
+        cy.get('.quicklinks--link[href="/whois"]').click();
+        cy.url().should('eq', `${baseUrl}/whois`);
+        // cy.wait('@getDomains').its('status').should('eq', 200);
+    });
 
-    // it('Displays domains list', () => {
-    //     cy.get('.table tbody tr').should('have.length', 4);
-    // });
+    it('Displays domains list', () => {
+        cy.get('.table tbody tr').should('have.length', 4);
+    });
 
-    // it('Opens domain detail info', () => {
-    //     cy.get('.table tbody tr:first-child button').click();
-    //     cy.get('.table tbody tr:first-child .adv-field-group.u-visible').should('be', 'visible');
-    // });
+    it('Opens domain detail info', () => {
+        cy.get('.table tbody tr:first-child button').click();
+        cy.get('.table tbody tr:first-child .adv-field-group.u-visible').should('be.visible');
+    });
 
-    // it('Send API request to change WhoIs visibility', () => {
-    //     cy.get('.table tbody tr:first-child input[name="name"]').should('be', 'visible');
-    //     cy.get('.table tbody tr:first-child input[name="email"]').should('be', 'visible');
-    //     cy.get('.table tbody tr:first-child .adv-field-group input[name="name"] + label').click();
-    //     cy.get('.form-filter--actions button').click();
-    //     cy.get('[data-test="change-contacts"]').click();
-    //     cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
-    // });
+    it('Send API request to change WhoIs visibility', () => {
+        cy.get('.table tbody tr:first-child input[name="name"]').should('exist');
+        cy.get('.table tbody tr:first-child input[name="email"]').should('exist');
+        cy.get('.table tbody tr:first-child .adv-field-group input[name="name"] + label').click();
+        cy.get('.form-filter--actions button').click();
+        cy.get('[data-test="change-contacts"]').click();
+        cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
+    });
 
-    // it('Links back to Dashboard from WhoIs page', () => {
-    //     cy.get('.back-link').click();
-    //     cy.url().should('eq', `${baseUrl}/`);
-    // });
+    it('Links back to Dashboard from WhoIs page', () => {   
+        cy.get('.back-link').click();
+        cy.url().should('eq', `${baseUrl}/`);
+    });
 
     it('Successfully logs user out', () => {
         cy.get('.log-out').click();

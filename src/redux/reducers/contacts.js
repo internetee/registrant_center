@@ -120,37 +120,35 @@ const fetchContact = (uuid) => (dispatch) => {
         });
 };
 
-const fetchContacts =
-    (uuid, offset = request.offset) =>
-    (dispatch) => {
-        if (uuid) {
-            dispatch(requestContact());
-            return api
-                .fetchContacts(uuid, offset, true)
-                .then((res) => res.data)
-                .then(async (data) => {
-                    return dispatch(receiveContact(data));
-                })
-                .catch(() => {
-                    return dispatch(invalidateContact());
-                });
-        }
-        dispatch(requestContacts());
+const fetchContacts = (uuid, offset = request.offset) => (dispatch) => {
+    if (uuid) {
+        dispatch(requestContact());
         return api
-            .fetchContacts(null, offset)
+            .fetchContacts(uuid, offset, true)
             .then((res) => res.data)
-            .then((data) => {
-                request.data = request.data.concat(data);
-                if (data.length === 200) {
-                    request.offset += 200;
-                    return dispatch(fetchContacts(null, request.offset));
-                }
-                return dispatch(receiveContacts(request.data));
+            .then(async (data) => {
+                return dispatch(receiveContact(data));
             })
             .catch(() => {
-                return dispatch(invalidateContacts());
+                return dispatch(invalidateContact());
             });
-    };
+    }
+    dispatch(requestContacts());
+    return api
+        .fetchContacts(null, offset)
+        .then((res) => res.data)
+        .then((data) => {
+            request.data = request.data.concat(data);
+            if (data.length === 200) {
+                request.offset += 200;
+                return dispatch(fetchContacts(null, request.offset));
+            }
+            return dispatch(receiveContacts(request.data));
+        })
+        .catch(() => {
+            return dispatch(invalidateContacts());
+        });
+};
 
 const updateContact = (uuid, form) => (dispatch) => {
     dispatch(requestContactUpdate());
@@ -194,7 +192,7 @@ export default function reducer(state = initialState, { payload, type }) {
             return {
                 ...state,
                 isLoading: true,
-            }
+            };
 
         case DO_UPDATE_CONTACTS_SUCCESS:
             return {
@@ -210,7 +208,7 @@ export default function reducer(state = initialState, { payload, type }) {
             return {
                 ...state,
                 isLoading: true,
-            }
+            };
 
         case UPDATE_CONTACTS_SUCCESS:
             return {

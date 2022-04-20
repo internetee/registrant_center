@@ -55,7 +55,15 @@ const getLocale = (locale) => {
     return {};
 };
 
-const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isTech, isUpdateContact }) => {
+const DomainList = ({
+    domainCount,
+    domainTotal,
+    domains,
+    lang,
+    onSelectTech,
+    isTech,
+    isUpdateContact,
+}) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
     const { domainsIsGrid, domainsPerPage } = cookies;
@@ -334,25 +342,25 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
         }
     };
 
-    const [contactUpdate, setContactUpdate] = useState(isUpdateContact)
-    const [contactUpdateCount, setContactUpdateCount] = useState("0")
+    const [contactUpdate, setContactUpdate] = useState(isUpdateContact);
+    const [contactUpdateCount, setContactUpdateCount] = useState('0');
 
     const dispatch = useDispatch();
     useEffect(() => {
-        let data = dispatch(fetchUpdateContacts()).then(response => { 
-            // console.log(response);
+        const data = dispatch(fetchUpdateContacts()).then((response) => {
+            console.log(response);
             setContactUpdate(response.payload.update_contacts);
-            setContactUpdateCount(response.payload.counter)
+            setContactUpdateCount(response.payload.counter);
         });
         console.log(data);
     }, []);
 
     const updateContacts = () => {
         dispatch(updateContactsConfirm()).then(response => {
-            // console.log(response);
+            console.log(response);
             setContactUpdate(!contactUpdate);
-        })
-    }
+        });
+    };
 
     const ConfirmUpdateContacts = () => {
     return (
@@ -379,7 +387,7 @@ const DomainList = ({ domainCount, domainTotal, domains, lang, onSelectTech, isT
                                 userTotalDomains: totalDomains,
                             }}
                         />
-                        { contactUpdate ? <ConfirmUpdateContacts /> : <></>  }
+                        {contactUpdate ? <ConfirmUpdateContacts /> : <></>}
                     </div>
                     <Form className="form-filter" onSubmit={handleSubmit}>
                         <div className="form-filter--search">
@@ -679,7 +687,7 @@ DomainList.propTypes = {
     isTech: PropTypes.any,
     lang: PropTypes.string,
     onSelectTech: PropTypes.func,
-    isUpdateContact: PropTypes.any
+    isUpdateContact: PropTypes.any,
 };
 
 DomainList.defaultProps = {

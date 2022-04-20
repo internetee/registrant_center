@@ -42,14 +42,12 @@ const HomePage = ({
                 await fetchDomains(0, false, isTech);
                 setIsLoading(false);
             })();
-                }
-        else if (previousTechParams !== isTech) {
+        } else if (previousTechParams !== isTech) {
             (async () => {
                 await fetchDomains(0, false, isTech);
                 setIsLoading(false);
             })();
-                }
-        else {
+        } else {
             setIsLoading(false);
         }
     }, [fetchDomains, isTech]);
