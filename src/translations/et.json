@@ -241,6 +241,7 @@
   "whois.edit.checkAll": "({count}/{countOf}) Kõik info nähtav",
   "whois.edit.checkNone": "({count}/{countOf}) Kõik info peidetud",
   "whois.edit.checkSome": "({count}/{countOf}) Osa info peidetud",
+  "whois.edit.phone": "Telefon avalik ({contactPhone})",
   "whois.edit.email": "E-mail avalik ({contactEmail})",
   "whois.edit.name": "Nimi avalik ({contactName})",
   "whois.none.message.title": "Teile ei kuulu hetkel ühtegi domeeni",

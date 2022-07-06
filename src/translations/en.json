@@ -241,6 +241,7 @@
   "whois.edit.checkAll": "({count}/{countOf}) All information visible",
   "whois.edit.checkNone": "({count}/{countOf}) All information hidden",
   "whois.edit.checkSome": "({count}/{countOf}) Some information hidden",
+  "whois.edit.phone": "Phone public ({contactPhone})",
   "whois.edit.email": "E-mail public ({contactEmail})",
   "whois.edit.name": "Name public ({contactName})",
   "whois.none.message.title": "You currently don't own any domain",
