@@ -177,6 +177,30 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 value={item.email}
                             />
                         </Form.Field>
+                        <Form.Field>
+                            <Checkbox
+                                checked={
+                                    domain.registrant.org ||
+                                    item.ident.type === 'org' ||
+                                    item.disclosed_attributes.has('phone')
+                                }
+                                disabled={item.ident.type === 'org' || domain.registrant.org}
+                                label={
+                                    <FormattedMessage
+                                        id="whois.edit.phone"
+                                        tagName="label"
+                                        values={{
+                                            contactPhone: item.initialPhone,
+                                        }}
+                                    />
+                                }
+                                name="phone"
+                                onChange={(e, elem) =>
+                                    handleChange(elem.checked, [item.id], ['phone'])
+                                }
+                                value={item.phone}
+                            />
+                        </Form.Field>
                     </React.Fragment>
                 ))}
             </Form.Group>
