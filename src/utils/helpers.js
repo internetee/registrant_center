@@ -123,6 +123,7 @@ export default {
                         ...contact,
                         ...domain.contacts[key],
                         disclosed_attributes: new Set(contact.disclosed_attributes),
+                        initialPhone: contact.phone,
                         initialEmail: contact.email,
                         initialName: contact.name,
                     },

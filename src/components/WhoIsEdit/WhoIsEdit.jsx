@@ -17,16 +17,16 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 // eslint-disable-next-line func-names
                 (function () {
                     if (domain.registrant.org) {
-                        return 2;
+                        return 3;
                     }
                     if (ident.type === 'org') {
-                        return 2;
+                        return 3;
                     }
                     return disclosed_attributes.size;
                 })(),
             isCheckedAll:
-                domain.registrant.org || disclosed_attributes.size === contactsList.length * 2,
-            totalCount: acc.totalCount + 2,
+                domain.registrant.org || disclosed_attributes.size === contactsList.length * 3,
+            totalCount: acc.totalCount + 3,
         }),
         {
             checkedCount: 0,
@@ -111,7 +111,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
-                            handleChange(elem.checked, Object.keys(contacts), ['name', 'email']);
+                            handleChange(elem.checked, Object.keys(contacts), ['name', 'email', 'phone']);
                         }}
                     />
                 </Form.Field>
