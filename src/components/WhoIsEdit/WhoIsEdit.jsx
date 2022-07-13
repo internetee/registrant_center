@@ -17,15 +17,14 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 // eslint-disable-next-line func-names
                 (function () {
                     if (domain.registrant.org) {
-                        return 3;
+                        return 2;
                     }
                     if (ident.type === 'org') {
-                        return 3;
+                        return 2;
                     }
                     return disclosed_attributes.size;
                 })(),
-            isCheckedAll:
-                domain.registrant.org || disclosed_attributes.size === contactsList.length * 3,
+            isCheckedAll: disclosed_attributes.size === contactsList.length * 3,
             totalCount: acc.totalCount + 3,
         }),
         {
@@ -102,12 +101,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
     return (
         <>
-            {checkAll && (
+            {checkAll && !isCompany && (
                 <Form.Field>
                     <Checkbox
-                        checked={isCheckedAll || isCompany}
+                        checked={isCheckedAll}
                         className="large"
-                        disabled={isCompany}
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
@@ -179,12 +177,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         </Form.Field>
                         <Form.Field>
                             <Checkbox
-                                checked={
-                                    domain.registrant.org ||
-                                    item.ident.type === 'org' ||
-                                    item.disclosed_attributes.has('phone')
-                                }
-                                disabled={item.ident.type === 'org' || domain.registrant.org}
+                                checked={item.disclosed_attributes.has('phone')}
                                 label={
                                     <FormattedMessage
                                         id="whois.edit.phone"
