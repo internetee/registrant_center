@@ -244,6 +244,7 @@
   "whois.edit.phone": "Phone public ({contactPhone})",
   "whois.edit.email": "E-mail public ({contactEmail})",
   "whois.edit.name": "Name public ({contactName})",
+  "whois.edit.publishable": "Make public - allow your data to be available without captcha check",
   "whois.none.message.title": "You currently don't own any domain",
   "whois.page_title": "WHOIS Privacy Settings | .ee registrant portal",
   "whois.publicInfo": "Info public",

@@ -194,6 +194,22 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 value={item.phone}
                             />
                         </Form.Field>
+                        <Form.Field>
+                            <Checkbox
+                                checked={item.publishable}
+                                label={
+                                    <FormattedMessage
+                                        id="whois.edit.publishable"
+                                        tagName="label"
+                                    />
+                                }
+                                name="publishable"
+                                onChange={(e, elem) =>
+                                    handleChange(elem.checked, [item.id], true)
+                                }
+                                value={item.publishable}
+                            />
+                        </Form.Field>
                     </React.Fragment>
                 ))}
             </Form.Group>
