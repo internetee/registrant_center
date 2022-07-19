@@ -25,10 +25,7 @@ import DomainGridItem from './GridItem';
 import DomainListItem from './ListItem';
 import PageMessage from '../PageMessage/PageMessage';
 import domainStatuses from '../../utils/domainStatuses.json';
-import {
-    fetchUpdateContacts,
-    updateContactsConfirm,
-} from '../../redux/reducers/contacts';
+import { fetchUpdateContacts, updateContactsConfirm } from '../../redux/reducers/contacts';
 
 const LIMIT_DOMAIN_TOTAL = 3000;
 
@@ -356,19 +353,22 @@ const DomainList = ({
     }, []);
 
     const updateContacts = () => {
-        dispatch(updateContactsConfirm()).then(response => {
+        dispatch(updateContactsConfirm()).then((response) => {
             console.log(response);
             setContactUpdate(!contactUpdate);
         });
     };
 
     const ConfirmUpdateContacts = () => {
-    return (
-        <div className='dialog-company-contacts-box'>
-            Found mismatches in .ee registry between contact names and business/citizenship registries. Please confirm to update {contactUpdateCount} contact records for your .ee domain registrations
-            <Button onClick={updateContacts}>Update contacts</Button>
-        </div>
-    )}
+        return (
+            <div className="dialog-company-contacts-box">
+                Found mismatches in .ee registry between contact names and business/citizenship
+                registries. Please confirm to update {contactUpdateCount} contact records for your
+                .ee domain registrations
+                <Button onClick={updateContacts}>Update contacts</Button>
+            </div>
+        );
+    };
 
     return (
         <div className="domains-list--wrap">

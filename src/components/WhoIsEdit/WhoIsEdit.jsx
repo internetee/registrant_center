@@ -44,11 +44,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
             type.forEach((attr) => {
                 if (attr === 'publishable') {
-                  publishable = checked;
+                    publishable = checked;
                 } else if (checked) {
-                  attributes.add(attr);
+                    attributes.add(attr);
                 } else {
-                  attributes.delete(attr);
+                    attributes.delete(attr);
                 }
             });
             return {
@@ -56,7 +56,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 [id]: {
                     ...contacts[id],
                     disclosed_attributes: attributes,
-                    publishable: publishable,
+                    publishable,
                 },
             };
         }, {});
@@ -114,7 +114,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
-                            handleChange(elem.checked, Object.keys(contacts), ['name', 'email', 'phone']);
+                            handleChange(elem.checked, Object.keys(contacts), [
+                                'name',
+                                'email',
+                                'phone',
+                            ]);
                         }}
                     />
                 </Form.Field>
@@ -200,9 +204,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                             />
                         </Form.Field>
                         <label htmlFor={item.id}>
+                            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                             <FormattedMessage id="whois.public.text" tagName="strong" />
                             <Popup basic inverted trigger={<Icon name="question circle" />}>
-                              <FormattedMessage id="whois.public.tooltip" />
+                                <FormattedMessage id="whois.public.tooltip" />
                             </Popup>
                         </label>
                         <Form.Field>

@@ -99,7 +99,10 @@ const DomainPage = ({
                 for (let i = 0; i < user_contacts_keys.length; i += 1) {
                     for (let j = 0; j < domain_contacts_keys.length; j += 1) {
                         if (user_contacts_keys[i] === domain_contacts_keys[j]) {
-                            if (JSON.stringify(domain.contacts[domain_contacts_keys[j]].roles) === JSON.stringify(['tech']))
+                            if (
+                                JSON.stringify(domain.contacts[domain_contacts_keys[j]].roles) ===
+                                JSON.stringify(['tech'])
+                            )
                                 break;
                             lockableFlag = true;
                         }
