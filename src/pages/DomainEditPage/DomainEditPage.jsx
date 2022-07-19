@@ -113,6 +113,7 @@ const DomainEditPage = ({
                 if (contact.ident.code === user.ident) {
                     return updateContact(contact.id, {
                         disclosed_attributes: [...contact.disclosed_attributes],
+                        publishable: contact.publishable,
                         email: contact.email,
                         phone: contact.phone,
                     });
@@ -125,8 +126,9 @@ const DomainEditPage = ({
                 }
                 return updateContact(contact.id, {
                     disclosed_attributes: [...contact.disclosed_attributes],
-                        email: contact.email,
-                        phone: contact.phone,
+                    publishable: contact.publishable,
+                    email: contact.email,
+                    phone: contact.phone,
                 });
             })
         );

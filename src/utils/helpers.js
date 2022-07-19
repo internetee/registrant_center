@@ -71,6 +71,7 @@ export default {
                 acc.push({
                     code: item.code,
                     disclosed_attributes: new Set(item.disclosed_attributes),
+                    publishable: item.publishable,
                     email: item.email,
                     id: item.id,
                     ident: item.ident,
@@ -101,6 +102,7 @@ export default {
                     ...contact,
                     ...domain.contacts[contact.id],
                     disclosed_attributes: new Set(contact.disclosed_attributes),
+                    publishable: contact.publishable,
                     initialEmail: contact.email,
                     initialPhone: contact.phone,
                     initialName: contact.name,
@@ -123,6 +125,7 @@ export default {
                         ...contact,
                         ...domain.contacts[key],
                         disclosed_attributes: new Set(contact.disclosed_attributes),
+                        publishable: contact.publishable,
                         initialPhone: contact.phone,
                         initialEmail: contact.email,
                         initialName: contact.name,

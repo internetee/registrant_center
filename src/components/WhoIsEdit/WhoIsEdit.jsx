@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Form, Checkbox } from 'semantic-ui-react';
+import { Form, Checkbox, Popup, Icon } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import Roles from '../Roles/Roles';
 
@@ -39,12 +39,16 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {
             const { disclosed_attributes } = contacts[id];
+            let { publishable } = contacts[id];
             const attributes = new Set(disclosed_attributes);
+
             type.forEach((attr) => {
-                if (checked) {
-                    attributes.add(attr);
+                if (attr === 'publishable') {
+                  publishable = checked;
+                } else if (checked) {
+                  attributes.add(attr);
                 } else {
-                    attributes.delete(attr);
+                  attributes.delete(attr);
                 }
             });
             return {
@@ -52,6 +56,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 [id]: {
                     ...contacts[id],
                     disclosed_attributes: attributes,
+                    publishable: publishable,
                 },
             };
         }, {});
@@ -194,6 +199,12 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 value={item.phone}
                             />
                         </Form.Field>
+                        <label htmlFor={item.id}>
+                            <FormattedMessage id="whois.public.text" tagName="strong" />
+                            <Popup basic inverted trigger={<Icon name="question circle" />}>
+                              <FormattedMessage id="whois.public.tooltip" />
+                            </Popup>
+                        </label>
                         <Form.Field>
                             <Checkbox
                                 checked={item.publishable}
@@ -201,11 +212,14 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                     <FormattedMessage
                                         id="whois.edit.publishable"
                                         tagName="label"
+                                        values={{
+                                            contactPublishable: item.publishable,
+                                        }}
                                     />
                                 }
                                 name="publishable"
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], true)
+                                    handleChange(elem.checked, [item.id], ['publishable'])
                                 }
                                 value={item.publishable}
                             />
