@@ -156,7 +156,7 @@ const WhoIsPage = ({
                             ...contact,
                             changed: true,
                             disclosed_attributes: data[id].disclosed_attributes,
-                            publishable: data[id].publishable,
+                            registrant_publishable: data[id].registrant_publishable,
                         },
                     };
                 }
@@ -182,7 +182,7 @@ const WhoIsPage = ({
                 .map((contact) => {
                     const form = {
                         disclosed_attributes: [...contact.disclosed_attributes],
-                        publishable: contact.publishable,
+                        registrant_publishable: contact.registrant_publishable,
                     };
                     return updateContact(contact.id, form);
                 })

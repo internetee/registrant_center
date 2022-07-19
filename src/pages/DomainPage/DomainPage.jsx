@@ -121,12 +121,12 @@ const DomainPage = ({
     const handleWhoIsChange = (data) => {
         setUserContacts((prevState) =>
             Object.entries(data).reduce(
-                (acc, [id, { disclosed_attributes, publishable }]) => ({
+                (acc, [id, { disclosed_attributes, registrant_publishable }]) => ({
                     ...acc,
                     [id]: {
                         ...prevState[id],
                         disclosed_attributes,
-                        publishable,
+                        registrant_publishable,
                     },
                 }),
                 {}
@@ -142,7 +142,7 @@ const DomainPage = ({
             Object.values(userContacts || {}).map((contact) => {
                 const form = {
                     disclosed_attributes: [...contact.disclosed_attributes],
-                    publishable: contact.publishable,
+                    registrant_publishable: contact.registrant_publishable,
                 };
                 return updateContact(contact.id, form);
             })

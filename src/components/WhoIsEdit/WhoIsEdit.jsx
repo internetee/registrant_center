@@ -39,16 +39,17 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {
             const { disclosed_attributes } = contacts[id];
-            let { publishable } = contacts[id];
+            const { registrant_publishable } = contacts[id];
             const attributes = new Set(disclosed_attributes);
+            let publishable = registrant_publishable
 
             type.forEach((attr) => {
-                if (attr === 'publishable') {
-                    publishable = checked;
+                if (attr === 'registrant_publishable') {
+                  publishable = checked;
                 } else if (checked) {
-                    attributes.add(attr);
+                  attributes.add(attr);
                 } else {
-                    attributes.delete(attr);
+                  attributes.delete(attr);
                 }
             });
             return {
@@ -56,7 +57,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 [id]: {
                     ...contacts[id],
                     disclosed_attributes: attributes,
-                    publishable,
+                    registrant_publishable: publishable,
                 },
             };
         }, {});
@@ -212,21 +213,18 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         </label>
                         <Form.Field>
                             <Checkbox
-                                checked={item.publishable}
+                                checked={item.registrant_publishable}
                                 label={
                                     <FormattedMessage
-                                        id="whois.edit.publishable"
+                                        id="whois.edit.registrant_publishable"
                                         tagName="label"
-                                        values={{
-                                            contactPublishable: item.publishable,
-                                        }}
                                     />
                                 }
-                                name="publishable"
+                                name="registrant_publishable"
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], ['publishable'])
+                                    handleChange(elem.checked, [item.id], ['registrant_publishable'])
                                 }
-                                value={item.publishable}
+                                value={item.registrant_publishable}
                             />
                         </Form.Field>
                     </React.Fragment>
