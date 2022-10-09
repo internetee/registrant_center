@@ -38,7 +38,7 @@
     "react-ga": "^3.3.0",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.5.0",
-	"dompurify": "^2.2.9"
+    "dompurify": "^2.2.9"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -66,7 +66,6 @@
     "eslint-plugin-react-hooks": "^4.0.0",
     "flatpickr": "^4.6.3",
     "lint-staged": "^10.3.0",
-    "node-sass": "^7.0.0",
     "nodemon": "^1.19.4",
     "pdfmake": "^0.1.65",
     "popper.js": "^1.16.1",
@@ -89,6 +88,7 @@
     "redux-mock-store": "^1.5.4",
     "redux-state-sync": "^3.1.1",
     "redux-thunk": "2.3.0",
+    "sass": "^1.55.0",
     "semantic-ui-react": "0.82.5",
     "serve-favicon": "^2.5.0"
   },
