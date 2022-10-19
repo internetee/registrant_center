@@ -97,8 +97,6 @@ export default async function callbackPageRoute(req, res, publicKey) {
 
                 console.log('Decrypted JWT from TARA:');
                 console.log(verifiedJwt);
-                console.log('userData:');
-                console.log(userData);
                 req.session.user = userData;
                 if (NODE_ENV === 'development') {
                     res.redirect(`https://${HOST}:3000`);

@@ -32,8 +32,6 @@ const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
         (a, b) => domainStatuses[a].priority - domainStatuses[b].priority
     );
 
-    console.log(statuses);
-
     const contacts = (simplify
         ? [
               ...(registrant && [
@@ -271,14 +269,10 @@ export default function reducer(state = initialState, { payload, type, simplify 
             };
 
         case FETCH_DOMAINS_SUCCESS:
-            // console.log(payload.count);
-            // console.log(payload.domains);
             let d = {
             dod: payload.domains.forEach(domain => {
                 parseDomain(domain, true, simplify)
             }) }
-
-            console.log(d);
 
             return {
                 ...state,
