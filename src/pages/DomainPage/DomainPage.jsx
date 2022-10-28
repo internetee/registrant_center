@@ -710,23 +710,23 @@ const mapDispatchToProps = (dispatch) =>
 
 export default connect(mapStateToProps, mapDispatchToProps)(DomainPage);
 
-DomainPage.propTypes = {
-    companies: PropTypes.object,
-    contacts: PropTypes.object,
-    domains: PropTypes.object,
-    fetchCompanies: PropTypes.func.isRequired,
-    fetchDomain: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-    lockDomain: PropTypes.func.isRequired,
-    match: PropTypes.object.isRequired,
-    ui: PropTypes.object.isRequired,
-    unlockDomain: PropTypes.func.isRequired,
-    updateContact: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
-};
+// DomainPage.propTypes = {
+//     companies: PropTypes.object,
+//     contacts: PropTypes.object,
+//     domains: PropTypes.object,
+//     fetchCompanies: PropTypes.func.isRequired,
+//     fetchDomain: PropTypes.func.isRequired,
+//     isLoading: PropTypes.bool.isRequired,
+//     lockDomain: PropTypes.func.isRequired,
+//     match: PropTypes.object.isRequired,
+//     ui: PropTypes.object.isRequired,
+//     unlockDomain: PropTypes.func.isRequired,
+//     updateContact: PropTypes.func.isRequired,
+//     user: PropTypes.object.isRequired,
+// };
 
-DomainPage.defaultProps = {
-    companies: [],
-    contacts: [],
-    domains: [],
-};
+// DomainPage.defaultProps = {
+//     companies: [],
+//     contacts: [],
+//     domains: [],
+// };

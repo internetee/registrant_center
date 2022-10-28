@@ -224,7 +224,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 onChange={(e, elem) =>
                                     handleChange(elem.checked, [item.id], ['registrant_publishable'])
                                 }
-                                value={item.registrant_publishable}
+                                // value={item.registrant_publishable}
                             />
                         </Form.Field>
                     </React.Fragment>
@@ -236,17 +236,17 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
 export default WhoIsEdit;
 
-WhoIsEdit.propTypes = {
-    isOpen: PropTypes.bool,
-    checkAll: PropTypes.bool,
-    onChange: PropTypes.func,
-    contacts: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
-    domain: PropTypes.object.isRequired,
-};
+// WhoIsEdit.propTypes = {
+//     isOpen: PropTypes.bool,
+//     checkAll: PropTypes.bool,
+//     onChange: PropTypes.func,
+//     contacts: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
+//     domain: PropTypes.object.isRequired,
+// };
 
-WhoIsEdit.defaultProps = {
-    isOpen: false,
-    checkAll: false,
-    onChange: () => {},
-    contacts: [],
-};
+// WhoIsEdit.defaultProps = {
+//     isOpen: false,
+//     checkAll: false,
+//     onChange: () => {},
+//     contacts: [],
+// };
