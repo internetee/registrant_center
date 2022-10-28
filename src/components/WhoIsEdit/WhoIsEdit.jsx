@@ -43,6 +43,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
             const attributes = new Set(disclosed_attributes);
             let publishable = registrant_publishable
 
+            if (domain.registrant.org) {
+                attributes.add('name');
+                attributes.add('email');
+            }
+
             type.forEach((attr) => {
                 if (attr === 'registrant_publishable') {
                   publishable = checked;
