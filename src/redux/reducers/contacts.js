@@ -300,4 +300,13 @@ export default function reducer(state = initialState, { payload, type }) {
     }
 }
 
-export { initialState, fetchContact, fetchContacts, updateContact, receiveContacts, receiveUpdateContact, fetchUpdateContacts, updateContactsConfirm };
+export {
+    initialState,
+    fetchContact,
+    fetchContacts,
+    updateContact,
+    receiveContacts,
+    receiveUpdateContact,
+    fetchUpdateContacts,
+    updateContactsConfirm,
+};

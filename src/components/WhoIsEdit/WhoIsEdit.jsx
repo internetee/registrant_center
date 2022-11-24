@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Form, Checkbox } from 'semantic-ui-react';
+import { Form, Checkbox, Popup, Icon } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import Roles from '../Roles/Roles';
 
@@ -24,9 +24,8 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                     }
                     return disclosed_attributes.size;
                 })(),
-            isCheckedAll:
-                domain.registrant.org || disclosed_attributes.size === contactsList.length * 2,
-            totalCount: acc.totalCount + 2,
+            isCheckedAll: disclosed_attributes.size === contactsList.length * 3,
+            totalCount: acc.totalCount + 3,
         }),
         {
             checkedCount: 0,
@@ -40,12 +39,22 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {
             const { disclosed_attributes } = contacts[id];
+            const { registrant_publishable } = contacts[id];
             const attributes = new Set(disclosed_attributes);
+            let publishable = registrant_publishable
+
+            if (domain.registrant.org) {
+                attributes.add('name');
+                attributes.add('email');
+            }
+
             type.forEach((attr) => {
-                if (checked) {
-                    attributes.add(attr);
+                if (attr === 'registrant_publishable') {
+                  publishable = checked;
+                } else if (checked) {
+                  attributes.add(attr);
                 } else {
-                    attributes.delete(attr);
+                  attributes.delete(attr);
                 }
             });
             return {
@@ -53,6 +62,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 [id]: {
                     ...contacts[id],
                     disclosed_attributes: attributes,
+                    registrant_publishable: publishable,
                 },
             };
         }, {});
@@ -102,16 +112,19 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
     return (
         <>
-            {checkAll && (
+            {checkAll && !isCompany && (
                 <Form.Field>
                     <Checkbox
-                        checked={isCheckedAll || isCompany}
+                        checked={isCheckedAll}
                         className="large"
-                        disabled={isCompany}
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
-                            handleChange(elem.checked, Object.keys(contacts), ['name', 'email']);
+                            handleChange(elem.checked, Object.keys(contacts), [
+                                'name',
+                                'email',
+                                'phone',
+                            ]);
                         }}
                     />
                 </Form.Field>
@@ -177,6 +190,48 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 value={item.email}
                             />
                         </Form.Field>
+                        <Form.Field>
+                            <Checkbox
+                                checked={item.disclosed_attributes.has('phone')}
+                                label={
+                                    <FormattedMessage
+                                        id="whois.edit.phone"
+                                        tagName="label"
+                                        values={{
+                                            contactPhone: item.initialPhone,
+                                        }}
+                                    />
+                                }
+                                name="phone"
+                                onChange={(e, elem) =>
+                                    handleChange(elem.checked, [item.id], ['phone'])
+                                }
+                                value={item.phone}
+                            />
+                        </Form.Field>
+                        <label htmlFor={item.id}>
+                            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                            <FormattedMessage id="whois.public.text" tagName="strong" />
+                            <Popup basic inverted trigger={<Icon name="question circle" />}>
+                                <FormattedMessage id="whois.public.tooltip" />
+                            </Popup>
+                        </label>
+                        <Form.Field>
+                            <Checkbox
+                                checked={item.registrant_publishable}
+                                label={
+                                    <FormattedMessage
+                                        id="whois.edit.registrant_publishable"
+                                        tagName="label"
+                                    />
+                                }
+                                name="registrant_publishable"
+                                onChange={(e, elem) =>
+                                    handleChange(elem.checked, [item.id], ['registrant_publishable'])
+                                }
+                                // value={item.registrant_publishable}
+                            />
+                        </Form.Field>
                     </React.Fragment>
                 ))}
             </Form.Group>
@@ -186,17 +241,17 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
 export default WhoIsEdit;
 
-WhoIsEdit.propTypes = {
-    isOpen: PropTypes.bool,
-    checkAll: PropTypes.bool,
-    onChange: PropTypes.func,
-    contacts: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
-    domain: PropTypes.object.isRequired,
-};
+// WhoIsEdit.propTypes = {
+//     isOpen: PropTypes.bool,
+//     checkAll: PropTypes.bool,
+//     onChange: PropTypes.func,
+//     contacts: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
+//     domain: PropTypes.object.isRequired,
+// };
 
-WhoIsEdit.defaultProps = {
-    isOpen: false,
-    checkAll: false,
-    onChange: () => {},
-    contacts: [],
-};
+// WhoIsEdit.defaultProps = {
+//     isOpen: false,
+//     checkAll: false,
+//     onChange: () => {},
+//     contacts: [],
+// };

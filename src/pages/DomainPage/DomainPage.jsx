@@ -99,7 +99,10 @@ const DomainPage = ({
                 for (let i = 0; i < user_contacts_keys.length; i += 1) {
                     for (let j = 0; j < domain_contacts_keys.length; j += 1) {
                         if (user_contacts_keys[i] === domain_contacts_keys[j]) {
-                            if (JSON.stringify(domain.contacts[domain_contacts_keys[j]].roles) === JSON.stringify(['tech']))
+                            if (
+                                JSON.stringify(domain.contacts[domain_contacts_keys[j]].roles) ===
+                                JSON.stringify(['tech'])
+                            )
                                 break;
                             lockableFlag = true;
                         }
@@ -118,11 +121,12 @@ const DomainPage = ({
     const handleWhoIsChange = (data) => {
         setUserContacts((prevState) =>
             Object.entries(data).reduce(
-                (acc, [id, { disclosed_attributes }]) => ({
+                (acc, [id, { disclosed_attributes, registrant_publishable }]) => ({
                     ...acc,
                     [id]: {
                         ...prevState[id],
                         disclosed_attributes,
+                        registrant_publishable,
                     },
                 }),
                 {}
@@ -138,6 +142,7 @@ const DomainPage = ({
             Object.values(userContacts || {}).map((contact) => {
                 const form = {
                     disclosed_attributes: [...contact.disclosed_attributes],
+                    registrant_publishable: contact.registrant_publishable,
                 };
                 return updateContact(contact.id, form);
             })
@@ -705,23 +710,23 @@ const mapDispatchToProps = (dispatch) =>
 
 export default connect(mapStateToProps, mapDispatchToProps)(DomainPage);
 
-DomainPage.propTypes = {
-    companies: PropTypes.object,
-    contacts: PropTypes.object,
-    domains: PropTypes.object,
-    fetchCompanies: PropTypes.func.isRequired,
-    fetchDomain: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-    lockDomain: PropTypes.func.isRequired,
-    match: PropTypes.object.isRequired,
-    ui: PropTypes.object.isRequired,
-    unlockDomain: PropTypes.func.isRequired,
-    updateContact: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
-};
+// DomainPage.propTypes = {
+//     companies: PropTypes.object,
+//     contacts: PropTypes.object,
+//     domains: PropTypes.object,
+//     fetchCompanies: PropTypes.func.isRequired,
+//     fetchDomain: PropTypes.func.isRequired,
+//     isLoading: PropTypes.bool.isRequired,
+//     lockDomain: PropTypes.func.isRequired,
+//     match: PropTypes.object.isRequired,
+//     ui: PropTypes.object.isRequired,
+//     unlockDomain: PropTypes.func.isRequired,
+//     updateContact: PropTypes.func.isRequired,
+//     user: PropTypes.object.isRequired,
+// };
 
-DomainPage.defaultProps = {
-    companies: [],
-    contacts: [],
-    domains: [],
-};
+// DomainPage.defaultProps = {
+//     companies: [],
+//     contacts: [],
+//     domains: [],
+// };

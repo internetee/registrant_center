@@ -38,7 +38,7 @@ const {
     SESSION_SECRET,
     TOKEN_PATH,
     SCOPE,
-    RESPONSE_TYPE
+    RESPONSE_TYPE,
 } = process.env;
 
 let publicKey = '';
