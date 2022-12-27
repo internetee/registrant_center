@@ -5,7 +5,7 @@
     "airbnb",
     "prettier",
     "prettier/react",
-    // "react-app"
+    "react-app"
   ],
   "plugins": ["prettier"],
   "env": {
