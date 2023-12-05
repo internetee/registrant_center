@@ -89,6 +89,14 @@ const MainFooter = ({ ui }) => {
                             </a>
                         </li>
                     </ul>
+                    <ul>
+                        <li>
+                            <span className="btn" data-cc="c-settings">
+                                <Icon name="configure" />
+                                <FormattedMessage id="footer.cookieSettings" tagName="p" />
+                            </span>
+                        </li>
+                    </ul>
                 </nav>
             </div>
         </footer>

@@ -3,7 +3,6 @@ import MediaQuery from 'react-responsive';
 import { connect } from 'react-redux';
 import { Button, Container, Icon } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useCookies } from 'react-cookie';
 import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
@@ -14,16 +13,15 @@ import {
     toggleMainMenu as toggleMainMenuAction,
 } from '../../../redux/reducers/ui';
 import { logoutUser as logoutUserAction } from '../../../redux/reducers/user';
+import 'vanilla-cookieconsent/dist/cookieconsent.css';
+import CookieConsent from '../CookieConsent/CookieConsent';
 
 function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, user }) {
-    const [cookies, setCookies] = useCookies(['cookiesAccepted']);
     const { formatMessage } = useIntl();
-    const { cookiesAccepted } = cookies;
     const {
         lang,
         menus: { main },
     } = ui;
-    const [isCookiesAccepted, setIsCookiesAccepted] = useState(false);
     const [isHeaderFixed, setIsHeaderFixed] = useState(false);
 
     const handleScroll = (e) => {
@@ -32,52 +30,17 @@ function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, us
     };
 
     useEffect(() => {
-        setIsCookiesAccepted(!!cookiesAccepted);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [cookiesAccepted]);
+    }, []);
 
     const handleLogout = () => {
         logoutUser();
         closeMainMenu();
     };
 
-    const handleCookies = () => {
-        setCookies('cookiesAccepted', true, { path: '/' });
-    };
-
     return (
         <>
-            {!isCookiesAccepted && (
-                <div className="cookie-notice">
-                    <Container>
-                        <div className="content">
-                            <FormattedMessage
-                                id="cookieNotice.content"
-                                tagName="p"
-                                values={{
-                                    a: (linkText) => (
-                                        <a
-                                            href={formatMessage({
-                                                id: 'cookieNotice.content.link',
-                                            })}
-                                            rel="noopener noreferrer"
-                                            target="_blank"
-                                        >
-                                            {linkText}
-                                        </a>
-                                    ),
-                                }}
-                            />
-                        </div>
-                        <div className="actions">
-                            <Button onClick={handleCookies} primary type="button">
-                                <FormattedMessage id="cookieNotice.close" />
-                            </Button>
-                        </div>
-                    </Container>
-                </div>
-            )}
             <header className={classNames({ 'main-header': true, 'u-fixed': isHeaderFixed })}>
                 <MediaQuery query="(min-width: 1224px)">
                     <div className="main-header-top">
@@ -128,6 +91,7 @@ function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, us
                     <PortalMenu items={main} lang={lang} />
                 </div>
             </MediaQuery>
+            <CookieConsent />
         </>
     );
 }

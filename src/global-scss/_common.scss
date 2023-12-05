@@ -290,3 +290,21 @@ strong {
   width: 100%;
   overflow: auto;
 }
+
+ /* Cookie Consent */
+ #cc--main {
+  /** Change font **/
+  --cc-font-family: 'Raleway';
+
+  /** Change button primary color to black **/
+  --cc-btn-primary-bg: #0085CA;
+  --cc-btn-primary-border-color: #0085CA;
+  --cc-btn-primary-hover-bg: #0073b1;
+  --cc-btn-primary-hover-border-color: #0073b1;
+
+  /** Also make toggles the same color as the button **/
+  --cc-toggle-bg-on: var(--cc-btn-primary-bg);
+
+  /** Make the buttons a bit rounder **/
+  --cc-btn-border-radius: 5px;
+}
