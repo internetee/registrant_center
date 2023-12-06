@@ -46,8 +46,8 @@ describe('Integration tests', () => {
     });
 
     it('Should accept cookies', () => {
-        cy.get('.cookie-notice button').click();
-        cy.getCookie('cookiesAccepted').should('exist');
+        cy.get('#c-p-bn').click();
+        cy.getCookie('cc_cookie').should('exist');
     });
 
     it('Should load dashboard', () => {
