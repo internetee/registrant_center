@@ -71,9 +71,9 @@ const hasConsentForAnalytics = () => {
 };
 
 const removeGACookies = () => {
-    const cookies = new Cookies().getAll(); // document.cookie.split(';');
+    const cookies = new Cookies(); // document.cookie.split(';');
 
-    Object.keys(cookies).forEach((cookie) => {
+    Object.keys(cookies.getAll()).forEach((cookie) => {
         const cookieName = cookie.split('=')[0].trim();
         if (cookieName.match(/^(_ga|_gid|_gat|.+\._ga|.+\._gid|.+\._gat)$/)) {
             // document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
