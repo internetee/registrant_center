@@ -5,7 +5,7 @@ import Cookies from 'universal-cookie';
 import GA from '../../../utils/googleAnalytics';
 const cookies = new Cookies();
 const pluginConfig = {
-    current_lang: cookies.get('locale'),
+    current_lang: cookies.get('locale') || 'et',
     autoclear_cookies: true,
     page_scripts: true,
     cookie_name: 'cc_cookie',
@@ -30,19 +30,33 @@ const pluginConfig = {
         }
     },
 
+    gui_options: {
+        consent_modal: {
+            layout: 'cloud',
+            position: 'bottom center',
+            transition: 'slide',
+            swap_buttons: false,
+        },
+        settings_modal: {
+            layout: 'box',
+            position: 'right',
+            transition: 'slide',
+        },
+    },
+
     languages: {
         en: {
             consent_modal: {
                 title: 'We use cookies!',
                 description:
-                    'Our website uses essential cookies to ensure its proper operation and tracking cookies to understand how you interact with it. The latter will be set only after consent. <button type="button" data-cc="c-settings" class="cc-link">Let me choose</button>',
+                    'Our website uses cookies to personalize content and ads, and to provide social media features. We ask for your permission to use cookies that are not necessarily essential for the basic functions of our website. Please read our detailed descriptions and rules of cookies <a class="cc__link" href="https://www.internet.ee/eif/cookies-on-internet-ee-webpage">here</a>.',
                 primary_btn: {
                     text: 'Accept all',
                     role: 'accept_all', // 'accept_selected' or 'accept_all'
                 },
                 secondary_btn: {
-                    text: 'Reject all',
-                    role: 'accept_necessary', // 'settings' or 'accept_necessary'
+                    text: 'Settings',
+                    role: 'settings', // 'settings' or 'accept_necessary'
                 },
             },
             settings_modal: {
@@ -61,7 +75,7 @@ const pluginConfig = {
                     {
                         title: 'Cookie usage',
                         description:
-                            'We use cookies to help you navigate efficiently and perform certain functions. You will find detailed information about all cookies under each consent category below. The cookies that are categorized as "Necessary" are stored on your browser as they are essential for enabling the basic functionalities of the site. For more details relative to cookies and other sensitive data, please read the full <a href="https://www.internet.ee/eif/cookies-on-internet-ee-webpage" class="cc-link">privacy policy</a>.',
+                            'We use cookies to help you navigate efficiently and perform certain functions. You will find detailed information about all cookies under each consent category below. The cookies that are categorized as "Necessary" are stored on your browser as they are essential for enabling the basic functionalities of the site.',
                     },
                     {
                         title: 'Strictly necessary cookies',
@@ -112,14 +126,14 @@ const pluginConfig = {
             consent_modal: {
                 title: 'Kasutame küpsiseid!',
                 description:
-                    'Meie veebisait kasutab olulisi küpsiseid selle nõuetekohaseks toimimiseks ning jälgimisküpsiseid, et mõista, kuidas te sellega suhtlete. Viimased seatakse alles pärast nõusolekut. <button type="button" data-cc="c-settings" class="cc-link">Muuda küpsiste seadistusi</button>',
+                    'Kasutame küpsiseid sisu ja reklaamide isikupärastamiseks, sotsiaalse meedia funktsioonide pakkumiseks. Küsime sinult luba, et kasutada küpsiseid, mis ei ole tingimata vajalikud meie veebilehe põhifunktsioonide toimimiseks. Palun loe meie küpsiste üksikasjalikke kirjeldusi ja reegleid <a class="cc__link" href="https://www.internet.ee/eis/kupsised-internet-ee-lehel">siit</a>.',
                 primary_btn: {
                     text: 'Luba kõik',
                     role: 'accept_all', // 'accept_selected' or 'accept_all'
                 },
                 secondary_btn: {
-                    text: 'Reject all',
-                    role: 'accept_necessary', // 'settings' or 'accept_necessary'
+                    text: 'Seadistused',
+                    role: 'settings', // 'settings' or 'accept_necessary'
                 },
             },
             settings_modal: {
@@ -138,7 +152,7 @@ const pluginConfig = {
                     {
                         title: 'Küpsiste kasutamine',
                         description:
-                            'Kasutame küpsiseid, et aidata Teil tõhusalt navigeerida ja teatud funktsioone täita. Üksikasjalikku teavet kõigi küpsiste kohta leiate allpool iga nõusolekukategooria alt. Küpsised, mis on liigitatud kui "Vajalikud", salvestatakse Teie brauserisse, kuna need on olulised saidi põhifunktsioonide võimaldamiseks. Küpsiste ja muu tundliku teabe kohta lisateabe saamiseks lugege täielikku <a href="https://www.internet.ee/eis/kupsised-internet-ee-lehel" class="cc-link">privaatsuspoliitikat</a>.',
+                            'Kasutame küpsiseid, et aidata Teil tõhusalt navigeerida ja teatud funktsioone täita. Üksikasjalikku teavet kõigi küpsiste kohta leiate allpool iga nõusolekukategooria alt. Küpsised, mis on liigitatud kui "Vajalikud", salvestatakse Teie brauserisse, kuna need on olulised saidi põhifunktsioonide võimaldamiseks.',
                     },
                     {
                         title: 'Vajalikud küpsised',

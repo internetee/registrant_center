@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactGA from 'react-ga';
 import { Route } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 const { REACT_APP_GA_TRACKING_ID } = process.env;
 class GoogleAnalytics extends Component {
@@ -70,12 +71,13 @@ const hasConsentForAnalytics = () => {
 };
 
 const removeGACookies = () => {
-    const cookies = document.cookie.split(';');
+    const cookies = new Cookies().getAll(); // document.cookie.split(';');
 
-    cookies.forEach((cookie) => {
+    Object.keys(cookies).forEach((cookie) => {
         const cookieName = cookie.split('=')[0].trim();
         if (cookieName.match(/^(_ga|_gid|_gat|.+\._ga|.+\._gid|.+\._gat)$/)) {
-            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+            // document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+            cookies.remove(cookieName);
         }
     });
 };
