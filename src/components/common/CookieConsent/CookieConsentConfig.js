@@ -49,7 +49,7 @@ const pluginConfig = {
             consent_modal: {
                 title: 'We use cookies!',
                 description:
-                    'Our website uses cookies to personalize content and ads, and to provide social media features. We ask for your permission to use cookies that are not necessarily essential for the basic functions of our website. Please read our detailed descriptions and rules of cookies <a class="cc__link" href="https://www.internet.ee/eif/cookies-on-internet-ee-webpage">here</a>.',
+                    'Our website uses cookies to personalize content and ads, and to provide social media features. We ask for your permission to use cookies that are not necessarily essential for the basic functions of our website. Please read our detailed descriptions and rules of cookies <a class="cc__link" href="https://www.internet.ee/eif/cookies-on-internet-ee-webpage" target="_blank">here</a>.',
                 primary_btn: {
                     text: 'Accept all',
                     role: 'accept_all', // 'accept_selected' or 'accept_all'
