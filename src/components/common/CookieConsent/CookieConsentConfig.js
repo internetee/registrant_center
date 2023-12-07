@@ -126,7 +126,7 @@ const pluginConfig = {
             consent_modal: {
                 title: 'Kasutame küpsiseid!',
                 description:
-                    'Kasutame küpsiseid sisu ja reklaamide isikupärastamiseks, sotsiaalse meedia funktsioonide pakkumiseks. Küsime sinult luba, et kasutada küpsiseid, mis ei ole tingimata vajalikud meie veebilehe põhifunktsioonide toimimiseks. Palun loe meie küpsiste üksikasjalikke kirjeldusi ja reegleid <a class="cc__link" href="https://www.internet.ee/eis/kupsised-internet-ee-lehel">siit</a>.',
+                    'Kasutame küpsiseid sisu ja reklaamide isikupärastamiseks ning sotsiaalse meedia funktsioonide pakkumiseks. Palume luba küpsiste kasutamiseks, mis ei ole tingimata vajalikud meie veebilehe põhifunktsioonide toimimiseks. Küpsiste üksikasjalikud kirjeldused ja reegleid leiad <a class="cc__link" href="https://www.internet.ee/eis/kupsised-internet-ee-lehel" target="_blank">siit</a>.',
                 primary_btn: {
                     text: 'Luba kõik',
                     role: 'accept_all', // 'accept_selected' or 'accept_all'
@@ -140,7 +140,7 @@ const pluginConfig = {
                 title: 'Küpsiste seaded',
                 save_settings_btn: 'Salvesta',
                 accept_all_btn: 'Luba kõik',
-                reject_all_btn: 'Keeldu kõik',
+                reject_all_btn: 'Keela kõik',
                 close_btn_label: 'Sulge',
                 cookie_table_headers: [
                     { col1: 'Nimi' },
@@ -152,12 +152,12 @@ const pluginConfig = {
                     {
                         title: 'Küpsiste kasutamine',
                         description:
-                            'Kasutame küpsiseid, et aidata Teil tõhusalt navigeerida ja teatud funktsioone täita. Üksikasjalikku teavet kõigi küpsiste kohta leiate allpool iga nõusolekukategooria alt. Küpsised, mis on liigitatud kui "Vajalikud", salvestatakse Teie brauserisse, kuna need on olulised saidi põhifunktsioonide võimaldamiseks.',
+                            'Kasutame küpsiseid, et aidata Teil tõhusalt navigeerida ja teatud funktsioone täita. Üksikasjalikku teavet kõigi küpsiste kohta leiate allpool iga nõusolekukategooria alt. Küpsistest, mis on liigitatud kui "Vajalikud", ei saa loobuda, sest need on olulised saidi põhifunktsioonide võimaldamiseks.',
                     },
                     {
                         title: 'Vajalikud küpsised',
                         description:
-                            'Veebileht ei saa ilma nende küpsisteta korralikult toimida. Kuna neid küpsiseid on vaja teenuste turvaliseks pakkumiseks, ei ole külastajal võimalik neist keelduda.',
+                            'Veebileht ei saa ilma nende küpsisteta korralikult toimida. Seetõttu ei ole külastajal võimalik neist keelduda.',
                         toggle: {
                             value: 'necessary',
                             enabled: true,
