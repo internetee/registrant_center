@@ -89,6 +89,17 @@ const MainFooter = ({ ui }) => {
                             </a>
                         </li>
                     </ul>
+                    <ul>
+                        <li>
+                            <button
+                                className="btn"
+                                onClick={() => showCookieSettings()}
+                                type="button"
+                            >
+                                <FormattedMessage id="footer.cookieSettings" />
+                            </button>
+                        </li>
+                    </ul>
                 </nav>
             </div>
         </footer>
@@ -98,6 +109,12 @@ const MainFooter = ({ ui }) => {
 const mapStateToProps = ({ ui }) => ({
     ui,
 });
+
+const showCookieSettings = () => {
+    if (window.CC) {
+        window.CC.showSettings(1);
+    }
+};
 
 export default connect(mapStateToProps)(MainFooter);
 

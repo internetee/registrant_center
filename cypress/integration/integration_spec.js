@@ -46,8 +46,8 @@ describe('Integration tests', () => {
     });
 
     it('Should accept cookies', () => {
-        cy.get('.cookie-notice button').click();
-        cy.getCookie('cookiesAccepted').should('exist');
+        cy.get('#c-p-bn').click(); // accept cookie consent
+        cy.getCookie('cc_cookie').should('exist');
     });
 
     it('Should load dashboard', () => {
@@ -139,6 +139,7 @@ describe('Integration tests', () => {
     });
 
     it('Sends API request to change WhoIs visibility', () => {
+        cy.get('#c-p-bn').click(); // accept cookie consent
         cy.get('.adv-field-group input[name="name"] + label').click();
         cy.get('.form-actions button').click();
         cy.get('[data-test="change-contacts"]').click();

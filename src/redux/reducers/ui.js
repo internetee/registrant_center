@@ -28,6 +28,9 @@ const setLang = (lang) => (dispatch) => {
         lang,
         type: SET_LANG,
     });
+    if (window.CC) {
+        window.CC.updateLanguage(lang, true);
+    }
 };
 
 const requestMenu = (menu) => (dispatch, getState) => {

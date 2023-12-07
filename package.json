@@ -37,6 +37,7 @@
     "moment": "^2.26.0",
     "qs": "^6.9.4",
     "react-ga": "^3.3.0",
+    "vanilla-cookieconsent": "^2.9.2",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.5.0"
   },

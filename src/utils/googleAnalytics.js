@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactGA from 'react-ga';
 import { Route } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 const { REACT_APP_GA_TRACKING_ID } = process.env;
 class GoogleAnalytics extends Component {
@@ -32,7 +33,9 @@ class GoogleAnalytics extends Component {
             page,
             ...options,
         });
-        ReactGA.pageview(page);
+        if (hasConsentForAnalytics()) {
+            ReactGA.pageview(page);
+        }
     }
 
     render() {
@@ -49,11 +52,43 @@ GoogleAnalytics.propTypes = {
 
 const RouteTracker = () => <Route component={GoogleAnalytics} />;
 
+const hasConsentForAnalytics = () => {
+    try {
+        const consentCookie = document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('cc_cookie='));
+
+        if (consentCookie) {
+            const consentData = JSON.parse(decodeURIComponent(consentCookie.split('=')[1]));
+            return consentData.categories.includes('analytics');
+        }
+
+        return false;
+    } catch (error) {
+        console.error('Error parsing consent cookie:', error);
+        return false;
+    }
+};
+
+const removeGACookies = () => {
+    const cookies = new Cookies(); // document.cookie.split(';');
+
+    Object.keys(cookies.getAll()).forEach((cookie) => {
+        const cookieName = cookie.split('=')[0].trim();
+        if (cookieName.match(/^(_ga|_gid|_gat|.+\._ga|.+\._gid|.+\._gat)$/)) {
+            // document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+            cookies.remove(cookieName);
+        }
+    });
+};
+
 const init = (options = {}) => {
-    if (REACT_APP_GA_TRACKING_ID) {
+    if (REACT_APP_GA_TRACKING_ID && hasConsentForAnalytics()) {
         ReactGA.initialize(REACT_APP_GA_TRACKING_ID);
         return true;
     }
+    window[`ga-disable-${REACT_APP_GA_TRACKING_ID}`] = true;
+    removeGACookies();
     return false;
 };
 

@@ -41,7 +41,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
             const { disclosed_attributes } = contacts[id];
             const { registrant_publishable } = contacts[id];
             const attributes = new Set(disclosed_attributes);
-            let publishable = registrant_publishable
+            let publishable = registrant_publishable;
 
             if (domain.registrant.org) {
                 attributes.add('name');
@@ -50,11 +50,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
             type.forEach((attr) => {
                 if (attr === 'registrant_publishable') {
-                  publishable = checked;
+                    publishable = checked;
                 } else if (checked) {
-                  attributes.add(attr);
+                    attributes.add(attr);
                 } else {
-                  attributes.delete(attr);
+                    attributes.delete(attr);
                 }
             });
             return {
@@ -227,7 +227,11 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 }
                                 name="registrant_publishable"
                                 onChange={(e, elem) =>
-                                    handleChange(elem.checked, [item.id], ['registrant_publishable'])
+                                    handleChange(
+                                        elem.checked,
+                                        [item.id],
+                                        ['registrant_publishable']
+                                    )
                                 }
                                 // value={item.registrant_publishable}
                             />
