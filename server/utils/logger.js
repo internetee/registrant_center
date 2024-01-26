@@ -17,15 +17,25 @@ const logger = {
     ignoreRoute,
     meta: false,
     msg: (req, res) => {
-        return `${req.method} ${req.protocol}://${req.get('host')}${req.originalUrl} (${
-            res.statusCode
-        }) ${Math.floor(res.responseTime / 1000)}, User-Agent: ${req.get(
+        return `${req.method} ${req.protocol}://${req.get('host')}${sanitizeUrl(
+            req.originalUrl
+        )} (${res.statusCode}) ${Math.floor(res.responseTime / 1000)}, User-Agent: ${req.get(
             'User-Agent'
-        )}, Referrer: ${req.get('Referrer')}, IP: ${
+        )}, Referrer: ${sanitizeUrl(req.get('Referrer'))}, IP: ${
             req.ip.indexOf(':') >= 0 ? req.ip.substring(req.ip.lastIndexOf(':') + 1) : req.i
         }`;
     },
 };
+
+function sanitizeUrl(url) {
+    // Implement URL sanitization logic here
+    // For example, removing or encoding certain characters
+    if (typeof url === 'string') {
+        return url.replace(/[{}]/g, match => encodeURIComponent(match));
+    } else {
+        return '';
+    }
+}
 
 export const accessLog = {
     ...logger,

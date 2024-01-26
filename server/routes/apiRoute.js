@@ -246,7 +246,13 @@ export default {
             if (e && e.response && e.response.status) {
                 return res.status(e.response.status).json({});
             }
-            return res.status(408).json({});
+            // return res.status(408).json({});
+            if (!res.headersSent) {
+                return res.status(408).json({});
+            } else {
+                // Log or handle the situation where a response was already sent
+                console.error('Response already sent.');
+            }
         }
     },
 
