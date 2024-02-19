@@ -2,6 +2,7 @@
   "actions.confirm.no": "Ei",
   "actions.confirm.yes": "Jah",
   "actions.login": "Logi sisse",
+  "actions.webauthn-login": "Logi sisse pääsuvõtmega",
   "actions.save": "Salvesta",
   "app.title": "EIS Registreerijaportaal",
   "companies.addresses": "Aadressid",
