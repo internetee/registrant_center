@@ -2,6 +2,7 @@
   "actions.confirm.no": "No",
   "actions.confirm.yes": "Yes",
   "actions.login": "Sign in",
+  "actions.webauthn-login": "Sign in with a passkey",
   "actions.save": "Save",
   "app.title": "EIS Registrant portal",
   "companies.addresses": "Addresses",
