@@ -5,7 +5,7 @@ import { Button, Container, Icon, Form } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { MainLayout, MessageModule } from '../../components';
 
-const { REACT_APP_SERVER_PORT, REACT_APP_URL } = process.env;
+const { REACT_APP_SCOPE, REACT_APP_SERVER_PORT, REACT_APP_URL } = process.env;
 
 const authPath =
     process.env.NODE_ENV === 'development'
@@ -48,6 +48,16 @@ function LoginPage({ user, ui }) {
                             <Button primary size={ui.uiElemSize} type="submit">
                                 <FormattedMessage id="actions.login" tagName="span" />
                             </Button>
+                            {REACT_APP_SCOPE && REACT_APP_SCOPE.includes('webauthn') && (
+                                <Button
+                                    formAction={`${authPath}/webauthn`}
+                                    primary
+                                    size={ui.uiElemSize}
+                                    type="submit"
+                                >
+                                    <FormattedMessage id="actions.webauthn-login" tagName="span" />
+                                </Button>
+                            )}
                         </Form>
                     </Container>
                 </div>

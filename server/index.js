@@ -37,7 +37,7 @@ const {
     REDIRECT_URL,
     SESSION_SECRET,
     TOKEN_PATH,
-    SCOPE,
+    REACT_APP_SCOPE,
     RESPONSE_TYPE,
 } = process.env;
 
@@ -98,31 +98,40 @@ const redirect_uri =
         : `https://${HOST}${REDIRECT_URL}`;
 
 // grant auth
-app.use(
-    grant({
-        defaults: {
-            protocol: 'https',
-            host: HOST,
-            state: true,
-            callback: '/auth/callback',
-            transport: 'querystring',
+const grantConfig = {
+    defaults: {
+        protocol: 'https',
+        host: HOST,
+        state: true,
+        callback: '/auth/callback',
+        transport: 'querystring',
+    },
+    openid: {
+        authorize_url: ISSUER_URL + AUTH_PATH,
+        access_url: ISSUER_URL + TOKEN_PATH,
+        oauth: 2,
+        key: CLIENT_ID,
+        secret: CLIENT_SECRET,
+        scope: REACT_APP_SCOPE,
+        redirect_uri,
+        response_type: RESPONSE_TYPE,
+        callback: REDIRECT_URL,
+        custom_params: {
+            ui_locales: LOCALE,
         },
-        openid: {
-            authorize_url: ISSUER_URL + AUTH_PATH,
-            access_url: ISSUER_URL + TOKEN_PATH,
-            oauth: 2,
-            key: CLIENT_ID,
-            secret: CLIENT_SECRET,
-            scope: SCOPE,
-            redirect_uri,
-            response_type: RESPONSE_TYPE,
-            callback: REDIRECT_URL,
-            custom_params: {
-                ui_locales: LOCALE,
-            },
+    }
+};
+
+if (REACT_APP_SCOPE.includes('webauthn')) {
+    grantConfig.openid.scope = REACT_APP_SCOPE.replace(/(?:^|\s)webauthn(?:\s|$)/, ' ').trim();
+    grantConfig.openid.overrides = {
+        webauthn: {
+            scope: REACT_APP_SCOPE,
         },
-    })
-);
+    };
+  }
+  
+app.use(grant(grantConfig));
 
 app.use(helmet());
 // api
