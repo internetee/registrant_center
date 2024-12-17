@@ -25,8 +25,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: npm ci --verbose
-      - run: npm run build --if-present
+      - name: Install dependencies
+        run: |
+          npm ci --verbose
+          npm install @rollup/rollup-linux-x64-gnu
+
+      - run: npm run build
+
       - name: run tests
         env:
           HOST: localhost
