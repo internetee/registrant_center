@@ -1,4 +1,4 @@
-import colors from './terminalColors';
+import colors from './terminalColors.js';
 
 export default () => {
     // eslint-disable-next-line no-console

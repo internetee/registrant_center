@@ -1,3 +1,6 @@
+@use "../../../global-scss/all" as *;
+@use "sass:color";
+
 /* Cookie Notice */
 .cookie-notice {
   position: fixed;
@@ -63,7 +66,7 @@
     &:hover {
       transform: scale(1.1);
     }
-    svg {
+    img {
       display: none;
       pointer-events: none;
     }
@@ -134,7 +137,7 @@
   }
   @include screen(768px,1223px) {
     .logo {
-      svg {
+      img {
         width: 85px;
         height: 80px;
       }
@@ -148,7 +151,7 @@
     z-index: 9999;
     transition: all .5s ease-in-out;
     &.u-fixed {
-      background: darken($green, 10%);
+      background: color.adjust($green, $lightness: -10%);
       box-shadow: 0 0 20px rgba(0,0,0,.2);
     }
     .u-menu-open & {
@@ -159,13 +162,13 @@
       height: 40px;
       width: 155px;
       transition: all .3s ease-in-out;
-      background: url('../../../static/logo-m.svg') no-repeat 0 0;
+      background: url('/logo-m.svg') no-repeat 0 0;
     }
   }
   @include min-screen(1224px) {
     margin: 0 50px;
     .logo {
-      svg {
+      img {
         display: block;
       }
     }
@@ -442,7 +445,7 @@
           left: 0;
           width: 280px;
           box-shadow: 0 0 20px rgba(0,0,0,.4);
-          background: darken($green, 10%);
+          background: color.adjust($green, $lightness: -10%);
           > li {
             display: block;
             border-top: 1px solid $green;

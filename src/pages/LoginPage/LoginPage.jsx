@@ -1,16 +1,15 @@
-import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { Button, Container, Icon, Form } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { MainLayout, MessageModule } from '../../components';
 
-const { REACT_APP_SCOPE, REACT_APP_SERVER_PORT, REACT_APP_URL } = process.env;
+const { VITE_SCOPE, VITE_SERVER_PORT, VITE_URL } = import.meta.env;
 
 const authPath =
     process.env.NODE_ENV === 'development'
-        ? `${REACT_APP_URL}:${REACT_APP_SERVER_PORT}/connect/openid`
-        : `${REACT_APP_URL}/connect/openid`;
+        ? `${VITE_URL}:${VITE_SERVER_PORT}/connect/openid`
+        : `${VITE_URL}/connect/openid`;
 
 function LoginPage({ user, ui }) {
     const message = {
@@ -44,20 +43,10 @@ function LoginPage({ user, ui }) {
                                 <FormattedMessage id="login.options.smartId" tagName="p" />
                             </div>
                         </div>
-                        <Form action={authPath}>
+                        <Form action={`${authPath}/${ui.lang}`} method="POST">
                             <Button primary size={ui.uiElemSize} type="submit">
                                 <FormattedMessage id="actions.login" tagName="span" />
                             </Button>
-                            {REACT_APP_SCOPE && REACT_APP_SCOPE.includes('webauthn') && (
-                                <Button
-                                    formAction={`${authPath}/webauthn`}
-                                    primary
-                                    size={ui.uiElemSize}
-                                    type="submit"
-                                >
-                                    <FormattedMessage id="actions.webauthn-login" tagName="span" />
-                                </Button>
-                            )}
                         </Form>
                     </Container>
                 </div>

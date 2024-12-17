@@ -13,24 +13,22 @@ const getUiElementSize = (width) => {
     const isMobile = width < 480;
     const isTablet = width >= 480 && width < 1224;
     if (isMobile) {
-        return 'tiny';
+        return 'small';
     }
     if (isTablet) {
-        return 'medium';
+        return 'large';
     }
     return 'big';
 };
 
-const setLang = (lang) => (dispatch) => {
+const setLang = (lang) => async (dispatch) => {
     cookies.remove('locale');
     cookies.set('locale', lang, { path: '/' });
+    
     dispatch({
         lang,
         type: SET_LANG,
     });
-    if (window.CC) {
-        window.CC.updateLanguage(lang, true);
-    }
 };
 
 const requestMenu = (menu) => (dispatch, getState) => {

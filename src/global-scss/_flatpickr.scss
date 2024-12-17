@@ -1,3 +1,5 @@
+@use './all' as *;
+
 .flatpickr-calendar {
     .flatpickr-day.selected,
     .flatpickr-day.startRange,

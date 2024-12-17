@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Form, Input, Container, Card, Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
@@ -18,20 +18,22 @@ import Helpers from '../../utils/helpers';
 import { fetchDomain as fetchDomainAction } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
+import { useParams } from 'react-router';
 
 const DomainEditPage = ({
     companies,
     contacts,
-    domain,
+    domains,
     fetchCompanies,
     fetchDomain,
     isLoading,
-    match,
     message,
     ui,
     updateContact,
     user,
 }) => {
+    const { id } = useParams();
+    const domain = domains[id];
     const { uiElemSize } = ui;
     const [isDirty, setIsDirty] = useState([]);
     const [isSaving, setIsSaving] = useState([]);
@@ -42,13 +44,13 @@ const DomainEditPage = ({
     useEffect(() => {
         (async () => {
             if ((!domain || !domain?.tech_contacts) && !isLoading) {
-                await fetchDomain(match.params.id);
+                await fetchDomain(id);
                 if (companies.isLoading === null) {
                     fetchCompanies();
                 }
             }
         })();
-    }, [domain, fetchDomain, isLoading, match]);
+    }, [domain, fetchDomain, isLoading, id]);
 
     useEffect(() => {
         if (domain) {
@@ -63,6 +65,12 @@ const DomainEditPage = ({
             setFormData(Helpers.parseDomainContacts(user, domain, contacts, companies.data));
         }
     }, [companies, contacts, domain, fetchCompanies, user]);
+
+    useEffect(() => {
+        if (message) {
+            window.scrollTo(0, 0);
+        }
+    }, [message]);
 
     const handleChange = (e, id) => {
         const { name, value } = e.target;
@@ -302,17 +310,15 @@ const DomainEditPage = ({
     );
 };
 
-const mapStateToProps = (state, { match }) => {
-    return {
-        companies: state.companies,
-        contacts: state.contacts.data,
-        domain: state.domains.data[match.params.id],
-        isLoading: state.domains.isLoading,
-        message: state.contacts.message,
-        ui: state.ui,
-        user: state.user.data,
-    };
-};
+const mapStateToProps = (state) => ({
+    companies: state.companies,
+    contacts: state.contacts.data,
+    domains: state.domains.data,
+    isLoading: state.domains.isLoading,
+    message: state.contacts.message,
+    ui: state.ui,
+    user: state.user.data,
+});
 
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
@@ -329,11 +335,10 @@ export default connect(mapStateToProps, mapDispatchToProps)(DomainEditPage);
 DomainEditPage.propTypes = {
     companies: PropTypes.object,
     contacts: PropTypes.object,
-    domain: PropTypes.object,
+    domains: PropTypes.object,
     fetchCompanies: PropTypes.func.isRequired,
     fetchDomain: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
-    match: PropTypes.object.isRequired,
     ui: PropTypes.object.isRequired,
     updateContact: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
@@ -342,5 +347,5 @@ DomainEditPage.propTypes = {
 DomainEditPage.defaultProps = {
     companies: {},
     contacts: {},
-    domain: {},
+    domains: {},
 }

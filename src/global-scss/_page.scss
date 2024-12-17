@@ -1,3 +1,5 @@
+@use './all' as *;
+
 .page {
   padding-bottom: 20px;
   &--header {
@@ -142,7 +144,7 @@
   font-size: 14px;
   line-height: 20px;
   text-align: center;
-  background: url("../static/hero.jpg") no-repeat 50% 50% / cover;
+  background: url("/hero.jpg") no-repeat 50% 50% / cover;
   box-shadow: 0 0 40px rgba(0,0,0,.2);
   h1 {
     font-size: 24px;

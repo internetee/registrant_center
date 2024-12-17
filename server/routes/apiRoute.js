@@ -1,7 +1,8 @@
 /* eslint-disable */
-import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
+
+import axios from 'axios';
 
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
 

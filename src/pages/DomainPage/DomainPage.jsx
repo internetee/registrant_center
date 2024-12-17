@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { Link, useParams } from 'react-router';
 import { FormattedMessage } from 'react-intl';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {
     Popup,
     Button,
@@ -14,7 +15,6 @@ import {
     Checkbox,
     Confirm,
 } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {
@@ -38,19 +38,20 @@ import Helpers from '../../utils/helpers';
 const DomainPage = ({
     companies,
     contacts,
-    domain,
     domains,
     fetchCompanies,
     fetchDomain,
     isLoading,
     lockDomain,
-    match,
     ui,
     unlockDomain,
     updateContact,
     user,
 }) => {
+    const { id } = useParams();
+    const domain = domains.data[id];
     const { uiElemSize } = ui;
+
     const [isDirty, setIsDirty] = useState(false);
     const [isLockable, setIsLockable] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -60,29 +61,25 @@ const DomainPage = ({
     const [message, setMessage] = useState(null);
     const [extensionsProhibited, setExtensionsProhibited] = useState(false);
     const [registrantContacts, setRegistrantContacts] = useState(null);
-    const { isLocked } = domain || {};
 
     useEffect(() => {
-        (async () => {
+        const fetchData = async () => {
             if (!domain?.tech_contacts && !isLoading) {
-                await fetchDomain(match.params.id);
+                await fetchDomain(id);
                 if (companies.isLoading === null) {
                     fetchCompanies();
                 }
             }
-        })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [domain, fetchDomain, isLoading, match]);
+        };
+        fetchData();
+    }, [domain, fetchDomain, isLoading, id, companies.isLoading, fetchCompanies]);
 
     useEffect(() => {
         if (registrantContacts?.ident?.type === 'org') {
             if (companies.isLoading === null) {
-                // setIsCompany(true);
-                (async () => {
-                    await fetchCompanies();
-                })();
+                fetchCompanies();
             } else {
-                setIsLockable(domain.isLockable && companies.data[registrantContacts.ident.code]);
+                setIsLockable(domain?.isLockable && companies.data[registrantContacts.ident.code]);
             }
         }
     }, [companies, domain, fetchCompanies, registrantContacts]);
@@ -99,10 +96,7 @@ const DomainPage = ({
                 for (let i = 0; i < user_contacts_keys.length; i += 1) {
                     for (let j = 0; j < domain_contacts_keys.length; j += 1) {
                         if (user_contacts_keys[i] === domain_contacts_keys[j]) {
-                            if (
-                                JSON.stringify(domain.contacts[domain_contacts_keys[j]].roles) ===
-                                JSON.stringify(['tech'])
-                            )
+                            if (JSON.stringify(domain.contacts[domain_contacts_keys[j]].roles) === JSON.stringify(['tech']))
                                 break;
                             lockableFlag = true;
                         }
@@ -118,7 +112,13 @@ const DomainPage = ({
         }
     }, [companies, contacts, domain, user]);
 
-    const handleWhoIsChange = (data) => {
+    useEffect(() => {
+        if (message) {
+            window.scrollTo(0, 0);
+        }
+    }, [message]);
+
+    const handleWhoIsChange = useCallback((data) => {
         setUserContacts((prevState) =>
             Object.entries(data).reduce(
                 (acc, [id, { disclosed_attributes, registrant_publishable }]) => ({
@@ -133,9 +133,9 @@ const DomainPage = ({
             )
         );
         setIsDirty(true);
-    };
+    }, []);
 
-    const handleWhoIsSubmit = async () => {
+    const handleWhoIsSubmit = useCallback(async () => {
         setIsSaving(true);
         setIsSubmitConfirmModalOpen(false);
         await Promise.all(
@@ -153,42 +153,57 @@ const DomainPage = ({
             code: 200,
             type: 'whois',
         });
-    };
+    }, [userContacts, updateContact]);
 
-    const toggleSubmitConfirmModal = () => {
+    const toggleSubmitConfirmModal = useCallback(() => {
         setIsSubmitConfirmModalOpen(!isSubmitConfirmModalOpen);
-    };
+    }, [isSubmitConfirmModalOpen]);
 
-    const toggleDomainLockModal = () => {
+    const toggleDomainLockModal = useCallback(() => {
         setIsDomainLockModalOpen(!isDomainLockModalOpen);
-    };
+    }, [isDomainLockModalOpen]);
 
-    const handleDomainLock = async (uuid) => {
+    const handleDomainLock = useCallback(async (uuid) => {
         setIsSaving(true);
         setIsDomainLockModalOpen(false);
         setMessage(null);
+
+        const wasLocked = domain.isLocked;
+
         try {
-            if (isLocked) {
-                await unlockDomain(uuid);
+            const result = wasLocked 
+                ? await unlockDomain(uuid)
+                : await lockDomain(uuid, extensionsProhibited);
+
+            // Check if the action resulted in an error
+            if (result.payload.success === false) {
+                setMessage({
+                    code: result.payload.code,
+                    type: `domain${wasLocked ? 'Unlock' : 'Lock'}`,
+                    success: false,
+                    message: result.payload.message
+                });
             } else {
-                await lockDomain(uuid, extensionsProhibited);
+                setMessage({
+                    code: 200,
+                    type: `domain${wasLocked ? 'Unlock' : 'Lock'}`,
+                    success: true
+                });
             }
-            setMessage({
-                code: 200,
-                type: `domain${isLocked ? 'Unlock' : 'Lock'}`,
-            });
         } catch (error) {
             setMessage({
                 code: 500,
-                type: `domain${isLocked ? 'Unlock' : 'Lock'}`,
+                type: `domain${wasLocked ? 'Unlock' : 'Lock'}`,
+                success: false,
+                message: 'Unexpected error occurred'
             });
         }
         setIsSaving(false);
-    };
+    }, [domain, unlockDomain, lockDomain, extensionsProhibited]);
 
-    const handleChangeExtensions = (mode) => {
+    const handleChangeExtensions = useCallback((mode) => {
         setExtensionsProhibited(mode);
-    };
+    }, []);
 
     if (isLoading) {
         return <Loading />;
@@ -226,14 +241,14 @@ const DomainPage = ({
                             />
                             {isLockable && (
                                 <Button
-                                    data-test={isLocked ? 'open-unlock-modal' : 'open-lock-modal'}
+                                    data-test={domain.isLocked ? 'open-unlock-modal' : 'open-lock-modal'}
                                     disabled={isSaving}
                                     loading={isSaving}
                                     onClick={toggleDomainLockModal}
                                     primary
                                     size={uiElemSize}
                                 >
-                                    {isLocked ? (
+                                    {domain.isLocked ? (
                                         <FormattedMessage id="domain.unlock" />
                                     ) : (
                                         <FormattedMessage id="domain.lock" />
@@ -586,7 +601,7 @@ const DomainPage = ({
                 }
                 content={
                     <Modal.Content className="center">
-                        {isLocked ? (
+                        {domain.isLocked ? (
                             ''
                         ) : (
                             <div className="fs-18">
@@ -609,7 +624,7 @@ const DomainPage = ({
                                 <div className="mb-1" />
                             </div>
                         )}
-                        {isLocked ? (
+                        {domain.isLocked ? (
                             <FormattedMessage id="domain.unlock.description" tagName="p" />
                         ) : (
                             <FormattedMessage id="domain.lock.description" tagName="p" />
@@ -618,7 +633,7 @@ const DomainPage = ({
                 }
                 header={
                     <Modal.Header>
-                        {isLocked ? (
+                        {domain.isLocked ? (
                             <FormattedMessage id="domain.unlock.title" tagName="h2" />
                         ) : (
                             <FormattedMessage id="domain.lock.title" tagName="h2" />
@@ -686,10 +701,9 @@ const DomainContacts = ({ type, contacts }) => {
     ));
 };
 
-const mapStateToProps = (state, { match }) => ({
+const mapStateToProps = (state) => ({
     companies: state.companies,
     contacts: state.contacts.data,
-    domain: state.domains.data[match.params.id],
     domains: state.domains,
     isLoading: state.domains.isLoading,
     ui: state.ui,

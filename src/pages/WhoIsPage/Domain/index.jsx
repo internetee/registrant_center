@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Icon, Table } from 'semantic-ui-react';
 import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { WhoIsEdit } from '../../../components';
 
-export default function Domain({ id, name, contacts, onChange }) {
+export default function Domain({ id, name, contacts, onChange, domains }) {
     const [isOpen, setIsOpen] = useState(false);
+
+    let index = 0;
+    // eslint-disable-next-line array-callback-return
+    domains.find((o, i) => {
+        if (o.id === id) index = i;
+    });
+
     return (
         <Table.Row verticalAlign="top">
             <Table.Cell width={6}>
@@ -14,7 +21,13 @@ export default function Domain({ id, name, contacts, onChange }) {
             </Table.Cell>
             <Table.Cell width={8}>
                 <div className="ui form">
-                    <WhoIsEdit checkAll contacts={contacts} isOpen={isOpen} onChange={onChange} />
+                    <WhoIsEdit
+                        checkAll
+                        contacts={contacts}
+                        domain={domains[index]}
+                        isOpen={isOpen}
+                        onChange={onChange}
+                    />
                 </div>
             </Table.Cell>
             <Table.Cell singleLine textAlign="right" width={2}>

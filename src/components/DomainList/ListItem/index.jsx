@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Icon, Label, Table } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import classNames from 'classnames';
 import moment from 'moment';
 

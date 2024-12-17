@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
@@ -28,6 +28,7 @@ import { fetchDomains as fetchDomainsAction } from '../../redux/reducers/domains
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import { setSortByRoles as setSortByRolesAction } from '../../redux/reducers/filters';
 import Helpers from '../../utils/helpers';
+import debounce from 'lodash/debounce';
 
 const perPageOptions = [
     { key: 6, text: '6', value: 6 },
@@ -53,166 +54,32 @@ const WhoIsPage = ({
 }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['whoIsPerPage']);
-    const { whoIsPerPage } = cookies;
-    const [isDirty, setIsDirty] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
-    const [perPage, setPerPage] = useState(whoIsPerPage ? Number(whoIsPerPage) : DEFAULT_PER_PAGE);
-    const [activePage, setActivePage] = useState(1);
-    const [queryKeys, setQueryKeys] = useState('');
-    const [whoIsData, setWhoIsData] = useState({});
-    const [results, setResults] = useState(domains);
-    const { uiElemSize } = ui;
-    const dispatch = useDispatch();
 
-    // Memoized values
-    const paginatedDomains = useMemo(() => {
+    // State management
+    const [state, setState] = useState({
+        isLoading: true,
+        isDirty: false,
+        isSubmitConfirmModalOpen: false,
+        perPage: cookies.whoIsPerPage ? Number(cookies.whoIsPerPage) : DEFAULT_PER_PAGE,
+        activePage: 1,
+        queryKeys: '',
+        whoIsData: {},
+        results: [],
+    });
+
+     // Memoized values
+     const paginatedDomains = useMemo(() => {
         const pages = [];
-        const copied = [...results];
-        const numOfChild = Math.ceil(copied.length / perPage);
+        const copied = [...state.results];
+        const numOfChild = Math.ceil(copied.length / state.perPage);
         
         for (let i = 0; i < numOfChild; i++) {
-            pages.push(copied.splice(0, perPage));
+            pages.push(copied.splice(0, state.perPage));
         }
         return pages;
-    }, [results, perPage]);
+    }, [state.results, state.perPage]);
 
-    const onSelectTech = useCallback((value) => {
-        dispatch(setSortByRoles(value));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        if (domains.length === 0) {
-            if (isTech) {
-                (async () => {
-                    await fetchDomains(0, false, true);
-                    await fetchContacts();
-                    await fetchCompanies();
-                    setIsLoading(false);
-                })();
-            } else {
-                (async () => {
-                    await fetchDomains(0, false, false);
-                    await fetchContacts();
-                    await fetchCompanies();
-                    setIsLoading(false);
-                })();
-            }
-        } else {
-            setIsLoading(false);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchDomains, fetchContacts, fetchCompanies, isTech, domains?.length]);
-
-    useEffect(() => {
-        setWhoIsData(contacts);
-    }, [contacts]);
-
-    useEffect(() => {
-        setResults(domains);
-    }, [domains]);
-
-    const handleItemsPerPage = (event, { value }) => {
-        setCookies('whoIsPerPage', value, { path: '/whois' });
-        setActivePage(1);
-        setPerPage(value);
-    };
-
-    const handleSearchChange = (event, { value }) => {
-        setQueryKeys(value);
-        setResults(value ? results : domains);
-    };
-
-    const handleSearchReset = () => {
-        setQueryKeys('');
-        setActivePage(1);
-        setWhoIsData(contacts);
-        setResults(domains);
-    };
-
-    const handleSearch = () => {
-        if (queryKeys.length > 0) {
-            const query = queryKeys.toString().toLowerCase();
-            const queryResults = domains.filter((domain) => {
-                return (
-                    domain.name.toLowerCase().includes(query) ||
-                    domain.tech_contacts.some((item) => item.name.toLowerCase().includes(query)) ||
-                    domain.admin_contacts.some((item) => item.name.toLowerCase().includes(query)) ||
-                    domain.nameservers.some(
-                        (item) =>
-                            item.hostname.toLowerCase().includes(query) ||
-                            item.ipv4.toString().toLowerCase().includes(query) ||
-                            item.ipv6.toString().toLowerCase().includes(query)
-                    )
-                );
-            });
-            setResults(queryResults.length ? queryResults : []);
-        } else if (queryKeys.length === 0) {
-            setResults(domains);
-        }
-        setActivePage(1);
-    };
-
-    const handleWhoIsChange = (data) => {
-        setWhoIsData((prevState) =>
-            Object.entries(prevState).reduce((acc, [id, contact]) => {
-                if (data[id]) {
-                    return {
-                        ...acc,
-                        [id]: {
-                            ...contact,
-                            changed: true,
-                            disclosed_attributes: data[id].disclosed_attributes,
-                            registrant_publishable: data[id].registrant_publishable,
-                        },
-                    };
-                }
-                return {
-                    ...acc,
-                    [id]: contact,
-                };
-            }, {})
-        );
-        setIsDirty(true);
-    };
-
-    const toggleSubmitConfirmModal = () => {
-        setIsSubmitConfirmModalOpen(!isSubmitConfirmModalOpen);
-    };
-
-    const handleWhoIsSubmit = async () => {
-        setIsLoading(true);
-        setIsSubmitConfirmModalOpen(false);
-        await Promise.all(
-            Object.values(whoIsData)
-                .filter(({ changed }) => changed)
-                .map((contact) => {
-                    const form = {
-                        disclosed_attributes: [...contact.disclosed_attributes],
-                        registrant_publishable: contact.registrant_publishable,
-                    };
-                    return updateContact(contact.id, form);
-                })
-        );
-        setIsDirty(false);
-        setIsLoading(false);
-    };
-
-    if ((!domains?.length || domains[0]?.tech_contacts?.length) && isLoading) {
-        return <Loading />;
-    }
-
-    const handleRole = (event, { name, value }) => {
-        if (value === 'domains.roles.regAndAdmRoles' && isTech) {
-            onSelectTech(false);
-        }
-        if (value === 'domains.roles.allRoles' && !isTech) {
-            onSelectTech(true);
-        }
-    };
-
-    const roleOptions = [
+    const roleOptions = useMemo(() => [
         {
             id: 'domains.roles.regAndAdmRoles',
             key: 'domains.roles.regAndAdmRoles',
@@ -225,11 +92,170 @@ const WhoIsPage = ({
             text: formatMessage({ id: 'domains.roles.allRoles' }),
             value: 'domains.roles.allRoles',
         },
-    ];
+    ], [formatMessage]);
+
+    const { uiElemSize } = ui;
+
+    const dispatch = useDispatch();
+
+     // Single effect to handle domains updates
+     useEffect(() => {
+        if (domains.length > 0) {
+            setState(prev => ({
+                ...prev,
+                results: domains,
+                isLoading: false
+            }));
+        }
+    }, [domains]); // Only depend on domains
+
+    // Effects
+    useEffect(() => {
+        const initializeData = async () => {
+            if (domains.length === 0) {
+                try {
+                    await Promise.all([
+                        fetchDomains(0, false, isTech),
+                        fetchContacts(),
+                        fetchCompanies()
+                    ]);
+                } catch (error) {
+                    console.error('Error fetching initial data:', error);
+                } finally {
+                    setState(prev => ({ ...prev, isLoading: false }));
+                }
+            } else {
+                setState(prev => ({ ...prev, isLoading: false }));
+            }
+        };
+
+        initializeData();
+    }, []);
+
+    useEffect(() => {
+        setState(prev => ({ 
+            ...prev, 
+            whoIsData: contacts,
+            results: domains 
+        }));
+    }, [contacts, domains]);
+
+    // Event Handlers
+    const onSelectTech = useCallback((value) => {
+        dispatch(setSortByRoles(value));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handleItemsPerPage = useCallback((_, { value }) => {
+        setCookies('whoIsPerPage', value, { path: '/whois' });
+        setState(prev => ({
+            ...prev,
+            activePage: 1,
+            perPage: value
+        }));
+    }, [setCookies]);
+
+    const handleSearch = useCallback(debounce(() => {
+        if (!state.queryKeys) {
+            setState(prev => ({ ...prev, results: domains }));
+            return;
+        }
+
+        const query = state.queryKeys.toLowerCase();
+        const queryResults = domains.filter(domain => (
+            domain.name.toLowerCase().includes(query) ||
+            domain.tech_contacts.some(item => item.name.toLowerCase().includes(query)) ||
+            domain.admin_contacts.some(item => item.name.toLowerCase().includes(query)) ||
+            domain.nameservers.some(item => 
+                item.hostname.toLowerCase().includes(query) ||
+                item.ipv4.toString().toLowerCase().includes(query) ||
+                item.ipv6.toString().toLowerCase().includes(query)
+            )
+        ));
+
+        setState(prev => ({
+            ...prev,
+            results: queryResults.length ? queryResults : [],
+            activePage: 1
+        }));
+    }, 300), [domains]);
+
+    useEffect(() => {
+        return () => {
+            handleSearch.cancel();
+        };
+    }, [handleSearch]);
+
+    const handleSearchChange = useCallback((_, { value }) => {
+        setState(prev => ({
+            ...prev,
+            queryKeys: value,
+            results: value ? prev.results : domains
+        }));
+        handleSearch();
+    }, [domains, handleSearch]);
+
+    const handleWhoIsChange = useCallback((data) => {
+        setState(prev => ({
+            ...prev,
+            isDirty: true,
+            whoIsData: Object.entries(prev.whoIsData).reduce((acc, [id, contact]) => ({
+                ...acc,
+                [id]: data[id] ? {
+                    ...contact,
+                    changed: true,
+                    disclosed_attributes: data[id].disclosed_attributes,
+                    registrant_publishable: data[id].registrant_publishable,
+                } : contact
+            }), {})
+        }));
+    }, []);
+
+    const handleWhoIsSubmit = async () => {
+        try {
+            setState(prev => ({ ...prev, isLoading: true, isSubmitConfirmModalOpen: false }));
+            
+            await Promise.all(
+                Object.values(state.whoIsData)
+                    .filter(({ changed }) => changed)
+                    .map(contact => updateContact(contact.id, {
+                        disclosed_attributes: [...contact.disclosed_attributes],
+                        registrant_publishable: contact.registrant_publishable,
+                    }))
+            );
+
+            setState(prev => ({ ...prev, isDirty: false }));
+        } catch (error) {
+            console.error('Error updating contacts:', error);
+        } finally {
+            setState(prev => ({ ...prev, isLoading: false }));
+        }
+    };
+
+    const handleSearchReset = () => {
+        setState(prev => ({ ...prev, queryKeys: '', activePage: 1, whoIsData: contacts, results: domains }));
+    };
+
+    const toggleSubmitConfirmModal = () => {
+        setState(prev => ({ ...prev, isSubmitConfirmModalOpen: !state.isSubmitConfirmModalOpen }));
+    };
+
+    const handleRole = (event, { name, value }) => {
+        if (value === 'domains.roles.regAndAdmRoles' && isTech) {
+            onSelectTech(false);
+        }
+        if (value === 'domains.roles.allRoles' && !isTech) {
+            onSelectTech(true);
+        }
+    };
+
+    if ((!domains?.length || domains[0]?.tech_contacts?.length) && state.isLoading) {
+        return <Loading />;
+    }
 
     return (
         <MainLayout hasBackButton titleKey="whois.title">
-            {!isLoading && message && <MessageModule message={message} />}
+            {!state.isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">
                 {domains?.length ? (
                     <>
@@ -245,8 +271,8 @@ const WhoIsPage = ({
                                         <div className="search-field">
                                             <Input
                                                 className="icon"
-                                                defaultValue={queryKeys}
-                                                disabled={isLoading}
+                                                defaultValue={state.queryKeys}
+                                                disabled={state.isLoading}
                                                 name="queryKeys"
                                                 onChange={handleSearchChange}
                                                 placeholder={formatMessage({
@@ -269,9 +295,9 @@ const WhoIsPage = ({
                                                 values={{ width: 1224 }}
                                             >
                                                 <Button
-                                                    disabled={isLoading || !isDirty}
+                                                    disabled={state.isLoading || !state.isDirty}
                                                     form="whois-page-form"
-                                                    loading={isLoading}
+                                                    loading={state.isLoading}
                                                     primary
                                                     size={uiElemSize}
                                                     type="submit"
@@ -300,10 +326,10 @@ const WhoIsPage = ({
                                 </Form>
                             </Container>
                         </div>
-                        {isLoading || !results.length ? (
+                        {state.isLoading || !state.results.length ? (
                             <>
-                                {isLoading && <Loading />}
-                                {!isLoading && !results.length && (
+                                {state.isLoading && <Loading />}
+                                {!state.isLoading && !state.results.length && (
                                     <PageMessage
                                         headerContent={
                                             <FormattedMessage
@@ -341,9 +367,9 @@ const WhoIsPage = ({
                                                     <Table.Row>
                                                         <Table.HeaderCell>
                                                             <Button
-                                                                disabled={isLoading || !isDirty}
+                                                                disabled={state.isLoading || !state.isDirty}
                                                                 form="whois-page-form"
-                                                                loading={isLoading}
+                                                                loading={state.isLoading}
                                                                 primary
                                                                 size={uiElemSize}
                                                                 type="submit"
@@ -358,9 +384,9 @@ const WhoIsPage = ({
                                                 <Table.Row>
                                                     <Table.Cell colSpan={3} textAlign="right">
                                                         <Button
-                                                            disabled={isLoading || !isDirty}
+                                                            disabled={state.isLoading || !state.isDirty}
                                                             form="whois-page-form"
-                                                            loading={isLoading}
+                                                            loading={state.isLoading}
                                                             primary
                                                             size={uiElemSize}
                                                             type="submit"
@@ -371,13 +397,13 @@ const WhoIsPage = ({
                                                 </Table.Row>
                                             </Table.Footer>
                                             <Table.Body>
-                                                {paginatedDomains[activePage - 1].map((domain) => (
+                                                {paginatedDomains[state.activePage - 1].map((domain) => (
                                                     <Domain
                                                         key={domain.id}
                                                         contacts={Helpers.parseDomainContacts(
                                                             user,
                                                             domain,
-                                                            whoIsData,
+                                                            state.whoIsData,
                                                             companies
                                                         )}
                                                         domains={domains}
@@ -393,7 +419,7 @@ const WhoIsPage = ({
                                 <div className="paginator">
                                     <Container>
                                         <Pagination
-                                            activePage={activePage}
+                                            activePage={state.activePage}
                                             firstItem={null}
                                             lastItem={null}
                                             nextItem={{
@@ -403,11 +429,11 @@ const WhoIsPage = ({
                                                         <Icon name="arrow right" />
                                                     </>
                                                 ),
-                                                disabled: activePage === paginatedDomains.length,
+                                                disabled: state.activePage === paginatedDomains.length,
                                                 icon: true,
                                             }}
                                             onPageChange={(e, { activePage: page }) =>
-                                                setActivePage(page)
+                                                setState(prev => ({ ...prev, activePage: page }))
                                             }
                                             prevItem={{
                                                 content: (
@@ -416,7 +442,7 @@ const WhoIsPage = ({
                                                         <FormattedMessage id="pagination.previous" />
                                                     </>
                                                 ),
-                                                disabled: activePage === 1,
+                                                disabled: state.activePage === 1,
                                                 icon: true,
                                             }}
                                             totalPages={paginatedDomains.length}
@@ -431,7 +457,7 @@ const WhoIsPage = ({
                                                     onChange={handleItemsPerPage}
                                                     options={perPageOptions}
                                                     selection
-                                                    value={perPage}
+                                                    value={state.perPage}
                                                 />
                                             </Form.Field>
                                         </Form>
@@ -440,10 +466,10 @@ const WhoIsPage = ({
                             </div>
                         )}
                         <WhoIsConfirmDialog
-                            contacts={whoIsData}
+                            contacts={state.whoIsData}
                             onCancel={toggleSubmitConfirmModal}
                             onConfirm={handleWhoIsSubmit}
-                            open={isSubmitConfirmModalOpen}
+                            open={state.isSubmitConfirmModalOpen}
                         />
                     </>
                 ) : (

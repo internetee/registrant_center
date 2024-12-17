@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';
 import moment from 'moment';
@@ -28,7 +28,7 @@ const HomePage = ({
     const dispatch = useDispatch();
 
     const [techParams, setTechParams] = useState(isTech);
-    const [previousTechParams, setPreviousTechParams] = useState(isTech);
+    const [previousTechParams] = useState(isTech);
 
     const onSelectTech = (value) => {
         setIsLoading(true);
@@ -50,7 +50,7 @@ const HomePage = ({
         } else {
             setIsLoading(false);
         }
-    }, [fetchDomains, isTech]);
+    }, [fetchDomains, isTech, domains.length, previousTechParams]);
 
     if (isLoading) return <Loading />;
 

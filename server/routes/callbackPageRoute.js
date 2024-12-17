@@ -1,19 +1,20 @@
 /* eslint-disable no-underscore-dangle */
 import dotenv from 'dotenv';
+dotenv.config();
+
 import axios from 'axios';
 import qs from 'qs';
 import jwt from 'jsonwebtoken';
 import capitalize from 'capitalize';
 
-dotenv.config();
-
 const {
     CLIENT_ID,
     CLIENT_SECRET,
     HOST,
+    PORT,
     ISSUER_URL,
     NODE_ENV,
-    REACT_APP_SERVER_PORT,
+    VITE_SERVER_PORT,
     REDIRECT_URL,
     TOKEN_PATH,
 } = process.env;
@@ -22,7 +23,7 @@ const B64_VALUE = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64'
 
 const redirect_uri =
     NODE_ENV === 'development'
-        ? `https://${HOST}:${REACT_APP_SERVER_PORT}${REDIRECT_URL}`
+        ? `https://${HOST}:${VITE_SERVER_PORT}${REDIRECT_URL}`
         : `https://${HOST}${REDIRECT_URL}`;
 
 export default async function callbackPageRoute(req, res, publicKey) {
@@ -31,12 +32,10 @@ export default async function callbackPageRoute(req, res, publicKey) {
             throw new Error(req.query.error);
         }
 
-        /* Võta päringu query-osast TARA poolt saadetud volituskood (authorization code) */
+        // Võta päringu query-osast EEID poolt saadetud volituskood (authorization code)
         const { code } = req.query;
 
-        /*
-     Turvaelemendi state kontroll
-    */
+        // Turvaelemendi state kontroll
         const returnedState = req.query.state;
         const sessionState = req.session.grant.state;
         if (returnedState !== sessionState) {
@@ -57,9 +56,7 @@ export default async function callbackPageRoute(req, res, publicKey) {
             url: ISSUER_URL + TOKEN_PATH,
         };
 
-        const {
-            data: { id_token },
-        } = await axios(options); // eslint-disable-line camelcase
+        const { data: { id_token } } = await axios(options); // eslint-disable-line camelcase
 
         /*
          Identsustõendi kontrollimine. Teegi jsonwebtoken
@@ -99,7 +96,7 @@ export default async function callbackPageRoute(req, res, publicKey) {
                 console.log(verifiedJwt);
                 req.session.user = userData;
                 if (NODE_ENV === 'development') {
-                    res.redirect(`https://${HOST}:3000`);
+                    res.redirect(`http://${HOST}:${PORT}`);
                 } else {
                     res.redirect('/');
                 }
@@ -108,7 +105,7 @@ export default async function callbackPageRoute(req, res, publicKey) {
     } catch (e) {
         console.log(e); // eslint-disable-line no-console
         if (NODE_ENV === 'development') {
-            res.redirect(`https://${HOST}:3000/login`);
+            res.redirect(`http://${HOST}:${PORT}/login`);
         } else {
             res.redirect('/login');
         }

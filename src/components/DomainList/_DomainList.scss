@@ -1,21 +1,4 @@
-.dialog-company-contacts-box {
-  width: 600px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  border: 1px dashed red;
-  background-color: rgb(216, 121, 121);
-  padding: 4px;
-  margin: 0 auto;
-
-  button {
-    width: 200px;
-    margin: 20px auto !important;
-    // margin-top: 20px !important;
-    background-color: rgb(107, 206, 148) !important;
-  }
-}
+@use "../../global-scss/all" as *;
 
 .domains-list--wrap {
   .paginator {

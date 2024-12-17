@@ -1,32 +1,61 @@
-# EESTI INTERNETI SA - Registrant center
+# EESTI INTERNETI SA - Registrant Center
 
-### Kasutatud 📦
- - Node.js: [node 14](https://nodejs.org/en/)
- - Core: [React v16](https://www.npmjs.com/package/react), [Redux](https://www.npmjs.com/package/redux), [React Router v4](https://www.npmjs.com/package/react-router), [React Intl](https://github.com/yahoo/react-intl)
- - Code: ES2017+ standard modern javascript
- - Server: [express v4](https://www.npmjs.com/package/express)
- - Logging: [winston](https://www.npmjs.com/package/winston)
- - Bundler: [CRA](https://github.com/facebook/create-react-app)
+## Tech Stack 🛠
 
-### Tests and linting
- - Syntax checking (aka linting) with [eslint](https://www.npmjs.com/package/eslint)
- - Unit testing with [jest](http://facebook.github.io/jest/)
- - End to end/integration testing with [cypress](https://www.cypress.io/)
+### Core Technologies
+- Node.js: [Node 22](https://nodejs.org/en/)
+- Frontend: 
+  - [React v18](https://www.npmjs.com/package/react)
+  - [Redux](https://www.npmjs.com/package/redux)
+  - [React Router v7](https://www.npmjs.com/package/react-router)
+  - [React Intl](https://github.com/yahoo/react-intl)
+- Backend: [Express v4](https://www.npmjs.com/package/express)
+- Logging: [Winston v3](https://www.npmjs.com/package/winston)
 
-## Setup
-- Create .env file from .env.example
+### Development Tools
+- Bundler: [Vite v6](https://github.com/vitejs/vite)
+- Language: Modern JavaScript (ES2020+)
+  - Full ESM support (import/export)
+  - Latest ECMAScript features
+  - TypeScript and JSX support
+  
+### Quality Assurance
+- Linting: [ESLint](https://www.npmjs.com/package/eslint)
+- Unit Testing: [Jest](http://facebook.github.io/jest/)
+- E2E Testing: [Cypress](https://www.cypress.io/)
 
+## Getting Started 🚀
+
+### Prerequisites
+- Node.js 22 or higher
+- npm 10 or higher
+
+### Setup
+1. Clone the repository
+2. Create `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+3. Install dependencies and deploy:
+   ```bash
+   npm i
+   npm run deploy
+   ```
+
+## Available Scripts 📜
+
+### Development
+```bash
+npm start        # Start development environment
 ```
-npm i
-npm run deploy
+
+### Production
+```bash
+npm run serve    # Start production environment
 ```
 
-## Scripts
-
-##### Start development environment
-```npm start```
-##### Start production environment
-```npm run serve```
-##### Run tests
-```npm run test```
-```npm run test:e2e``` - edit cypress.json baseUrl before use
+### Testing
+```bash
+npm run test     # Run unit tests
+npm run test:e2e # Run end-to-end tests (update cypress.json baseUrl first)
+```

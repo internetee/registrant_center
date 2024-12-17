@@ -2,6 +2,7 @@ import api from '../../utils/api';
 import {
     DO_UPDATE_CONTACTS_REQUEST,
     DO_UPDATE_CONTACTS_SUCCESS,
+    DO_UPDATE_CONTACTS_FAILURE,
     FETCH_CONTACT_REQUEST,
     FETCH_CONTACT_SUCCESS,
     FETCH_CONTACT_FAILURE,
@@ -72,9 +73,14 @@ const doUpdateContacts = (payload) => ({
     type: DO_UPDATE_CONTACTS_REQUEST,
 });
 
-const receiveUpdateContact = (payload) => ({
+const receiveDoUpdateContacts = (payload) => ({
     payload,
     type: DO_UPDATE_CONTACTS_SUCCESS,
+});
+
+const failDoUpdateContacts = (payload) => ({
+    payload,
+    type: DO_UPDATE_CONTACTS_FAILURE,
 });
 
 const requestUpdateContacts = (payload) => ({
@@ -93,8 +99,11 @@ const fetchUpdateContacts = (uuid) => (dispatch) => {
         .fetchUpdateContacts(uuid, false)
         .then((res) => res.data)
         .then((data) => {
-            return dispatch(receiveUpdateContact(data));
-        });
+            return dispatch(receiveDoUpdateContacts(data));
+        })
+        .catch(() => {
+            return dispatch(failDoUpdateContacts());
+        });;
 };
 
 const updateContactsConfirm = (uuid) => (dispatch) => {
@@ -206,6 +215,12 @@ export default function reducer(state = initialState, { payload, type }) {
                 message: null,
             };
 
+        case DO_UPDATE_CONTACTS_FAILURE:
+            return {
+                ...state,
+                isLoading: false,
+            };
+
         case UPDATE_CONTACTS_REQUEST:
             return {
                 ...state,
@@ -308,7 +323,7 @@ export {
     fetchContacts,
     updateContact,
     receiveContacts,
-    receiveUpdateContact,
+    receiveDoUpdateContacts,
     fetchUpdateContacts,
     updateContactsConfirm,
 };

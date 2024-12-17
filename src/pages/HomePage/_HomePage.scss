@@ -1,10 +1,12 @@
+@use "../../global-scss/all" as *;
+
 .quicklinks {
   position: relative;
   z-index: 1;
   padding: 0 0 20px;
   color: #fff;
   text-align: center;
-  background: $green url("../../static/html-pattern.png") no-repeat 50% 50% / 728px auto;
+  background: $green url("/html-pattern.png") no-repeat 50% 50% / 728px auto;
   overflow: hidden;
   a {
     color: #fff;

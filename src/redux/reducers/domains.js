@@ -18,14 +18,6 @@ import {
 import { fetchContacts } from './contacts';
 import domainStatuses from '../../utils/domainStatuses.json';
 
-let request = {
-    data: {
-        count: 0,
-        domains: [],
-    },
-    offset: 0,
-};
-
 const parseDomain = (domain, shouldFetchContacts = false, simplify = false) => {
     const { admin_contacts, registrant, tech_contacts } = domain;
     const statuses = domain.statuses.sort(
@@ -174,20 +166,42 @@ const fetchDomain = (uuid) => (dispatch) => {
         });
 };
 
-const fetchDomains = (offset = request.offset, simplify = false, tech = false) => (dispatch) => {
+const fetchDomains = (offset = 0, simplify = false, tech = false, accumulatedData = null) => (dispatch) => {
+    // console.log("Fetching domains with offset:", offset);
+    // console.log("Currently accumulated data:", accumulatedData);
+
     dispatch(requestDomains());
+
     return api
         .fetchDomains(null, offset, simplify, tech)
         .then((res) => res.data)
         .then((data) => {
-            request.data.domains = request.data.domains.concat(data.domains);
-            request.data.count = data.count;
-            request.data.total = data.total;
-            if (request.offset < data.count) {
-                request.offset += 200;
-                return dispatch(fetchDomains(request.offset, simplify, tech));
+            // Initialize or update accumulated data
+            const updatedData = accumulatedData || {
+                domains: [],
+                count: data.count,
+                total: data.total
+            };
+
+            // Add new domains to accumulated data
+            updatedData.domains = [...updatedData.domains, ...data.domains];
+            
+            // console.log(`Fetched batch of ${data.domains.length} domains, total now: ${updatedData.domains.length}`);
+
+            // If there are more domains to fetch
+            if (offset + 200 < data.total) {
+                // Continue fetching with accumulated data
+                return dispatch(fetchDomains(
+                    offset + 200, 
+                    simplify, 
+                    tech, 
+                    updatedData
+                ));
             }
-            return dispatch(receiveDomains(request.data, simplify, tech));
+
+            // All domains fetched, dispatch final result
+            // console.log("Final domains payload:", updatedData);
+            return dispatch(receiveDomains(updatedData, simplify));
         })
         .catch(() => {
             dispatch(failDomains());
@@ -205,7 +219,9 @@ const lockDomain = (uuid, extensionsProhibited) => (dispatch) => {
         .catch((error) => {
             return dispatch(
                 failDomainLock({
-                    code: error.response.status,
+                    code: error.response?.status || 500,
+                    success: false,
+                    message: error.response?.data?.message || 'Unknown error'
                 })
             );
         });
@@ -222,7 +238,9 @@ const unlockDomain = (uuid) => (dispatch) => {
         .catch((error) => {
             return dispatch(
                 failDomainUnlock({
-                    code: error.response.status,
+                    code: error.response?.status || 500,
+                    success: false,
+                    message: error.response?.data?.message || 'Unknown error'
                 })
             );
         });
@@ -269,11 +287,6 @@ export default function reducer(state = initialState, { payload, type, simplify 
             };
 
         case FETCH_DOMAINS_SUCCESS:
-            let d = {
-            dod: payload.domains.forEach(domain => {
-                parseDomain(domain, true, simplify)
-            }) }
-
             return {
                 ...state,
                 data: {
@@ -319,8 +332,10 @@ export default function reducer(state = initialState, { payload, type, simplify 
             return {
                 ...state,
                 message: {
-                    ...payload,
+                    code: payload.code,
                     type: 'domainLock',
+                    success: false,
+                    message: payload.message
                 },
             };
 
@@ -346,8 +361,10 @@ export default function reducer(state = initialState, { payload, type, simplify 
             return {
                 ...state,
                 message: {
-                    ...payload,
+                    code: payload.code,
                     type: 'domainUnlock',
+                    success: false,
+                    message: payload.message
                 },
             };
 

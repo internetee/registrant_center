@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import { Redirect, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import { MainLayout, PageMessage } from '../../components';
@@ -19,7 +19,7 @@ const ErrorPage = ({ setLang }) => {
     }, [lang, setLang]);
 
     if (langs.includes(lang)) {
-        return <Redirect to="/" />;
+        return <Navigate to="/" replace />;
     }
 
     return (

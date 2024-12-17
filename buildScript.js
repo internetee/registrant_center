@@ -1,14 +1,53 @@
-const fs = require('fs');
-const fse = require('fs-extra');
-const childProcess = require('child_process');
+import fs from 'node:fs';
+import fse from 'fs-extra';
+import { exec } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 
-if (fs.existsSync('./build')) {
-    fse.removeSync('./build');
+const execAsync = promisify(exec);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+async function build() {
+    // Clean up existing directories
+    const clientDist = path.join(__dirname, 'dist');
+    const serverDist = path.join(__dirname, 'server', 'dist');
+
+    if (fs.existsSync(clientDist)) {
+        console.log('Cleaning client dist directory...');
+        fse.removeSync(clientDist);
+    }
+
+    if (fs.existsSync(serverDist)) {
+        console.log('Cleaning server dist directory...');
+        fse.removeSync(serverDist);
+    }
+
+    try {
+        // Build client
+        console.log('Building client...');
+        await execAsync('vite build', { stdio: 'inherit' });
+
+        // Ensure client dist was created
+        if (!fs.existsSync(clientDist)) {
+            throw new Error('Client build failed - dist directory not created');
+        }
+
+        // Create server dist directory
+        console.log('Creating server dist directory...');
+        fse.ensureDirSync(serverDist);
+
+        // Copy client build to server
+        console.log('Copying client build to server...');
+        fse.copySync(clientDist, serverDist);
+
+        console.log('Build completed successfully!');
+        console.log(`Client build: ${clientDist}`);
+        console.log(`Server build: ${serverDist}`);
+    } catch (error) {
+        console.error('Build failed:', error);
+        process.exit(1);
+    }
 }
 
-// Run 'react-scripts build' script
-childProcess.execSync('react-scripts build', { stdio: 'inherit' });
-
-// Move app build to server/build directory
-console.log('Moving ./build to /server/build');
-fse.moveSync('./build', './server/build', { overwrite: true });
+build();

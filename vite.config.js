@@ -1,0 +1,57 @@
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+const env = loadEnv('', process.cwd(), '');
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: parseInt(env.PORT),
+    proxy: {
+      '/api': {
+        target: `https://localhost:${env.VITE_SERVER_PORT || 1234}`,
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('Sending Request to the Target:', req.method, req.url);
+          });
+        }
+      }
+    }
+  },
+  esbuild: {
+    target: ['es2020', 'chrome60', 'firefox60', 'safari11'],
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment',
+    loader: 'jsx',
+  },
+  optimizeDeps: {
+    include: ['core-js', 'regenerator-runtime', 'react-cookie', 'universal-cookie'],
+  },
+  build: {
+    commonjsOptions: {
+      // include: [/core-js/, /regenerator-runtime/],
+      transformMixedEsModules: true
+    },
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true,
+    target: 'es2015',
+    polyfillDynamicImport: true,
+  },
+  publicDir: 'public',
+  assetsInclude: ['**/*.woff', '**/*.woff2'],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@fonts': '/fonts'
+    },
+    dedupe: ['react', 'react-dom']
+  }
+}) 
