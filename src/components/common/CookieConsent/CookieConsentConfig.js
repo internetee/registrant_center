@@ -24,16 +24,16 @@ const pluginConfig = {
             layout: 'cloud',
             position: 'bottom center',
             equalWeightButtons: true,
-            flipButtons: false
+            flipButtons: false,
         },
         preferencesModal: {
             layout: 'box',
             equalWeightButtons: true,
-            flipButtons: false
-        }
+            flipButtons: false,
+        },
     },
 
-    onChange: ({cookie, changedCategories, changedServices}) => {
+    onChange: ({ cookie, changedCategories }) => {
         if (changedCategories.includes('analytics')) {
             const hasAnalyticsConsent = cookie.categories.includes('analytics');
             if (!hasAnalyticsConsent) {
@@ -44,19 +44,19 @@ const pluginConfig = {
 
     categories: {
         necessary: {
-            enabled: true,  // this category is enabled by default
-            readOnly: true  // this category cannot be disabled
+            enabled: true, // this category is enabled by default
+            readOnly: true, // this category cannot be disabled
         },
         analytics: {
             autoClear: {
                 cookies: [
                     {
-                        name: /^_ga/,   // regex: match all cookies starting with '_ga'
+                        name: /^_ga/, // regex: match all cookies starting with '_ga'
                     },
                     {
-                        name: '_gid',   // string: exact cookie name
-                    }
-                ]
+                        name: '_gid', // string: exact cookie name
+                    },
+                ],
             },
 
             // // https://cookieconsent.orestbida.com/reference/configuration-reference.html#category-services
@@ -68,16 +68,17 @@ const pluginConfig = {
             //     },
             // }
         },
-        ads: {}
+        ads: {},
     },
 
     language: {
         default: 'et',
         translations: {
-            'en': {
+            en: {
                 consentModal: {
                     title: 'We use cookies!',
-                    description: 'Our website uses cookies to personalize content and ads, and to provide social media features. We ask for your permission to use cookies that are not necessarily essential for the basic functions of our website. Please read our detailed descriptions and rules of cookies <a class="cc__link" href="https://www.internet.ee/eif/cookies-on-internet-ee-webpage" target="_blank">here</a>.',
+                    description:
+                        'Our website uses cookies to personalize content and ads, and to provide social media features. We ask for your permission to use cookies that are not necessarily essential for the basic functions of our website. Please read our detailed descriptions and rules of cookies <a class="cc__link" href="https://www.internet.ee/eif/cookies-on-internet-ee-webpage" target="_blank">here</a>.',
                     acceptAllBtn: 'Accept all',
                     showPreferencesBtn: 'Settings',
                     // closeIconLabel: 'Reject all and close modal',
@@ -91,25 +92,28 @@ const pluginConfig = {
                     sections: [
                         {
                             title: 'Cookie usage',
-                            description: 'We use cookies to help you navigate efficiently and perform certain functions. You will find detailed information about all cookies under each consent category below. The cookies that are categorized as "Necessary" are stored on your browser as they are essential for enabling the basic functionalities of the site.',
+                            description:
+                                'We use cookies to help you navigate efficiently and perform certain functions. You will find detailed information about all cookies under each consent category below. The cookies that are categorized as "Necessary" are stored on your browser as they are essential for enabling the basic functionalities of the site.',
                         },
                         {
                             title: 'Strictly necessary cookies',
-                            description: 'Help us make the website more user-friendly by activating essential functions. The website cannot function properly without these cookies. As these cookies are needed for the secure provision of services, the visitor cannot refuse them.',
+                            description:
+                                'Help us make the website more user-friendly by activating essential functions. The website cannot function properly without these cookies. As these cookies are needed for the secure provision of services, the visitor cannot refuse them.',
 
                             //this field will generate a toggle linked to the 'necessary' category
-                            linkedCategory: 'necessary'
+                            linkedCategory: 'necessary',
                         },
                         {
                             title: 'Performance and Analytics cookies',
-                            description: 'Help us understand how a specific visitor uses the website. This way we see how many people visit the site during a certain period, how they navigate through web pages, and what they click on. These cookies provide us with information based on which we improve the customer experience.',
+                            description:
+                                'Help us understand how a specific visitor uses the website. This way we see how many people visit the site during a certain period, how they navigate through web pages, and what they click on. These cookies provide us with information based on which we improve the customer experience.',
                             linkedCategory: 'analytics',
                             cookieTable: {
                                 headers: {
                                     name: 'Name',
                                     domain: 'Domain',
                                     exp: 'Expiration',
-                                    desc: 'Description'
+                                    desc: 'Description',
                                 },
                                 body: [
                                     {
@@ -129,17 +133,18 @@ const pluginConfig = {
                                         domain: '.internet.ee',
                                         exp: '1 day',
                                         desc: 'Used by Google Analytics to throttle request rate.',
-                                    }
-                                ]
-                            }
+                                    },
+                                ],
+                            },
                         },
-                    ]
-                }
+                    ],
+                },
             },
-            'et': {
+            et: {
                 consentModal: {
                     title: 'Kasutame küpsiseid!',
-                    description: 'Kasutame küpsiseid sisu ja reklaamide isikupärastamiseks ning sotsiaalse meedia funktsioonide pakkumiseks. Palume luba küpsiste kasutamiseks, mis ei ole tingimata vajalikud meie veebilehe põhifunktsioonide toimimiseks. Küpsiste üksikasjalikud kirjeldused ja reegleid leiad <a class="cc__link" href="https://www.internet.ee/eis/kupsised-internet-ee-lehel" target="_blank">siit</a>.',
+                    description:
+                        'Kasutame küpsiseid sisu ja reklaamide isikupärastamiseks ning sotsiaalse meedia funktsioonide pakkumiseks. Palume luba küpsiste kasutamiseks, mis ei ole tingimata vajalikud meie veebilehe põhifunktsioonide toimimiseks. Küpsiste üksikasjalikud kirjeldused ja reegleid leiad <a class="cc__link" href="https://www.internet.ee/eis/kupsised-internet-ee-lehel" target="_blank">siit</a>.',
                     acceptAllBtn: 'Luba kõik',
                     showPreferencesBtn: 'Seadistused',
                     // closeIconLabel: 'Reject all and close modal',
@@ -153,25 +158,28 @@ const pluginConfig = {
                     sections: [
                         {
                             title: 'Küpsiste kasutamine',
-                            description: 'Kasutame küpsiseid, et aidata Teil tõhusalt navigeerida ja teatud funktsioone täita. Üksikasjalikku teavet kõigi küpsiste kohta leiate allpool iga nõusolekukategooria alt. Küpsistest, mis on liigitatud kui "Vajalikud", ei saa loobuda, sest need on olulised saidi põhifunktsioonide võimaldamiseks.',
+                            description:
+                                'Kasutame küpsiseid, et aidata Teil tõhusalt navigeerida ja teatud funktsioone täita. Üksikasjalikku teavet kõigi küpsiste kohta leiate allpool iga nõusolekukategooria alt. Küpsistest, mis on liigitatud kui "Vajalikud", ei saa loobuda, sest need on olulised saidi põhifunktsioonide võimaldamiseks.',
                         },
                         {
                             title: 'Vajalikud küpsised',
-                            description: 'Veebileht ei saa ilma nende küpsisteta korralikult toimida. Seetõttu ei ole külastajal võimalik neist keelduda.',
+                            description:
+                                'Veebileht ei saa ilma nende küpsisteta korralikult toimida. Seetõttu ei ole külastajal võimalik neist keelduda.',
 
                             //this field will generate a toggle linked to the 'necessary' category
-                            linkedCategory: 'necessary'
+                            linkedCategory: 'necessary',
                         },
                         {
                             title: 'Statistika ja analüütika küpsised',
-                            description: 'Aitavad meil mõista, kuidas konkreetne külastaja veebilehte kasutab. Nii näeme, kui palju inimesi kindlal ajavahemikul lehte külastab, kuidas veebilehtedel liigutakse ja millele klikitakse. Need küpsised annavad meile infot, mille põhjal parendada kliendikogemust.',
+                            description:
+                                'Aitavad meil mõista, kuidas konkreetne külastaja veebilehte kasutab. Nii näeme, kui palju inimesi kindlal ajavahemikul lehte külastab, kuidas veebilehtedel liigutakse ja millele klikitakse. Need küpsised annavad meile infot, mille põhjal parendada kliendikogemust.',
                             linkedCategory: 'analytics',
                             cookieTable: {
                                 headers: {
                                     name: 'Nimi',
                                     domain: 'Domeen',
                                     exp: 'Kehtivus',
-                                    desc: 'Kirjeldus'
+                                    desc: 'Kirjeldus',
                                 },
                                 body: [
                                     {
@@ -191,15 +199,15 @@ const pluginConfig = {
                                         domain: '.internet.ee',
                                         exp: '1 päev',
                                         desc: 'Google Analytics kasutab seda taotluste määra piiramiseks.',
-                                    }
-                                ]
-                            }
+                                    },
+                                ],
+                            },
                         },
-                    ]
-                }
-            }
-        }
-    }
+                    ],
+                },
+            },
+        },
+    },
 };
 
 export default pluginConfig;

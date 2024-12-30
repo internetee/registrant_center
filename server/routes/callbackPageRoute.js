@@ -56,7 +56,9 @@ export default async function callbackPageRoute(req, res, publicKey) {
             url: ISSUER_URL + TOKEN_PATH,
         };
 
-        const { data: { id_token } } = await axios(options); // eslint-disable-line camelcase
+        const {
+            data: { id_token },
+        } = await axios(options);
 
         /*
          Identsustõendi kontrollimine. Teegi jsonwebtoken

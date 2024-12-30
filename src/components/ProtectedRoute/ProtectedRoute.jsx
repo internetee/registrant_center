@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 const ProtectedRoute = ({ user, children }) => {
     if (!user?.data?.name) {
-        return <Navigate to="/login" replace />;
+        return <Navigate replace to="/login" />;
     }
     return children;
 };

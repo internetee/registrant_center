@@ -1,6 +1,6 @@
 import { Icon } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import PropTypes from 'prop-types';
 
@@ -30,7 +30,7 @@ const MainLayout = ({
         if (htmlTitleKey || titleKey) {
             return formatMessage(
                 { id: htmlTitleKey || titleKey },
-                { 
+                {
                     ...htmlTitleValues,
                     ...titleValues,
                 }
@@ -41,9 +41,7 @@ const MainLayout = ({
 
     return (
         <HelmetProvider>
-            <Helmet
-                title={getTitle() + formatMessage({ id: 'head.title' })}
-            />
+            <Helmet title={getTitle() + formatMessage({ id: 'head.title' })} />
             <MainHeader />
             <main className="main-layout">
                 <div className="main-hero">

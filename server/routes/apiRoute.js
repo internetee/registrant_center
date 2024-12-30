@@ -119,12 +119,6 @@ export default {
         );
     },
 
-    getDomain: async ({ params, session }, res) => {
-        const { uuid } = params;
-        const { data, status } = await API(session).get(`/api/v1/registrant/domains/${uuid}`);
-        return res.status(status).json(data);
-    },
-
     getDomains: async ({ query, params, session }, res) => {
         const { uuid } = params;
         const { offset, simple, tech } = query;

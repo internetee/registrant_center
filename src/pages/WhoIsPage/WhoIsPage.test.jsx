@@ -1,14 +1,13 @@
 import 'core-js';
-import React from 'react';
 import { shallow } from 'enzyme';
-import ErrorPage from './ErrorPage';
+import WhoIsPage from './WhoIsPage';
 import Providers from '../../__mocks__/Providers';
 
-describe('pages/ErrorPage', () => {
-    it('should render', () => {
+describe('pages/Home', () => {
+    it('should render content', () => {
         const component = shallow(
             <Providers>
-                <ErrorPage />
+                <WhoIsPage />
             </Providers>
         );
         expect(component).toMatchSnapshot();

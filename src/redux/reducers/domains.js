@@ -278,6 +278,7 @@ export default function reducer(state = initialState, { payload, type, simplify 
             return {
                 ...state,
                 isLoading: false,
+                error: true,
             };
 
         case FETCH_DOMAINS_REQUEST:

@@ -103,7 +103,7 @@ const fetchUpdateContacts = (uuid) => (dispatch) => {
         })
         .catch(() => {
             return dispatch(failDoUpdateContacts());
-        });;
+        });
 };
 
 const updateContactsConfirm = (uuid) => (dispatch) => {

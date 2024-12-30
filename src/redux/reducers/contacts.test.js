@@ -5,8 +5,7 @@ import reducer, { fetchContacts, initialState, updateContact } from './contacts'
 import contacts from '../../__mocks__/contacts';
 
 describe('Contacts action creators', () => {
-    const middlewares = [thunk];
-    const mockStore = configureMockStore(middlewares);
+    const mockStore = configureMockStore([thunk]);
     let store;
 
     beforeEach(() => {

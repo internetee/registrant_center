@@ -10,6 +10,7 @@ function WhoIsConfirmDialog({ contacts, domains, onConfirm, onCancel, open, ui }
 
     return (
         <Confirm
+            data-testid="confirmation-modal"
             cancelButton={
                 <Button data-test="close-change-contacts-modal" secondary size={uiElemSize}>
                     <FormattedMessage defaultMessage="Ei" id="actions.confirm.no" />

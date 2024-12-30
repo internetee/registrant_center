@@ -1,4 +1,5 @@
 /* eslint-disable sort-keys */
+/* eslint-disable no-unused-vars */
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -31,19 +32,19 @@ const certificate = fs.readFileSync('./server.crt', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 const {
-  AUTH_PATH,
-  CLIENT_ID,
-  CLIENT_SECRET,
-  HOST,
-  ISSUER_URL,
-  JWKS_PATH,
-  NODE_ENV,
-  VITE_SERVER_PORT,
-  REDIRECT_URL,
-  SESSION_SECRET,
-  TOKEN_PATH,
-  VITE_SCOPE,
-  RESPONSE_TYPE,
+    AUTH_PATH,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    HOST,
+    ISSUER_URL,
+    JWKS_PATH,
+    NODE_ENV,
+    VITE_SERVER_PORT,
+    REDIRECT_URL,
+    SESSION_SECRET,
+    TOKEN_PATH,
+    VITE_SCOPE,
+    RESPONSE_TYPE,
 } = process.env;
 
 let publicKey = '';
@@ -67,35 +68,33 @@ app.use(compression()); // GZip compress responses
 
 // static files
 if (NODE_ENV !== 'development') {
-  app.use(express.static(path.join(__dirname, 'dist')));
+    app.use(express.static(path.join(__dirname, 'dist')));
 }
 app.use(favicon(path.join(__dirname, '../public/favicon.ico')));
 
 app.use(
-  session({
-      name: 'session',
-      keys: [SESSION_SECRET],
-      httpOnly: true,
-      maxAge: 7200000,
-      secure: true,
-  })
+    session({
+        name: 'session',
+        keys: [SESSION_SECRET],
+        httpOnly: true,
+        maxAge: 7200000,
+        secure: true,
+    })
 );
 
 (async () => {
-  try {
-      const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
-      if (!data?.keys?.[0]) {
-          throw new Error('Invalid JWKS response format');
-      }
-      publicKey = data.keys[0];
-      console.log(
-        'Successfully initialized public key from eeID! -> ' + ISSUER_URL + JWKS_PATH
-      );
-  } catch (e) {
-      console.error(`Failed to fetch public key: ${e}`);
-      // Optionally, you might want to retry the fetch after a delay
-      // setTimeout(() => { /* retry logic */ }, 5000);
-  }
+    try {
+        const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
+        if (!data?.keys?.[0]) {
+            throw new Error('Invalid JWKS response format');
+        }
+        publicKey = data.keys[0];
+        console.log('Successfully initialized public key from eeID! -> ' + ISSUER_URL + JWKS_PATH);
+    } catch (e) {
+        console.error(`Failed to fetch public key: ${e}`);
+        // Optionally, you might want to retry the fetch after a delay
+        // setTimeout(() => { /* retry logic */ }, 5000);
+    }
 })();
 
 // middlewares
@@ -112,32 +111,32 @@ const redirect_uri =
 
 // grant auth
 const grantConfig = {
-  defaults: {
-      protocol: 'https',
-      host: HOST,
-      state: true,
-      callback: '/auth/callback',
-      transport: 'querystring',
-  },
-  openid: {
-      authorize_url: ISSUER_URL + AUTH_PATH,
-      access_url: ISSUER_URL + TOKEN_PATH,
-      oauth: 2,
-      key: CLIENT_ID,
-      secret: CLIENT_SECRET,
-      scope: VITE_SCOPE,
-      redirect_uri,
-      response_type: RESPONSE_TYPE,
-      callback: REDIRECT_URL,
-      overrides: {
-        en: {
-          custom_params: { ui_locales: 'en' }
+    defaults: {
+        protocol: 'https',
+        host: HOST,
+        state: true,
+        callback: '/auth/callback',
+        transport: 'querystring',
+    },
+    openid: {
+        authorize_url: ISSUER_URL + AUTH_PATH,
+        access_url: ISSUER_URL + TOKEN_PATH,
+        oauth: 2,
+        key: CLIENT_ID,
+        secret: CLIENT_SECRET,
+        scope: VITE_SCOPE,
+        redirect_uri,
+        response_type: RESPONSE_TYPE,
+        callback: REDIRECT_URL,
+        overrides: {
+            en: {
+                custom_params: { ui_locales: 'en' },
+            },
+            et: {
+                custom_params: { ui_locales: 'et' },
+            },
         },
-        et: {
-          custom_params: { ui_locales: 'et' }
-        }
-      }
-  }
+    },
 };
 
 // Create grant middleware instance
@@ -156,7 +155,7 @@ app.all('/api/*', API.checkAuth);
 
 // Protected routes below
 app.get('/api/domains', API.getDomains);
-app.get('/api/domains/:uuid', API.getDomain);
+app.get('/api/domains/:uuid', API.getDomains);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
 app.delete('/api/domains/:uuid/registry_lock', API.deleteDomainRegistryLock);
 app.get('/api/contacts/:uuid/do_need_update_contacts', API.doNeedUpdateContacts);
@@ -167,7 +166,7 @@ app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
 // Basic health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+    res.json({ status: 'ok' });
 });
 
 // all page rendering
@@ -175,15 +174,14 @@ app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).t
 
 app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')));
 
-const server = https
-    .createServer(credentials, app)
-    .listen(NODE_ENV === 'test' ? 4000 : VITE_SERVER_PORT, () => {
-        banner();
-        // eslint-disable-next-line no-console
-        console.log(`Environment: ${NODE_ENV}`);
-        // 'ready' is a hook used by the e2e (integration) tests (see node-while)
-        server.emit('ready');
-    });
+const PORT = process.env.NODE_ENV === 'test' ? 4000 : process.env.VITE_SERVER_PORT;
+
+const server = https.createServer(credentials, app).listen(PORT, () => {
+    banner();
+    console.log(`Environment: ${NODE_ENV}`);
+    console.log(`Server listening on port ${PORT}`);
+    server.emit('ready');
+});
 
 // export server instance so we can hook into it in e2e tests etc
 export default server;

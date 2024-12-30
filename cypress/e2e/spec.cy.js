@@ -2,41 +2,38 @@ const { baseUrl } = Cypress.config();
 
 describe('Integration tests', () => {
     beforeEach(() => {
-        cy.server();
-        cy.route('GET', '**/api/menu/main', 'fx:menuMain').as('getMainMenu');
-        cy.route('GET', '**/api/menu/footer', 'fx:menuFooter').as('getFooterMenu');
-        cy.route('GET', '**/api/user', 'fx:user').as('getUser');
-        cy.route('POST', '**/api/destroy', 'fx:user').as('destroySession');
-        cy.route('GET', '**/api/companies?*', 'fx:companies').as('getCompanies');
-        cy.route('GET', '**/api/domains?*', 'fx:domains').as('getDomains');
-        cy.route('GET', '**/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e', 'fx:domain').as(
-            'getDomain'
-        );
-        cy.route(
-            'GET',
-            '**/api/domains/2198affc-7479-499d-9eae-b0611ec2fb49',
-            'fx:domain-locked'
-        ).as('getLockedDomain');
-        cy.route('POST', '**/api/domains/*/registry_lock?extensionsProhibited=false', 'fx:domain').as('setDomainLock');
-        cy.route('DELETE', '**/api/domains/*/registry_lock', 'fx:domain').as('deleteDomainLock');
-        cy.route('GET', '**/api/contacts?*', 'fx:contacts').as('getContacts');
-        cy.route(
-            'GET',
-            '**/api/contacts/cfbfbb76-aed8-497a-91c1-48d82cbc4588?links=true',
-            'fx:contact-registrant'
-        ).as('getRegistrant');
-        cy.route(
-            'GET',
-            '**/api/contacts/528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7?links=true',
-            'fx:contact-admin'
-        ).as('getAdmin');
-        cy.route(
-            'GET',
-            '**/api/contacts/700829af-4bdd-4c5f-8389-f6568e2ba4ad?links=true',
-            'fx:contact-tech'
-        ).as('getTech');
-        cy.route('PATCH', '**/api/contacts/*', 'fx:contacts').as('setContacts');
-        cy.route('PATCH', '**/api/contacts/*', 'fx:contact-registrant').as('setRegistrantContacts');
+        cy.intercept('GET', '**/api/menu/main', { fixture: 'menuMain' }).as('getMainMenu');
+        cy.intercept('GET', '**/api/menu/footer', { fixture: 'menuFooter' }).as('getFooterMenu');
+        cy.intercept('GET', '**/api/user', { fixture: 'user' }).as('getUser');
+        cy.intercept('POST', '**/api/destroy', { fixture: 'user' }).as('destroySession');
+        cy.intercept('GET', '**/api/companies?*', { fixture: 'companies' }).as('getCompanies');
+        cy.intercept('GET', '**/api/domains?*', { fixture: 'domains' }).as('getDomains');
+        cy.intercept('GET', '**/api/domains/bd695cc9-1da8-4c39-b7ac-9a2055e0a93e', {
+            fixture: 'domain',
+        }).as('getDomain');
+        cy.intercept('GET', '**/api/domains/2198affc-7479-499d-9eae-b0611ec2fb49', {
+            fixture: 'domain-locked',
+        }).as('getLockedDomain');
+        cy.intercept('POST', '**/api/domains/*/registry_lock?extensionsProhibited=false', {
+            fixture: 'domain',
+        }).as('setDomainLock');
+        cy.intercept('DELETE', '**/api/domains/*/registry_lock', {
+            fixture: 'domain',
+        }).as('deleteDomainLock');
+        cy.intercept('GET', '**/api/contacts?*', { fixture: 'contacts' }).as('getContacts');
+        cy.intercept('GET', '**/api/contacts/cfbfbb76-aed8-497a-91c1-48d82cbc4588?links=true', {
+            fixture: 'contact-registrant',
+        }).as('getRegistrant');
+        cy.intercept('GET', '**/api/contacts/528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7?links=true', {
+            fixture: 'contact-admin',
+        }).as('getAdmin');
+        cy.intercept('GET', '**/api/contacts/700829af-4bdd-4c5f-8389-f6568e2ba4ad?links=true', {
+            fixture: 'contact-tech',
+        }).as('getTech');
+        cy.intercept('PATCH', '**/api/contacts/*', { fixture: 'contacts' }).as('setContacts');
+        cy.intercept('PATCH', '**/api/contacts/*', {
+            fixture: 'contact-registrant',
+        }).as('setRegistrantContacts');
     });
 
     it('Should load login page', () => {
@@ -229,7 +226,7 @@ describe('Integration tests', () => {
         cy.wait('@setRegistrantContacts').its('status').should('eq', 200);
     });
 
-    it('Links back to Dashboard from WhoIs page', () => {   
+    it('Links back to Dashboard from WhoIs page', () => {
         cy.get('.back-link').click();
         cy.url().should('eq', `${baseUrl}/`);
     });

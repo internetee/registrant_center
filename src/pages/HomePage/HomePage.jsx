@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Grid, Icon } from 'semantic-ui-react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';
 import moment from 'moment';
@@ -105,8 +105,8 @@ const HomePage = ({
                 </div>
                 <DomainList
                     domainCount={totalDomains}
-                    domains={domains}
                     domainTotal={absoluteCount}
+                    domains={domains}
                     isTech={isTech}
                     isUpdateContact={isUpdateContact}
                     lang={lang}

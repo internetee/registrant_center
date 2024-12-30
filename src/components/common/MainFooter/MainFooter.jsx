@@ -2,7 +2,7 @@ import { Icon } from 'semantic-ui-react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import dompurify from 'dompurify';
-import * as CookieConsent from "vanilla-cookieconsent";
+import * as CookieConsent from 'vanilla-cookieconsent';
 import PropTypes from 'prop-types';
 
 const sanitizer = dompurify.sanitize;
@@ -54,10 +54,10 @@ const MainFooter = ({ ui }) => {
                 <nav className="menu-footer">
                     {menu.map((item) => (
                         <div
-                            key={item.id}
                             className="column"
                             // eslint-disable-next-line react/no-danger
                             dangerouslySetInnerHTML={{ __html: sanitizer(item.body) }}
+                            key={item.id}
                         />
                     ))}
                 </nav>

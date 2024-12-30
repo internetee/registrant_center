@@ -31,7 +31,7 @@ function sanitizeUrl(url) {
     // Implement URL sanitization logic here
     // For example, removing or encoding certain characters
     if (typeof url === 'string') {
-        return url.replace(/[{}]/g, match => encodeURIComponent(match));
+        return url.replace(/[{}]/g, (match) => encodeURIComponent(match));
     } else {
         return '';
     }

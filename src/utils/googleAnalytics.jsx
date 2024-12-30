@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import ReactGA from 'react-ga';
@@ -8,7 +9,7 @@ const { VITE_GA_TRACKING_ID } = import.meta.env;
 
 function GoogleAnalytics({ options = {} }) {
     const location = useLocation();
-    
+
     useEffect(() => {
         const logPageChange = (pathname, search = '') => {
             const page = pathname + search;
@@ -64,7 +65,7 @@ const removeGACookies = () => {
     });
 };
 
-const init = (options = {}) => {
+const init = () => {
     if (VITE_GA_TRACKING_ID && hasConsentForAnalytics()) {
         ReactGA.initialize(VITE_GA_TRACKING_ID);
         return true;
@@ -74,7 +75,6 @@ const init = (options = {}) => {
     return false;
 };
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default {
     GoogleAnalytics,
     init,

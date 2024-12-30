@@ -1,5 +1,4 @@
-/* eslint-disabled */
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
@@ -14,7 +13,7 @@ import {
     Dropdown,
     Container,
     Pagination,
-    Message
+    Message,
 } from 'semantic-ui-react';
 import Masonry from 'react-layout-masonry';
 import Flatpickr from 'react-flatpickr';
@@ -26,10 +25,7 @@ import DomainGridItem from './GridItem';
 import DomainListItem from './ListItem';
 import PageMessage from '../PageMessage/PageMessage';
 import domainStatuses from '../../utils/domainStatuses.json';
-import { 
-    fetchUpdateContacts, 
-    updateContactsConfirm
-} from '../../redux/reducers/contacts';
+import { fetchUpdateContacts, updateContactsConfirm } from '../../redux/reducers/contacts';
 
 const LIMIT_DOMAIN_TOTAL = 3000;
 
@@ -55,7 +51,7 @@ const DomainList = ({
     isTech,
     isUpdateContact,
     fetchUpdateContacts,
-    updateContactsConfirm
+    updateContactsConfirm,
 }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
@@ -103,6 +99,7 @@ const DomainList = ({
                     registrants: {
                         ...acc.registrants,
                         [domain.registrant.ident]: {
+                            key: domain.registrant.ident,
                             text: domain.registrant.name,
                             value: domain.registrant.ident,
                         },
@@ -139,7 +136,7 @@ const DomainList = ({
                 {
                     allStatuses: {
                         all: {
-                            key: 0,
+                            key: 'all',
                             label: {
                                 circular: true,
                                 color: domainStatuses.all.color,
@@ -153,7 +150,7 @@ const DomainList = ({
                     minDate: domains[0].valid_to,
                     registrants: {
                         all: {
-                            key: 0,
+                            key: 'all',
                             text: formatMessage({ id: 'domainsList.allRegistrants' }),
                             value: 'all',
                         },
@@ -321,7 +318,7 @@ const DomainList = ({
         },
     ];
 
-    const handleRole = (event, { name, value }) => {
+    const handleRole = (event, { _name, value }) => {
         if (value === 'domains.roles.regAndAdmRoles' && roleDropboxValue) {
             onSelectTech(false);
         }
@@ -368,20 +365,20 @@ const DomainList = ({
 
     const MessageUpdateContacts = () => (
         <Message negative>
-            <FormattedMessage 
-                id="domains.contacts.update.message"
+            <FormattedMessage
                 defaultMessage="Found mismatches in .ee registry between contact names and business/citizenship registries. Please confirm to update {count} contact records for your .ee domain registrations"
+                id="domains.contacts.update.message"
                 values={{
-                    count: contactUpdateCount
+                    count: contactUpdateCount,
                 }}
             />
             <p style={{ marginTop: '1em' }}>
-                <Button 
-                    primary
+                <Button
                     compact
-                    onClick={updateContacts}
-                    loading={isUpdating}
                     disabled={isUpdating}
+                    loading={isUpdating}
+                    onClick={updateContacts}
+                    primary
                 >
                     <FormattedMessage
                         defaultMessage="Salvesta"
@@ -394,7 +391,7 @@ const DomainList = ({
     );
 
     return (
-        <div className="domains-list--wrap">
+        <div className="domains-list--wrap" data-testid="domains-list-wrap">
             <div className="page--header">
                 <Container>
                     <div className="page--header--text">
@@ -569,18 +566,18 @@ const DomainList = ({
                             <Transition animation="fade" duration={300} visible={isGrid}>
                                 <div className="domains-grid--wrap">
                                     <Masonry
-                                        ref={masonry}
                                         className="domains-grid"
-                                        columns={{ 640: 1, 768: 2}}
-                                        gap={16}
                                         columnProps={{
-                                            className: 'domains-grid--item'
+                                            className: 'domains-grid--item',
                                         }}
+                                        columns={{ 640: 1, 768: 2 }}
+                                        gap={16}
+                                        ref={masonry}
                                     >
                                         {paginatedDomains[activePage - 1].map((domain) => (
                                             <DomainGridItem
-                                                key={domain.id}
                                                 domain={domain}
+                                                key={domain.id}
                                                 lang={lang}
                                             />
                                         ))}
@@ -622,8 +619,8 @@ const DomainList = ({
                                             <Table.Body>
                                                 {paginatedDomains[activePage - 1].map((domain) => (
                                                     <DomainListItem
-                                                        key={domain.id}
                                                         domain={domain}
+                                                        key={domain.id}
                                                         lang={lang}
                                                     />
                                                 ))}
@@ -706,13 +703,10 @@ const DomainList = ({
 
 const mapDispatchToProps = {
     fetchUpdateContacts,
-    updateContactsConfirm
+    updateContactsConfirm,
 };
 
-export default connect(
-    null, 
-    mapDispatchToProps
-)(DomainList);
+export default connect(null, mapDispatchToProps)(DomainList);
 
 DomainList.propTypes = {
     domainCount: PropTypes.number,

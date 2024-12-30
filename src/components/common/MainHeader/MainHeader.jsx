@@ -101,7 +101,7 @@ function MainHeader({ closeMainMenu, logoutUser, setLang, toggleMainMenu, ui, us
 const Logo = () => {
     return (
         <a className="logo" href="https://internet.ee">
-            <img src={logo} alt="Logo" />
+            <img alt="Logo" src={logo} />
         </a>
     );
 };
@@ -124,13 +124,13 @@ const PortalMenu = ({ items = [], lang }) => {
             </a>
             {menu.map((item) => (
                 <a
-                    key={item.id}
                     className={
                         item.public_url === 'https://registrant.internet.ee'
                             ? 'u-active'
                             : undefined
                     }
                     href={item.public_url}
+                    key={item.id}
                 >
                     {item.title}
                 </a>

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -70,7 +69,6 @@ const WhoIsPage = ({
         const pages = [];
         const copied = [...results];
         const numOfChild = Math.ceil(copied.length / perPage);
-        
         for (let i = 0; i < numOfChild; i++) {
             pages.push(copied.splice(0, perPage));
         }
@@ -203,7 +201,7 @@ const WhoIsPage = ({
         return <Loading />;
     }
 
-    const handleRole = (event, { name, value }) => {
+    const handleRole = (event, { _name, value }) => {
         if (value === 'domains.roles.regAndAdmRoles' && isTech) {
             onSelectTech(false);
         }
@@ -373,7 +371,6 @@ const WhoIsPage = ({
                                             <Table.Body>
                                                 {paginatedDomains[activePage - 1].map((domain) => (
                                                     <Domain
-                                                        key={domain.id}
                                                         contacts={Helpers.parseDomainContacts(
                                                             user,
                                                             domain,
@@ -382,6 +379,7 @@ const WhoIsPage = ({
                                                         )}
                                                         domains={domains}
                                                         id={domain.id}
+                                                        key={domain.id}
                                                         name={domain.name}
                                                         onChange={handleWhoIsChange}
                                                     />

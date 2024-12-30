@@ -1,8 +1,0 @@
-{
-  "baseUrl": "https://localhost:4000",
-  "viewportWidth": 1280,
-  "viewportHeight": 720,
-  "videoCompression": false,
-  "pageLoadTimeout": 5000,
-  "trashAssetsBeforeRuns": true
-}

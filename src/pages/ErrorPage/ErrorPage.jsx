@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import { Navigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import { MainLayout, PageMessage } from '../../components';
@@ -11,16 +11,14 @@ const langs = ['et', 'en'];
 
 const ErrorPage = ({ setLang }) => {
     const { lang } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (langs.includes(lang)) {
             setLang(lang);
+            navigate('/', { replace: true });
         }
-    }, [lang, setLang]);
-
-    if (langs.includes(lang)) {
-        return <Navigate to="/" replace />;
-    }
+    }, [lang, setLang, navigate]);
 
     return (
         <MainLayout hasBackButton titleKey="errorpage.title">
@@ -41,7 +39,7 @@ const mapDispatchToProps = (dispatch) =>
     );
 
 export default connect(null, mapDispatchToProps)(ErrorPage);
-
 ErrorPage.propTypes = {
     setLang: PropTypes.func.isRequired,
 };
+

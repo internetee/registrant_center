@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from 'semantic-ui-react';
 import { Link, useNavigate } from 'react-router';
 import { FormattedMessage } from 'react-intl';
@@ -73,7 +73,7 @@ const MainMenu = ({ items = [], lang, user, closeMainMenu }) => {
                     </li>
                 )}
                 {menu.map((item, i) => (
-                    <li key={item.id} className={item.isOpen ? 'u-submenu-open' : ''}>
+                    <li className={item.isOpen ? 'u-submenu-open' : ''} key={item.id}>
                         <a href={item.public_url}>{item.title}</a>
                         {item.children && item.children.length > 0 && (
                             <>

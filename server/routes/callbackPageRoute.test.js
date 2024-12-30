@@ -1,26 +1,36 @@
 /**
  * @jest-environment node
  */
-
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import axios from 'axios';
 import callbackPage, { get_user_country_code, get_user_ident } from './callbackPageRoute';
+import jwt from 'jsonwebtoken';
 
-const publicKey =
-    '-----BEGIN PUBLIC KEY-----\n' +
-    'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiVKwG5cTHFx60wYLndRL\n' +
-    'lzlvH9m2XsVaWh0LQFcvQBCcUMXjCYQRJ22sLjAz6fvig83dWcoKQVanZfzNGAqG\n' +
-    '/I54LIVT6oUZxFgCA1cyFKELaCqnpzQa3m7CBOklQUV7Z6Dtj1bMJiMIaEv8lzht\n' +
-    'KmqkC6o2xjTWIbVCBublwF0DH5SsVdeX+kC4aJtYCbhsuYuzrn4VpR33NuvLxOBP\n' +
-    'HDVCMYImxlYU337uf6DjmdZMV96ODqP7E9iMS3GWk/MJEzrgLU7/7JiO3OWtkBUN\n' +
-    'spZ7pgNdIc6OQ5ZASfWsUufS44kt1fNmPqowklHCRNqcnFOx0lc7ya/VlCdXV6Qf\n' +
-    'ewIDAQAB\n' +
-    '-----END PUBLIC KEY-----';
+vi.mock('axios');
+vi.mock('jsonwebtoken');
 
-let mockReq = {};
-let mockRes = {};
+const mockPublicKey = 'mock-public-key';
 
 describe('server/routes/callbackPageRoute', () => {
+    let mockReq;
+    let mockRes;
+
     beforeEach(() => {
+        vi.resetAllMocks();
+
+        // Mock JWT verify to return decoded token data
+        jwt.verify.mockImplementation((token, key, options, callback) => {
+            // Verify that the correct key is being passed
+            expect(key).toBe(mockPublicKey);
+            callback(null, {
+                sub: 'EE30303039914',
+                profile_attributes: {
+                    given_name: 'OK',
+                    family_name: 'TESTNUMBER',
+                },
+            });
+        });
+
         mockReq = {
             query: {
                 code: 1234,
@@ -30,60 +40,95 @@ describe('server/routes/callbackPageRoute', () => {
                 grant: {
                     state: 1337,
                 },
-                regenerate: jest.fn(),
+                regenerate: vi.fn(),
             },
             url: '/auth/callback',
         };
 
         mockRes = {
-            clearCookie: jest.fn(),
-            redirect: jest.fn(),
-            send: jest.fn(),
-            sendFile: jest.fn(),
-            setHeader: jest.fn(),
-            status: jest.fn(),
+            clearCookie: vi.fn(),
+            redirect: vi.fn(),
+            send: vi.fn(),
+            sendFile: vi.fn(),
+            setHeader: vi.fn(),
+            status: vi.fn(),
         };
-    });
 
-    afterEach(() => {
-        mockReq = {};
-        mockRes = {};
-    });
-
-    it('logs in user', async () => {
-        axios.mockResolvedValueOnce({
+        axios.mockResolvedValue({
             data: {
+                id_token: 'dummy-token',
                 access_token: '12345',
                 expires_in: 600,
-                id_token:
-                    'eyJhbGciOiJSUzI1NiJ9.eyJqdGkiOiJiMGJjMTg2Yy1kYTk2LTQxMDUtYjYzYy00Mzk3M2E0MzBmODQiLCJpc3MiOiJodHRwczovL3RhcmEtdGVzdC5pbmZyYS50bGQuZWUiLCJhdWQiOiIxMzM3IiwiZXhwIjoxNjEyMjE1NDQ4LCJpYXQiOjE2MTIxODY2NDgsIm5iZiI6MTYxMjE4NjM0OCwic3ViIjoiRUUxMDEwMTAxMDAwNSIsInByb2ZpbGVfYXR0cmlidXRlcyI6eyJkYXRlX29mX2JpcnRoIjoiMTgwMS0wMS0wMSIsImZhbWlseV9uYW1lIjoiU01BUlQtSUQiLCJnaXZlbl9uYW1lIjoiREVNTyJ9LCJhbXIiOlsic21hcnRpZCJdLCJhY3IiOiJoaWdoIiwic3RhdGUiOiI0YzM4MWY5MmM0ZTFlYjBmZmE3ZCIsIm5vbmNlIjoiIiwiYXRfaGFzaCI6InUwS01EekdjeTM3eDY2MnFNQ2VyMEE9PSJ9.hOkkhkP-WsqE_3sjj0OAUpx7N2twFHNuWnY5CWScQfLS1LsEPSNQwMDo7a4_MNhMWrOrsLe2e98wtxlrac03bqJTbT4wQoApOypXXnUhVFbr59QhPssR8ctlp10qZx-jixTJgomu7FqIkH_gBdHquwpv9sf-CCT4Sg3QEcTEfdnMxqn-3JUkxsQqa6hN6KYYrge5T9C84x905gN_moK1i9QHeZ9tLClmJZtjmxBMMy5pHCAln2YBOxxQWsv1VbvvnROZADBdXky_fQVMimmZrMqKi3pyHj-5rYiZ5Q45udVS7RZkk6RMwLtKSOiNSXQvdJirtz1vdV5Sta2C318JyQ',
                 token_type: 'bearer',
             },
         });
-        await callbackPage(mockReq, mockRes, publicKey);
+    });
+
+    afterEach(() => {
+        vi.unstubAllEnvs();
+    });
+
+    it('should handle successful login and set user session', async () => {
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockRes.clearCookie).toHaveBeenCalledWith('connect.sid', expect.any(Object));
         expect(mockReq.session).toHaveProperty('user');
+        expect(mockRes.redirect).toHaveBeenCalledWith('/');
+    });
+
+    it('should redirect to login page with error when user cancels authentication', async () => {
+        mockReq.query.error = 'user_cancel';
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockRes.redirect).toHaveBeenCalledWith('/login');
+    });
+
+    it('should handle state mismatch error', async () => {
+        mockReq.session.grant.state = 'different-state';
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockRes.redirect).toHaveBeenCalledWith('/login');
+    });
+
+    it('should handle axios error', async () => {
+        axios.mockRejectedValue(new Error('Network error'));
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockRes.redirect).toHaveBeenCalledWith('/login');
+    });
+
+    it('should handle JWT verification error', async () => {
+        jwt.verify.mockImplementation((token, key, options, callback) => {
+            expect(key).toBe(mockPublicKey);
+            callback(new Error('TokenExpiredError: jwt expired'));
+        });
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockRes.redirect).toHaveBeenCalledWith('/login');
     });
 });
 
-describe('Check removing country code from ident', () => {
-    it('Check if person has Estonian ident', () => {
-        const ident = get_user_ident('EE38903110313');
-        expect(ident).toBe('38903110313');
+describe('User identification helper functions', () => {
+    describe('get_user_ident', () => {
+        it('should extract Estonian personal code correctly', () => {
+            expect(get_user_ident('EE38903110313')).toBe('38903110313');
+        });
+
+        it('should extract foreign identification code correctly', () => {
+            expect(get_user_ident('FRACD43556DB')).toBe('ACD43556DB');
+        });
+
+        it('should handle empty string', () => {
+            expect(get_user_ident('')).toBe('');
+        });
     });
 
-    it('Check if person has some foreign ident', () => {
-        const ident = get_user_ident('FRACD43556DB');
-        expect(ident).toBe('ACD43556DB');
-    });
-});
+    describe('get_user_country_code', () => {
+        it('should extract Estonian country code correctly', () => {
+            expect(get_user_country_code('EE38903110313')).toBe('EE');
+        });
 
-describe('Check country code from ident', () => {
-    it('Check country code of Estonian ident', () => {
-        const country_code = get_user_country_code('EE38903110313');
-        expect(country_code).toBe('EE');
-    });
-    it('Check country code of Foreign ident', () => {
-        const country_code = get_user_country_code('FRACD43556DB');
-        expect(country_code).toBe('FR');
+        it('should extract foreign country code correctly', () => {
+            expect(get_user_country_code('FRACD43556DB')).toBe('FR');
+        });
+
+        it('should handle empty string', () => {
+            expect(get_user_country_code('')).toBe('');
+        });
     });
 });

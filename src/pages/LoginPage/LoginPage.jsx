@@ -4,7 +4,7 @@ import { Button, Container, Icon, Form } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { MainLayout, MessageModule } from '../../components';
 
-const { VITE_SCOPE, VITE_SERVER_PORT, VITE_URL } = import.meta.env;
+const { VITE_SERVER_PORT, VITE_URL } = import.meta.env;
 
 const authPath =
     process.env.NODE_ENV === 'development'

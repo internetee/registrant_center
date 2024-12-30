@@ -18,12 +18,13 @@ import Helpers from '../../utils/helpers';
 import { fetchDomain as fetchDomainAction } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 const DomainEditPage = ({
     companies,
     contacts,
     domains,
+    error,
     fetchCompanies,
     fetchDomain,
     isLoading,
@@ -40,17 +41,16 @@ const DomainEditPage = ({
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [formData, setFormData] = useState({});
     const [stageData, setStageData] = useState({});
-
     useEffect(() => {
         (async () => {
-            if ((!domain || !domain?.tech_contacts) && !isLoading) {
+            if ((!domain || !domain?.tech_contacts) && !isLoading && !error) {
                 await fetchDomain(id);
                 if (companies.isLoading === null) {
                     fetchCompanies();
                 }
             }
         })();
-    }, [domain, fetchDomain, isLoading, id]);
+    }, [domain, fetchDomain, isLoading, id, error]);
 
     useEffect(() => {
         if (domain) {
@@ -152,14 +152,14 @@ const DomainEditPage = ({
         return <Loading />;
     }
 
-    if (!domain) {
+    if (!domain || error) {
         return (
             <MainLayout hasBackButton titleKey="domain.404.title">
                 <PageMessage
                     headerContent={<FormattedMessage id="domain.404.message.title" />}
                     icon="frown outline"
                 >
-                    <FormattedMessage id="domain.none.message.text" tagName="p" />
+                    <FormattedMessage id="domain.404.message.content" tagName="p" />
                 </PageMessage>
             </MainLayout>
         );
@@ -314,6 +314,7 @@ const mapStateToProps = (state) => ({
     companies: state.companies,
     contacts: state.contacts.data,
     domains: state.domains.data,
+    error: state.domains.error,
     isLoading: state.domains.isLoading,
     message: state.contacts.message,
     ui: state.ui,
@@ -335,7 +336,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(DomainEditPage);
 DomainEditPage.propTypes = {
     companies: PropTypes.object,
     contacts: PropTypes.object,
-    domains: PropTypes.object,
+    domain: PropTypes.object,
     fetchCompanies: PropTypes.func.isRequired,
     fetchDomain: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,

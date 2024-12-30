@@ -1,5 +1,4 @@
 import 'core-js';
-import React from 'react';
 import { mount, shallow } from 'enzyme';
 import MessageModule from './MessageModule';
 import Providers from '../../../__mocks__/Providers';

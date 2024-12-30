@@ -1,4 +1,3 @@
-import React from 'react';
 import { Container, Loader } from 'semantic-ui-react';
 import { FormattedMessage } from 'react-intl';
 

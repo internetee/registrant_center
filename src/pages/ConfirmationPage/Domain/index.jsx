@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Icon, Table } from 'semantic-ui-react';
 import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';

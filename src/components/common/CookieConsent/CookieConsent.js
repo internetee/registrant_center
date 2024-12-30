@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import pluginConfig from './CookieConsentConfig';
-import "vanilla-cookieconsent/dist/cookieconsent.css";
-import * as CookieConsent from "vanilla-cookieconsent";
+import 'vanilla-cookieconsent/dist/cookieconsent.css';
+import * as CookieConsent from 'vanilla-cookieconsent';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();

@@ -1,4 +1,3 @@
-import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Message, Container, Icon } from 'semantic-ui-react';
 import PropTypes from 'prop-types';

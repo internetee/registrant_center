@@ -8,12 +8,12 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import translations from './translations';
 import { Loading, ProtectedRoute, ScrollToTop } from './components';
 import {
-  fetchMenu as fetchMenuAction,
-  getDeviceType as getDeviceTypeAction,
+    fetchMenu as fetchMenuAction,
+    getDeviceType as getDeviceTypeAction,
 } from './redux/reducers/ui';
 import {
-  fetchUser as fetchUserAction,
-  logoutUser as logoutUserAction,
+    fetchUser as fetchUserAction,
+    logoutUser as logoutUserAction,
 } from './redux/reducers/user';
 
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
@@ -25,114 +25,169 @@ const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
 const ErrorPage = lazy(() => import('./pages/ErrorPage/ErrorPage'));
 const ConfirmationPage = lazy(() => import('./pages/ConfirmationPage/ConfirmationPage'));
 
-function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, setLang, ui, user }) {
-  const location = useLocation();
-  const [isLoading, setIsLoading] = useState(true);
-  const { isMainMenuOpen, lang } = ui || {};
-  const { name } = user;
+function App({ fetchMenu, fetchUser, getDeviceType, isLoggedOut, ui, user }) {
+    const location = useLocation();
+    const [isLoading, setIsLoading] = useState(true);
+    const { isMainMenuOpen, lang } = ui || {};
+    const { name } = user;
 
-  useEffect(() => {
-    getDeviceType(window.innerWidth);
-    window.addEventListener('resize', getDeviceType);
-    return () => window.removeEventListener('resize', getDeviceType);
-}, [getDeviceType]);
+    useEffect(() => {
+        getDeviceType(window.innerWidth);
+        window.addEventListener('resize', getDeviceType);
+        return () => window.removeEventListener('resize', getDeviceType);
+    }, [getDeviceType]);
 
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      await fetchMenu('main');
-      await fetchMenu('footer');
-      setIsLoading(false);
-    })();
-  }, [fetchMenu]);
+    useEffect(() => {
+        (async () => {
+            setIsLoading(true);
+            await fetchMenu('main');
+            await fetchMenu('footer');
+            setIsLoading(false);
+        })();
+    }, [fetchMenu]);
 
-  useEffect(() => {
-    (async () => {
-      if (!name && !isLoggedOut) {
-        fetchUser();
-      }
-    })();
-  }, [fetchUser, isLoggedOut, location, name]);
+    useEffect(() => {
+        (async () => {
+            if (!name && !isLoggedOut) {
+                fetchUser();
+            }
+        })();
+    }, [fetchUser, isLoggedOut, location, name]);
 
-  return (
-    <HelmetProvider>
-      <IntlProvider key={lang} defaultLocale="et" locale={lang} messages={translations[lang]}>
-        <FormattedMessage id="app.title">
-          {(title) => (
-            <Helmet>
-              <meta content="IE=edge,chrome=1" httpEquiv="X-UA-Compatible" />
-              <meta
-                content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes"
-                name="viewport"
-              />
-              <meta content="yes" name="apple-mobile-web-app-capable" />
-              <meta content="yes" name="mobile-web-app-capable" />
-              <link
-                href="/apple-touch-icon.png"
-                rel="apple-touch-icon"
-                sizes="180x180"
-              />
-              <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
-              <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
-              <link href="/site.webmanifest" rel="manifest" />
-              <link
-                color="#009de1"
-                href="/safari-pinned-tab.svg"
-                rel="mask-icon"
-              />
-              <meta content="#ffffff" name="msapplication-TileColor" />
-              <meta content="/mstile-144x144.png" name="msapplication-TileImage" />
-              <meta content="#ffffff" name="theme-color" />
-              <title>{title}</title>
-            </Helmet>
-          )}
-        </FormattedMessage>
-        <div className={classNames({ 'app-wrapper': true, 'u-menu-open': isMainMenuOpen })}>
-          <ScrollToTop location={location}>
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <Suspense fallback={<Loading />}>
-                <Routes>
-                  {/* Redirect route */}
-                  {name && location.pathname === '/login' && (
-                    <Route path="/login" element={<Navigate to="/" replace />} />
-                  )}
-                  {/* Protected routes */}
-                  <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-                  <Route path="/domain/:id" element={<ProtectedRoute><DomainPage /></ProtectedRoute>} />
-                  <Route path="/domain/:id/edit" element={<ProtectedRoute><DomainEditPage /></ProtectedRoute>} />
-                  <Route path="/companies" element={<ProtectedRoute><CompaniesPage /></ProtectedRoute>} />
-                  <Route path="/whois" element={<ProtectedRoute><WhoIsPage /></ProtectedRoute>} />
-                  {/* Public routes */}
-                  <Route path="/confirmation/:name/:type/:token" element={<ConfirmationPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/:lang" element={<ErrorPage />} />
-                </Routes>
-              </Suspense>
-            )}
-          </ScrollToTop>
-        </div>
-      </IntlProvider>
-    </HelmetProvider>
-  );
+    return (
+        <HelmetProvider>
+            <IntlProvider defaultLocale="et" key={lang} locale={lang} messages={translations[lang]}>
+                <FormattedMessage id="app.title">
+                    {(title) => (
+                        <Helmet>
+                            <meta content="IE=edge,chrome=1" httpEquiv="X-UA-Compatible" />
+                            <meta
+                                content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes"
+                                name="viewport"
+                            />
+                            <meta content="yes" name="apple-mobile-web-app-capable" />
+                            <meta content="yes" name="mobile-web-app-capable" />
+                            <link
+                                href="/apple-touch-icon.png"
+                                rel="apple-touch-icon"
+                                sizes="180x180"
+                            />
+                            <link
+                                href="/favicon-32x32.png"
+                                rel="icon"
+                                sizes="32x32"
+                                type="image/png"
+                            />
+                            <link
+                                href="/favicon-16x16.png"
+                                rel="icon"
+                                sizes="16x16"
+                                type="image/png"
+                            />
+                            <link href="/site.webmanifest" rel="manifest" />
+                            <link color="#009de1" href="/safari-pinned-tab.svg" rel="mask-icon" />
+                            <meta content="#ffffff" name="msapplication-TileColor" />
+                            <meta content="/mstile-144x144.png" name="msapplication-TileImage" />
+                            <meta content="#ffffff" name="theme-color" />
+                            <title>{title}</title>
+                        </Helmet>
+                    )}
+                </FormattedMessage>
+                <div className={classNames({ 'app-wrapper': true, 'u-menu-open': isMainMenuOpen })}>
+                    <ScrollToTop location={location}>
+                        {isLoading ? (
+                            <Loading />
+                        ) : (
+                            <Suspense fallback={<Loading />}>
+                                <Routes>
+                                    {/* Redirect route */}
+                                    {name && location.pathname === '/login' && (
+                                        <Route
+                                            element={<Navigate replace to="/" />}
+                                            path="/login"
+                                        />
+                                    )}
+                                    {/* Protected routes */}
+                                    <Route
+                                        element={
+                                            <ProtectedRoute>
+                                                <HomePage />
+                                            </ProtectedRoute>
+                                        }
+                                        path="/"
+                                    />
+                                    <Route
+                                        element={
+                                            <ProtectedRoute>
+                                                <DomainPage />
+                                            </ProtectedRoute>
+                                        }
+                                        path="/domain/:id"
+                                    />
+                                    <Route
+                                        element={
+                                            <ProtectedRoute>
+                                                <DomainEditPage />
+                                            </ProtectedRoute>
+                                        }
+                                        path="/domain/:id/edit"
+                                    />
+                                    <Route
+                                        element={
+                                            <ProtectedRoute>
+                                                <CompaniesPage />
+                                            </ProtectedRoute>
+                                        }
+                                        path="/companies"
+                                    />
+                                    <Route
+                                        element={
+                                            <ProtectedRoute>
+                                                <WhoIsPage />
+                                            </ProtectedRoute>
+                                        }
+                                        path="/whois"
+                                    />
+                                    {/* Public routes */}
+                                    <Route
+                                        element={<ConfirmationPage />}
+                                        path="/confirmation/:name/:type/:token"
+                                    />
+                                    <Route
+                                        element={<ConfirmationPage />}
+                                        path="/confirmation/:name/:type"
+                                    />
+                                    <Route
+                                        element={<ConfirmationPage />}
+                                        path="/confirmation/:name"
+                                    />
+                                    <Route element={<LoginPage />} path="/login" />
+                                    <Route element={<ErrorPage />} path="/:lang" />
+                                </Routes>
+                            </Suspense>
+                        )}
+                    </ScrollToTop>
+                </div>
+            </IntlProvider>
+        </HelmetProvider>
+    );
 }
 
 const mapStateToProps = ({ ui, user }) => ({
-  isLoggedOut: user.isLoggedOut,
-  ui,
-  user: user.data,
+    isLoggedOut: user.isLoggedOut,
+    ui,
+    user: user.data,
 });
 
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-      {
-          fetchMenu: fetchMenuAction,
-          fetchUser: fetchUserAction,
-          getDeviceType: getDeviceTypeAction,
-          logoutUser: logoutUserAction,
-      },
-      dispatch
-  );
+    bindActionCreators(
+        {
+            fetchMenu: fetchMenuAction,
+            fetchUser: fetchUserAction,
+            getDeviceType: getDeviceTypeAction,
+            logoutUser: logoutUserAction,
+        },
+        dispatch
+    );
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -24,14 +24,13 @@ const getUiElementSize = (width) => {
 const setLang = (lang) => async (dispatch) => {
     cookies.remove('locale');
     cookies.set('locale', lang, { path: '/' });
-    
     dispatch({
         lang,
         type: SET_LANG,
     });
 };
 
-const requestMenu = (menu) => (dispatch, getState) => {
+const requestMenu = (menu) => (dispatch) => {
     dispatch({
         isInvalidated: false,
         isLoading: true,
@@ -40,7 +39,7 @@ const requestMenu = (menu) => (dispatch, getState) => {
     });
 };
 
-const receiveMenu = (menu, data) => (dispatch, getState) => {
+const receiveMenu = (menu, data) => (dispatch) => {
     dispatch({
         isInvalidated: false,
         isLoading: false,

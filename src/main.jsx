@@ -13,33 +13,31 @@ import 'eis-registrant-theme/dist/semantic.min.css';
 import './index.scss';
 
 const stateSyncConfig = {
-  whitelist: ['LOGOUT_USER'],
+    whitelist: ['LOGOUT_USER'],
 };
 
 const store = configureStore({
-  reducer: reducers,
-  middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(
-          createStateSyncMiddleware(stateSyncConfig)
-      )
+    reducer: reducers,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(createStateSyncMiddleware(stateSyncConfig)),
 });
 
 const root = createRoot(document.getElementById('root'));
 
 root.render(
-  <StrictMode>
-    <Provider store={store}>
-      <CookiesProvider>
-        <BrowserRouter 
-          future={{ 
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
-          {GA.init() && <GA.RouteTracker />}
-          <App />
-        </BrowserRouter>
-      </CookiesProvider>
-    </Provider>
-  </StrictMode>,
-)
+    <StrictMode>
+        <Provider store={store}>
+            <CookiesProvider>
+                <BrowserRouter
+                    future={{
+                        v7_startTransition: true,
+                        v7_relativeSplatPath: true,
+                    }}
+                >
+                    {GA.init() && <GA.RouteTracker />}
+                    <App />
+                </BrowserRouter>
+            </CookiesProvider>
+        </Provider>
+    </StrictMode>
+);

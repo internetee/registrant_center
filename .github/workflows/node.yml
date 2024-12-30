@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci --verbose
+          npm ci
           npm install @rollup/rollup-linux-x64-gnu
 
       - run: npm run build

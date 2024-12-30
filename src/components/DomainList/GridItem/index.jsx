@@ -54,11 +54,11 @@ const DomainGridItem = ({ domain, lang }) => {
                         <Label.Group className="statuses" size="large">
                             {domain.statuses.map((status, i) => (
                                 <Label
-                                    key={status}
                                     basic
                                     circular
                                     className={classNames({ hidden: !showStatuses && i > 0 })}
                                     color={domainStatuses[status].color}
+                                    key={status}
                                     title={formatMessage({
                                         id: `domain.status.${status}.description`,
                                     })}
