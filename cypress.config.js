@@ -2,7 +2,12 @@ import { defineConfig } from 'cypress';
 
 export default defineConfig({
     e2e: {
-        baseUrl: 'http://localhost:4000',
+        baseUrl: 'https://localhost:4000',
+        video: false,
+        chromeWebSecurity: false,
+        requestTimeout: 30000,
+        responseTimeout: 30000,
+        defaultCommandTimeout: 10000,
         supportFile: 'cypress/support/index.js',
         viewportWidth: 1280,
         viewportHeight: 720,

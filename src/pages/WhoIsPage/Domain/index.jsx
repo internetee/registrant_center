@@ -31,7 +31,7 @@ export default function Domain({ id, name, contacts, onChange, domains }) {
                 </div>
             </Table.Cell>
             <Table.Cell singleLine textAlign="right" width={2}>
-                <button onClick={() => setIsOpen(!isOpen)} type="button">
+                <button className="detailed-info" onClick={() => setIsOpen(!isOpen)} type="button">
                     <FormattedMessage id="whois.domain.detailInfo" />
                     <Icon
                         className={classNames({ 'vertically flipped': isOpen })}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
@@ -11,17 +10,17 @@ const mockNavigate = vi.fn();
 // Mock react-router-dom
 vi.mock('react-router-dom', () => ({
     useParams: vi.fn(),
-    useNavigate: () => mockNavigate
+    useNavigate: () => mockNavigate,
 }));
 
 // Mock redux actions
 vi.mock('../../redux/reducers/ui', () => ({
     setLang: () => ({
         type: 'SET_LANG',
-        payload: 'et'
+        payload: 'et',
     }),
     closeMainMenu: vi.fn(),
-    toggleMainMenu: vi.fn()
+    toggleMainMenu: vi.fn(),
 }));
 
 const createTestStore = (overrides = {}) => {
@@ -31,13 +30,13 @@ const createTestStore = (overrides = {}) => {
             uiElemSize: 'small',
             menus: { main: [] },
             isMainMenuOpen: false,
-            ...overrides.ui
+            ...overrides.ui,
         },
         user: {
             data: {},
             error: null,
-            ...overrides.user
-        }
+            ...overrides.user,
+        },
     };
 
     return configureStore({
@@ -47,19 +46,19 @@ const createTestStore = (overrides = {}) => {
                     case 'SET_LANG':
                         return {
                             ...state,
-                            lang: action.payload
+                            lang: action.payload,
                         };
                     default:
                         return state;
                 }
             },
-            user: (state = baseState.user) => state
+            user: (state = baseState.user) => state,
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: false,
                 immutableCheck: false,
-            })
+            }),
     });
 };
 

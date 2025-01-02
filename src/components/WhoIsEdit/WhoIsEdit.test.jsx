@@ -12,7 +12,7 @@ import { parseDomain } from '../../redux/reducers/domains';
 describe('WhoIsEdit Component', () => {
     let store;
 
-    const parsedDomains = mockDomains.map(domain => parseDomain(domain, true));
+    const parsedDomains = mockDomains.map((domain) => parseDomain(domain, true));
     const domain = parsedDomains[0];
 
     const createStore = (initialState = {}) =>
@@ -28,13 +28,16 @@ describe('WhoIsEdit Component', () => {
                     state = initialState.domains || {
                         data: {
                             count: parsedDomains.length,
-                            domains: parsedDomains.reduce((acc, domain) => ({
-                                ...acc,
-                                [domain.id]: domain
-                            }), {}),
-                            total: parsedDomains.length
+                            domains: parsedDomains.reduce(
+                                (acc, domain) => ({
+                                    ...acc,
+                                    [domain.id]: domain,
+                                }),
+                                {}
+                            ),
+                            total: parsedDomains.length,
                         },
-                        ids: parsedDomains.map(domain => domain.id),
+                        ids: parsedDomains.map((domain) => domain.id),
                         isLoading: false,
                     }
                 ) => state,
@@ -45,7 +48,7 @@ describe('WhoIsEdit Component', () => {
                 ) => state,
                 user: (
                     state = initialState.user || {
-                        data: mockUser
+                        data: mockUser,
                     }
                 ) => state,
             },
@@ -80,13 +83,13 @@ describe('WhoIsEdit Component', () => {
     describe('Basic Rendering', () => {
         it('should render the component correctly', () => {
             const { container, getByText } = renderWhoIsEdit();
-            
+
             // Check if the component renders
             expect(container.firstChild).toBeInTheDocument();
-            
+
             // Check for specific elements we expect to see
             expect(getByText('Roll:')).toBeInTheDocument();
-            
+
             // Check for form group
             const formGroup = container.querySelector('.adv-field-group');
             expect(formGroup).toBeInTheDocument();
@@ -127,22 +130,24 @@ describe('WhoIsEdit Component', () => {
             const onChange = vi.fn();
             // Phone checkbox is never disabled, so we don't need to modify domain
             const { container } = renderWhoIsEdit({ onChange });
-            
+
             const phoneCheckbox = container.querySelector('input[name="phone"]');
             expect(phoneCheckbox).not.toBeDisabled();
             fireEvent.click(phoneCheckbox);
-            
+
             expect(onChange).toHaveBeenCalled();
         });
 
         it('should handle registrant publishable checkbox change', () => {
             const onChange = vi.fn();
             const { container } = renderWhoIsEdit({ onChange });
-            
-            const publishableCheckbox = container.querySelector('input[name="registrant_publishable"]');
+
+            const publishableCheckbox = container.querySelector(
+                'input[name="registrant_publishable"]'
+            );
             expect(publishableCheckbox).not.toBeDisabled();
             fireEvent.click(publishableCheckbox);
-            
+
             expect(onChange).toHaveBeenCalled();
         });
     });
@@ -153,17 +158,17 @@ describe('WhoIsEdit Component', () => {
                 ...defaultProps.domain,
                 registrant: {
                     ...defaultProps.domain.registrant,
-                    org: 'true'
-                }
+                    org: 'true',
+                },
             };
 
             const { container } = renderWhoIsEdit({ domain: domainWithOrg });
-            
+
             const nameCheckboxes = container.querySelectorAll('input[name="name"]');
             const emailCheckboxes = container.querySelectorAll('input[name="email"]');
-            
-            expect([...nameCheckboxes].every(cb => cb.disabled)).toBe(true);
-            expect([...emailCheckboxes].every(cb => cb.disabled)).toBe(true);
+
+            expect([...nameCheckboxes].every((cb) => cb.disabled)).toBe(true);
+            expect([...emailCheckboxes].every((cb) => cb.disabled)).toBe(true);
         });
 
         it('should auto-check name and email for organization contacts', () => {
@@ -171,17 +176,17 @@ describe('WhoIsEdit Component', () => {
                 ...defaultProps.domain,
                 registrant: {
                     ...defaultProps.domain.registrant,
-                    org: 'true'
-                }
+                    org: 'true',
+                },
             };
 
             const { container } = renderWhoIsEdit({ domain: domainWithOrg });
-            
+
             const nameCheckboxes = container.querySelectorAll('input[name="name"]');
             const emailCheckboxes = container.querySelectorAll('input[name="email"]');
-            
-            expect([...nameCheckboxes].every(cb => cb.checked)).toBe(true);
-            expect([...emailCheckboxes].every(cb => cb.checked)).toBe(true);
+
+            expect([...nameCheckboxes].every((cb) => cb.checked)).toBe(true);
+            expect([...emailCheckboxes].every((cb) => cb.checked)).toBe(true);
         });
     });
 
@@ -197,7 +202,7 @@ describe('WhoIsEdit Component', () => {
         //         }
         //     };
 
-        //     const { container } = renderWhoIsEdit({ 
+        //     const { container } = renderWhoIsEdit({
         //         checkAll: true,
         //         domain: nonOrgDomain,
         //         contacts: nonOrgContacts
@@ -218,19 +223,18 @@ describe('WhoIsEdit Component', () => {
                 ...defaultProps.domain,
                 registrant: {
                     ...defaultProps.domain.registrant,
-                    org: 'true'
-                }
+                    org: 'true',
+                },
             };
 
-            const { container } = renderWhoIsEdit({ 
+            const { container } = renderWhoIsEdit({
                 checkAll: true,
-                domain: orgDomain
+                domain: orgDomain,
             });
 
             const checkAllBox = container.querySelector('.checkbox.large');
             expect(checkAllBox).not.toBeInTheDocument();
         });
-
     });
 
     describe('Visibility Control', () => {

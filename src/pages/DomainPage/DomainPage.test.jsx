@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
@@ -12,28 +11,40 @@ import contacts from '../../__mocks__/contacts';
 global.scrollTo = vi.fn();
 
 const mockDomain = {
-    ...domains[0]
+    ...domains[0],
 };
 
-vi.mock('react-router-dom', () => ({
-    Link: React.forwardRef(({ children, to, ...props }, ref) => (
-        <a href={to} ref={ref} {...props}>{children}</a>
-    )),
-    useParams: () => ({ id: mockDomain.id }),
-    useNavigate: vi.fn()
-}));
+// Mock modules using factory functions
+vi.mock('react-router-dom', () => {
+    const React = require('react');
+    const MockLink = React.forwardRef((props, ref) => {
+        const { children, to, ...rest } = props;
+        return (
+            <a href={to} ref={ref} {...rest}>
+                {children}
+            </a>
+        );
+    });
+    MockLink.displayName = 'MockLink';
+
+    return {
+        Link: MockLink,
+        useParams: () => ({ id: domains[0].id }),
+        useNavigate: () => vi.fn(),
+    };
+});
 
 // Mock the domain actions
 vi.mock('../../redux/reducers/domains', () => ({
     fetchDomain: vi.fn(),
     lockDomain: () => ({
         type: 'domains/lockDomain/fulfilled',
-        payload: { ...mockDomain, isLocked: true }
+        payload: { ...mockDomain, isLocked: true },
     }),
     unlockDomain: () => ({
         type: 'domains/unlockDomain/fulfilled',
-        payload: { ...mockDomain, isLocked: false }
-    })
+        payload: { ...mockDomain, isLocked: false },
+    }),
 }));
 
 const createTestStore = (overrides = {}) => {
@@ -42,11 +53,11 @@ const createTestStore = (overrides = {}) => {
             uiElemSize: 'small',
             lang: 'et',
             menus: { main: [] },
-            isMainMenuOpen: false
+            isMainMenuOpen: false,
         },
         user: {
             data: user,
-            error: null
+            error: null,
         },
         domains: {
             data: {
@@ -54,26 +65,24 @@ const createTestStore = (overrides = {}) => {
                     ...mockDomain,
                     contacts: {
                         [mockDomain.registrant.id]: {
-                            ...contacts.find(c => c.id === mockDomain.registrant.id),
-                            roles: ['registrant', 'tech']
+                            ...contacts.find((c) => c.id === mockDomain.registrant.id),
+                            roles: ['registrant', 'tech'],
                         },
                         [mockDomain.admin_contacts[0].id]: {
-                            ...contacts.find(c => c.id === mockDomain.admin_contacts[0].id),
-                            roles: ['admin']
-                        }
+                            ...contacts.find((c) => c.id === mockDomain.admin_contacts[0].id),
+                            roles: ['admin'],
+                        },
                     },
                     isLockable: true,
                     isLocked: false,
-                }
+                },
             },
             isLoading: false,
-            error: null
+            error: null,
         },
         contacts: {
             data: {
-                ...Object.fromEntries(
-                    contacts.map(contact => [contact.id, contact])
-                )
+                ...Object.fromEntries(contacts.map((contact) => [contact.id, contact])),
             },
             message: null,
         },
@@ -81,7 +90,7 @@ const createTestStore = (overrides = {}) => {
             data: {},
             ids: [],
             isLoading: null,
-            message: null
+            message: null,
         },
     };
 
@@ -101,23 +110,25 @@ const createTestStore = (overrides = {}) => {
                                 ...action.payload,
                                 contacts: {
                                     [mockDomain.registrant.id]: {
-                                        ...contacts.find(c => c.id === mockDomain.registrant.id),
-                                        roles: ['registrant', 'tech']
+                                        ...contacts.find((c) => c.id === mockDomain.registrant.id),
+                                        roles: ['registrant', 'tech'],
                                     },
                                     [mockDomain.admin_contacts[0].id]: {
-                                        ...contacts.find(c => c.id === mockDomain.admin_contacts[0].id),
-                                        roles: ['admin']
-                                    }
+                                        ...contacts.find(
+                                            (c) => c.id === mockDomain.admin_contacts[0].id
+                                        ),
+                                        roles: ['admin'],
+                                    },
                                 },
-                            }
-                        }
+                            },
+                        },
                     };
                 default:
                     return state;
             }
         },
         contacts: (state = { ...baseState.contacts, ...overrides.contacts }) => state,
-        companies: (state = { ...baseState.companies, ...overrides.companies }) => state
+        companies: (state = { ...baseState.companies, ...overrides.companies }) => state,
     };
 
     return configureStore({
@@ -147,11 +158,11 @@ describe('DomainPage', () => {
                 <DomainPage />
             </Providers>
         );
-        
+
         // Basic structure checks
         expect(container.querySelector('.page--domain')).toBeInTheDocument();
         expect(container.querySelector('.page--header')).toBeInTheDocument();
-        
+
         // Check if domain data is displayed
         expect(container.textContent).toContain(mockDomain.name);
         expect(container.textContent).toContain(mockDomain.registrant.name);
@@ -163,8 +174,8 @@ describe('DomainPage', () => {
             domains: {
                 data: {},
                 error: 'Domain not found',
-                isLoading: false
-            }
+                isLoading: false,
+            },
         });
 
         const { container } = render(
@@ -172,7 +183,7 @@ describe('DomainPage', () => {
                 <DomainPage />
             </Providers>
         );
-        
+
         expect(container.querySelector('.page--message')).toBeInTheDocument();
         expect(container.textContent).toContain('Domeeni ei leitud');
     });
@@ -188,8 +199,8 @@ describe('DomainPage', () => {
         const lockButton = container.querySelector('button[data-test="open-lock-modal"]');
         fireEvent.click(lockButton);
 
-         // Wait for and check if confirmation dialog is shown
-         await waitFor(() => {
+        // Wait for and check if confirmation dialog is shown
+        await waitFor(() => {
             expect(getByTestId('lock-confirmation-modal')).toBeInTheDocument();
         });
 
@@ -213,19 +224,19 @@ describe('DomainPage', () => {
                         ...mockDomain,
                         contacts: {
                             [mockDomain.registrant.id]: {
-                                ...contacts.find(c => c.id === mockDomain.registrant.id),
-                                roles: ['registrant', 'tech']
+                                ...contacts.find((c) => c.id === mockDomain.registrant.id),
+                                roles: ['registrant', 'tech'],
                             },
                             [mockDomain.admin_contacts[0].id]: {
-                                ...contacts.find(c => c.id === mockDomain.admin_contacts[0].id),
-                                roles: ['admin']
-                            }
+                                ...contacts.find((c) => c.id === mockDomain.admin_contacts[0].id),
+                                roles: ['admin'],
+                            },
                         },
                         isLockable: true,
                         isLocked: true,
-                    }
+                    },
                 },
-            }
+            },
         });
 
         const { container, getByTestId } = render(
@@ -238,8 +249,8 @@ describe('DomainPage', () => {
         const unlockButton = container.querySelector('button[data-test="open-unlock-modal"]');
         fireEvent.click(unlockButton);
 
-         // Wait for and check if confirmation dialog is shown
-         await waitFor(() => {
+        // Wait for and check if confirmation dialog is shown
+        await waitFor(() => {
             expect(getByTestId('lock-confirmation-modal')).toBeInTheDocument();
         });
 

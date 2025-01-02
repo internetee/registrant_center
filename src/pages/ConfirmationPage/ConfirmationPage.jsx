@@ -10,7 +10,6 @@ import {
     respondToVerification as respondToVerificationAction,
 } from '../../redux/reducers/verification';
 import { useParams } from 'react-router-dom';
-import { should } from 'vitest';
 
 const ConfirmationPage = ({
     ui,
@@ -22,6 +21,25 @@ const ConfirmationPage = ({
     const { name, type, token } = useParams();
     const [isLoading, setIsLoading] = useState(true);
     const { uiElemSize } = ui;
+
+    useEffect(() => {
+        (async () => {
+            if (!token) {
+                // If no token, just show the form without fetching
+                setIsLoading(false);
+                return;
+            }
+
+            setIsLoading(true);
+            await fetchVerification({
+                domain: name,
+                token: token,
+                type: type,
+            });
+            setIsLoading(false);
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fetchVerification]);
 
     if (!name || !type) {
         return (
@@ -57,44 +75,16 @@ const ConfirmationPage = ({
 
     const handleVerification = async (shouldConfirm) => {
         setIsLoading(true);
-        await respondToVerification(
-            name,
-            token,
-            shouldConfirm,
-            type
-        );
+        await respondToVerification(name, token, shouldConfirm, type);
         setIsLoading(false);
     };
-
-    useEffect(() => {
-        (async () => {
-            if (!token) {
-                // If no token, just show the form without fetching
-                setIsLoading(false);
-                return;
-            }
-
-            setIsLoading(true);
-            await fetchVerification({
-                domain: name,
-                token: token,
-                type: type,
-            });
-            setIsLoading(false);
-        })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchVerification]);
 
     if (isLoading) return <Loading />;
 
     return (
         <MainLayout
             hasBackButton
-            titleKey={
-                type === 'change'
-                    ? 'confirmation.change_title'
-                    : 'confirmation.delete_title'
-            }
+            titleKey={type === 'change' ? 'confirmation.change_title' : 'confirmation.delete_title'}
         >
             {!isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">

@@ -129,10 +129,12 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                             <Checkbox
                                 checked={Boolean(
                                     domain.registrant.org ||
-                                    item.ident.type === 'org' ||
-                                    item.disclosed_attributes.has('name')
+                                        item.ident.type === 'org' ||
+                                        item.disclosed_attributes.has('name')
                                 )}
-                                disabled={Boolean(item.ident.type === 'org' || domain.registrant.org)}
+                                disabled={Boolean(
+                                    item.ident.type === 'org' || domain.registrant.org
+                                )}
                                 id={`name-${item.id}`}
                                 label={
                                     <label htmlFor={`name-${item.id}`}>
@@ -155,10 +157,12 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                             <Checkbox
                                 checked={Boolean(
                                     domain.registrant.org ||
-                                    item.ident.type === 'org' ||
-                                    item.disclosed_attributes.has('email')
+                                        item.ident.type === 'org' ||
+                                        item.disclosed_attributes.has('email')
                                 )}
-                                disabled={Boolean(item.ident.type === 'org' || domain.registrant.org)}
+                                disabled={Boolean(
+                                    item.ident.type === 'org' || domain.registrant.org
+                                )}
                                 id={`email-${item.id}`}
                                 label={
                                     <label htmlFor={`email-${item.id}`}>

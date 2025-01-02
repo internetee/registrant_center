@@ -14,6 +14,7 @@ import {
     UPDATE_CONTACT_FAILURE,
     UPDATE_CONTACTS_REQUEST,
     UPDATE_CONTACTS_SUCCESS,
+    UPDATE_CONTACTS_FAILURE,
     LOGOUT_USER,
 } from '../actions';
 
@@ -93,6 +94,11 @@ const updateContacts = (payload) => ({
     type: UPDATE_CONTACTS_SUCCESS,
 });
 
+const failUpdateContacts = (payload) => ({
+    payload,
+    type: UPDATE_CONTACTS_FAILURE,
+});
+
 const fetchUpdateContacts = (uuid) => (dispatch) => {
     dispatch(doUpdateContacts());
     return api
@@ -113,6 +119,9 @@ const updateContactsConfirm = (uuid) => (dispatch) => {
         .then((res) => res.data)
         .then((data) => {
             return dispatch(updateContacts(data));
+        })
+        .catch(() => {
+            return dispatch(failUpdateContacts());
         });
 };
 

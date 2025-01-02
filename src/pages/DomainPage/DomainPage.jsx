@@ -73,7 +73,7 @@ const DomainPage = ({
             }
         };
         fetchData();
-    }, [domain, fetchDomain, isLoading, id, error]);
+    }, [domain, fetchDomain, isLoading, id, error, companies.isLoading, fetchCompanies]);
 
     useEffect(() => {
         if (registrantContacts?.ident?.type === 'org') {

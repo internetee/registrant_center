@@ -21,7 +21,7 @@ const getUiElementSize = (width) => {
     return 'big';
 };
 
-const setLang = (lang) => async (dispatch) => {
+const setLang = (lang) => (dispatch) => {
     cookies.remove('locale');
     cookies.set('locale', lang, { path: '/' });
     dispatch({
@@ -30,26 +30,24 @@ const setLang = (lang) => async (dispatch) => {
     });
 };
 
-const requestMenu = (menu) => (dispatch) => {
-    dispatch({
+const requestMenu = (menu) => {
+    return {
         isInvalidated: false,
         isLoading: true,
         status: null,
         type: fetchMenuAction(menu, 'request'),
-    });
+    };
 };
 
-const receiveMenu = (menu, data) => (dispatch) => {
-    dispatch({
-        isInvalidated: false,
-        isLoading: false,
-        payload: {
-            [menu]: data,
-        },
-        status: 200,
-        type: fetchMenuAction(menu, 'success'),
-    });
-};
+const receiveMenu = (menu, data) => ({
+    isInvalidated: false,
+    isLoading: false,
+    payload: {
+        [menu]: data,
+    },
+    status: 200,
+    type: fetchMenuAction(menu, 'success'),
+});
 
 const invalidateMenuRequest = (menu, status) => {
     return {
@@ -68,11 +66,11 @@ const fetchMenu = (menu) => (dispatch) => {
     return api
         .fetchMenu(menu)
         .then((res) => res.data)
-        .then(async (data) => {
-            dispatch(receiveMenu(menu, data));
+        .then((data) => {
+            return dispatch(receiveMenu(menu, data));
         })
         .catch((error) => {
-            dispatch(invalidateMenuRequest(menu, error.response.status));
+            return dispatch(invalidateMenuRequest(menu, error.response.status));
         });
 };
 

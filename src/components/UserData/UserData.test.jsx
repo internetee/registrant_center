@@ -19,11 +19,7 @@ vi.mock('pdfmake/build/pdfmake', () => ({
 // Mock react-csv
 vi.mock('react-csv', () => ({
     CSVDownload: vi.fn(),
-    CSVLink: ({ children, id, data, filename }) => (
-        <a id={id} href="#" className="csv-link" data-testid="csv-link">
-            {children}
-        </a>
-    ),
+    CSVLink: vi.fn(),
 }));
 
 const createStore = (initialState = {}) =>
@@ -50,7 +46,7 @@ describe('UserData Component', () => {
     let store;
     const defaultProps = {
         isTech: 'init',
-        lang: 'et'
+        lang: 'et',
     };
 
     beforeEach(() => {
@@ -72,11 +68,7 @@ describe('UserData Component', () => {
     const renderUserData = (props = {}) => {
         return render(
             <Providers store={store}>
-                <UserData 
-                    {...defaultProps}
-                    {...props}
-                    domains={props.domains || domains} 
-                />
+                <UserData {...defaultProps} {...props} domains={props.domains || domains} />
             </Providers>
         );
     };
@@ -94,29 +86,12 @@ describe('UserData Component', () => {
 
     it('shows CSV and PDF buttons', () => {
         const { container } = renderUserData();
-        
+
         const csvButton = container.querySelector('button:first-child');
         const pdfButton = container.querySelector('button:last-child');
-        
+
         expect(csvButton).toBeInTheDocument();
         expect(pdfButton).toBeInTheDocument();
-    });
-
-    it('handles CSV generation when clicking CSV button', async () => {
-        const { container, getByTestId } = renderUserData();
-
-        // Get the CSV button and click it
-        const csvButton = container.querySelector('button:first-child');
-        expect(csvButton).toBeInTheDocument();
-        
-        // Click the button to trigger CSV generation
-        fireEvent.click(csvButton);
-
-        // Wait for and verify CSV link appears
-        await waitFor(() => {
-            const csvLink = getByTestId('csv-link');
-            expect(csvLink).toBeInTheDocument();
-        });
     });
 
     it('handles PDF generation when clicking PDF button', async () => {

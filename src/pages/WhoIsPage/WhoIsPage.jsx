@@ -81,7 +81,7 @@ const WhoIsPage = ({
     }, []);
 
     useEffect(() => {
-        if (domains.length === 0) {
+        if (domains.length === 0 || Object.keys(contacts).length === 0) {
             if (isTech) {
                 (async () => {
                     await fetchDomains(0, false, true);
@@ -101,7 +101,7 @@ const WhoIsPage = ({
             setIsLoading(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchDomains, fetchContacts, fetchCompanies, isTech, domains?.length]);
+    }, [fetchDomains, fetchContacts, fetchCompanies, isTech, domains?.length, contacts]);
 
     useEffect(() => {
         setWhoIsData(contacts);
@@ -490,7 +490,7 @@ WhoIsPage.propTypes = {
 
 WhoIsPage.defaultProps = {
     companies: [],
-    contacts: [],
+    contacts: {},
     domains: {},
     message: false,
 };

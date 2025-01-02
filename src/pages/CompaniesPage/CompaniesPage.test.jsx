@@ -12,43 +12,46 @@ const mockCompanies = companiesMock.companies;
 vi.mock('../../redux/reducers/companies', () => ({
     fetchCompanies: () => ({
         type: 'companies/fetchCompanies/fulfilled',
-        payload: mockCompanies
-    })
+        payload: mockCompanies,
+    }),
 }));
 
 vi.mock('react-router-dom', () => ({
-    useNavigate: vi.fn()
+    useNavigate: vi.fn(),
 }));
 
 const createTestStore = (overrides = {}) => {
     const baseState = {
         companies: {
             data: Object.fromEntries(
-                mockCompanies.map(company => [company.registry_no, company])
+                mockCompanies.map((company) => [company.registry_no, company])
             ),
-            ids: mockCompanies.map(company => company.registry_no),
+            ids: mockCompanies.map((company) => company.registry_no),
             isLoading: false,
             message: null,
-            ...overrides.companies
+            ...overrides.companies,
         },
         ui: {
             uiElemSize: 'small',
             lang: 'et',
             menus: { main: [] },
-            isMainMenuOpen: false
+            isMainMenuOpen: false,
         },
         user: {
             data: user,
             isLoading: false,
-            error: null
-        }
+            error: null,
+        },
     };
 
     return configureStore({
-        reducer: Object.entries(baseState).reduce((acc, [key, value]) => ({
-            ...acc,
-            [key]: (state = { ...value, ...overrides[key] }) => state
-        }), {}),
+        reducer: Object.entries(baseState).reduce(
+            (acc, [key, value]) => ({
+                ...acc,
+                [key]: (state = { ...value, ...overrides[key] }) => state,
+            }),
+            {}
+        ),
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: false,
@@ -74,13 +77,13 @@ describe('CompaniesPage', () => {
                 <CompaniesPage />
             </Providers>
         );
-        
+
         // Basic structure checks
         expect(container.querySelector('.page--companies')).toBeInTheDocument();
         expect(container.querySelector('.page--header')).toBeInTheDocument();
-        
+
         // Check if companies are displayed
-        mockCompanies.forEach(company => {
+        mockCompanies.forEach((company) => {
             expect(container.textContent).toContain(company.name);
             expect(container.textContent).toContain(company.registry_no);
         });
@@ -88,7 +91,7 @@ describe('CompaniesPage', () => {
 
     it('shows loading state while fetching companies', () => {
         const loadingStore = createTestStore({
-            companies: { isLoading: true }
+            companies: { isLoading: true },
         });
 
         const { container } = render(
@@ -105,8 +108,8 @@ describe('CompaniesPage', () => {
             companies: {
                 data: {},
                 ids: [],
-                isLoading: false
-            }
+                isLoading: false,
+            },
         });
 
         const { container } = render(
@@ -115,7 +118,9 @@ describe('CompaniesPage', () => {
             </Providers>
         );
 
-        expect(container.textContent).toContain('Äriregistri andmetel ei kuulu Teile ühtegi ettevõtet');
+        expect(container.textContent).toContain(
+            'Äriregistri andmetel ei kuulu Teile ühtegi ettevõtet'
+        );
     });
 
     it('filters companies based on search input', async () => {
@@ -159,7 +164,7 @@ describe('CompaniesPage', () => {
 
         // Check if all companies are shown again
         await waitFor(() => {
-            mockCompanies.forEach(company => {
+            mockCompanies.forEach((company) => {
                 expect(container.textContent).toContain(company.name);
             });
         });

@@ -10,12 +10,12 @@ const mockVerification = {
     currentRegistrant: {
         name: 'Current Registrant',
         ident: '12345678',
-        country: 'EE'
+        country: 'EE',
     },
     newRegistrant: {
         name: 'New Registrant',
         ident: '87654321',
-        country: 'EE'
+        country: 'EE',
     },
     status: null,
 };
@@ -24,23 +24,23 @@ const mockVerification = {
 vi.mock('../../redux/reducers/verification', () => ({
     fetchVerification: () => ({
         type: 'verification/fetchVerification/fulfilled',
-        payload: mockVerification
+        payload: mockVerification,
     }),
-    respondToVerification: (domain, token, shouldConfirm, type) => ({
+    respondToVerification: (_domain, _token, shouldConfirm, _type) => ({
         type: 'verification/respondToVerification/fulfilled',
         payload: {
             domainName: mockVerification.domainName,
             currentRegistrant: mockVerification.currentRegistrant,
             newRegistrant: mockVerification.newRegistrant,
-            status: shouldConfirm === 'confirmed' ? 'confirmed' : 'rejected'
-        }
-    })
+            status: shouldConfirm === 'confirmed' ? 'confirmed' : 'rejected',
+        },
+    }),
 }));
 
 // Mock react-router-dom
 vi.mock('react-router-dom', () => ({
     useParams: vi.fn(),
-    useNavigate: vi.fn()
+    useNavigate: vi.fn(),
 }));
 
 const createTestStore = (overrides = {}) => {
@@ -49,29 +49,32 @@ const createTestStore = (overrides = {}) => {
             uiElemSize: 'small',
             lang: 'et',
             menus: { main: [] },
-            isMainMenuOpen: false
+            isMainMenuOpen: false,
         },
         user: {
-            data: {}
+            data: {},
         },
-        verification: mockVerification
+        verification: mockVerification,
     };
 
     // Create reducers that actually handle the verification actions
     const reducers = {
         ui: (state = { ...baseState.ui, ...overrides.ui }) => state,
         user: (state = { ...baseState.user, ...overrides.user }) => state,
-        verification: (state = { ...baseState.verification, ...overrides.verification }, action) => {
+        verification: (
+            state = { ...baseState.verification, ...overrides.verification },
+            action
+        ) => {
             switch (action.type) {
                 case 'verification/respondToVerification/fulfilled':
                     return {
                         ...state,
-                        ...action.payload
+                        ...action.payload,
                     };
                 default:
                     return state;
             }
-        }
+        },
     };
 
     return configureStore({
@@ -88,10 +91,10 @@ describe('ConfirmationPage', () => {
     let store;
 
     beforeEach(() => {
-        vi.mocked(useParams).mockReturnValue({ 
+        vi.mocked(useParams).mockReturnValue({
             name: 'test-domain.ee',
             token: 'token',
-            type: 'change'
+            type: 'change',
         });
         store = createTestStore();
     });
@@ -100,7 +103,7 @@ describe('ConfirmationPage', () => {
         vi.clearAllMocks();
     });
 
-    it('renders correctly for change request', async() => {
+    it('renders correctly for change request', async () => {
         const { container } = render(
             <Providers store={store}>
                 <ConfirmationPage />
@@ -110,11 +113,11 @@ describe('ConfirmationPage', () => {
         await waitFor(() => {
             expect(container.querySelector('.loading')).not.toBeInTheDocument();
         });
-        
+
         // Basic structure checks
         expect(container.querySelector('.page--whois')).toBeInTheDocument();
         expect(container.querySelector('.page--header')).toBeInTheDocument();
-        
+
         // Check if verification data is displayed
         expect(container.textContent).toContain(mockVerification.domainName);
         expect(container.textContent).toContain(mockVerification.currentRegistrant.name);
@@ -129,20 +132,26 @@ describe('ConfirmationPage', () => {
                 <ConfirmationPage />
             </Providers>
         );
-        
+
         expect(container.querySelector('.page--message')).toBeInTheDocument();
-        expect(container.textContent).toContain('Kahjuks sellisele URL-le vastavat lehte ei leitud');
+        expect(container.textContent).toContain(
+            'Kahjuks sellisele URL-le vastavat lehte ei leitud'
+        );
     });
 
     it('renders form without fetching if token is null', () => {
-        vi.mocked(useParams).mockReturnValue({ name: 'test-domain.ee', token: null, type: 'change' });
+        vi.mocked(useParams).mockReturnValue({
+            name: 'test-domain.ee',
+            token: null,
+            type: 'change',
+        });
         const initialStore = createTestStore({
             verification: {
                 domainName: null,
                 currentRegistrant: null,
                 newRegistrant: null,
                 status: null,
-            }
+            },
         });
 
         const { container } = render(
@@ -150,17 +159,17 @@ describe('ConfirmationPage', () => {
                 <ConfirmationPage />
             </Providers>
         );
-        
+
         expect(container.querySelector('.page--whois')).toBeInTheDocument();
         expect(container.querySelector('.page--message')).toBeInTheDocument();
         expect(container.textContent).toContain('Domeeni omanikuvahetust pole võimalik kinnitada.');
     });
 
-    it('shows error message when verification is not available', async() => {
+    it('shows error message when verification is not available', async () => {
         const errorStore = createTestStore({
             verification: {
-                domainName: null
-            }
+                domainName: null,
+            },
         });
 
         const { container } = render(
@@ -221,12 +230,18 @@ describe('ConfirmationPage', () => {
         // Wait for and check rejection result
         await waitFor(() => {
             expect(store.getState().verification.status).toBe('rejected');
-            expect(container.textContent).toContain('Omanikuvahetuse avaldus on edukalt tagasilükatud.');
+            expect(container.textContent).toContain(
+                'Omanikuvahetuse avaldus on edukalt tagasilükatud.'
+            );
         });
     });
 
-    it('shows different content for delete request', async() => {
-        vi.mocked(useParams).mockReturnValue({ name: 'test-domain.ee', token: 'token', type: 'delete' });
+    it('shows different content for delete request', async () => {
+        vi.mocked(useParams).mockReturnValue({
+            name: 'test-domain.ee',
+            token: 'token',
+            type: 'delete',
+        });
 
         const { container } = render(
             <Providers store={store}>

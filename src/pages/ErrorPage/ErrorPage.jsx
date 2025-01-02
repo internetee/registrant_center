@@ -42,4 +42,3 @@ export default connect(null, mapDispatchToProps)(ErrorPage);
 ErrorPage.propTypes = {
     setLang: PropTypes.func.isRequired,
 };
-
