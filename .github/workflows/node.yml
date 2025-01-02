@@ -35,8 +35,8 @@ jobs:
       - name: run tests
         env:
           HOST: localhost
-          REACT_APP_URL: https://$HOST
-          REACT_APP_SERVER_PORT: 5000
+          VITE_URL: https://$HOST
+          VITE_SERVER_PORT: 5000
           API_HOST: https://testrant.internet.ee
           PUBLIC_API_HOST: https://www.internet.ee
           PUBLIC_API_KEY: 4395743059dsfksdfyds8f7334
@@ -49,4 +49,4 @@ jobs:
           REDIRECT_URL: /auth/callback
           SESSION_SECRET: secret555555
           HTTPS: true
-        run: npm test
+        run: npm run test
