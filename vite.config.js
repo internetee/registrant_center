@@ -18,9 +18,9 @@ export default defineConfig({
                     proxy.on('error', (err, _req, _res) => {
                         console.log('proxy error', err);
                     });
-                    proxy.on('proxyReq', (proxyReq, req, _res) => {
-                        console.log('Sending Request to the Target:', req.method, req.url);
-                    });
+                    // proxy.on('proxyReq', (proxyReq, req, _res) => {
+                    //     console.log('Sending Request to the Target:', req.method, req.url);
+                    // });
                 },
             },
         },
@@ -43,16 +43,6 @@ export default defineConfig({
         assetsDir: 'assets',
         sourcemap: true,
         target: 'es2015',
-        modulePreload: false,
-        cssCodeSplit: true,
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    vendor: ['react', 'react-dom', 'react-router-dom'],
-                    redux: ['@reduxjs/toolkit', 'react-redux'],
-                }
-            }
-        }
     },
     publicDir: 'public',
     assetsInclude: ['**/*.woff', '**/*.woff2'],
