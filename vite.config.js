@@ -35,45 +35,14 @@ export default defineConfig({
         include: ['core-js', 'regenerator-runtime', 'react-cookie', 'universal-cookie'],
     },
     build: {
-        // Basic build options
+        commonjsOptions: {
+            // include: [/core-js/, /regenerator-runtime/],
+            transformMixedEsModules: true,
+        },
         outDir: 'dist',
         assetsDir: 'assets',
         sourcemap: true,
         target: 'es2015',
-        
-        // Use esbuild instead of terser
-        minify: 'esbuild',
-        
-        // Disable browser features
-        manifest: false,
-        cssCodeSplit: true,
-        modulePreload: false,
-        
-        // Performance optimizations
-        chunkSizeWarningLimit: 1000,
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    vendor: ['react', 'react-dom', 'react-router-dom'],
-                    redux: ['@reduxjs/toolkit', 'react-redux'],
-                },
-                compact: true
-            }
-        },
-        
-        // CommonJS handling
-        commonjsOptions: {
-            transformMixedEsModules: true,
-            include: [/node_modules/],
-        },
-        
-        // Write manifest file
-        write: true,
-        
-        // Disable browser-specific optimizations
-        ssrManifest: false,
-        emptyOutDir: true,
-        brotliSize: false,
     },
     publicDir: 'public',
     assetsInclude: ['**/*.woff', '**/*.woff2'],
@@ -88,7 +57,7 @@ export default defineConfig({
         global: true,
         environment: 'jsdom',
         coverage: {
-            provider: 'v8',
+            provider: 'v8', // or 'istanbul'
             reporter: ['text', 'json', 'html'],
         },
         setupFiles: './setupTest.js',
