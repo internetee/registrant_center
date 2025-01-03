@@ -26,7 +26,8 @@ async function build() {
     try {
         // Build client
         console.log('Building client...');
-        await execAsync('vite build', { stdio: 'inherit' });
+        const buildCommand = process.env.CI ? 'CI=true vite build' : 'vite build';
+        await execAsync(buildCommand, { stdio: 'inherit' });
 
         // Ensure client dist was created
         if (!fs.existsSync(clientDist)) {

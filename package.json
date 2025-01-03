@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:server": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
     "start": "concurrently \"npm run dev:server\" \"npm run dev\" \"npm run lint:watch\" --kill-others --kill-others-on-fail",
-    "build": "node ./buildScript",
+    "build": "CI=true node ./buildScript",
     "serve": "cross-env NODE_ENV=production node server/index.js",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",

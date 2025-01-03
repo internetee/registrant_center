@@ -1,12 +1,10 @@
 import { render, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
 import HomePage from './HomePage';
 import Providers from '../../__mocks__/Providers';
 import domains from '../../__mocks__/domains';
 import user from '../../__mocks__/user';
-
-const mockDomains = domains;
 
 // Mock the domains actions
 vi.mock('../../redux/reducers/domains', () => ({
@@ -16,11 +14,20 @@ vi.mock('../../redux/reducers/domains', () => ({
     })),
 }));
 
+// Mock the filters actions
+vi.mock('../../redux/reducers/filters', () => ({
+    setSortByRoles: vi.fn(() => ({
+        type: 'SET_SORT_BY_ROLES',
+    })),
+}));
+
 // Mock react-router-dom
 vi.mock('react-router-dom', () => ({
     useNavigate: vi.fn(),
     Link: ({ children, to }) => <a href={to}>{children}</a>,
 }));
+
+const mockDomains = domains;
 
 const createTestStore = (overrides = {}) => {
     const baseState = {
@@ -71,11 +78,8 @@ describe('HomePage', () => {
     let store;
 
     beforeEach(() => {
-        store = createTestStore();
-    });
-
-    afterEach(() => {
         vi.clearAllMocks();
+        store = createTestStore();
     });
 
     it('renders correctly with user data and domains', () => {
