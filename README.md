@@ -21,7 +21,7 @@
   
 ### Quality Assurance
 - Linting: [ESLint](https://www.npmjs.com/package/eslint)
-- Unit Testing: [Jest](http://facebook.github.io/jest/)
+- Unit Testing: [Vitest](https://vitest.dev/)
 - E2E Testing: [Cypress](https://www.cypress.io/)
 
 ## Getting Started 🚀
