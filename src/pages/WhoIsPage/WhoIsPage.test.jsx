@@ -29,11 +29,11 @@ vi.mock('../../redux/reducers/domains', () => ({
         contacts: [
             ...(domain.registrant ? [domain.registrant] : []),
             ...(domain.admin_contacts || []),
-            ...(domain.tech_contacts || [])
+            ...(domain.tech_contacts || []),
         ],
         isLockable: !domain.statuses?.includes('serverRegistrantChangeProhibited'),
-        isLocked: Boolean(domain.locked_by_registrant_at)
-    }))
+        isLocked: Boolean(domain.locked_by_registrant_at),
+    })),
 }));
 
 // Mock the contact actions
@@ -53,7 +53,7 @@ vi.mock('../../redux/reducers/contacts', () => ({
     updateContact: vi.fn(() => (dispatch) => {
         dispatch({ type: 'UPDATE_CONTACT_REQUEST' });
         return Promise.resolve();
-    })
+    }),
 }));
 
 // Mock the company actions
@@ -61,24 +61,27 @@ vi.mock('../../redux/reducers/companies', () => ({
     fetchCompanies: vi.fn(() => (dispatch) => {
         dispatch({ type: 'FETCH_COMPANIES_REQUEST' });
         return Promise.resolve();
-    })
+    }),
 }));
 
 const createTestStore = (overrides = {}) => {
     const baseState = {
         domains: {
             data: {
-                domains: mockDomains.reduce((acc, domain) => ({
-                    ...acc,
-                    [domain.id]: parseDomain(domain)
-                }), {}),
+                domains: mockDomains.reduce(
+                    (acc, domain) => ({
+                        ...acc,
+                        [domain.id]: parseDomain(domain),
+                    }),
+                    {}
+                ),
                 count: mockDomains.length,
-                total: mockDomains.length
+                total: mockDomains.length,
             },
-            ids: mockDomains.map(domain => domain.id),
+            ids: mockDomains.map((domain) => domain.id),
             isLoading: false,
             message: null,
-            ...overrides.domains
+            ...overrides.domains,
         },
         contacts: {
             data: contacts.reduce(

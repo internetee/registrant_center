@@ -90,7 +90,9 @@ if (NODE_ENV !== 'test') {
                 throw new Error('Invalid JWKS response format');
             }
             publicKey = data.keys[0];
-            console.log('Successfully initialized public key from eeID! -> ' + ISSUER_URL + JWKS_PATH);
+            console.log(
+                'Successfully initialized public key from eeID! -> ' + ISSUER_URL + JWKS_PATH
+            );
         } catch (e) {
             console.error(`Failed to fetch public key: ${e}`);
             // Optionally, you might want to retry the fetch after a delay
