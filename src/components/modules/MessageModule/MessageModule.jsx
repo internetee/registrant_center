@@ -43,9 +43,10 @@ export default MessageModule;
 
 MessageModule.propTypes = {
     formMessage: PropTypes.bool,
-    message: PropTypes.object.isRequired,
+    message: PropTypes.object,
 };
 
 MessageModule.defaultProps = {
     formMessage: false,
+    message: null,
 };

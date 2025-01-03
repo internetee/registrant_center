@@ -35,7 +35,7 @@ describe('MessageModule', () => {
     it('renders error message correctly', () => {
         const errorMessage = {
             code: 404,
-            type: 'error',
+            type: 'domainUnlock',
         };
 
         const { container } = render(
@@ -54,7 +54,7 @@ describe('MessageModule', () => {
     it('renders success message correctly', () => {
         const successMessage = {
             code: 200,
-            type: 'success',
+            type: 'domainUnlock',
         };
 
         const { container } = render(
@@ -73,7 +73,7 @@ describe('MessageModule', () => {
     it('renders form message with icon when formMessage prop is true', () => {
         const successMessage = {
             code: 200,
-            type: 'success',
+            type: 'domainUnlock',
         };
 
         const { container } = render(
@@ -94,7 +94,7 @@ describe('MessageModule', () => {
     it('renders error form message with correct icon', () => {
         const errorMessage = {
             code: 404,
-            type: 'error',
+            type: 'domainUnlock',
         };
 
         const { container } = render(
@@ -110,7 +110,7 @@ describe('MessageModule', () => {
     it('returns null when no message is provided', () => {
         const { container } = render(
             <Providers store={store}>
-                <MessageModule message={null} />
+                <MessageModule />
             </Providers>
         );
 
@@ -133,5 +133,25 @@ describe('MessageModule', () => {
         const messageHeader = container.querySelector('.header');
         expect(messageHeader).toBeInTheDocument();
         expect(messageHeader.textContent).toContain('Test 200');
+    });
+
+    it('returns null when message is undefined', () => {
+        const { container } = render(
+            <Providers store={store}>
+                <MessageModule />
+            </Providers>
+        );
+
+        expect(container.querySelector('.message')).not.toBeInTheDocument();
+    });
+
+    it('returns null when message is null', () => {
+        const { container } = render(
+            <Providers store={store}>
+                <MessageModule message={null} />
+            </Providers>
+        );
+
+        expect(container.querySelector('.message')).not.toBeInTheDocument();
     });
 });

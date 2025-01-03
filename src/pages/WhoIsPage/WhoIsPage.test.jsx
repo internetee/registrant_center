@@ -10,30 +10,75 @@ import user from '../../__mocks__/user';
 import { parseDomain } from '../../redux/reducers/domains';
 
 const mockCompanies = companiesMock.companies;
-const parsedDomains = domains.map((domain) => parseDomain(domain, true));
+const mockDomains = domains;
 
 // Mock react-router-dom
 vi.mock('react-router-dom', () => ({
     useNavigate: vi.fn(),
 }));
 
+// Mock the domain actions
+vi.mock('../../redux/reducers/domains', () => ({
+    fetchDomains: vi.fn(() => (dispatch) => {
+        dispatch({ type: 'FETCH_DOMAINS_REQUEST' });
+        return Promise.resolve();
+    }),
+    parseDomain: vi.fn((domain) => ({
+        ...domain,
+        name: domain.name,
+        contacts: [
+            ...(domain.registrant ? [domain.registrant] : []),
+            ...(domain.admin_contacts || []),
+            ...(domain.tech_contacts || [])
+        ],
+        isLockable: !domain.statuses?.includes('serverRegistrantChangeProhibited'),
+        isLocked: Boolean(domain.locked_by_registrant_at)
+    }))
+}));
+
+// Mock the contact actions
+vi.mock('../../redux/reducers/contacts', () => ({
+    fetchContacts: vi.fn(() => (dispatch) => {
+        dispatch({ type: 'FETCH_CONTACTS_REQUEST' });
+        return Promise.resolve();
+    }),
+    fetchUpdateContacts: vi.fn(() => (dispatch) => {
+        dispatch({ type: 'FETCH_UPDATE_CONTACTS_REQUEST' });
+        return Promise.resolve();
+    }),
+    updateContactsConfirm: vi.fn(() => (dispatch) => {
+        dispatch({ type: 'UPDATE_CONTACTS_REQUEST' });
+        return Promise.resolve();
+    }),
+    updateContact: vi.fn(() => (dispatch) => {
+        dispatch({ type: 'UPDATE_CONTACT_REQUEST' });
+        return Promise.resolve();
+    })
+}));
+
+// Mock the company actions
+vi.mock('../../redux/reducers/companies', () => ({
+    fetchCompanies: vi.fn(() => (dispatch) => {
+        dispatch({ type: 'FETCH_COMPANIES_REQUEST' });
+        return Promise.resolve();
+    })
+}));
+
 const createTestStore = (overrides = {}) => {
     const baseState = {
         domains: {
             data: {
-                count: parsedDomains.length,
-                domains: parsedDomains.reduce(
-                    (acc, domain) => ({
-                        ...acc,
-                        [domain.id]: domain,
-                    }),
-                    {}
-                ),
-                total: parsedDomains.length,
+                domains: mockDomains.reduce((acc, domain) => ({
+                    ...acc,
+                    [domain.id]: parseDomain(domain)
+                }), {}),
+                count: mockDomains.length,
+                total: mockDomains.length
             },
-            ids: parsedDomains.map((domain) => domain.id),
+            ids: mockDomains.map(domain => domain.id),
             isLoading: false,
-            ...overrides.domains,
+            message: null,
+            ...overrides.domains
         },
         contacts: {
             data: contacts.reduce(
@@ -152,7 +197,7 @@ describe('WhoIsPage', () => {
 
         // Find and fill the search input
         const searchInput = container.querySelector('input[type="text"]');
-        fireEvent.change(searchInput, { target: { value: parsedDomains[1].name } });
+        fireEvent.change(searchInput, { target: { value: mockDomains[1].name } });
 
         // Click search button
         const searchButton = container.querySelector('button[type="submit"]');
@@ -162,7 +207,7 @@ describe('WhoIsPage', () => {
         await waitFor(() => {
             const domainRows = container.querySelectorAll('tbody tr');
             expect(domainRows.length).toBe(1);
-            expect(container.textContent).toContain(parsedDomains[1].name);
+            expect(container.textContent).toContain(mockDomains[1].name);
         });
     });
 
