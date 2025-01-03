@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { remove, ensureDir, copy } from 'fs-extra';
+import fse from 'fs-extra';
 import { exec } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,21 +15,24 @@ async function build() {
 
     if (fs.existsSync(clientDist)) {
         console.log('Cleaning client dist directory...');
-        await remove(clientDist);
+        fse.removeSync(clientDist);
     }
 
     if (fs.existsSync(serverDist)) {
         console.log('Cleaning server dist directory...');
-        await remove(serverDist);
+        fse.removeSync(serverDist);
     }
 
     try {
-        // Build client with CI=true for headless mode
+        // Build client
         console.log('Building client...');
-        process.env.CI = 'true';  // Set CI environment variable
         await execAsync('vite build', { 
             stdio: 'inherit',
-            env: { ...process.env, CI: 'true' }
+            env: { 
+                ...process.env, 
+                CI: 'true',  // Tell Vite we're in CI environment
+                NODE_ENV: 'production'
+            }
         });
 
         // Ensure client dist was created
@@ -39,11 +42,11 @@ async function build() {
 
         // Create server dist directory
         console.log('Creating server dist directory...');
-        await ensureDir(serverDist);
+        fse.ensureDirSync(serverDist);
 
         // Copy client build to server
         console.log('Copying client build to server...');
-        await copy(clientDist, serverDist);
+        fse.copySync(clientDist, serverDist);
 
         console.log('Build completed successfully!');
         console.log(`Client build: ${clientDist}`);
