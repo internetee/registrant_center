@@ -26,14 +26,7 @@ async function build() {
     try {
         // Build client
         console.log('Building client...');
-        await execAsync('vite build', { 
-            stdio: 'inherit',
-            env: { 
-                ...process.env, 
-                CI: 'true',  // Tell Vite we're in CI environment
-                NODE_ENV: 'production'
-            }
-        });
+        await execAsync('vite build', { stdio: 'inherit' });
 
         // Ensure client dist was created
         if (!fs.existsSync(clientDist)) {
