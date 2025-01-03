@@ -43,6 +43,16 @@ export default defineConfig({
         assetsDir: 'assets',
         sourcemap: true,
         target: 'es2015',
+        modulePreload: false,
+        cssCodeSplit: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom', 'react-router-dom'],
+                    redux: ['@reduxjs/toolkit', 'react-redux'],
+                }
+            }
+        }
     },
     publicDir: 'public',
     assetsInclude: ['**/*.woff', '**/*.woff2'],

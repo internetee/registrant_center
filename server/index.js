@@ -68,7 +68,7 @@ app.use(compression()); // GZip compress responses
 
 // static files
 if (NODE_ENV !== 'development') {
-    app.use(express.static(path.join(__dirname, 'dist')));
+    app.use(express.static(path.join(__dirname, '../dist')));
 }
 app.use(favicon(path.join(__dirname, '../public/favicon.ico')));
 
@@ -176,7 +176,7 @@ app.get('/api/health', (req, res) => {
 // all page rendering
 app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
 
-app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')));
+app.get('/*', (req, res) => res.sendFile(path.join(__dirname, '../dist', 'index.html')));
 
 const PORT = process.env.NODE_ENV === 'test' ? 4000 : process.env.VITE_SERVER_PORT;
 
