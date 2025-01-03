@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import fse from 'fs-extra';
+import { remove, ensureDir, copy } from 'fs-extra';
 import { exec } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,18 +15,22 @@ async function build() {
 
     if (fs.existsSync(clientDist)) {
         console.log('Cleaning client dist directory...');
-        fse.removeSync(clientDist);
+        await remove(clientDist);
     }
 
     if (fs.existsSync(serverDist)) {
         console.log('Cleaning server dist directory...');
-        fse.removeSync(serverDist);
+        await remove(serverDist);
     }
 
     try {
-        // Build client
+        // Build client with CI=true for headless mode
         console.log('Building client...');
-        await execAsync('vite build', { stdio: 'inherit' });
+        process.env.CI = 'true';  // Set CI environment variable
+        await execAsync('vite build', { 
+            stdio: 'inherit',
+            env: { ...process.env, CI: 'true' }
+        });
 
         // Ensure client dist was created
         if (!fs.existsSync(clientDist)) {
@@ -35,11 +39,11 @@ async function build() {
 
         // Create server dist directory
         console.log('Creating server dist directory...');
-        fse.ensureDirSync(serverDist);
+        await ensureDir(serverDist);
 
         // Copy client build to server
         console.log('Copying client build to server...');
-        fse.copySync(clientDist, serverDist);
+        await copy(clientDist, serverDist);
 
         console.log('Build completed successfully!');
         console.log(`Client build: ${clientDist}`);
