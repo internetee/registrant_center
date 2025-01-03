@@ -43,7 +43,6 @@ export default defineConfig({
         assetsDir: 'assets',
         sourcemap: true,
         target: 'es2015',
-        polyfillDynamicImport: true,
     },
     publicDir: 'public',
     assetsInclude: ['**/*.woff', '**/*.woff2'],
