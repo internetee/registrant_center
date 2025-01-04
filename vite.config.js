@@ -14,14 +14,6 @@ export default defineConfig({
                 target: `https://localhost:${env.VITE_SERVER_PORT || 1234}`,
                 changeOrigin: true,
                 secure: false,
-                configure: (proxy, _options) => {
-                    proxy.on('error', (err, _req, _res) => {
-                        console.log('proxy error', err);
-                    });
-                    // proxy.on('proxyReq', (proxyReq, req, _res) => {
-                    //     console.log('Sending Request to the Target:', req.method, req.url);
-                    // });
-                },
             },
         },
     },

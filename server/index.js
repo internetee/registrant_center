@@ -70,8 +70,8 @@ app.use(compression()); // GZip compress responses
 if (NODE_ENV !== 'development') {
     app.use(express.static(path.join(__dirname, '../dist')));
 }
-app.use(favicon(path.join(__dirname, '../public/favicon.ico')));
 
+// API routes need to be defined before the catch-all route
 app.use(
     session({
         name: 'session',
@@ -173,10 +173,15 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-// all page rendering
+// Auth callback route
 app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
 
-app.get('/*', (req, res) => res.sendFile(path.join(__dirname, '../dist', 'index.html')));
+// Catch-all route for the SPA should be last
+if (NODE_ENV !== 'development') {
+    app.get('/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../dist/index.html'));
+    });
+}
 
 const PORT = process.env.NODE_ENV === 'test' ? 4000 : process.env.VITE_SERVER_PORT;
 
