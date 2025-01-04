@@ -35,14 +35,21 @@ export default defineConfig({
         assetsDir: 'assets',
         sourcemap: true,
         target: 'es2015',
-        chunkSizeWarningLimit: 1000,
+        chunkSizeWarningLimit: 1500,
         rollupOptions: {
             output: {
                 manualChunks: {
-                    'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-                    'vendor-redux': ['@reduxjs/toolkit', 'react-redux', 'redux', 'redux-state-sync'],
-                    'vendor-ui': ['semantic-ui-react', 'react-helmet-async', 'react-layout-masonry'],
-                    'vendor-utils': ['axios', 'core-js', 'regenerator-runtime']
+                    'react-core': ['react', 'react-dom'],
+                    'react-router': ['react-router-dom'],
+                    'redux-core': ['@reduxjs/toolkit', 'redux'],
+                    'redux-integration': ['react-redux', 'redux-state-sync'],
+                    'ui-framework': ['semantic-ui-react'],
+                    'ui-components': ['react-helmet-async', 'react-layout-masonry'],
+                    'http': ['axios'],
+                    'polyfills': ['core-js', 'regenerator-runtime'],
+                    'cookies': ['react-cookie', 'universal-cookie'],
+                    'intl': ['react-intl'],
+                    'utils': ['classnames', 'dompurify']
                 }
             }
         }
