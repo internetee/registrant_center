@@ -7,13 +7,13 @@ async function build() {
     try {
         // Build client
         console.log('Building client...');
-        const { stdout, stderr } = await execAsync('vite build', { 
-            stdio: ['inherit', 'pipe', 'pipe']  // Capture output while still showing it
+        const { stdout, stderr } = await execAsync('vite build', {
+            stdio: ['inherit', 'pipe', 'pipe'], // Capture output while still showing it
         });
-        
+
         if (stdout) console.log(stdout);
         if (stderr) console.error(stderr);
-        
+
         console.log('Build completed successfully!');
     } catch (error) {
         console.error('Build failed:', error);
