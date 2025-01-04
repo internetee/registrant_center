@@ -44,12 +44,6 @@ export default defineConfig({
                     'redux-core': ['@reduxjs/toolkit', 'redux'],
                     'redux-integration': ['react-redux', 'redux-state-sync'],
                     'ui-framework': ['semantic-ui-react'],
-                    'ui-components': ['react-helmet-async', 'react-layout-masonry'],
-                    'http': ['axios'],
-                    'polyfills': ['core-js', 'regenerator-runtime'],
-                    'cookies': ['react-cookie', 'universal-cookie'],
-                    'intl': ['react-intl'],
-                    'utils': ['classnames', 'dompurify']
                 }
             }
         }
