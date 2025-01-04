@@ -1,26 +1,26 @@
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
+import { spawn } from 'node:child_process';
 
-const execAsync = promisify(exec);
+function build() {
+    console.log('Building client...');
+    
+    const buildProcess = spawn('npx', ['vite', 'build'], {
+        stdio: 'inherit',
+        shell: true
+    });
 
-async function build() {
-    try {
-        // Build client
-        console.log('Building client...');
-        const { stdout, stderr } = await execAsync('vite build', { 
-            stdio: ['inherit', 'pipe', 'pipe']  // Capture output while still showing it
-        });
-        
-        if (stdout) console.log(stdout);
-        if (stderr) console.error(stderr);
-        
-        console.log('Build completed successfully!');
-    } catch (error) {
+    buildProcess.on('error', (error) => {
         console.error('Build failed:', error);
-        if (error.stdout) console.log('stdout:', error.stdout);
-        if (error.stderr) console.log('stderr:', error.stderr);
         process.exit(1);
-    }
+    });
+
+    buildProcess.on('close', (code) => {
+        if (code === 0) {
+            console.log('Build completed successfully!');
+        } else {
+            console.error(`Build process exited with code ${code}`);
+            process.exit(1);
+        }
+    });
 }
 
 build();
