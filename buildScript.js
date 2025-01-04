@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 function build() {
     console.log('Building client...');
     
-    const buildProcess = spawn('npx', ['vite', 'build'], {
+    const buildProcess = spawn('vite', ['build'], {
         stdio: 'inherit',
         shell: true
     });
