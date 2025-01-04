@@ -44,9 +44,9 @@ export default defineConfig({
                     'redux-core': ['@reduxjs/toolkit', 'redux'],
                     'redux-integration': ['react-redux', 'redux-state-sync'],
                     'ui-framework': ['semantic-ui-react'],
-                }
-            }
-        }
+                },
+            },
+        },
     },
     publicDir: 'public',
     assetsInclude: ['**/*.woff', '**/*.woff2'],

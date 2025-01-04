@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm ci --omit=dev
           npm install @rollup/rollup-linux-x64-gnu
 
       - run: npm run build
