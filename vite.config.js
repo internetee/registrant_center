@@ -35,6 +35,17 @@ export default defineConfig({
         assetsDir: 'assets',
         sourcemap: true,
         target: 'es2015',
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+                    'vendor-redux': ['@reduxjs/toolkit', 'react-redux', 'redux', 'redux-state-sync'],
+                    'vendor-ui': ['semantic-ui-react', 'react-helmet-async', 'react-layout-masonry'],
+                    'vendor-utils': ['axios', 'core-js', 'regenerator-runtime']
+                }
+            }
+        }
     },
     publicDir: 'public',
     assetsInclude: ['**/*.woff', '**/*.woff2'],
