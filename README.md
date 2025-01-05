@@ -46,16 +46,39 @@
 
 ### Development
 ```bash
-npm start        # Start development environment
+npm start          # Start development server with hot reload and linting
+npm run dev        # Start Vite development server
+npm run dev:server # Start backend server in development mode
+```
+
+### Building
+```bash
+npm run build     # Build the application for production
+npm run preview   # Preview the production build locally
 ```
 
 ### Production
 ```bash
-npm run serve    # Start production environment
+npm run serve     # Start production server
+```
+
+### Linting
+```bash
+npm run lint      # Run ESLint check
+npm run lint:fix  # Fix ESLint issues automatically
+npm run lint:watch # Watch files and run linting on changes
 ```
 
 ### Testing
 ```bash
-npm run test     # Run unit tests
-npm run test:e2e # Run end-to-end tests (update cypress.json baseUrl first)
+npm run test      # Run linting and unit tests
+npm run coverage  # Run tests with coverage report
+npm run test:e2e  # Run end-to-end tests
+npm run cypress:open  # Open Cypress test runner
+npm run cypress:run  # Run Cypress tests in headless mode
+```
+
+### Deployment
+```bash
+npm run deploy    # Full deployment process: test, build, e2e tests, and serve
 ```

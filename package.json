@@ -2,6 +2,41 @@
   "name": "eis-registrant",
   "private": true,
   "version": "1.1.0",
+  "description": "Registrant Center application for managing domain names",
+  "author": "Estonian Internet Foundation",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/internetee/registrant_center.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "keywords": [
+    "registrant",
+    "domain-management",
+    "react"
+  ],
+  "bugs": {
+    "url": "https://github.com/internetee/registrant_center/issues"
+  },
+  "homepage": "https://registrant.internet.ee",
+  "contributors": [
+    "Sergei Tsõganov <sergei.tsoganov@internet.ee> (https://github.com/maricavor)"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
