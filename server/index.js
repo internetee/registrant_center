@@ -19,7 +19,6 @@ import jwkToPem from 'jwk-to-pem';
 import callbackPage from './routes/callbackPageRoute.js';
 import { accessLog, consoleLog, errorLog } from './utils/logger.js';
 import compression from 'compression';
-import favicon from 'serve-favicon';
 import session from 'cookie-session';
 import API from './routes/apiRoute.js';
 import https from 'https';

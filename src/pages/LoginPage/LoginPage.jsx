@@ -6,15 +6,41 @@ import { MainLayout, MessageModule } from '../../components';
 
 const { VITE_SERVER_PORT, VITE_URL } = import.meta.env;
 
-const authPath =
-    process.env.NODE_ENV === 'development'
-        ? `${VITE_URL}:${VITE_SERVER_PORT}/connect/openid`
-        : `${VITE_URL}/connect/openid`;
+const getAuthUrl = (lang) => {
+    if (!VITE_URL || (process.env.NODE_ENV === 'development' && !VITE_SERVER_PORT)) {
+        console.error('Missing required environment variables for auth URL');
+        return null;
+    }
+
+    const baseUrl =
+        process.env.NODE_ENV === 'development' ? `${VITE_URL}:${VITE_SERVER_PORT}` : VITE_URL;
+
+    try {
+        // Ensure URL is properly encoded
+        return new URL(`/connect/openid/${encodeURIComponent(lang)}`, baseUrl).toString();
+    } catch (error) {
+        console.error('Failed to construct auth URL:', error);
+        return null;
+    }
+};
 
 function LoginPage({ user, ui }) {
     const message = {
         code: user.status > 0 ? user.status : null,
         type: 'logout',
+    };
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        const authUrl = getAuthUrl(ui.lang);
+
+        if (!authUrl) {
+            // You might want to show an error message to the user here
+            console.error('Unable to proceed with login - invalid auth URL');
+            return;
+        }
+
+        window.location.href = authUrl;
     };
 
     return (
@@ -43,7 +69,7 @@ function LoginPage({ user, ui }) {
                                 <FormattedMessage id="login.options.smartId" tagName="p" />
                             </div>
                         </div>
-                        <Form action={`${authPath}/${ui.lang}`} method="POST">
+                        <Form onSubmit={handleLogin}>
                             <Button primary size={ui.uiElemSize} type="submit">
                                 <FormattedMessage id="actions.login" tagName="span" />
                             </Button>

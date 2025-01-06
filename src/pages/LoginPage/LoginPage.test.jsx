@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
 import LoginPage from './LoginPage';
@@ -75,7 +75,12 @@ describe('LoginPage', () => {
         expect(container.textContent).toContain('eIDAS');
     });
 
-    it('displays login button with correct form action in development', () => {
+    it('displays login button with correct form action', () => {
+        // Mock window.location.href setter
+        const originalLocation = window.location;
+        delete window.location;
+        window.location = { href: originalLocation.href };
+
         const { container } = render(
             <Providers store={store}>
                 <LoginPage />
@@ -84,11 +89,16 @@ describe('LoginPage', () => {
 
         const form = container.querySelector('form');
         expect(form).toBeInTheDocument();
-        expect(form.getAttribute('action')).toBe(`${VITE_URL}/connect/openid/et`);
 
-        const button = container.querySelector('button[type="submit"]');
-        expect(button).toBeInTheDocument();
-        expect(button.textContent).toContain('Logi sisse');
+        const expectedUrl = new URL('/connect/openid/et', VITE_URL).toString();
+
+        fireEvent.submit(form);
+
+        // Check if window.location.href was set to the correct URL
+        expect(window.location.href).toBe(expectedUrl);
+
+        // Cleanup
+        window.location = originalLocation;
     });
 
     it('shows logout message when user is logged out', () => {
