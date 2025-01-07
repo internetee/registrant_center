@@ -6,6 +6,7 @@ import axios from 'axios';
 import qs from 'qs';
 import jwt from 'jsonwebtoken';
 import capitalize from 'capitalize';
+import { logger } from '../utils/logger.js';
 
 const {
     CLIENT_ID,
@@ -94,8 +95,7 @@ export default async function callbackPageRoute(req, res, publicKey) {
                     last_name: capitalize.words(verifiedJwt.profile_attributes.family_name),
                 };
 
-                // console.log('Decrypted JWT from TARA:');
-                // console.log(verifiedJwt);
+                logger.debug('Decrypted JWT from TARA:\n' + JSON.stringify(verifiedJwt, null, 2));
                 req.session.user = userData;
                 if (NODE_ENV === 'development') {
                     res.redirect(`http://${HOST}:${PORT}`);

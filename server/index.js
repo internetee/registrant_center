@@ -54,13 +54,37 @@ app.disable('x-powered-by');
 app.enable('trust proxy');
 
 app.use(bodyParser.json());
-
 app.use(cookieParser());
 
+// Add response capture middleware BEFORE routes and logging
+app.use((req, res, next) => {
+    const originalSend = res.send;
+    res.send = function (data) {
+        res.locals.responseData = data;
+        return originalSend.apply(res, arguments);
+    };
+    next();
+});
+
 // logging
-app.use(expressWinston.logger(consoleLog));
-app.use(expressWinston.logger(accessLog));
-app.use(expressWinston.errorLogger(errorLog));
+app.use(
+    expressWinston.logger({
+        ...consoleLog,
+        level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+    })
+);
+app.use(
+    expressWinston.logger({
+        ...accessLog,
+        level: process.env.LOG_LEVEL || 'info',
+    })
+);
+app.use(
+    expressWinston.errorLogger({
+        ...errorLog,
+        level: 'error',
+    })
+);
 
 // compression
 app.use(compression()); // GZip compress responses
