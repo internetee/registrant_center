@@ -154,6 +154,11 @@ app.post('/api/destroy', API.destroyUser);
 app.get('/api/confirms/:name/:type/:token', API.getRegistrantUpdate);
 app.post('/api/confirms/:name/:type/:token/:action', API.sendVerificationStatus);
 
+// Basic health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
 app.all('/api/*', API.checkAuth);
 
 // Protected routes below
@@ -167,10 +172,6 @@ app.get('/api/companies', API.getCompanies);
 app.get('/api/contacts', API.getContacts);
 app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
-// Basic health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok' });
-});
 
 // Auth callback route
 app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
