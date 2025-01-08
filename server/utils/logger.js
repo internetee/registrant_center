@@ -213,12 +213,14 @@ export const logWarn = (message, data = {}) => {
 };
 
 export const logError = (message, error = null) => {
-    const data = error ? {
-        error: {
-            message: error.message,
-            stack: error.stack,
-            ...error
-        }
-    } : {};
+    const data = error
+        ? {
+              error: {
+                  message: error.message,
+                  stack: error.stack,
+                  ...error,
+              },
+          }
+        : {};
     logger.error(message, { meta: data });
 };
