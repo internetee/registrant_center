@@ -36,11 +36,16 @@ const getUserFromSession = (req) => {
 };
 
 const printFormat = winston.format.printf(({ timestamp, level, message, meta }) => {
-    let logMessage = `${timestamp} [${level}]: ${message}`;
+    let logMessage = `${timestamp} [${level}]`;
 
     if (meta) {
         const filteredMeta = { ...meta };
-        logMessage = `${timestamp} [${level}]: ${filteredMeta.user} - ${message}`;
+
+        // Only add user to message if it exists
+        if (filteredMeta.user) {
+            logMessage += `: ${filteredMeta.user} -`;
+        }
+        logMessage += ` ${message}`;
 
         // Store response data for later if it exists
         const responseData = LOG_LEVEL === 'debug' ? filteredMeta.response : null;
@@ -118,34 +123,24 @@ const shouldUseFileLogging = () => {
     return ['development', 'test'].includes(process.env.NODE_ENV);
 };
 
-export const accessLog = {
+export const appLog = {
     ...expressLogger,
     transports: shouldUseFileLogging()
         ? [
               new winston.transports.DailyRotateFile({
                   datePattern: 'YYYY-MM-DD',
                   dirname: 'logs',
-                  filename: 'access-%DATE%.log',
+                  filename: 'app-%DATE%.log',
                   level: LOG_LEVEL,
                   format: winston.format.combine(timestampFormat, printFormat),
               }),
           ]
-        : [],
-};
-
-export const errorLog = {
-    ...expressLogger,
-    transports: shouldUseFileLogging()
-        ? [
-              new winston.transports.DailyRotateFile({
-                  datePattern: 'YYYY-MM-DD',
-                  dirname: 'logs',
-                  filename: 'error-%DATE%.log',
-                  level: 'error',
-                  format: winston.format.combine(timestampFormat, printFormat),
+        : [
+              // In production, use a silent transport to prevent empty transports
+              new winston.transports.Console({
+                  silent: true,
               }),
-          ]
-        : [],
+          ],
 };
 
 export const consoleLog = {
@@ -166,6 +161,7 @@ export const consoleLog = {
 
 // Manual logger instance
 export const logger = winston.createLogger({
+    ...expressLogger,
     format: winston.format.combine(timestampFormat, printFormat),
     transports: [
         // Console transport with colors
@@ -185,13 +181,6 @@ export const logger = winston.createLogger({
                       dirname: 'logs',
                       filename: 'app-%DATE%.log',
                       level: LOG_LEVEL,
-                      format: winston.format.combine(timestampFormat, printFormat),
-                  }),
-                  new winston.transports.DailyRotateFile({
-                      datePattern: 'YYYY-MM-DD',
-                      dirname: 'logs',
-                      filename: 'error-%DATE%.log',
-                      level: 'error',
                       format: winston.format.combine(timestampFormat, printFormat),
                   }),
               ]

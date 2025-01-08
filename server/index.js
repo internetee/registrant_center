@@ -17,7 +17,7 @@ import cookieParser from 'cookie-parser';
 import expressWinston from 'express-winston';
 import jwkToPem from 'jwk-to-pem';
 import callbackPage from './routes/callbackPageRoute.js';
-import { accessLog, consoleLog, errorLog, logError } from './utils/logger.js';
+import { appLog, consoleLog, logError } from './utils/logger.js';
 import compression from 'compression';
 import session from 'cookie-session';
 import API from './routes/apiRoute.js';
@@ -66,10 +66,12 @@ app.use((req, res, next) => {
     next();
 });
 
-// logging
+// Regular request logging
 app.use(expressWinston.logger(consoleLog));
-app.use(expressWinston.logger(accessLog));
-app.use(expressWinston.errorLogger(errorLog));
+app.use(expressWinston.logger(appLog));
+
+// Error logging - catches unhandled errors
+app.use(expressWinston.errorLogger(consoleLog));
 
 // compression
 app.use(compression()); // GZip compress responses
@@ -185,30 +187,27 @@ app.patch('/api/contacts/:uuid', API.setContact);
 // Auth callback route
 app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
 
-// Catch-all route for the SPA should be last
+// Global error handler
+app.use((err, req, res, next) => {
+    // Set status code
+    const statusCode = err.status || 500;
+
+    // Log if it's a 500 error since it's unexpected
+    if (statusCode === 500) {
+        logError('Unhandled server error', err);
+    }
+
+    res.status(statusCode).json({
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    });
+});
+
+// Keep your catch-all route last
 if (NODE_ENV !== 'development') {
     app.get('/*', (req, res) => {
         res.sendFile(path.join(__dirname, '../dist/index.html'));
     });
 }
-
-// Global error handler
-app.use((err, req, res, next) => {
-    const errorDetails = {
-        error: {
-            message: err.message,
-            stack: err.stack,
-            status: err.status || 500,
-            code: err.code,
-        },
-    };
-
-    logError('Unhandled error', errorDetails);
-
-    res.status(err.status || 500).json({
-        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
-    });
-});
 
 const PORT = process.env.NODE_ENV === 'test' ? 4000 : process.env.VITE_SERVER_PORT;
 const LOG_LEVEL = process.env.LOG_LEVEL;
