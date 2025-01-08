@@ -14,6 +14,8 @@ const IGNORE_PATHS = [
     '/assets',
     '/fonts',
     '/logo192.png',
+    '/logo-m.svg',
+    '/html-pattern.png',
     '/eis-logo-white.svg',
     '/hero.jpg',
     '/auth',
