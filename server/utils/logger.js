@@ -1,9 +1,13 @@
 import winston from 'winston';
 import 'winston-daily-rotate-file';
-import 'winston-syslog';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import { sanitizeData } from './maskData.js';
 
-const ignorePaths = [
+// Constants
+const IGNORE_PATHS = [
     '/service-worker.js',
     '/favicon.ico',
     '/public',
@@ -16,10 +20,88 @@ const ignorePaths = [
     '/manifest.json',
 ];
 
-const ignoreRoute = (req) => !!ignorePaths.find((path) => req.url.includes(path));
+// Get log level from environment variable, default to 'info' if not set
+const LOG_LEVEL = process.env.LOG_LEVEL?.toLowerCase() || 'info';
 
-const LOG_LEVEL =
-    process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug');
+// Format constants
+const timestampFormat = winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' });
+
+// Helper functions
+const ignoreRoute = (req) => IGNORE_PATHS.some((path) => req.url.includes(path));
+
+const getUserFromSession = (req) => {
+    if (!req.session?.user) return 'anonymous';
+    const maskedIdent = sanitizeData(req.session.user.ident, 'ident');
+    return `${req.session.user.first_name} ${req.session.user.last_name} [${maskedIdent}]`;
+};
+
+const printFormat = winston.format.printf(({ timestamp, level, message, meta }) => {
+    let logMessage = `${timestamp} [${level}]: ${message}`;
+
+    if (meta) {
+        const filteredMeta = { ...meta };
+        logMessage = `${timestamp} [${level}]: ${filteredMeta.user} - ${message}`;
+
+        // Store response data for later if it exists
+        const responseData = LOG_LEVEL === 'debug' ? filteredMeta.response : null;
+        delete filteredMeta.response;
+
+        if (LOG_LEVEL !== 'debug') {
+            delete filteredMeta.res;
+            delete filteredMeta.responseTime;
+            delete filteredMeta.user;
+        }
+
+        const metaStr = Object.entries(filteredMeta)
+            .map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`)
+            .join(' ');
+        if (metaStr) {
+            logMessage += ` | ${metaStr}`;
+        }
+
+        // Add response data at the end if it exists
+        if (responseData) {
+            logMessage +=
+                '\nResponse Data:\n' +
+                JSON.stringify(responseData, null, 2)
+                    .split('\n')
+                    .map((line) => '  ' + line)
+                    .join('\n');
+        }
+    }
+    return logMessage;
+});
+
+const expressLogger = {
+    exitOnError: false,
+    format: winston.format.combine(timestampFormat, printFormat),
+    ignoreRoute,
+    meta: true,
+    metaField: 'meta',
+    dynamicMeta: (req, res) => ({
+        ip: req.ip.indexOf(':') >= 0 ? req.ip.substring(req.ip.lastIndexOf(':') + 1) : req.ip,
+        'User-Agent': req.get('User-Agent'),
+        Referrer: req.get('Referrer') || '',
+        user: getUserFromSession(req),
+        req: {
+            url: req.originalUrl,
+            method: req.method,
+            ...(req.method !== 'GET' && req.body && { body: sanitizeData(req.body) }),
+            ...(Object.keys(req.query).length > 0 && { query: sanitizeData(req.query) }),
+        },
+        ...(LOG_LEVEL === 'debug' &&
+            res.locals.responseData && {
+                response: sanitizeData(
+                    typeof res.locals.responseData === 'string'
+                        ? JSON.parse(res.locals.responseData)
+                        : res.locals.responseData
+                ),
+            }),
+    }),
+    msg: (req, res) => {
+        return `${req.method} ${sanitizeUrl(req.originalUrl)} ${res.statusCode} ${res.responseTime}ms`;
+    },
+};
 
 function sanitizeUrl(url) {
     // Implement URL sanitization logic here
@@ -31,197 +113,112 @@ function sanitizeUrl(url) {
     }
 }
 
-// Custom log format
-const logFormat = winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.printf(({ timestamp, level, message, meta }) => {
-        let logMessage = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
-
-        if (meta) {
-            // Create a filtered copy of meta for info level
-            const filteredMeta = { ...meta };
-
-            // Remove response-related fields if not in debug mode
-            if (level !== 'debug') {
-                delete filteredMeta.response;
-                delete filteredMeta.res;
-                delete filteredMeta.responseTime;
-                delete filteredMeta.user;
-            }
-
-            if (level === 'debug') {
-                // In debug mode, format metadata in multiple lines
-                logMessage +=
-                    '\n' +
-                    Object.entries(filteredMeta)
-                        .map(([key, value]) => {
-                            const valueStr =
-                                typeof value === 'object' ? JSON.stringify(value, null, 2) : value;
-                            return `  ${key}: ${valueStr}`;
-                        })
-                        .join('\n');
-            } else {
-                // In info mode, show only essential data in one line
-                const metaStr = Object.entries(filteredMeta)
-                    .map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`)
-                    .join(' ');
-                if (metaStr) {
-                    logMessage += ` | ${metaStr}`;
-                }
-            }
-        }
-        return logMessage;
-    })
-);
-
-// Add this helper function at the top with other helpers
-const getUserFromSession = (req) => {
-    if (!req.session?.user) return 'anonymous';
-    const maskedIdent = sanitizeData(req.session.user.ident, 'ident');
-    return `${req.session.user.first_name} ${req.session.user.last_name} [${maskedIdent}]`;
-};
-
-const expressLogger = {
-    exitOnError: false,
-    format: logFormat,
-    ignoreRoute,
-    meta: true,
-    metaField: 'meta',
-    dynamicMeta: (req, res) => {
-        // Basic metadata for info level
-        const meta = {
-            ip: req.ip.indexOf(':') >= 0 ? req.ip.substring(req.ip.lastIndexOf(':') + 1) : req.ip,
-            'User-Agent': req.get('User-Agent'),
-            Referrer: req.get('Referrer') || '',
-            user: getUserFromSession(req), // Use helper function
-            req: {
-                url: req.originalUrl,
-                method: req.method,
-                // Include body for non-GET requests
-                ...(req.method !== 'GET' &&
-                    req.body && {
-                        body: sanitizeData(req.body),
-                    }),
-                // Include query parameters if present
-                ...(Object.keys(req.query).length > 0 && {
-                    query: sanitizeData(req.query),
-                }),
-            },
-        };
-
-        // Remove the duplicate user setting in debug level
-        if (LOG_LEVEL === 'debug') {
-            if (res.locals.responseData) {
-                try {
-                    const responseData =
-                        typeof res.locals.responseData === 'string'
-                            ? JSON.parse(res.locals.responseData)
-                            : res.locals.responseData;
-                    meta.response = sanitizeData(responseData);
-                } catch (error) {
-                    meta.response = 'Error processing response data';
-                }
-            }
-        }
-
-        return meta;
-    },
-    msg: (req, res) => {
-        return `${getUserFromSession(req)} ${req.method} ${sanitizeUrl(req.originalUrl)} ${res.statusCode} ${Math.floor(res.responseTime)}ms`;
-    },
-};
-
-// Helper function to get appropriate transport based on environment
-const getTransport = (options) => {
-    if (process.env.NODE_ENV === 'production') {
-        // In production, only return syslog transport
-        return new winston.transports.Syslog({
-            app_name: 'registrant-center',
-            level: options.level,
-        });
-    }
-
-    // In development, return file transport
-    return new winston.transports.DailyRotateFile({
-        datePattern: 'YYYY-MM-DD',
-        dirname: 'logs',
-        filename: options.filename,
-        level: options.level,
-        levels: winston.config.npm.levels,
-        maxFiles: '14d',
-        zippedArchive: true,
-    });
+// Helper function to determine if we should use file logging
+const shouldUseFileLogging = () => {
+    return ['development', 'test'].includes(process.env.NODE_ENV);
 };
 
 export const accessLog = {
     ...expressLogger,
-    transports: [
-        getTransport({
-            filename: 'access-%DATE%.log',
-            level: LOG_LEVEL,
-        }),
-    ],
+    transports: shouldUseFileLogging()
+        ? [
+              new winston.transports.DailyRotateFile({
+                  datePattern: 'YYYY-MM-DD',
+                  dirname: 'logs',
+                  filename: 'access-%DATE%.log',
+                  level: LOG_LEVEL,
+                  format: winston.format.combine(timestampFormat, printFormat),
+              }),
+          ]
+        : [],
 };
 
 export const errorLog = {
     ...expressLogger,
-    transports: [
-        getTransport({
-            filename: 'error-%DATE%.log',
-            level: 'error',
-        }),
-    ],
+    transports: shouldUseFileLogging()
+        ? [
+              new winston.transports.DailyRotateFile({
+                  datePattern: 'YYYY-MM-DD',
+                  dirname: 'logs',
+                  filename: 'error-%DATE%.log',
+                  level: 'error',
+                  format: winston.format.combine(timestampFormat, printFormat),
+              }),
+          ]
+        : [],
 };
 
 export const consoleLog = {
-    baseMeta: null,
+    ...expressLogger,
     colorize: true,
     expressFormat: true,
     format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        winston.format.printf(({ timestamp, level, message }) => {
-            return `[${timestamp}] ${level}: ${message}`;
-        })
+        timestampFormat,
+        winston.format.colorize({ all: true }),
+        printFormat
     ),
-    ignoreRoute,
-    meta: false,
-    metaField: null,
     transports: [
         new winston.transports.Console({
             level: LOG_LEVEL,
-            levels: winston.config.npm.levels,
         }),
     ],
 };
 
+// Manual logger instance
 export const logger = winston.createLogger({
-    format: logFormat,
-    levels: winston.config.npm.levels,
-    level: LOG_LEVEL,
+    format: winston.format.combine(timestampFormat, printFormat),
     transports: [
-        // Only add file transport in development
-        ...(process.env.NODE_ENV !== 'production'
+        // Console transport with colors
+        new winston.transports.Console({
+            level: LOG_LEVEL,
+            format: winston.format.combine(
+                timestampFormat,
+                winston.format.colorize({ all: true }),
+                printFormat
+            ),
+        }),
+        // File transports without colors - only in dev/test
+        ...(shouldUseFileLogging()
             ? [
-                  getTransport({
+                  new winston.transports.DailyRotateFile({
+                      datePattern: 'YYYY-MM-DD',
+                      dirname: 'logs',
                       filename: 'app-%DATE%.log',
                       level: LOG_LEVEL,
+                      format: winston.format.combine(timestampFormat, printFormat),
+                  }),
+                  new winston.transports.DailyRotateFile({
+                      datePattern: 'YYYY-MM-DD',
+                      dirname: 'logs',
+                      filename: 'error-%DATE%.log',
+                      level: 'error',
+                      format: winston.format.combine(timestampFormat, printFormat),
                   }),
               ]
             : []),
-        // In production, only use syslog
-        ...(process.env.NODE_ENV === 'production'
-            ? [
-                  new winston.transports.Syslog({
-                      app_name: 'registrant-center',
-                      level: LOG_LEVEL,
-                  }),
-              ]
-            : []),
-        // Console transport for both environments
-        new winston.transports.Console({
-            format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
-            level: LOG_LEVEL,
-        }),
     ],
 });
+
+// Add convenience methods for logging
+export const logDebug = (message, data = {}) => {
+    logger.debug(message, { meta: data });
+};
+
+export const logInfo = (message, data = {}) => {
+    logger.info(message, { meta: data });
+};
+
+export const logWarn = (message, data = {}) => {
+    logger.warn(message, { meta: data });
+};
+
+export const logError = (message, error = null) => {
+    const data = error ? {
+        error: {
+            message: error.message,
+            stack: error.stack,
+            ...error
+        }
+    } : {};
+    logger.error(message, { meta: data });
+};

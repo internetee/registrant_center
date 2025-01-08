@@ -17,7 +17,7 @@ import cookieParser from 'cookie-parser';
 import expressWinston from 'express-winston';
 import jwkToPem from 'jwk-to-pem';
 import callbackPage from './routes/callbackPageRoute.js';
-import { accessLog, consoleLog, errorLog } from './utils/logger.js';
+import { accessLog, consoleLog, errorLog, logError } from './utils/logger.js';
 import compression from 'compression';
 import session from 'cookie-session';
 import API from './routes/apiRoute.js';
@@ -67,24 +67,9 @@ app.use((req, res, next) => {
 });
 
 // logging
-app.use(
-    expressWinston.logger({
-        ...consoleLog,
-        level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
-    })
-);
-app.use(
-    expressWinston.logger({
-        ...accessLog,
-        level: process.env.LOG_LEVEL || 'info',
-    })
-);
-app.use(
-    expressWinston.errorLogger({
-        ...errorLog,
-        level: 'error',
-    })
-);
+app.use(expressWinston.logger(consoleLog));
+app.use(expressWinston.logger(accessLog));
+app.use(expressWinston.errorLogger(errorLog));
 
 // compression
 app.use(compression()); // GZip compress responses
@@ -207,11 +192,31 @@ if (NODE_ENV !== 'development') {
     });
 }
 
+// Global error handler
+app.use((err, req, res, next) => {
+    const errorDetails = {
+        error: {
+            message: err.message,
+            stack: err.stack,
+            status: err.status || 500,
+            code: err.code,
+        },
+    };
+
+    logError('Unhandled error', errorDetails);
+
+    res.status(err.status || 500).json({
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    });
+});
+
 const PORT = process.env.NODE_ENV === 'test' ? 4000 : process.env.VITE_SERVER_PORT;
+const LOG_LEVEL = process.env.LOG_LEVEL;
 
 const server = https.createServer(credentials, app).listen(PORT, () => {
     banner();
     console.log(`Environment: ${NODE_ENV}`);
+    console.log(`Log level: ${LOG_LEVEL}`);
     console.log(`Server listening on port ${PORT}`);
     server.emit('ready');
 });

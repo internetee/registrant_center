@@ -6,7 +6,7 @@ import axios from 'axios';
 import qs from 'qs';
 import jwt from 'jsonwebtoken';
 import capitalize from 'capitalize';
-import { logger } from '../utils/logger.js';
+import { logDebug, logInfo, logError } from '../utils/logger.js';
 
 const {
     CLIENT_ID,
@@ -95,7 +95,9 @@ export default async function callbackPageRoute(req, res, publicKey) {
                     last_name: capitalize.words(verifiedJwt.profile_attributes.family_name),
                 };
 
-                logger.debug('Decrypted JWT from TARA:\n' + JSON.stringify(verifiedJwt, null, 2));
+                logDebug('Decrypted JWT from TARA:', { verifiedJwt });
+                logInfo('User logged in successfully!');
+
                 req.session.user = userData;
                 if (NODE_ENV === 'development') {
                     res.redirect(`http://${HOST}:${PORT}`);
@@ -105,6 +107,7 @@ export default async function callbackPageRoute(req, res, publicKey) {
             }
         );
     } catch (e) {
+        logError('Authentication failed', e);
         if (process.env.NODE_ENV !== 'test') {
             console.warn(e);
         }

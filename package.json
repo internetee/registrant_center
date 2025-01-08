@@ -56,7 +56,7 @@
     "cypress:run": "concurrently \"npm run serve:test\" \"cypress run\" --kill-others --success first",
     "deploy": "npm run test && npm run build && npm run test:e2e && npm run serve",
     "preview": "vite preview --port 3000",
-    "clean-logs": "rm -rf logs/*.log logs/*.gz logs/*.json"
+    "clean-logs": "rm -rf logs && mkdir logs"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
@@ -104,8 +104,7 @@
     "vanilla-cookieconsent": "^3.0.1",
     "vite": "^6.0.1",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0",
-    "winston-syslog": "^2.7.1"
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
