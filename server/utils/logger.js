@@ -123,6 +123,11 @@ const shouldUseFileLogging = () => {
     return ['development', 'test'].includes(process.env.NODE_ENV);
 };
 
+// Helper function to determine if we should colorize output
+const shouldColorize = () => {
+    return ['development', 'test'].includes(process.env.NODE_ENV);
+};
+
 export const appLog = {
     ...expressLogger,
     transports: shouldUseFileLogging()
@@ -145,11 +150,12 @@ export const appLog = {
 
 export const consoleLog = {
     ...expressLogger,
-    colorize: true,
+    colorize: shouldColorize(),
     expressFormat: true,
     format: winston.format.combine(
         timestampFormat,
-        winston.format.colorize({ all: true }),
+        // Only colorize in development/test
+        ...(shouldColorize() ? [winston.format.colorize({ all: true })] : []),
         printFormat
     ),
     transports: [
@@ -164,12 +170,13 @@ export const logger = winston.createLogger({
     ...expressLogger,
     format: winston.format.combine(timestampFormat, printFormat),
     transports: [
-        // Console transport with colors
+        // Console transport with conditional colors
         new winston.transports.Console({
             level: LOG_LEVEL,
             format: winston.format.combine(
                 timestampFormat,
-                winston.format.colorize({ all: true }),
+                // Only colorize in development/test
+                ...(shouldColorize() ? [winston.format.colorize({ all: true })] : []),
                 printFormat
             ),
         }),

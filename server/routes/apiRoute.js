@@ -227,7 +227,7 @@ export default {
                         userData
                     );
                     session.token = response.data;
-                    logInfo('User authenticated successfully', { userData });
+                    logInfo('User authenticated successfully!');
                 }
                 return res.status(200).json(userData);
             }
