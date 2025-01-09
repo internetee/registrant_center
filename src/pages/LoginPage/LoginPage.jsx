@@ -44,7 +44,7 @@ function LoginPage({ user, ui }) {
     };
 
     return (
-        <MainLayout heroKey="login.hero.text" titleKey="login.title">
+        <MainLayout titleKey="login.title">
             {user.isLoggedOut && message.code && <MessageModule message={message} />}
             <div className="page page--login">
                 <div className="u-container">
@@ -61,12 +61,12 @@ function LoginPage({ user, ui }) {
                                 <FormattedMessage id="login.options.mobileId" tagName="p" />
                             </div>
                             <div className="login-options--item">
-                                <Icon name="lock" size="big" />
-                                <FormattedMessage id="login.options.eidas" tagName="p" />
-                            </div>
-                            <div className="login-options--item">
                                 <Icon name="mobile alternate" size="big" />
                                 <FormattedMessage id="login.options.smartId" tagName="p" />
+                            </div>
+                            <div className="login-options--item">
+                                <Icon name="lock" size="big" />
+                                <FormattedMessage id="login.options.eidas" tagName="p" />
                             </div>
                         </div>
                         <Form onSubmit={handleLogin}>
