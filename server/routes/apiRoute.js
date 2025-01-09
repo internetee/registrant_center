@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import axios from 'axios';
-import { logDebug, logInfo, logError } from '../utils/logger.js';
+import { logWarn, logInfo, logError } from '../utils/logger.js';
 
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
 
@@ -231,8 +231,10 @@ export default {
                 }
                 return res.status(200).json(userData);
             }
-            logWarn('User data not found in session');
-            return res.status(498).json({ error: 'Invalid token' });
+            return res.status(401).json({ 
+                status: 'unauthorized',
+                message: 'Session expired' 
+            });
         } catch (e) {
             const errorDetails = {
                 error: {
@@ -241,11 +243,11 @@ export default {
                     ...(e.response?.status && { status: e.response.status })
                 }
             };
-            if (e.response?.status) {
-                logError(`Authentication error: ${e.response.status}`, errorDetails);
-                return res.status(e.response.status).json(e.response.data || {});
-            }
-            return res.status(408).json({ error: 'Request timeout' });
+            logError(`Authentication error`, errorDetails);
+            return res.status(401).json({ 
+                status: 'error',
+                message: 'Authentication failed'
+            });
         }
     },
 
