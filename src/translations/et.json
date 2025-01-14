@@ -205,7 +205,7 @@
   "header.public_portal": "Avalik portaal",
   "hero.link.back": "Tagasi",
   "loading": "Laen...",
-  "login.content.text": "Sisene kasutades Eesti (sh e-residendi) ID-kaarti, Mobiil-ID-d, Smart-ID-d või ELi liikmesriikide elektroonset isikutunnistust (eIDAS)",
+  "login.content.text": "Tuvasta ennast elektrooniliselt, kasutades toetatud identifitseerimisvahendeid nagu  riiklikud ID-kaardid, Mobiil-ID, Smart-ID, pääsuvõtmed jne.",
   "login.content.title": "Logi sisse eeID-ga",
   "login.hero.text": "Sisenemine võimalik vaid Eesti riigi kodanikele ja e-residentidele, kellel on ID-Kaart või Mobiil-ID.",
   "login.options.eidas": "eIDAS",

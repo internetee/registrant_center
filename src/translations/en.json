@@ -205,7 +205,7 @@
   "header.public_portal": "Public portal",
   "hero.link.back": "Back",
   "loading": "Loading...",
-  "login.content.text": "Sign in using Estonian (incl. e-residents) ID card, Mobile ID, Smart-ID or other EU citizen's electronic ID supported by EIDAS.",
+  "login.content.text": "Authenticate yourself electronically using supported identification tools such as national ID cards, Mobile ID, Smart-ID, passkeys, etc.",
   "login.content.title": "Sign in with eeID",
   "login.hero.text": "Sign in using Estonian (incl. e-residents) ID card, mobile ID, Bank link or other EU citizen's electronic ID supported by EIDAS.",
   "login.options.eidas": "eIDAS",
