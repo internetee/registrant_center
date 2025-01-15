@@ -1,25 +1,30 @@
 /* eslint-disable sort-keys */
-import axios from 'axios';
+/* eslint-disable no-unused-vars */
 import dotenv from 'dotenv';
+dotenv.config();
+
+import axios from 'axios';
+import banner from './utils/banner.js';
 import express from 'express';
 import helmet from 'helmet';
-import session from 'cookie-session';
-import bodyParser from 'body-parser';
-import grant from 'grant-express';
-import cookieParser from 'cookie-parser';
-import https from 'https';
-import favicon from 'serve-favicon';
-import compression from 'compression';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import path from 'path';
+import grant from 'grant-express';
 import fs from 'fs';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import expressWinston from 'express-winston';
 import jwkToPem from 'jwk-to-pem';
-import callbackPage from './routes/callbackPageRoute';
-import banner from './utils/banner';
-import API from './routes/apiRoute';
-import { accessLog, consoleLog, errorLog } from './utils/logger';
+import callbackPage from './routes/callbackPageRoute.js';
+import { appLog, consoleLog, logError } from './utils/logger.js';
+import compression from 'compression';
+import session from 'cookie-session';
+import API from './routes/apiRoute.js';
+import https from 'https';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const privateKey = fs.readFileSync('./server.key', 'utf8');
 const certificate = fs.readFileSync('./server.crt', 'utf8');
@@ -33,11 +38,11 @@ const {
     ISSUER_URL,
     JWKS_PATH,
     NODE_ENV,
-    REACT_APP_SERVER_PORT,
+    VITE_SERVER_PORT,
     REDIRECT_URL,
     SESSION_SECRET,
     TOKEN_PATH,
-    REACT_APP_SCOPE,
+    VITE_SCOPE,
     RESPONSE_TYPE,
 } = process.env;
 
@@ -49,41 +54,62 @@ app.disable('x-powered-by');
 app.enable('trust proxy');
 
 app.use(bodyParser.json());
-
 app.use(cookieParser());
 
-// logging
+// Add response capture middleware BEFORE routes and logging
+app.use((req, res, next) => {
+    const originalSend = res.send;
+    res.send = function (data) {
+        res.locals.responseData = data;
+        return originalSend.apply(res, arguments);
+    };
+    next();
+});
+
+// Regular request logging
 app.use(expressWinston.logger(consoleLog));
-app.use(expressWinston.logger(accessLog));
-app.use(expressWinston.errorLogger(errorLog));
+app.use(expressWinston.logger(appLog));
+
+// Error logging - catches unhandled errors
+app.use(expressWinston.errorLogger(consoleLog));
 
 // compression
 app.use(compression()); // GZip compress responses
 
 // static files
 if (NODE_ENV !== 'development') {
-    app.use(express.static(path.join(__dirname, 'build')));
+    app.use(express.static(path.join(__dirname, '../dist')));
 }
-app.use(favicon(path.join(__dirname, '../public/favicon.ico')));
 
+// API routes need to be defined before the catch-all route
 app.use(
     session({
+        name: 'session',
+        keys: [SESSION_SECRET],
         httpOnly: true,
         maxAge: 7200000,
-        secret: SESSION_SECRET,
         secure: true,
     })
 );
 
-(async () => {
-    try {
-        const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
-        console.log('Received public key from TARA'); // eslint-disable-line no-console
-        publicKey = data.keys[0]; // eslint-disable-line prefer-destructuring
-    } catch (e) {
-        console.log(`Public key request error: ${e}`); // eslint-disable-line no-console
-    }
-})();
+if (NODE_ENV !== 'test') {
+    (async () => {
+        try {
+            const { data } = await axios.get(ISSUER_URL + JWKS_PATH);
+            if (!data?.keys?.[0]) {
+                throw new Error('Invalid JWKS response format');
+            }
+            publicKey = data.keys[0];
+            console.log(
+                'Successfully initialized public key from eeID! -> ' + ISSUER_URL + JWKS_PATH
+            );
+        } catch (e) {
+            console.error(`Failed to fetch public key: ${e}`);
+            // Optionally, you might want to retry the fetch after a delay
+            // setTimeout(() => { /* retry logic */ }, 5000);
+        }
+    })();
+}
 
 // middlewares
 let LOCALE = 'et';
@@ -94,7 +120,7 @@ app.use((req, res, next) => {
 
 const redirect_uri =
     NODE_ENV === 'development'
-        ? `https://${HOST}:${REACT_APP_SERVER_PORT}${REDIRECT_URL}`
+        ? `https://${HOST}:${VITE_SERVER_PORT}${REDIRECT_URL}`
         : `https://${HOST}${REDIRECT_URL}`;
 
 // grant auth
@@ -112,26 +138,24 @@ const grantConfig = {
         oauth: 2,
         key: CLIENT_ID,
         secret: CLIENT_SECRET,
-        scope: REACT_APP_SCOPE,
+        scope: VITE_SCOPE,
         redirect_uri,
         response_type: RESPONSE_TYPE,
         callback: REDIRECT_URL,
-        custom_params: {
-            ui_locales: LOCALE,
+        overrides: {
+            en: {
+                custom_params: { ui_locales: 'en' },
+            },
+            et: {
+                custom_params: { ui_locales: 'et' },
+            },
         },
-    }
+    },
 };
 
-if (REACT_APP_SCOPE.includes('webauthn')) {
-    grantConfig.openid.scope = REACT_APP_SCOPE.replace(/(?:^|\s)webauthn(?:\s|$)/, ' ').trim();
-    grantConfig.openid.overrides = {
-        webauthn: {
-            scope: REACT_APP_SCOPE,
-        },
-    };
-  }
-  
-app.use(grant(grantConfig));
+// Create grant middleware instance
+const grantMiddleware = grant(grantConfig);
+app.use(grantMiddleware);
 
 app.use(helmet());
 // api
@@ -140,9 +164,17 @@ app.get('/api/user', API.getUser);
 app.post('/api/destroy', API.destroyUser);
 app.get('/api/confirms/:name/:type/:token', API.getRegistrantUpdate);
 app.post('/api/confirms/:name/:type/:token/:action', API.sendVerificationStatus);
+
+// Basic health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
 app.all('/api/*', API.checkAuth);
+
+// Protected routes below
 app.get('/api/domains', API.getDomains);
-app.get('/api/domains/:uuid', API.getDomain);
+app.get('/api/domains/:uuid', API.getDomains);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
 app.delete('/api/domains/:uuid/registry_lock', API.deleteDomainRegistryLock);
 app.get('/api/contacts/:uuid/do_need_update_contacts', API.doNeedUpdateContacts);
@@ -152,20 +184,41 @@ app.get('/api/contacts', API.getContacts);
 app.get('/api/contacts/:uuid', API.getContacts);
 app.patch('/api/contacts/:uuid', API.setContact);
 
-// all page rendering
+// Auth callback route
 app.get(REDIRECT_URL, (req, res) => callbackPage(req, res, jwkToPem(publicKey).trim()));
 
-app.get('/*', (req, res) => res.sendFile(path.join(__dirname, 'build', 'index.html')));
+// Global error handler
+app.use((err, req, res, next) => {
+    // Set status code
+    const statusCode = err.status || 500;
 
-const server = https
-    .createServer(credentials, app)
-    .listen(NODE_ENV === 'test' ? 4000 : REACT_APP_SERVER_PORT, () => {
-        banner();
-        // eslint-disable-next-line no-console
-        console.log(`Environment: ${NODE_ENV}`);
-        // 'ready' is a hook used by the e2e (integration) tests (see node-while)
-        server.emit('ready');
+    // Log if it's a 500 error since it's unexpected
+    if (statusCode === 500) {
+        logError('Unhandled server error', err);
+    }
+
+    res.status(statusCode).json({
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
     });
+});
+
+// Keep your catch-all route last
+if (NODE_ENV !== 'development') {
+    app.get('/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../dist/index.html'));
+    });
+}
+
+const PORT = process.env.NODE_ENV === 'test' ? 4000 : process.env.VITE_SERVER_PORT;
+const LOG_LEVEL = process.env.LOG_LEVEL;
+
+const server = https.createServer(credentials, app).listen(PORT, () => {
+    banner();
+    console.log(`Environment: ${NODE_ENV}`);
+    console.log(`Log level: ${LOG_LEVEL}`);
+    console.log(`Server listening on port ${PORT}`);
+    server.emit('ready');
+});
 
 // export server instance so we can hook into it in e2e tests etc
 export default server;

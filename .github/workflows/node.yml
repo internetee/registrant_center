@@ -6,28 +6,45 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    container: 
+      image: debian:buster
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [22.x]
 
     steps:
-      - uses: actions/checkout@v2
+      # Install essential packages first
+      - name: Install essential packages
+        run: |
+          apt-get update
+          apt-get install -y git curl
+
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
       - name: Reconfigure git to use HTTP authentication
         run: >
           git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
+
+      - name: Install dependencies
+        run: |
+          npm ci --omit=dev
+          npm install @rollup/rollup-linux-x64-gnu
+
+      - run: npm run build
+
       - name: run tests
         env:
           HOST: localhost
-          REACT_APP_URL: https://$HOST
-          REACT_APP_SERVER_PORT: 5000
+          VITE_URL: https://$HOST
+          VITE_SERVER_PORT: 5000
           API_HOST: https://testrant.internet.ee
           PUBLIC_API_HOST: https://www.internet.ee
           PUBLIC_API_KEY: 4395743059dsfksdfyds8f7334
@@ -40,4 +57,4 @@ jobs:
           REDIRECT_URL: /auth/callback
           SESSION_SECRET: secret555555
           HTTPS: true
-        run: npm test
+        run: npm run test

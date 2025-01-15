@@ -13,10 +13,10 @@ const getUiElementSize = (width) => {
     const isMobile = width < 480;
     const isTablet = width >= 480 && width < 1224;
     if (isMobile) {
-        return 'tiny';
+        return 'small';
     }
     if (isTablet) {
-        return 'medium';
+        return 'large';
     }
     return 'big';
 };
@@ -28,31 +28,26 @@ const setLang = (lang) => (dispatch) => {
         lang,
         type: SET_LANG,
     });
-    if (window.CC) {
-        window.CC.updateLanguage(lang, true);
-    }
 };
 
-const requestMenu = (menu) => (dispatch, getState) => {
-    dispatch({
+const requestMenu = (menu) => {
+    return {
         isInvalidated: false,
         isLoading: true,
         status: null,
         type: fetchMenuAction(menu, 'request'),
-    });
+    };
 };
 
-const receiveMenu = (menu, data) => (dispatch, getState) => {
-    dispatch({
-        isInvalidated: false,
-        isLoading: false,
-        payload: {
-            [menu]: data,
-        },
-        status: 200,
-        type: fetchMenuAction(menu, 'success'),
-    });
-};
+const receiveMenu = (menu, data) => ({
+    isInvalidated: false,
+    isLoading: false,
+    payload: {
+        [menu]: data,
+    },
+    status: 200,
+    type: fetchMenuAction(menu, 'success'),
+});
 
 const invalidateMenuRequest = (menu, status) => {
     return {
@@ -71,11 +66,11 @@ const fetchMenu = (menu) => (dispatch) => {
     return api
         .fetchMenu(menu)
         .then((res) => res.data)
-        .then(async (data) => {
-            dispatch(receiveMenu(menu, data));
+        .then((data) => {
+            return dispatch(receiveMenu(menu, data));
         })
         .catch((error) => {
-            dispatch(invalidateMenuRequest(menu, error.response.status));
+            return dispatch(invalidateMenuRequest(menu, error.response.status));
         });
 };
 

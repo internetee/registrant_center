@@ -1,218 +1,315 @@
-import axios from 'axios';
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
-import reducer, { fetchContacts, initialState, updateContact } from './contacts';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import reducer, {
+    initialState,
+    fetchContact,
+    fetchContacts,
+    updateContact,
+    fetchUpdateContacts,
+    updateContactsConfirm,
+} from './contacts';
 import contacts from '../../__mocks__/contacts';
 
-describe('Contacts action creators', () => {
-    const middlewares = [thunk];
-    const mockStore = configureMockStore(middlewares);
-    let store;
+// Mock the api module
+vi.mock('../../utils/api', () => ({
+    default: {
+        fetchContacts: vi.fn(),
+        updateContact: vi.fn(),
+        fetchUpdateContacts: vi.fn(),
+        updateContacts: vi.fn(),
+    },
+}));
+
+import api from '../../utils/api';
+
+describe('Contact Actions', () => {
+    let dispatch;
 
     beforeEach(() => {
-        store = mockStore({
-            contacts: initialState,
+        vi.clearAllMocks();
+        dispatch = vi.fn((action) => {
+            // If the action is a function (thunk), execute it
+            if (typeof action === 'function') {
+                return action(dispatch);
+            }
+            return action;
         });
     });
 
-    it('dipatches the right actions on fetchContacts request fail', () => {
-        // nock(`${apiHost}`).get('/api/user').reply(404);
-        axios.get.mockRejectedValueOnce({
-            response: {
-                status: 401,
-            },
-        });
+    describe('fetchContact', () => {
+        it('fetches a single contact successfully', async () => {
+            api.fetchContacts.mockResolvedValueOnce({ data: contacts[0] });
 
-        const expectedActions = [
-            {
-                type: 'FETCH_CONTACTS_REQUEST',
-            },
-            {
-                type: 'FETCH_CONTACTS_FAILURE',
-            },
-        ];
+            await fetchContact(contacts[0].id)(dispatch);
 
-        return store.dispatch(fetchContacts()).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
-
-    it('dipatches the right actions to fetch contacts', () => {
-        axios.get.mockResolvedValueOnce({ data: contacts });
-
-        const expectedActions = [
-            {
-                type: 'FETCH_CONTACTS_REQUEST',
-            },
-            {
-                payload: contacts,
-                type: 'FETCH_CONTACTS_SUCCESS',
-            },
-        ];
-        return store.dispatch(fetchContacts()).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
-
-    it('dipatches the right actions on fetchContacts request fail', () => {
-        // nock(`${apiHost}`).get('/api/user').reply(404);
-        axios.get.mockRejectedValueOnce({
-            response: {
-                status: 401,
-            },
-        });
-
-        const expectedActions = [
-            {
-                type: 'FETCH_CONTACT_REQUEST',
-            },
-            {
-                type: 'FETCH_CONTACT_FAILURE',
-            },
-        ];
-
-        return store.dispatch(fetchContacts('cfbfbb76-aed8-497a-91c1-48d82cbc4588')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
-
-    it('dipatches the right actions to fetch a single contact', () => {
-        axios.get.mockResolvedValueOnce({ data: contacts[0] });
-        const expectedActions = [
-            {
-                type: 'FETCH_CONTACT_REQUEST',
-            },
-            {
-                payload: contacts[0],
+            expect(dispatch).toHaveBeenCalledWith({ type: 'FETCH_CONTACT_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
                 type: 'FETCH_CONTACT_SUCCESS',
-            },
-        ];
-        return store.dispatch(fetchContacts('cfbfbb76-aed8-497a-91c1-48d82cbc4588')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
-
-    it('dipatches the right actions to update a contact', () => {
-        axios.patch.mockResolvedValueOnce({ data: contacts[0] });
-        const expectedActions = [
-            {
-                type: 'UPDATE_CONTACT_REQUEST',
-            },
-            {
                 payload: contacts[0],
-                type: 'UPDATE_CONTACT_SUCCESS',
-            },
-        ];
-        return store
-            .dispatch(updateContact('cfbfbb76-aed8-497a-91c1-48d82cbc4588', {}))
-            .then(() => {
-                expect(store.getActions()).toEqual(expectedActions);
             });
+
+            expect(api.fetchContacts).toHaveBeenCalledWith(contacts[0].id, false);
+        });
+
+        it('handles fetch contact failure', async () => {
+            api.fetchContacts.mockRejectedValueOnce(new Error('Failed to fetch'));
+
+            await fetchContact('invalid-id')(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'FETCH_CONTACT_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({ type: 'FETCH_CONTACT_FAILURE' });
+        });
     });
 
-    it('handles contact update errors', () => {
-        axios.patch.mockResolvedValueOnce({
-            data: {
-                errors: [],
-            },
-            status: 401,
+    describe('fetchContacts', () => {
+        it('fetches contacts with pagination', async () => {
+            // First batch
+            api.fetchContacts.mockResolvedValueOnce({
+                data: contacts.slice(0, 2),
+            });
+
+            await fetchContacts()(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'FETCH_CONTACTS_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'FETCH_CONTACTS_SUCCESS',
+                payload: contacts.slice(0, 2),
+            });
         });
-        const expectedActions = [
-            {
-                type: 'UPDATE_CONTACT_REQUEST',
-            },
-            {
+
+        it('handles fetch contacts failure', async () => {
+            api.fetchContacts.mockRejectedValueOnce(new Error('Failed to fetch'));
+
+            await fetchContacts()(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'FETCH_CONTACTS_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({ type: 'FETCH_CONTACTS_FAILURE' });
+        });
+
+        it('should handle pagination when there are more than 200 contacts', async () => {
+            // Create mock contacts
+            const firstPage = Array(200)
+                .fill()
+                .map((_, i) => ({
+                    id: `${i}`,
+                    name: `contact${i}`,
+                }));
+            const secondPage = Array(50)
+                .fill()
+                .map((_, i) => ({
+                    id: `${i + 200}`,
+                    name: `contact${i + 200}`,
+                }));
+
+            // Mock API responses
+            api.fetchContacts
+                .mockResolvedValueOnce({
+                    data: firstPage,
+                })
+                .mockResolvedValueOnce({
+                    data: secondPage,
+                });
+
+            // Call fetchCompanies
+            await fetchContacts()(dispatch);
+
+            // Verify api.fetchCompanies was called twice with correct offsets
+            expect(api.fetchContacts).toHaveBeenCalledTimes(2);
+            expect(api.fetchContacts).toHaveBeenNthCalledWith(1, null, 0);
+            expect(api.fetchContacts).toHaveBeenNthCalledWith(2, null, 200);
+
+            // Get all dispatch calls
+            const dispatchCalls = dispatch.mock.calls.map((call) => call[0]);
+
+            // Verify the sequence of actions
+            expect(dispatchCalls).toContainEqual({
+                type: 'FETCH_CONTACTS_REQUEST',
+            });
+
+            // Verify the final success action contains all companies
+            const successAction = dispatchCalls.find(
+                (call) => call.type === 'FETCH_CONTACTS_SUCCESS'
+            );
+            expect(successAction).toBeTruthy();
+            expect(successAction.payload).toHaveLength(250);
+            expect(successAction.payload).toEqual([...firstPage, ...secondPage]);
+        });
+    });
+
+    describe('updateContact', () => {
+        const mockForm = {
+            name: 'Updated Name',
+            email: 'updated@email.com',
+        };
+
+        it('updates contact successfully', async () => {
+            const updatedContact = { ...contacts[0], ...mockForm };
+            api.updateContact.mockResolvedValueOnce({ data: updatedContact });
+
+            await updateContact(contacts[0].id, mockForm)(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'UPDATE_CONTACT_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'UPDATE_CONTACT_SUCCESS',
+                payload: updatedContact,
+            });
+        });
+
+        it('handles update contact failure', async () => {
+            const errorResponse = {
+                response: {
+                    status: 400,
+                    data: { errors: ['Invalid email'] },
+                },
+            };
+            api.updateContact.mockRejectedValueOnce(errorResponse);
+
+            await updateContact(contacts[0].id, mockForm)(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'UPDATE_CONTACT_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'UPDATE_CONTACT_FAILURE',
                 payload: {
-                    code: 401,
-                    errors: [],
+                    code: 400,
                     type: 'whois',
                 },
-                type: 'UPDATE_CONTACT_FAILURE',
-            },
-        ];
-        return store
-            .dispatch(updateContact('cfbfbb76-aed8-497a-91c1-48d82cbc4588', {}))
-            .then(() => {
-                expect(store.getActions()).toEqual(expectedActions);
             });
+        });
+    });
+
+    describe('fetchUpdateContacts', () => {
+        it('fetches update contacts successfully', async () => {
+            const mockResponse = { status: 'pending' };
+            api.fetchUpdateContacts.mockResolvedValueOnce({ data: mockResponse });
+
+            await fetchUpdateContacts('domain-id')(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'DO_UPDATE_CONTACTS_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'DO_UPDATE_CONTACTS_SUCCESS',
+                payload: mockResponse,
+            });
+        });
+
+        it('handles fetch update contacts failure', async () => {
+            api.fetchUpdateContacts.mockRejectedValueOnce(new Error('Failed to fetch'));
+
+            await fetchUpdateContacts('domain-id')(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'DO_UPDATE_CONTACTS_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({ type: 'DO_UPDATE_CONTACTS_FAILURE' });
+        });
+    });
+
+    describe('updateContactsConfirm', () => {
+        it('confirms contact update successfully', async () => {
+            const mockResponse = {
+                message: 'get it',
+                contacts: [
+                    { id: '1', name: 'Updated Contact 1' },
+                    { id: '2', name: 'Updated Contact 2' },
+                ],
+            };
+            api.updateContacts.mockResolvedValueOnce({ data: mockResponse });
+
+            await updateContactsConfirm('domain-id')(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'UPDATE_CONTACTS_REQUEST',
+            });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'UPDATE_CONTACTS_SUCCESS',
+                payload: mockResponse,
+            });
+
+            expect(api.updateContacts).toHaveBeenCalledWith('domain-id', false);
+        });
+
+        it('handles contact update confirmation failure', async () => {
+            const errorResponse = {
+                response: {
+                    status: 400,
+                    data: {
+                        message: 'Failed to update contacts',
+                        errors: ['Contact update failed'],
+                    },
+                },
+            };
+            api.updateContacts.mockRejectedValueOnce(errorResponse);
+
+            await updateContactsConfirm('domain-id')(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'UPDATE_CONTACTS_REQUEST',
+            });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'UPDATE_CONTACTS_FAILURE',
+            });
+        });
+
+        it('handles network or server errors', async () => {
+            api.updateContacts.mockRejectedValueOnce(new Error('Network error'));
+
+            await updateContactsConfirm('domain-id')(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'UPDATE_CONTACTS_REQUEST',
+            });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'UPDATE_CONTACTS_FAILURE',
+            });
+        });
     });
 });
 
-describe('Contacts reducers', () => {
-    it('should return the initial state', () => {
+describe('Contacts Reducer', () => {
+    it('returns initial state', () => {
         expect(reducer(undefined, {})).toEqual(initialState);
     });
 
-    it('should handle LOGOUT_USER', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'LOGOUT_USER',
-                }
-            )
-        ).toEqual(initialState);
+    it('handles FETCH_CONTACT_SUCCESS', () => {
+        const action = {
+            type: 'FETCH_CONTACT_SUCCESS',
+            payload: contacts[0],
+        };
+
+        const state = reducer(initialState, action);
+        expect(state.data[contacts[0].id]).toEqual(contacts[0]);
+        expect(state.ids).toContain(contacts[0].id);
+        expect(state.isLoading).toBe(false);
     });
 
-    it('should handle FETCH_CONTACTS_REQUEST', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'FETCH_CONTACTS_REQUEST',
-                }
-            )
-        ).toEqual({
-            isLoading: true,
+    it('handles FETCH_CONTACTS_SUCCESS', () => {
+        const action = {
+            type: 'FETCH_CONTACTS_SUCCESS',
+            payload: contacts,
+        };
+
+        const state = reducer(initialState, action);
+        expect(Object.keys(state.data)).toHaveLength(contacts.length);
+        expect(state.ids).toHaveLength(contacts.length);
+        expect(state.isLoading).toBe(false);
+    });
+
+    it('handles UPDATE_CONTACT_SUCCESS', () => {
+        const updatedContact = { ...contacts[0], name: 'Updated Name' };
+        const action = {
+            type: 'UPDATE_CONTACT_SUCCESS',
+            payload: updatedContact,
+        };
+
+        const state = reducer(initialState, action);
+        expect(state.data[updatedContact.id]).toEqual(updatedContact);
+        expect(state.message).toEqual({
+            code: 200,
+            type: 'whois',
         });
     });
 
-    it('should handle FETCH_CONTACTS_FAILURE', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'FETCH_CONTACTS_FAILURE',
-                }
-            )
-        ).toEqual({
-            isLoading: false,
-        });
-    });
+    it('handles loading states', () => {
+        const requestState = reducer(initialState, { type: 'FETCH_CONTACTS_REQUEST' });
+        expect(requestState.isLoading).toBe(true);
 
-    it('should handle FETCH_CONTACT_SUCCESS', () => {
-        expect(
-            reducer(initialState, {
-                payload: contacts[0],
-                type: 'FETCH_CONTACT_SUCCESS',
-            })
-        ).toEqual({
-            data: {
-                [contacts[0].id]: contacts[0],
-            },
-            ids: [contacts[0].id],
-            isLoading: false,
-            message: null,
-        });
-    });
-
-    it('should handle FETCH_CONTACTS_SUCCESS', () => {
-        expect(
-            reducer(initialState, {
-                payload: contacts,
-                type: 'FETCH_CONTACTS_SUCCESS',
-            })
-        ).toEqual({
-            data: contacts.reduce(
-                (acc, item) => ({
-                    ...acc,
-                    [item.id]: item,
-                }),
-                {}
-            ),
-            ids: contacts.map((item) => item.id),
-            isLoading: false,
-            message: null,
-        });
+        const failureState = reducer(requestState, { type: 'FETCH_CONTACTS_FAILURE' });
+        expect(failureState.isLoading).toBe(false);
     });
 });

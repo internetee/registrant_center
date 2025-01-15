@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Icon, Label, Table } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -40,11 +40,11 @@ const DomainListItem = ({ domain, lang }) => {
                 <Label.Group className="statuses" size="large">
                     {domain.statuses.map((status, i) => (
                         <Label
-                            key={status}
                             basic
                             circular
                             className={classNames({ hidden: !showStatuses && i > 0 })}
                             color={domainStatuses[status].color}
+                            key={status}
                             title={formatMessage({
                                 id: `domain.status.${status}.description`,
                             })}

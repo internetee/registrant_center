@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from 'semantic-ui-react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-const MainMenu = ({ items, lang, user, closeMainMenu }) => {
+const MainMenu = ({ items = [], lang, user, closeMainMenu }) => {
     const [menu, setMenu] = useState([]);
-    const { push } = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (items) {
+        if (items && items.length > 0) {
             const menuItems = items
                 .reduce((acc, item) => {
                     // Exclude portals menu items
@@ -58,7 +58,7 @@ const MainMenu = ({ items, lang, user, closeMainMenu }) => {
     };
 
     const handleLink = () => {
-        push('/');
+        navigate('/');
         closeMainMenu();
     };
 
@@ -73,7 +73,7 @@ const MainMenu = ({ items, lang, user, closeMainMenu }) => {
                     </li>
                 )}
                 {menu.map((item, i) => (
-                    <li key={item.id} className={item.isOpen ? 'u-submenu-open' : ''}>
+                    <li className={item.isOpen ? 'u-submenu-open' : ''} key={item.id}>
                         <a href={item.public_url}>{item.title}</a>
                         {item.children && item.children.length > 0 && (
                             <>
@@ -103,8 +103,12 @@ const MainMenu = ({ items, lang, user, closeMainMenu }) => {
 export default MainMenu;
 
 MainMenu.propTypes = {
-    items: PropTypes.array.isRequired,
+    items: PropTypes.arrayOf(PropTypes.object),
     lang: PropTypes.string.isRequired,
     user: PropTypes.object.isRequired,
     closeMainMenu: PropTypes.func.isRequired,
+};
+
+MainMenu.defaultProps = {
+    items: [],
 };

@@ -1,9 +1,8 @@
-// eslint-disable-next-line import/no-anonymous-default-export
 export default {
     getChangedUserContactsByDomain: (domains = {}, contacts = {}) => {
         try {
             const contactsObj = Object.values(contacts);
-            if (contactsObj.length && contactsObj[0].links.length) {
+            if (contactsObj.length && contactsObj[0].links?.length) {
                 const arr = [];
                 contactsObj.forEach((c) => {
                     c.links.forEach((d) => {
@@ -17,7 +16,10 @@ export default {
 
                 return arr;
             }
-            return Object.values(domains).reduce((acc, domain) => {
+
+            const domainsArray = Object.values(domains);
+
+            return domainsArray.reduce((acc, domain) => {
                 const changedDomain = {
                     id: domain.id,
                     name: domain.name,
@@ -48,6 +50,7 @@ export default {
                 return acc;
             }, []);
         } catch (e) {
+            console.error('Error in getChangedUserContactsByDomain:', e);
             return [];
         }
     },

@@ -1,5 +1,4 @@
-/* eslint-disable camelcase */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Container, Table } from 'semantic-ui-react';
 import { connect } from 'react-redux';
@@ -10,27 +9,60 @@ import {
     fetchVerification as fetchVerificationAction,
     respondToVerification as respondToVerificationAction,
 } from '../../redux/reducers/verification';
+import { useParams } from 'react-router-dom';
 
 const ConfirmationPage = ({
-    match,
     ui,
     message,
     fetchVerification,
     respondToVerification,
     verification,
 }) => {
+    const { name, type, token } = useParams();
     const [isLoading, setIsLoading] = useState(true);
     const { uiElemSize } = ui;
 
+    useEffect(() => {
+        (async () => {
+            if (!token) {
+                // If no token, just show the form without fetching
+                setIsLoading(false);
+                return;
+            }
+
+            setIsLoading(true);
+            await fetchVerification({
+                domain: name,
+                token: token,
+                type: type,
+            });
+            setIsLoading(false);
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fetchVerification]);
+
+    if (!name || !type) {
+        return (
+            <MainLayout titleKey="errorpage.title">
+                <div className="page">
+                    <PageMessage
+                        headerContent={<FormattedMessage id="errorpage.none.message.title" />}
+                        icon="times circle outline"
+                    />
+                </div>
+            </MainLayout>
+        );
+    }
+
     const headerAltText = () => {
         let str = '';
-        if (match.params.type === 'change') {
+        if (type === 'change') {
             if (verification.status === 'confirmed') {
                 str = 'confirmation.change_confirmed_alt';
             } else {
                 str = 'confirmation.change_rejected_alt';
             }
-        } else if (match.params.type === 'delete') {
+        } else if (type === 'delete') {
             if (verification.status === 'confirmed') {
                 str = 'confirmation.delete_confirmed_alt';
             } else {
@@ -43,38 +75,16 @@ const ConfirmationPage = ({
 
     const handleVerification = async (shouldConfirm) => {
         setIsLoading(true);
-        await respondToVerification(
-            match.params.name,
-            match.params.token,
-            shouldConfirm,
-            match.params.type
-        );
+        await respondToVerification(name, token, shouldConfirm, type);
         setIsLoading(false);
     };
-
-    useEffect(() => {
-        (async () => {
-            setIsLoading(true);
-            await fetchVerification({
-                domain: match.params.name,
-                token: match.params.token,
-                type: match.params.type,
-            });
-            setIsLoading(false);
-        })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchVerification]);
 
     if (isLoading) return <Loading />;
 
     return (
         <MainLayout
             hasBackButton
-            titleKey={
-                match.params.type === 'change'
-                    ? 'confirmation.change_title'
-                    : 'confirmation.delete_title'
-            }
+            titleKey={type === 'change' ? 'confirmation.change_title' : 'confirmation.delete_title'}
         >
             {!isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">
@@ -89,7 +99,7 @@ const ConfirmationPage = ({
                                             <p>
                                                 <FormattedMessage
                                                     id={
-                                                        match.params.type === 'change'
+                                                        type === 'change'
                                                             ? 'confirmation.change_default_alt'
                                                             : 'confirmation.delete_default_alt'
                                                     }
@@ -98,7 +108,7 @@ const ConfirmationPage = ({
                                         </div>
                                     </Container>
                                 </div>
-                                {match.params.type === 'change' ? (
+                                {type === 'change' ? (
                                     <div className="page--block">
                                         {' '}
                                         <Container text>
@@ -197,7 +207,7 @@ const ConfirmationPage = ({
                                     <Container textAlign="center">
                                         <div className="page--header--actions">
                                             <Button
-                                                data-test="link-domain-edit"
+                                                data-test="reject"
                                                 disabled={isLoading}
                                                 loading={isLoading}
                                                 onClick={() => handleVerification('rejected')}
@@ -207,7 +217,7 @@ const ConfirmationPage = ({
                                                 <FormattedMessage id="confirmation.reject" />
                                             </Button>
                                             <Button
-                                                data-test="link-domain-edit"
+                                                data-test="confirm"
                                                 disabled={isLoading}
                                                 loading={isLoading}
                                                 onClick={() => handleVerification('confirmed')}
@@ -286,7 +296,7 @@ const ConfirmationPage = ({
                         headerContent={
                             <FormattedMessage
                                 id={
-                                    match.params.type === 'change'
+                                    type === 'change'
                                         ? 'confirmation.change_not_available'
                                         : 'confirmation.delete_not_available'
                                 }
@@ -301,7 +311,11 @@ const ConfirmationPage = ({
 };
 
 export default connect(
-    (state) => state,
+    (state) => ({
+        ui: state.ui,
+        message: state.message,
+        verification: state.verification,
+    }),
     (dispatch) =>
         bindActionCreators(
             {
@@ -313,9 +327,12 @@ export default connect(
 )(ConfirmationPage);
 
 ConfirmationPage.propTypes = {
-    match: PropTypes.object.isRequired,
     ui: PropTypes.object.isRequired,
-    message: PropTypes.string.isRequired,
+    message: PropTypes.string,
     fetchVerification: PropTypes.func.isRequired,
-    verification: PropTypes.bool.isRequired,
+    verification: PropTypes.object.isRequired,
+};
+
+ConfirmationPage.defaultProps = {
+    message: '',
 };

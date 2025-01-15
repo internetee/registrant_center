@@ -1,21 +1,22 @@
 import { useEffect } from 'react';
 import pluginConfig from './CookieConsentConfig';
+import 'vanilla-cookieconsent/dist/cookieconsent.css';
+import * as CookieConsent from 'vanilla-cookieconsent';
+import Cookies from 'universal-cookie';
 
-import 'vanilla-cookieconsent';
+const cookies = new Cookies();
 
-const CookieConsent = () => {
+function CookieConsentComponent() {
     useEffect(() => {
-        /**
-         * useEffect is executed twice (React 18+),
-         * make sure the plugin is initialized and executed once
-         */
-        if (!document.getElementById('cc--main')) {
-            window.CC = window.initCookieConsent();
-            window.CC.run(pluginConfig);
+        try {
+            CookieConsent.run(pluginConfig);
+            CookieConsent.setLanguage(cookies.get('locale'));
+        } catch (error) {
+            console.error('Error initializing CookieConsent:', error);
         }
     }, []);
 
     return null;
-};
+}
 
-export default CookieConsent;
+export default CookieConsentComponent;

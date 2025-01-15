@@ -1,7 +1,4 @@
-import 'core-js';
-import axios from 'axios';
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import reducer, {
     initialState,
     fetchDomain,
@@ -10,328 +7,318 @@ import reducer, {
     parseDomain,
     unlockDomain,
 } from './domains';
-import contacts from '../../__mocks__/contacts';
 import domains from '../../__mocks__/domains';
 
-const middlewares = [thunk];
-const mockStore = configureMockStore(middlewares);
+// Mock the api module instead of axios
+vi.mock('../../utils/api', () => ({
+    default: {
+        fetchDomains: vi.fn(),
+        setDomainRegistryLock: vi.fn(),
+        deleteDomainRegistryLock: vi.fn(),
+    },
+}));
 
-describe('Domains action creators', () => {
-    let store;
+vi.mock('./contacts', () => ({
+    fetchContacts: vi.fn((id) => ({ type: 'MOCK_FETCH_CONTACTS', payload: id })),
+}));
+
+// Import api after mocking
+import api from '../../utils/api';
+
+describe('Domain Actions', () => {
+    let dispatch;
 
     beforeEach(() => {
-        store = mockStore({
-            domains: {
-                ...initialState,
-            },
+        vi.clearAllMocks();
+        dispatch = vi.fn((action) => {
+            // If the action is a function (thunk), execute it
+            if (typeof action === 'function') {
+                return action(dispatch);
+            }
+            return action;
         });
     });
 
-    it('dipatches the right actions on fetchDomain request fail', () => {
-        // nock(`${apiHost}`).get('/api/user').reply(404);
-        axios.get.mockRejectedValueOnce({
-            response: {
-                status: 401,
-            },
-        });
+    describe('fetchDomain', () => {
+        it('fetches a single domain and its contacts', async () => {
+            const mockDomain = {
+                ...domains[0],
+            };
+            api.fetchDomains.mockResolvedValueOnce({ data: mockDomain });
 
-        const expectedActions = [
-            {
-                type: 'FETCH_DOMAIN_REQUEST',
-            },
-            {
-                type: 'FETCH_DOMAIN_FAILURE',
-            },
-        ];
+            await fetchDomain(mockDomain.id)(dispatch);
 
-        return store.dispatch(fetchDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
+            expect(dispatch).toHaveBeenCalledWith({ type: 'FETCH_DOMAIN_REQUEST' });
 
-    it('dipatches the right actions on fetchDomains request fail', () => {
-        // nock(`${apiHost}`).get('/api/user').reply(404);
-        axios.get.mockRejectedValueOnce({
-            response: {
-                status: 401,
-            },
-        });
+            // Verify fetchContacts was called for each contact
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'MOCK_FETCH_CONTACTS',
+                payload: mockDomain.registrant.id,
+            });
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'MOCK_FETCH_CONTACTS',
+                payload: mockDomain.tech_contacts[0].id,
+            });
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'MOCK_FETCH_CONTACTS',
+                payload: mockDomain.admin_contacts[0].id,
+            });
 
-        const expectedActions = [
-            {
-                type: 'FETCH_DOMAINS_REQUEST',
-            },
-            {
-                type: 'FETCH_DOMAINS_FAILURE',
-            },
-        ];
-
-        return store.dispatch(fetchDomains()).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
-
-    // it('dipatches the right actions to fetch domains', () => {
-    //     axios.get.mockResolvedValueOnce({ data: { count: 2, domains } });
-    //     const expectedActions = [
-    //         {
-    //             type: 'FETCH_DOMAINS_REQUEST',
-    //         },
-    //         {
-    //             payload: { count: 2, domains },
-    //             simplify: false,
-    //             type: 'FETCH_DOMAINS_SUCCESS',
-    //         },
-    //     ];
-    //     return store.dispatch(fetchDomains()).then(() => {
-    //         expect(store.getActions()).toEqual(expectedActions);
-    //     });
-    // });
-
-    it('dipatches the right actions to fetch a single domain by uuid', () => {
-        axios.get.mockResolvedValueOnce({ data: domains[0] });
-        axios.get.mockResolvedValueOnce({ data: contacts[2] });
-        axios.get.mockResolvedValueOnce({ data: contacts[1] });
-        axios.get.mockResolvedValueOnce({ data: contacts[0] });
-
-        const expectedActions = [
-            {
-                type: 'FETCH_DOMAIN_REQUEST',
-            },
-            {
-                type: 'FETCH_CONTACT_REQUEST',
-            },
-            {
-                type: 'FETCH_CONTACT_REQUEST',
-            },
-            {
-                type: 'FETCH_CONTACT_REQUEST',
-            },
-            {
-                payload: contacts[2],
-                type: 'FETCH_CONTACT_SUCCESS',
-            },
-            {
-                payload: contacts[1],
-                type: 'FETCH_CONTACT_SUCCESS',
-            },
-            {
-                payload: contacts[0],
-                type: 'FETCH_CONTACT_SUCCESS',
-            },
-            {
-                payload: parseDomain(domains[0]),
+            expect(dispatch).toHaveBeenLastCalledWith({
                 type: 'FETCH_DOMAIN_SUCCESS',
-            },
-        ];
+                payload: parseDomain(mockDomain),
+            });
 
-        return store.dispatch(fetchDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
+            expect(api.fetchDomains).toHaveBeenCalledWith(mockDomain.id);
+        });
+
+        it('handles fetch domain failure', async () => {
+            api.fetchDomains.mockRejectedValueOnce(new Error('Failed to fetch'));
+
+            await fetchDomain('invalid-id')(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'FETCH_DOMAIN_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({ type: 'FETCH_DOMAIN_FAILURE' });
         });
     });
 
-    it('dipatches the right actions to lock domain failure', () => {
-        axios.post.mockRejectedValueOnce({
-            response: {
-                status: 401,
-            },
-        });
-
-        const expectedActions = [
-            {
-                type: 'LOCK_DOMAIN_REQUEST',
-            },
-            {
-                payload: {
-                    code: 401,
+    describe('fetchDomains', () => {
+        it('fetches domains with pagination', async () => {
+            api.fetchDomains.mockResolvedValueOnce({
+                data: {
+                    domains: domains,
+                    count: 2,
+                    total: 2,
                 },
-                type: 'LOCK_DOMAIN_FAILURE',
-            },
-        ];
+            });
 
-        return store.dispatch(lockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
+            await fetchDomains(0, false, false)(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'FETCH_DOMAINS_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'FETCH_DOMAINS_SUCCESS',
+                payload: {
+                    domains: domains,
+                    count: 2,
+                    total: 2,
+                },
+                simplify: false,
+            });
+
+            expect(api.fetchDomains).toHaveBeenCalledWith(null, 0, false, false);
+        });
+
+        it('should handle pagination when there are more than 200 domains', async () => {
+            // Create mock contacts
+            const firstPage = Array(200)
+                .fill()
+                .map((_, i) => ({
+                    id: `${i}`,
+                    name: `domain${i}.ee`,
+                }));
+            const secondPage = Array(50)
+                .fill()
+                .map((_, i) => ({
+                    id: `${i + 200}`,
+                    name: `domain${i + 200}.ee`,
+                }));
+
+            // Mock API responses
+            api.fetchDomains
+                .mockResolvedValueOnce({
+                    data: {
+                        domains: firstPage,
+                        count: 200,
+                        total: 250,
+                    },
+                })
+                .mockResolvedValueOnce({
+                    data: {
+                        domains: secondPage,
+                        count: 50,
+                        total: 250,
+                    },
+                });
+
+            // Call fetchCompanies
+            await fetchDomains(0, false, false)(dispatch);
+
+            // Verify api.fetchCompanies was called twice with correct offsets
+            expect(api.fetchDomains).toHaveBeenCalledTimes(2);
+            expect(api.fetchDomains).toHaveBeenNthCalledWith(1, null, 0, false, false);
+            expect(api.fetchDomains).toHaveBeenNthCalledWith(2, null, 200, false, false);
+
+            // Get all dispatch calls
+            const dispatchCalls = dispatch.mock.calls.map((call) => call[0]);
+
+            // Verify the sequence of actions
+            expect(dispatchCalls).toContainEqual({
+                type: 'FETCH_DOMAINS_REQUEST',
+            });
+
+            // Verify the final success action contains all companies
+            const successAction = dispatchCalls.find(
+                (call) => call.type === 'FETCH_DOMAINS_SUCCESS'
+            );
+            expect(successAction).toBeTruthy();
+            expect(successAction.payload.domains).toHaveLength(250);
+            expect(successAction.payload.domains).toEqual([...firstPage, ...secondPage]);
         });
     });
 
-    it('dipatches the right actions to lock a domain', () => {
-        axios.post.mockResolvedValueOnce({ data: domains[0] });
+    describe('lockDomain', () => {
+        it('locks domain with extensionsProhibited', async () => {
+            const mockResponse = {
+                ...domains[0],
+                locked_by_registrant_at: new Date().toISOString(),
+            };
+            api.setDomainRegistryLock.mockResolvedValueOnce({ data: mockResponse });
 
-        const expectedActions = [
-            {
-                type: 'LOCK_DOMAIN_REQUEST',
-            },
-            {
-                payload: domains[0],
+            await lockDomain(domains[0].id, true)(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'LOCK_DOMAIN_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
                 type: 'LOCK_DOMAIN_SUCCESS',
-            },
-        ];
+                payload: mockResponse,
+            });
 
-        return store.dispatch(lockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
-
-    it('dipatches the right actions to unlock domain failure', () => {
-        axios.delete.mockRejectedValueOnce({
-            response: {
-                status: 401,
-            },
+            expect(api.setDomainRegistryLock).toHaveBeenCalledWith(domains[0].id, true);
         });
 
-        const expectedActions = [
-            {
-                type: 'UNLOCK_DOMAIN_REQUEST',
-            },
-            {
-                payload: {
-                    code: 401,
+        it('handles lock domain failure', async () => {
+            const errorResponse = {
+                response: {
+                    status: 403,
+                    data: { message: 'Domain cannot be locked' },
                 },
-                type: 'UNLOCK_DOMAIN_FAILURE',
-            },
-        ];
+            };
+            api.setDomainRegistryLock.mockRejectedValueOnce(errorResponse);
 
-        return store.dispatch(unlockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
+            await lockDomain(domains[0].id)(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'LOCK_DOMAIN_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'LOCK_DOMAIN_FAILURE',
+                payload: {
+                    code: 403,
+                    success: false,
+                    message: 'Domain cannot be locked',
+                },
+            });
         });
     });
 
-    it('dipatches the right actions to unlock a domain', () => {
-        axios.delete.mockResolvedValueOnce({ data: domains[0] });
+    describe('unlockDomain', () => {
+        it('unlocks domain successfully', async () => {
+            const mockResponse = {
+                ...domains[0],
+                locked_by_registrant_at: null,
+            };
+            api.deleteDomainRegistryLock.mockResolvedValueOnce({ data: mockResponse });
 
-        const expectedActions = [
-            {
-                type: 'UNLOCK_DOMAIN_REQUEST',
-            },
-            {
-                payload: domains[0],
+            await unlockDomain(domains[0].id)(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'UNLOCK_DOMAIN_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
                 type: 'UNLOCK_DOMAIN_SUCCESS',
-            },
-        ];
+                payload: mockResponse,
+            });
 
-        return store.dispatch(unlockDomain('bd695cc9-1da8-4c39-b7ac-9a2055e0a93e')).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
+            expect(api.deleteDomainRegistryLock).toHaveBeenCalledWith(domains[0].id);
+        });
+
+        it('handles unlock domain failure', async () => {
+            const errorResponse = {
+                response: {
+                    status: 403,
+                    data: { message: 'Domain cannot be unlocked' },
+                },
+            };
+            api.deleteDomainRegistryLock.mockRejectedValueOnce(errorResponse);
+
+            await unlockDomain(domains[0].id)(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({ type: 'UNLOCK_DOMAIN_REQUEST' });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'UNLOCK_DOMAIN_FAILURE',
+                payload: {
+                    code: 403,
+                    success: false,
+                    message: 'Domain cannot be unlocked',
+                },
+            });
         });
     });
 });
 
-describe('Domains reducers', () => {
-    it('should return the initial state', () => {
+describe('Domains Reducer', () => {
+    it('returns initial state', () => {
         expect(reducer(undefined, {})).toEqual(initialState);
     });
 
-    it('should handle LOGOUT_USER', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'LOGOUT_USER',
-                }
-            )
-        ).toEqual(initialState);
-    });
-
-    it('should handle FETCH_DOMAIN_REQUEST', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'FETCH_DOMAIN_REQUEST',
-                }
-            )
-        ).toEqual({
-            isLoading: true,
-        });
-    });
-
-    it('should handle FETCH_DOMAINS_REQUEST', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'FETCH_DOMAINS_REQUEST',
-                }
-            )
-        ).toEqual({
-            isLoading: true,
-        });
-    });
-
-    it('should handle FETCH_DOMAINS_FAILURE', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    type: 'FETCH_DOMAINS_FAILURE',
-                }
-            )
-        ).toEqual({
-            isLoading: false,
-        });
-    });
-
-    it('should handle FETCH_DOMAINS_SUCCESS', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    payload: { count: 2, domains },
-                    type: 'FETCH_DOMAINS_SUCCESS',
-                }
-            )
-        ).toEqual({
-            data: {
-                count: 2,
-                domains: domains.reduce(
-                    (acc, item) => ({
-                        ...acc,
-                        [item.id]: parseDomain(item, true),
-                    }),
-                    {}
-                ),
+    it('handles FETCH_DOMAINS_SUCCESS', () => {
+        const action = {
+            type: 'FETCH_DOMAINS_SUCCESS',
+            payload: {
+                domains: domains,
+                count: 4,
+                total: 4,
             },
-            ids: domains.map(({ id }) => id),
-            isLoading: false,
+            simplify: false,
+        };
+
+        const state = reducer(initialState, action);
+        expect(state.data.count).toBe(4);
+        expect(state.data.total).toBe(4);
+        expect(Object.keys(state.data.domains)).toHaveLength(domains.length);
+        expect(state.isLoading).toBe(false);
+    });
+
+    it('handles LOCK_DOMAIN_SUCCESS', () => {
+        const mockDomain = {
+            ...domains[0],
+            locked_by_registrant_at: new Date().toISOString(),
+        };
+
+        const action = {
+            type: 'LOCK_DOMAIN_SUCCESS',
+            payload: mockDomain,
+        };
+
+        const state = reducer(initialState, action);
+        expect(state.data[mockDomain.id]).toEqual(parseDomain(mockDomain));
+        expect(state.message).toEqual({
+            code: 200,
+            type: 'domainLock',
         });
     });
 
-    it('should handle LOCK_DOMAIN_SUCCESS', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    payload: domains[0],
-                    type: 'LOCK_DOMAIN_SUCCESS',
-                }
-            )
-        ).toEqual({
-            data: {
-                [domains[0].id]: parseDomain(domains[0]),
+    it('handles LOCK_DOMAIN_FAILURE', () => {
+        const action = {
+            type: 'LOCK_DOMAIN_FAILURE',
+            payload: {
+                code: 403,
+                success: false,
+                message: 'Domain cannot be locked',
             },
-            message: {
-                code: 200,
-                type: 'domainLock',
-            },
+        };
+
+        const state = reducer(initialState, action);
+        expect(state.message).toEqual({
+            code: 403,
+            type: 'domainLock',
+            success: false,
+            message: 'Domain cannot be locked',
         });
     });
 
-    it('should handle UNLOCK_DOMAIN_SUCCESS', () => {
-        expect(
-            reducer(
-                {},
-                {
-                    payload: domains[0],
-                    type: 'UNLOCK_DOMAIN_SUCCESS',
-                }
-            )
-        ).toEqual({
-            data: {
-                [domains[0].id]: parseDomain(domains[0]),
-            },
-            message: {
-                code: 200,
-                type: 'domainUnlock',
-            },
-        });
+    it('handles FETCH_DOMAINS_REQUEST', () => {
+        const state = reducer(initialState, { type: 'FETCH_DOMAINS_REQUEST' });
+        expect(state.isLoading).toBe(true);
+    });
+
+    it('handles FETCH_DOMAINS_FAILURE', () => {
+        const state = reducer(initialState, { type: 'FETCH_DOMAINS_FAILURE' });
+        expect(state.isLoading).toBe(false);
     });
 });

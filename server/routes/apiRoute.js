@@ -1,7 +1,9 @@
 /* eslint-disable */
-import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
+
+import axios from 'axios';
+import { logWarn, logInfo, logError } from '../utils/logger.js';
 
 const { API_HOST, PUBLIC_API_HOST, PUBLIC_API_KEY } = process.env;
 
@@ -41,12 +43,30 @@ const API = (session) => {
 const handleResponse = async (apiReq, res) => {
     try {
         const { data, status } = await apiReq();
+        res.locals.responseData = data;
         return res.status(status).json(data);
     } catch (e) {
+        const errorDetails = {
+            error: {
+                message: e.message,
+                code: e.code,
+                ...(e.response?.data && { responseData: e.response.data }),
+                ...(e.response?.status && { status: e.response.status }),
+                ...(e.config?.url && { url: e.config.url }),
+                ...(e.config?.method && { method: e.config.method }),
+            }
+        };
         if (e.response) {
+            logError(`API Error: ${e.response.status}`, errorDetails);
             return res.status(e.response.status).json({});
         }
-        return res.status(408).json({});
+        if (e.code === 'ECONNABORTED') {
+            logError('API Timeout', errorDetails);
+            return res.status(408).json({ error: 'Request timeout' });
+        }
+
+        logError('API Error: Unknown', errorDetails);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 };
 
@@ -55,7 +75,8 @@ export default {
         if (isSessionValid(req)) {
             return next();
         }
-        return res.status(401).json({});
+        logWarn('Authentication failed: Invalid session', { session: req.session });
+        return res.status(401).json({ error: 'Unauthorized' });
     },
 
     doNeedUpdateContacts: async ({ params, session }, res) => {
@@ -118,53 +139,22 @@ export default {
         );
     },
 
-    getDomain: async ({ params, session }, res) => {
-        const { uuid } = params;
-        const { data, status } = await API(session).get(`/api/v1/registrant/domains/${uuid}`);
-        return res.status(status).json(data);
-    },
-
     getDomains: async ({ query, params, session }, res) => {
         const { uuid } = params;
         const { offset, simple, tech } = query;
-        if (simple === 'true') {
-            if (tech === 'true') {
-                return handleResponse(
-                    () =>
-                        API(session, res).get(
-                            `/api/v1/registrant/domains${
-                                uuid ? `/${uuid}` : `?offset=${offset}&simple=true&tech=${tech}`
-                            }`
-                        ),
-                    res
-                );
-            }
-            return handleResponse(
-                () =>
-                    API(session, res).get(
-                        `/api/v1/registrant/domains${
-                            uuid ? `/${uuid}` : `?offset=${offset}&simple=true`
-                        }`
-                    ),
-                res
-            );
-        }
-        if (tech === 'true') {
-            return handleResponse(
-                () =>
-                    API(session, res).get(
-                        `/api/v1/registrant/domains${
-                            uuid ? `/${uuid}` : `?offset=${offset}&simple=false&tech=${tech}`
-                        }`
-                    ),
-                res
-            );
+        let endpoint = '/api/v1/registrant/domains';
+        if (uuid) {
+            endpoint += `/${uuid}`;
+        } else {
+            const queryParams = new URLSearchParams({
+                offset: offset || '0',
+                ...(simple && { simple }),
+                ...(tech && { tech })
+            }).toString();
+            endpoint += `?${queryParams}`;
         }
         return handleResponse(
-            () =>
-                API(session, res).get(
-                    `/api/v1/registrant/domains${uuid ? `/${uuid}` : `?offset=${offset}&tech=${tech}`}`
-                ),
+            () => API(session, res).get(endpoint),
             res
         );
     },
@@ -236,23 +226,28 @@ export default {
                         '/api/v1/registrant/auth/eid',
                         userData
                     );
-                    // eslint-disable-next-line no-param-reassign
                     session.token = response.data;
+                    logInfo('User authenticated successfully!');
                 }
                 return res.status(200).json(userData);
             }
-            return res.status(498).json({});
+            return res.status(401).json({ 
+                status: 'unauthorized',
+                message: 'Session expired' 
+            });
         } catch (e) {
-            if (e && e.response && e.response.status) {
-                return res.status(e.response.status).json({});
-            }
-            // return res.status(408).json({});
-            if (!res.headersSent) {
-                return res.status(408).json({});
-            } else {
-                // Log or handle the situation where a response was already sent
-                console.error('Response already sent.');
-            }
+            const errorDetails = {
+                error: {
+                    message: e.message,
+                    ...(e.response?.data && { responseData: e.response.data }),
+                    ...(e.response?.status && { status: e.response.status })
+                }
+            };
+            logError(`Authentication error`, errorDetails);
+            return res.status(401).json({ 
+                status: 'error',
+                message: 'Authentication failed'
+            });
         }
     },
 

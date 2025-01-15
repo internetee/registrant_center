@@ -1,29 +1,115 @@
 import winston from 'winston';
 import 'winston-daily-rotate-file';
+import dotenv from 'dotenv';
 
-const ignorePaths = [
+dotenv.config();
+
+import { sanitizeData } from './maskData.js';
+
+// Constants
+const IGNORE_PATHS = [
     '/service-worker.js',
     '/favicon.ico',
-    '/static',
+    '/public',
+    '/assets',
+    '/fonts',
+    '/logo192.png',
+    '/logo-m.svg',
+    '/html-pattern.png',
     '/eis-logo-white.svg',
+    '/hero.jpg',
     '/auth',
+    '/api/health',
+    '/robots.txt',
+    '/.well-known',
+    '/manifest.json',
 ];
 
-const ignoreRoute = (req) => !!ignorePaths.find((path) => req.url.includes(path));
+// Get log level from environment variable, default to 'info' if not set
+const LOG_LEVEL = process.env.LOG_LEVEL?.toLowerCase() || 'info';
 
-const logger = {
+// Format constants
+const timestampFormat = winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' });
+
+// Helper functions
+const ignoreRoute = (req) => IGNORE_PATHS.some((path) => req.url.includes(path));
+
+const getUserFromSession = (req) => {
+    if (!req.session?.user) return 'anonymous';
+    const maskedIdent = sanitizeData(req.session.user.ident, 'ident');
+    return `${req.session.user.first_name} ${req.session.user.last_name} [${maskedIdent}]`;
+};
+
+const printFormat = winston.format.printf(({ timestamp, level, message, meta }) => {
+    let logMessage = `${timestamp} [${level}]`;
+
+    if (meta) {
+        const filteredMeta = { ...meta };
+
+        // Only add user to message if it exists
+        if (filteredMeta.user) {
+            logMessage += `: ${filteredMeta.user} -`;
+        }
+        logMessage += ` ${message}`;
+
+        // Store response data for later if it exists
+        const responseData = LOG_LEVEL === 'debug' ? filteredMeta.response : null;
+        delete filteredMeta.response;
+
+        if (LOG_LEVEL !== 'debug') {
+            delete filteredMeta.res;
+            delete filteredMeta.responseTime;
+            delete filteredMeta.user;
+        }
+
+        const metaStr = Object.entries(filteredMeta)
+            .map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`)
+            .join(' ');
+        if (metaStr) {
+            logMessage += ` | ${metaStr}`;
+        }
+
+        // Add response data at the end if it exists
+        if (responseData) {
+            logMessage +=
+                '\nResponse Data:\n' +
+                JSON.stringify(responseData, null, 2)
+                    .split('\n')
+                    .map((line) => '  ' + line)
+                    .join('\n');
+        }
+    }
+    return logMessage;
+});
+
+const expressLogger = {
     exitOnError: false,
-    format: winston.format.simple(),
+    format: winston.format.combine(timestampFormat, printFormat),
     ignoreRoute,
-    meta: false,
+    meta: true,
+    metaField: 'meta',
+    dynamicMeta: (req, res) => ({
+        ip: req.ip.indexOf(':') >= 0 ? req.ip.substring(req.ip.lastIndexOf(':') + 1) : req.ip,
+        'User-Agent': req.get('User-Agent'),
+        Referrer: req.get('Referrer') || '',
+        user: getUserFromSession(req),
+        req: {
+            url: req.originalUrl,
+            method: req.method,
+            ...(req.method !== 'GET' && req.body && { body: sanitizeData(req.body) }),
+            ...(Object.keys(req.query).length > 0 && { query: sanitizeData(req.query) }),
+        },
+        ...(LOG_LEVEL === 'debug' &&
+            res.locals.responseData && {
+                response: sanitizeData(
+                    typeof res.locals.responseData === 'string'
+                        ? JSON.parse(res.locals.responseData)
+                        : res.locals.responseData
+                ),
+            }),
+    }),
     msg: (req, res) => {
-        return `${req.method} ${req.protocol}://${req.get('host')}${sanitizeUrl(
-            req.originalUrl
-        )} (${res.statusCode}) ${Math.floor(res.responseTime / 1000)}, User-Agent: ${req.get(
-            'User-Agent'
-        )}, Referrer: ${sanitizeUrl(req.get('Referrer'))}, IP: ${
-            req.ip.indexOf(':') >= 0 ? req.ip.substring(req.ip.lastIndexOf(':') + 1) : req.i
-        }`;
+        return `${req.method} ${sanitizeUrl(req.originalUrl)} ${res.statusCode} ${res.responseTime}ms`;
     },
 };
 
@@ -31,43 +117,111 @@ function sanitizeUrl(url) {
     // Implement URL sanitization logic here
     // For example, removing or encoding certain characters
     if (typeof url === 'string') {
-        return url.replace(/[{}]/g, match => encodeURIComponent(match));
+        return url.replace(/[{}]/g, (match) => encodeURIComponent(match));
     } else {
         return '';
     }
 }
 
-export const accessLog = {
-    ...logger,
-    transports: [
-        new winston.transports.DailyRotateFile({
-            datePattern: 'YYYY-MM-DD',
-            dirname: 'logs',
-            filename: 'access-%DATE%.log',
-            level: 'debug',
-        }),
-    ],
+// Helper function to determine if we should use file logging
+const shouldUseFileLogging = () => {
+    return ['development', 'test'].includes(process.env.NODE_ENV);
 };
 
-export const errorLog = {
-    ...logger,
-    transports: [
-        new winston.transports.DailyRotateFile({
-            datePattern: 'YYYY-MM-DD',
-            dirname: 'logs',
-            filename: 'error-%DATE%.log',
-            level: 'error',
-        }),
-    ],
+// Helper function to determine if we should colorize output
+const shouldColorize = () => {
+    return ['development', 'test'].includes(process.env.NODE_ENV);
+};
+
+export const appLog = {
+    ...expressLogger,
+    transports: shouldUseFileLogging()
+        ? [
+              new winston.transports.DailyRotateFile({
+                  datePattern: 'YYYY-MM-DD',
+                  dirname: 'logs',
+                  filename: 'app-%DATE%.log',
+                  level: LOG_LEVEL,
+                  format: winston.format.combine(timestampFormat, printFormat),
+              }),
+          ]
+        : [
+              // In production, use a silent transport to prevent empty transports
+              new winston.transports.Console({
+                  silent: true,
+              }),
+          ],
 };
 
 export const consoleLog = {
-    baseMeta: null,
-    colorize: true,
+    ...expressLogger,
+    colorize: shouldColorize(),
     expressFormat: true,
-    format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
-    ignoreRoute,
-    meta: false,
-    metaField: null,
-    transports: [new winston.transports.Console()],
+    format: winston.format.combine(
+        timestampFormat,
+        // Only colorize in development/test
+        ...(shouldColorize() ? [winston.format.colorize({ all: true })] : []),
+        printFormat
+    ),
+    transports: [
+        new winston.transports.Console({
+            level: LOG_LEVEL,
+        }),
+    ],
+};
+
+// Manual logger instance
+export const logger = winston.createLogger({
+    ...expressLogger,
+    format: winston.format.combine(timestampFormat, printFormat),
+    transports: [
+        // Console transport with conditional colors
+        new winston.transports.Console({
+            level: LOG_LEVEL,
+            format: winston.format.combine(
+                timestampFormat,
+                // Only colorize in development/test
+                ...(shouldColorize() ? [winston.format.colorize({ all: true })] : []),
+                printFormat
+            ),
+        }),
+        // File transports without colors - only in dev/test
+        ...(shouldUseFileLogging()
+            ? [
+                  new winston.transports.DailyRotateFile({
+                      datePattern: 'YYYY-MM-DD',
+                      dirname: 'logs',
+                      filename: 'app-%DATE%.log',
+                      level: LOG_LEVEL,
+                      format: winston.format.combine(timestampFormat, printFormat),
+                  }),
+              ]
+            : []),
+    ],
+});
+
+// Add convenience methods for logging
+export const logDebug = (message, data = {}) => {
+    logger.debug(message, { meta: data });
+};
+
+export const logInfo = (message, data = {}) => {
+    logger.info(message, { meta: data });
+};
+
+export const logWarn = (message, data = {}) => {
+    logger.warn(message, { meta: data });
+};
+
+export const logError = (message, error = null) => {
+    const data = error
+        ? {
+              error: {
+                  message: error.message,
+                  stack: error.stack,
+                  ...error,
+              },
+          }
+        : {};
+    logger.error(message, { meta: data });
 };

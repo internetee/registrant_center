@@ -2,7 +2,9 @@ import { useIntl } from 'react-intl';
 
 const Roles = ({ roles = [] }) => {
     const { formatMessage } = useIntl();
-    return roles.map((role, i) => {
+    // Convert Set to Array if needed
+    const rolesArray = roles instanceof Set ? Array.from(roles) : roles;
+    return rolesArray.map((role, i) => {
         const domainRole = formatMessage({
             id: `domain.role.${role}`,
         });

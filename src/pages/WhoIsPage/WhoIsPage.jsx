@@ -1,5 +1,4 @@
-/* eslint-disable camelcase */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
@@ -35,6 +34,8 @@ const perPageOptions = [
     { key: 24, text: '24', value: 24 },
 ];
 
+const DEFAULT_PER_PAGE = 12;
+
 const WhoIsPage = ({
     companies,
     contacts,
@@ -55,27 +56,32 @@ const WhoIsPage = ({
     const [isDirty, setIsDirty] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
-    const [perPage, setPerPage] = useState(whoIsPerPage ? Number(whoIsPerPage) : 12);
+    const [perPage, setPerPage] = useState(whoIsPerPage ? Number(whoIsPerPage) : DEFAULT_PER_PAGE);
     const [activePage, setActivePage] = useState(1);
     const [queryKeys, setQueryKeys] = useState('');
     const [whoIsData, setWhoIsData] = useState({});
     const [results, setResults] = useState(domains);
     const { uiElemSize } = ui;
-    const paginatedDomains = [];
-    const copied = [...results];
-    const numOfChild = Math.ceil(copied.length / perPage);
     const dispatch = useDispatch();
-    for (let i = 0; i < numOfChild; i += 1) {
-        paginatedDomains.push(copied.splice(0, perPage));
-    }
 
-    const onSelectTech = React.useCallback((value) => {
+    // Memoized values
+    const paginatedDomains = useMemo(() => {
+        const pages = [];
+        const copied = [...results];
+        const numOfChild = Math.ceil(copied.length / perPage);
+        for (let i = 0; i < numOfChild; i++) {
+            pages.push(copied.splice(0, perPage));
+        }
+        return pages;
+    }, [results, perPage]);
+
+    const onSelectTech = useCallback((value) => {
         dispatch(setSortByRoles(value));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        if (domains.length === 0) {
+        if (domains.length === 0 || Object.keys(contacts).length === 0) {
             if (isTech) {
                 (async () => {
                     await fetchDomains(0, false, true);
@@ -95,7 +101,7 @@ const WhoIsPage = ({
             setIsLoading(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchDomains, fetchContacts, fetchCompanies, isTech]);
+    }, [fetchDomains, fetchContacts, fetchCompanies, isTech, domains?.length, contacts]);
 
     useEffect(() => {
         setWhoIsData(contacts);
@@ -195,7 +201,7 @@ const WhoIsPage = ({
         return <Loading />;
     }
 
-    const handleRole = (event, { name, value }) => {
+    const handleRole = (event, { _name, value }) => {
         if (value === 'domains.roles.regAndAdmRoles' && isTech) {
             onSelectTech(false);
         }
@@ -365,7 +371,6 @@ const WhoIsPage = ({
                                             <Table.Body>
                                                 {paginatedDomains[activePage - 1].map((domain) => (
                                                     <Domain
-                                                        key={domain.id}
                                                         contacts={Helpers.parseDomainContacts(
                                                             user,
                                                             domain,
@@ -374,6 +379,7 @@ const WhoIsPage = ({
                                                         )}
                                                         domains={domains}
                                                         id={domain.id}
+                                                        key={domain.id}
                                                         name={domain.name}
                                                         onChange={handleWhoIsChange}
                                                     />
@@ -454,7 +460,7 @@ const mapStateToProps = (state) => {
         companies: state.companies.data,
         contacts: state.contacts.data,
         domains: state.domains.ids.map((id) => state.domains.data.domains[id]),
-        isTech: state.filters.isTech,
+        isTech: Boolean(state.filters.isTech),
         ui: state.ui,
         user: state.user.data,
     };
@@ -479,12 +485,12 @@ WhoIsPage.propTypes = {
     ui: PropTypes.object.isRequired,
     updateContact: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
-    isTech: PropTypes.string.isRequired,
+    isTech: PropTypes.bool.isRequired,
 };
 
 WhoIsPage.defaultProps = {
     companies: [],
-    contacts: [],
+    contacts: {},
     domains: {},
     message: false,
 };

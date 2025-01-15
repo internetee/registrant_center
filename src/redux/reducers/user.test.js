@@ -1,112 +1,164 @@
-import axios from 'axios';
-import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import reducer, { initialState, fetchUser, logoutUser } from './user';
 import user from '../../__mocks__/user';
 
-const middlewares = [thunk];
-const mockStore = configureStore(middlewares);
+// Mock the api module
+vi.mock('../../utils/api', () => ({
+    default: {
+        fetchUser: vi.fn(),
+        destroyUser: vi.fn(),
+    },
+}));
 
-describe('User action creators', () => {
-    let store;
+import api from '../../utils/api';
+
+describe('User Actions', () => {
+    let dispatch;
+
     beforeEach(() => {
-        store = mockStore({
-            user: initialState,
+        vi.clearAllMocks();
+        dispatch = vi.fn((action) => {
+            // If the action is a function (thunk), execute it
+            if (typeof action === 'function') {
+                return action(dispatch);
+            }
+            return action;
         });
     });
 
-    it('dipatches the right actions to fetch user data', () => {
-        axios.get.mockResolvedValueOnce({ data: user });
-        const expectedActions = [
-            {
+    describe('fetchUser', () => {
+        it('fetches user successfully', async () => {
+            api.fetchUser.mockResolvedValueOnce({ data: user });
+
+            await fetchUser()(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
                 type: 'FETCH_USER_REQUEST',
-            },
-            {
-                payload: user,
+            });
+            expect(dispatch).toHaveBeenLastCalledWith({
                 type: 'FETCH_USER_SUCCESS',
-            },
-        ];
-        return store.dispatch(fetchUser()).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
-        });
-    });
+                payload: user,
+            });
 
-    it('dipatches the right actions on fetchUser request fail', () => {
-        // nock(`${apiHost}`).get('/api/user').reply(404);
-        axios.get.mockRejectedValueOnce({
-            response: {
-                status: 400,
-            },
+            expect(api.fetchUser).toHaveBeenCalled();
         });
 
-        const expectedActions = [
-            {
+        it('handles fetch user failure with response', async () => {
+            const errorResponse = {
+                response: { status: 400 },
+            };
+            api.fetchUser.mockRejectedValueOnce(errorResponse);
+
+            await fetchUser()(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
                 type: 'FETCH_USER_REQUEST',
-            },
-            {
-                status: 400,
+            });
+            expect(dispatch).toHaveBeenLastCalledWith({
                 type: 'FETCH_USER_FAILURE',
-            },
-        ];
+                status: 400,
+            });
+        });
 
-        return store.dispatch(fetchUser()).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
+        it('handles fetch user failure without response', async () => {
+            api.fetchUser.mockRejectedValueOnce(new Error('Network error'));
+
+            await fetchUser()(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'FETCH_USER_REQUEST',
+            });
+            expect(dispatch).toHaveBeenLastCalledWith({
+                type: 'FETCH_USER_FAILURE',
+                status: 501,
+            });
         });
     });
 
-    it('dipatches the right actions to log out user', () => {
-        axios.post.mockResolvedValueOnce({ status: 200 });
+    describe('logoutUser', () => {
+        it('logs out user successfully', async () => {
+            api.destroyUser.mockResolvedValueOnce({ status: 200 });
 
-        const expectedActions = [
-            {
+            await logoutUser()(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
+                type: 'LOGOUT_USER',
                 isLoggedOut: true,
                 status: 200,
+            });
+
+            expect(api.destroyUser).toHaveBeenCalled();
+        });
+
+        it('handles logout failure', async () => {
+            const errorResponse = {
+                response: { status: 400 },
+            };
+            api.destroyUser.mockRejectedValueOnce(errorResponse);
+
+            await logoutUser()(dispatch);
+
+            expect(dispatch).toHaveBeenCalledWith({
                 type: 'LOGOUT_USER',
-            },
-        ];
-        return store.dispatch(logoutUser()).then(() => {
-            expect(store.getActions()).toEqual(expectedActions);
+                isLoggedOut: true,
+                status: 400,
+            });
         });
     });
 });
 
-describe('User reducers', () => {
-    it('should return the initial state', () => {
+describe('User Reducer', () => {
+    it('returns initial state', () => {
         expect(reducer(undefined, {})).toEqual(initialState);
     });
 
-    it('should handle FETCH_USER_REQUEST', () => {
-        expect(
-            reducer([], {
-                type: 'FETCH_USER_REQUEST',
-            })
-        ).toEqual({});
+    it('handles FETCH_USER_REQUEST', () => {
+        const state = reducer(initialState, {
+            type: 'FETCH_USER_REQUEST',
+        });
+        expect(state).toEqual({
+            ...initialState,
+        });
     });
 
-    it('should handle FETCH_USER_SUCCESS', () => {
-        expect(
-            reducer([], {
-                payload: user,
-                type: 'FETCH_USER_SUCCESS',
-            })
-        ).toEqual({
+    it('handles FETCH_USER_SUCCESS', () => {
+        const state = reducer(initialState, {
+            type: 'FETCH_USER_SUCCESS',
+            payload: user,
+        });
+
+        expect(state).toEqual({
             data: {
                 ...user,
                 name: `${user.first_name} ${user.last_name}`,
             },
             isInvalidated: false,
             status: 200,
+            isLoggedOut: null,
         });
     });
 
-    it('should handle LOGOUT_USER', () => {
-        expect(
-            reducer([], {
-                isLoggedOut: true,
-                status: 200,
-                type: 'LOGOUT_USER',
-            })
-        ).toEqual({
+    it('handles FETCH_USER_FAILURE', () => {
+        const state = reducer(initialState, {
+            type: 'FETCH_USER_FAILURE',
+            status: 400,
+        });
+
+        expect(state).toEqual({
+            ...initialState,
+            isInvalidated: true,
+            status: 400,
+        });
+    });
+
+    it('handles LOGOUT_USER', () => {
+        const state = reducer(initialState, {
+            type: 'LOGOUT_USER',
+            isLoggedOut: true,
+            status: 200,
+        });
+
+        expect(state).toEqual({
             ...initialState,
             isLoggedOut: true,
             status: 200,

@@ -1,12 +1,11 @@
-/* eslint-disable camelcase */
-import React from 'react';
+import { Fragment, forwardRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox, Popup, Icon } from 'semantic-ui-react';
-import PropTypes from 'prop-types';
 import Roles from '../Roles/Roles';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
     const contactsList = Object.values(contacts);
+
     const isCompany =
         contactsList.find(({ ident }) => ident.type === 'org' || domain.registrant.org) != null;
 
@@ -69,42 +68,27 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
         onChange(changedContacts);
     };
 
-    const CheckAllLabel = () => {
-        if (indeterminate) {
-            return (
-                <FormattedMessage
-                    id="whois.edit.checkSome"
-                    tagName="label"
-                    values={{
-                        count: checkedCount,
-                        countOf: totalCount,
-                    }}
-                />
-            );
-        }
-        if (isCheckedAll) {
-            return (
-                <FormattedMessage
-                    id="whois.edit.checkAll"
-                    tagName="label"
-                    values={{
-                        count: checkedCount,
-                        countOf: totalCount,
-                    }}
-                />
-            );
-        }
+    const CheckAllLabel = forwardRef((props, ref) => {
+        const message = indeterminate
+            ? 'whois.edit.checkSome'
+            : isCheckedAll
+              ? 'whois.edit.checkAll'
+              : 'whois.edit.checkNone';
+
         return (
-            <FormattedMessage
-                id="whois.edit.checkNone"
-                tagName="label"
-                values={{
-                    count: checkedCount,
-                    countOf: totalCount,
-                }}
-            />
+            <label ref={ref}>
+                <FormattedMessage
+                    id={message}
+                    values={{
+                        count: checkedCount,
+                        countOf: totalCount,
+                    }}
+                />
+            </label>
         );
-    };
+    });
+
+    CheckAllLabel.displayName = 'CheckAllLabel';
 
     if (!contactsList.length) {
         return null;
@@ -134,30 +118,33 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 grouped
             >
                 {contactsList.map((item) => (
-                    <React.Fragment key={item.id}>
-                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                        <label htmlFor={item.id}>
+                    <Fragment key={item.id}>
+                        <div className="contact-role-label">
                             <FormattedMessage id="domain.role" tagName="strong" />
                             <strong>
                                 <Roles roles={item.roles} />
                             </strong>
-                        </label>
+                        </div>
                         <Form.Field>
                             <Checkbox
-                                checked={
+                                checked={Boolean(
                                     domain.registrant.org ||
-                                    item.ident.type === 'org' ||
-                                    item.disclosed_attributes.has('name')
-                                }
-                                disabled={item.ident.type === 'org' || domain.registrant.org}
+                                        item.ident.type === 'org' ||
+                                        item.disclosed_attributes.has('name')
+                                )}
+                                disabled={Boolean(
+                                    item.ident.type === 'org' || domain.registrant.org
+                                )}
+                                id={`name-${item.id}`}
                                 label={
-                                    <FormattedMessage
-                                        id="whois.edit.name"
-                                        tagName="label"
-                                        values={{
-                                            contactName: item.initialName,
-                                        }}
-                                    />
+                                    <label htmlFor={`name-${item.id}`}>
+                                        <FormattedMessage
+                                            id="whois.edit.name"
+                                            values={{
+                                                contactName: item.initialName,
+                                            }}
+                                        />
+                                    </label>
                                 }
                                 name="name"
                                 onChange={(e, elem) =>
@@ -168,20 +155,24 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         </Form.Field>
                         <Form.Field>
                             <Checkbox
-                                checked={
+                                checked={Boolean(
                                     domain.registrant.org ||
-                                    item.ident.type === 'org' ||
-                                    item.disclosed_attributes.has('email')
-                                }
-                                disabled={item.ident.type === 'org' || domain.registrant.org}
+                                        item.ident.type === 'org' ||
+                                        item.disclosed_attributes.has('email')
+                                )}
+                                disabled={Boolean(
+                                    item.ident.type === 'org' || domain.registrant.org
+                                )}
+                                id={`email-${item.id}`}
                                 label={
-                                    <FormattedMessage
-                                        id="whois.edit.email"
-                                        tagName="label"
-                                        values={{
-                                            contactEmail: item.initialEmail,
-                                        }}
-                                    />
+                                    <label htmlFor={`email-${item.id}`}>
+                                        <FormattedMessage
+                                            id="whois.edit.email"
+                                            values={{
+                                                contactEmail: item.initialEmail,
+                                            }}
+                                        />
+                                    </label>
                                 }
                                 name="email"
                                 onChange={(e, elem) =>
@@ -193,14 +184,16 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         <Form.Field>
                             <Checkbox
                                 checked={item.disclosed_attributes.has('phone')}
+                                id={`phone-${item.id}`}
                                 label={
-                                    <FormattedMessage
-                                        id="whois.edit.phone"
-                                        tagName="label"
-                                        values={{
-                                            contactPhone: item.initialPhone,
-                                        }}
-                                    />
+                                    <label htmlFor={`phone-${item.id}`}>
+                                        <FormattedMessage
+                                            id="whois.edit.phone"
+                                            values={{
+                                                contactPhone: item.initialPhone,
+                                            }}
+                                        />
+                                    </label>
                                 }
                                 name="phone"
                                 onChange={(e, elem) =>
@@ -209,21 +202,20 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 value={item.phone}
                             />
                         </Form.Field>
-                        <label htmlFor={item.id}>
-                            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                        <div className="whois-public-label">
                             <FormattedMessage id="whois.public.text" tagName="strong" />
                             <Popup basic inverted trigger={<Icon name="question circle" />}>
                                 <FormattedMessage id="whois.public.tooltip" />
                             </Popup>
-                        </label>
+                        </div>
                         <Form.Field>
                             <Checkbox
                                 checked={item.registrant_publishable}
+                                id={`publishable-${item.id}`}
                                 label={
-                                    <FormattedMessage
-                                        id="whois.edit.registrant_publishable"
-                                        tagName="label"
-                                    />
+                                    <label htmlFor={`publishable-${item.id}`}>
+                                        <FormattedMessage id="whois.edit.registrant_publishable" />
+                                    </label>
                                 }
                                 name="registrant_publishable"
                                 onChange={(e, elem) =>
@@ -233,10 +225,9 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                         ['registrant_publishable']
                                     )
                                 }
-                                // value={item.registrant_publishable}
                             />
                         </Form.Field>
-                    </React.Fragment>
+                    </Fragment>
                 ))}
             </Form.Group>
         </>

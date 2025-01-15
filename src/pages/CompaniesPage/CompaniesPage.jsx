@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
     Pagination,
@@ -23,20 +23,18 @@ const perPageOptions = [
     { key: 24, text: '24', value: 24 },
 ];
 
-const CompaniesPage = ({ companies = [], fetchCompanies }) => {
+const CompaniesPage = ({ companies = [], fetchCompanies, isLoading }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookie] = useCookies(['companies_per_page']);
     const { companies_per_page } = cookies;
     const [perPage, setPerPage] = useState(companies_per_page ? Number(companies_per_page) : 24);
     const [activePage, setActivePage] = useState(1);
     const [results, setResults] = useState(companies);
-    const [isLoading, setIsLoading] = useState(true);
     const [queryKeys, setQueryKeys] = useState('');
 
     useEffect(() => {
         (async () => {
             await fetchCompanies();
-            setIsLoading(false);
         })();
     }, [fetchCompanies]);
 
@@ -240,6 +238,7 @@ const CompaniesPage = ({ companies = [], fetchCompanies }) => {
 
 const mapStateToProps = ({ companies }) => ({
     companies: companies.ids.map((id) => companies.data[id]),
+    isLoading: companies.isLoading,
 });
 
 const mapDispatchToProps = (dispatch) =>

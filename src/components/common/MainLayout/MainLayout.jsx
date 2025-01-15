@@ -1,8 +1,7 @@
-import React from 'react';
 import { Icon } from 'semantic-ui-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { useNavigate } from 'react-router-dom';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import PropTypes from 'prop-types';
 
 import MainFooter from '../MainFooter/MainFooter';
@@ -19,22 +18,30 @@ const MainLayout = ({
     titleValues,
     titleKey,
 }) => {
-    const { goBack } = useHistory();
+    const navigate = useNavigate();
     const { formatMessage } = useIntl();
-    return (
-        <>
-            <Helmet
-                title={
-                    (title ||
-                        formatMessage(
-                            { id: htmlTitleKey || titleKey },
-                            {
-                                ...htmlTitleValues,
-                                ...titleValues,
-                            }
-                        )) + formatMessage({ id: 'head.title' })
+    const goBack = () => {
+        navigate(-1);
+    };
+
+    // Create title safely
+    const getTitle = () => {
+        if (title) return title;
+        if (htmlTitleKey || titleKey) {
+            return formatMessage(
+                { id: htmlTitleKey || titleKey },
+                {
+                    ...htmlTitleValues,
+                    ...titleValues,
                 }
-            />
+            );
+        }
+        return '';
+    };
+
+    return (
+        <HelmetProvider>
+            <Helmet title={getTitle() + formatMessage({ id: 'head.title' })} />
             <MainHeader />
             <main className="main-layout">
                 <div className="main-hero">
@@ -53,7 +60,7 @@ const MainLayout = ({
                 {children}
             </main>
             <MainFooter />
-        </>
+        </HelmetProvider>
     );
 };
 

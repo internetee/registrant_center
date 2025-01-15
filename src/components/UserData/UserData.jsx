@@ -485,10 +485,10 @@ const UserData = ({ domains, isTech }) => {
                                         <Icon name="table" />
                                         CSV
                                     </Button.Content>
-																		<Button.Content hidden>
-																			<CSVLink id="csvLink" data={userCSV} filename="eis_andmed.csv">
-                                        <Icon name="download" />
-																			</CSVLink>
+									<Button.Content hidden>
+										<CSVLink id="csvLink" data={userCSV} filename="eis_andmed.csv">
+                                            <Icon name="download" />
+										</CSVLink>
                                     </Button.Content>
                                 </Button>
                                 <Button.Or text="või" />
@@ -527,7 +527,7 @@ export default connect(mapStateToProps)(UserData);
 
 UserData.propTypes = {
     domains: PropTypes.array,
-    isTech: PropTypes.string,
+    isTech: PropTypes.any,
 };
 
 UserData.defaultProps = {

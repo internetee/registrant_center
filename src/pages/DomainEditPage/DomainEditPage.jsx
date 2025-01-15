@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Form, Input, Container, Card, Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
@@ -18,37 +18,39 @@ import Helpers from '../../utils/helpers';
 import { fetchDomain as fetchDomainAction } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
+import { useParams } from 'react-router-dom';
 
 const DomainEditPage = ({
     companies,
     contacts,
-    domain,
+    domains,
+    error,
     fetchCompanies,
     fetchDomain,
     isLoading,
-    match,
     message,
     ui,
     updateContact,
     user,
 }) => {
+    const { id } = useParams();
+    const domain = domains[id];
     const { uiElemSize } = ui;
     const [isDirty, setIsDirty] = useState([]);
     const [isSaving, setIsSaving] = useState([]);
     const [isSubmitConfirmModalOpen, setIsSubmitConfirmModalOpen] = useState(false);
     const [formData, setFormData] = useState({});
     const [stageData, setStageData] = useState({});
-
     useEffect(() => {
         (async () => {
-            if ((!domain || !domain?.tech_contacts) && !isLoading) {
-                await fetchDomain(match.params.id);
+            if ((!domain || !domain?.tech_contacts) && !isLoading && !error) {
+                await fetchDomain(id);
                 if (companies.isLoading === null) {
                     fetchCompanies();
                 }
             }
         })();
-    }, [domain, fetchDomain, isLoading, match]);
+    }, [domain, fetchDomain, isLoading, id, error]);
 
     useEffect(() => {
         if (domain) {
@@ -63,6 +65,12 @@ const DomainEditPage = ({
             setFormData(Helpers.parseDomainContacts(user, domain, contacts, companies.data));
         }
     }, [companies, contacts, domain, fetchCompanies, user]);
+
+    useEffect(() => {
+        if (message) {
+            window.scrollTo(0, 0);
+        }
+    }, [message]);
 
     const handleChange = (e, id) => {
         const { name, value } = e.target;
@@ -144,14 +152,14 @@ const DomainEditPage = ({
         return <Loading />;
     }
 
-    if (!domain) {
+    if (!domain || error) {
         return (
             <MainLayout hasBackButton titleKey="domain.404.title">
                 <PageMessage
                     headerContent={<FormattedMessage id="domain.404.message.title" />}
                     icon="frown outline"
                 >
-                    <FormattedMessage id="domain.none.message.text" tagName="p" />
+                    <FormattedMessage id="domain.404.message.content" tagName="p" />
                 </PageMessage>
             </MainLayout>
         );
@@ -302,17 +310,16 @@ const DomainEditPage = ({
     );
 };
 
-const mapStateToProps = (state, { match }) => {
-    return {
-        companies: state.companies,
-        contacts: state.contacts.data,
-        domain: state.domains.data[match.params.id],
-        isLoading: state.domains.isLoading,
-        message: state.contacts.message,
-        ui: state.ui,
-        user: state.user.data,
-    };
-};
+const mapStateToProps = (state) => ({
+    companies: state.companies,
+    contacts: state.contacts.data,
+    domains: state.domains.data,
+    error: state.domains.error,
+    isLoading: state.domains.isLoading,
+    message: state.contacts.message,
+    ui: state.ui,
+    user: state.user.data,
+});
 
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
@@ -333,7 +340,6 @@ DomainEditPage.propTypes = {
     fetchCompanies: PropTypes.func.isRequired,
     fetchDomain: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
-    match: PropTypes.object.isRequired,
     ui: PropTypes.object.isRequired,
     updateContact: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
@@ -342,5 +348,5 @@ DomainEditPage.propTypes = {
 DomainEditPage.defaultProps = {
     companies: {},
     contacts: {},
-    domain: {},
+    domains: {},
 }

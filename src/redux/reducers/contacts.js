@@ -2,6 +2,7 @@ import api from '../../utils/api';
 import {
     DO_UPDATE_CONTACTS_REQUEST,
     DO_UPDATE_CONTACTS_SUCCESS,
+    DO_UPDATE_CONTACTS_FAILURE,
     FETCH_CONTACT_REQUEST,
     FETCH_CONTACT_SUCCESS,
     FETCH_CONTACT_FAILURE,
@@ -13,6 +14,7 @@ import {
     UPDATE_CONTACT_FAILURE,
     UPDATE_CONTACTS_REQUEST,
     UPDATE_CONTACTS_SUCCESS,
+    UPDATE_CONTACTS_FAILURE,
     LOGOUT_USER,
 } from '../actions';
 
@@ -72,9 +74,14 @@ const doUpdateContacts = (payload) => ({
     type: DO_UPDATE_CONTACTS_REQUEST,
 });
 
-const receiveUpdateContact = (payload) => ({
+const receiveDoUpdateContacts = (payload) => ({
     payload,
     type: DO_UPDATE_CONTACTS_SUCCESS,
+});
+
+const failDoUpdateContacts = (payload) => ({
+    payload,
+    type: DO_UPDATE_CONTACTS_FAILURE,
 });
 
 const requestUpdateContacts = (payload) => ({
@@ -87,13 +94,21 @@ const updateContacts = (payload) => ({
     type: UPDATE_CONTACTS_SUCCESS,
 });
 
+const failUpdateContacts = (payload) => ({
+    payload,
+    type: UPDATE_CONTACTS_FAILURE,
+});
+
 const fetchUpdateContacts = (uuid) => (dispatch) => {
     dispatch(doUpdateContacts());
     return api
         .fetchUpdateContacts(uuid, false)
         .then((res) => res.data)
         .then((data) => {
-            return dispatch(receiveUpdateContact(data));
+            return dispatch(receiveDoUpdateContacts(data));
+        })
+        .catch(() => {
+            return dispatch(failDoUpdateContacts());
         });
 };
 
@@ -104,6 +119,9 @@ const updateContactsConfirm = (uuid) => (dispatch) => {
         .then((res) => res.data)
         .then((data) => {
             return dispatch(updateContacts(data));
+        })
+        .catch(() => {
+            return dispatch(failUpdateContacts());
         });
 };
 
@@ -204,6 +222,12 @@ export default function reducer(state = initialState, { payload, type }) {
                 },
                 isLoading: false,
                 message: null,
+            };
+
+        case DO_UPDATE_CONTACTS_FAILURE:
+            return {
+                ...state,
+                isLoading: false,
             };
 
         case UPDATE_CONTACTS_REQUEST:
@@ -308,7 +332,7 @@ export {
     fetchContacts,
     updateContact,
     receiveContacts,
-    receiveUpdateContact,
+    receiveDoUpdateContacts,
     fetchUpdateContacts,
     updateContactsConfirm,
 };

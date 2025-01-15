@@ -1,30 +1,28 @@
-//core
-@import "./global-scss/vars";
-@import "./global-scss/mixins";
-@import "./global-scss/common";
-@import "./global-scss/page";
-@import "./global-scss/forms";
+// Core
+@use "./global-scss/common";
+@use "./global-scss/page";
+@use "./global-scss/forms";
 
-//plugins
-@import "./global-scss/flatpickr";
+// Plugins
+@use "./global-scss/flatpickr";
 
-//modules
-@import "./components/modules/MessageModule/MessageModule";
+// Modules
+@use "./components/modules/MessageModule/MessageModule";
 
-//components
-@import "./components/common/Loading/Loading";
-@import "./components/common/MainHeader/MainHeader";
-@import "./components/common/MainFooter/MainFooter";
-@import "./components/common/MainLayout/MainLayout";
-@import "./components/DomainList/DomainList";
-@import "./components/UserData/UserData";
+// Components
+@use "./components/common/Loading/Loading";
+@use "./components/common/MainHeader/MainHeader";
+@use "./components/common/MainFooter/MainFooter";
+@use "./components/common/MainLayout/MainLayout";
+@use "./components/DomainList/DomainList";
+@use "./components/UserData/UserData";
 
-//pages
-@import "./pages/LoginPage/LoginPage";
-@import "./pages/CompaniesPage/CompaniesPage";
-@import "./pages/HomePage/HomePage";
-@import "./pages/DomainPage/DomainPage";
-@import "./pages/DomainEditPage/DomainEditPage";
-@import "./pages/WhoIsPage/WhoIsPage";
-@import "./pages/ErrorPage/ErrorPage";
-@import "./pages/ConfirmationPage/ConfirmationPage";
+// Pages
+@use "./pages/LoginPage/LoginPage";
+@use "./pages/CompaniesPage/CompaniesPage";
+@use "./pages/HomePage/HomePage";
+@use "./pages/DomainPage/DomainPage";
+@use "./pages/DomainEditPage/DomainEditPage";
+@use "./pages/WhoIsPage/WhoIsPage";
+@use "./pages/ErrorPage/ErrorPage";
+@use "./pages/ConfirmationPage/ConfirmationPage";

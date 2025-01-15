@@ -1,14 +1,26 @@
-const fs = require('fs');
-const fse = require('fs-extra');
-const childProcess = require('child_process');
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 
-if (fs.existsSync('./build')) {
-    fse.removeSync('./build');
+const execAsync = promisify(exec);
+
+async function build() {
+    try {
+        // Build client
+        console.log('Building client...');
+        const { stdout, stderr } = await execAsync('vite build', {
+            stdio: ['inherit', 'pipe', 'pipe'], // Capture output while still showing it
+        });
+
+        if (stdout) console.log(stdout);
+        if (stderr) console.error(stderr);
+
+        console.log('Build completed successfully!');
+    } catch (error) {
+        console.error('Build failed:', error);
+        if (error.stdout) console.log('stdout:', error.stdout);
+        if (error.stderr) console.log('stderr:', error.stderr);
+        process.exit(1);
+    }
 }
 
-// Run 'react-scripts build' script
-childProcess.execSync('react-scripts build', { stdio: 'inherit' });
-
-// Move app build to server/build directory
-console.log('Moving ./build to /server/build');
-fse.moveSync('./build', './server/build', { overwrite: true });
+build();

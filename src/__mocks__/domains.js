@@ -14,6 +14,7 @@ const domains = [
         registrant: {
             name: 'Test Registrant',
             id: 'cfbfbb76-aed8-497a-91c1-48d82cbc4588',
+            ident: 'cfbfbb76',
             org: 'false',
         },
         tech_contacts: [
@@ -28,6 +29,7 @@ const domains = [
                 id: '528240a3-3f9e-4d9a-83a2-3b3a43cf0dc7',
             },
         ],
+        dnssec_keys: [],
         transfer_code: '1a055bd6b339b94b5ca2205f86dc325d',
         name_dirty: 'domain.ee',
         name_puny: 'domain.ee',
@@ -75,6 +77,7 @@ const domains = [
         registrant: {
             name: 'Test Registrant',
             id: 'cfbfbb76-aed8-497a-91c1-48d82cbc4588',
+            ident: 'cfbfbb76',
             org: 'true',
         },
         tech_contacts: [

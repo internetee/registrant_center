@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Icon, Label, Table, Transition } from 'semantic-ui-react';
 import moment from 'moment';
@@ -28,7 +28,7 @@ const DomainGridItem = ({ domain, lang }) => {
 
     if (domain) {
         return (
-            <article className={classNames('domains-grid--item', { 'is-open': isOpen })}>
+            <article className={classNames({ 'is-open': isOpen })}>
                 <div className="container">
                     <div className="content">
                         <Link className="link" to={`/domain/${domain.id}`}>
@@ -54,11 +54,11 @@ const DomainGridItem = ({ domain, lang }) => {
                         <Label.Group className="statuses" size="large">
                             {domain.statuses.map((status, i) => (
                                 <Label
-                                    key={status}
                                     basic
                                     circular
                                     className={classNames({ hidden: !showStatuses && i > 0 })}
                                     color={domainStatuses[status].color}
+                                    key={status}
                                     title={formatMessage({
                                         id: `domain.status.${status}.description`,
                                     })}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Message, Container, Icon } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
@@ -44,9 +43,10 @@ export default MessageModule;
 
 MessageModule.propTypes = {
     formMessage: PropTypes.bool,
-    message: PropTypes.object.isRequired,
+    message: PropTypes.object,
 };
 
 MessageModule.defaultProps = {
     formMessage: false,
+    message: null,
 };

@@ -14,11 +14,21 @@
 // ***********************************************************
 import './commands';
 
-Cypress.Cookies.defaults({
-    preserve: 'user',
+beforeEach(() => {
+    // Use cy.session() to preserve cookies between tests
+    cy.session('user session', () => {
+        // Preserve only the 'user' cookie if it exists
+        cy.getCookie('user').then((cookie) => {
+            if (cookie) {
+                cy.setCookie('user', cookie.value);
+            }
+        });
+    });
 });
 
+/* eslint-disable no-unused-vars */
+// Configure other Cypress behaviors if needed
 Cypress.on('uncaught:exception', (err, runnable) => {
     // returning false here prevents Cypress from failing the test
-    return false
+    return false;
 });

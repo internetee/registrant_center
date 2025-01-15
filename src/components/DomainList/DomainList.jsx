@@ -1,6 +1,5 @@
-/* eslint-disabled */
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import { connect } from 'react-redux';
 import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -14,8 +13,9 @@ import {
     Dropdown,
     Container,
     Pagination,
+    Message,
 } from 'semantic-ui-react';
-import Masonry from 'react-masonry-component';
+import Masonry from 'react-layout-masonry';
 import Flatpickr from 'react-flatpickr';
 import { Estonian } from 'flatpickr/dist/l10n/et';
 import 'flatpickr/dist/themes/light.css';
@@ -28,16 +28,6 @@ import domainStatuses from '../../utils/domainStatuses.json';
 import { fetchUpdateContacts, updateContactsConfirm } from '../../redux/reducers/contacts';
 
 const LIMIT_DOMAIN_TOTAL = 3000;
-
-const masonryOptions = {
-    columnWidth: '.domains-grid--item',
-    gutter: 0,
-    horizontalOrder: true,
-    initLayout: true,
-    itemSelector: '.domains-grid--item',
-    percentPosition: true,
-    transitionDuration: 300,
-};
 
 const perPageOptions = [
     { key: 6, text: '6', value: 6 },
@@ -60,6 +50,8 @@ const DomainList = ({
     onSelectTech,
     isTech,
     isUpdateContact,
+    fetchUpdateContacts,
+    updateContactsConfirm,
 }) => {
     const { formatMessage } = useIntl();
     const [cookies, setCookies] = useCookies(['domainsIsGrid']);
@@ -107,6 +99,7 @@ const DomainList = ({
                     registrants: {
                         ...acc.registrants,
                         [domain.registrant.ident]: {
+                            key: domain.registrant.ident,
                             text: domain.registrant.name,
                             value: domain.registrant.ident,
                         },
@@ -143,7 +136,7 @@ const DomainList = ({
                 {
                     allStatuses: {
                         all: {
-                            key: 0,
+                            key: 'all',
                             label: {
                                 circular: true,
                                 color: domainStatuses.all.color,
@@ -157,7 +150,7 @@ const DomainList = ({
                     minDate: domains[0].valid_to,
                     registrants: {
                         all: {
-                            key: 0,
+                            key: 'all',
                             text: formatMessage({ id: 'domainsList.allRegistrants' }),
                             value: 'all',
                         },
@@ -214,11 +207,6 @@ const DomainList = ({
         setCookies('domainsIsGrid', !isGrid, { path: '/' });
         setActivePage(1);
         setIsGrid((prevState) => !prevState);
-        setTimeout(() => {
-            if (filteredDomains.length > 0) {
-                masonry.current.performLayout();
-            }
-        });
     };
 
     const toggleAdvSearch = () => {
@@ -330,7 +318,7 @@ const DomainList = ({
         },
     ];
 
-    const handleRole = (event, { name, value }) => {
+    const handleRole = (event, { _name, value }) => {
         if (value === 'domains.roles.regAndAdmRoles' && roleDropboxValue) {
             onSelectTech(false);
         }
@@ -341,37 +329,69 @@ const DomainList = ({
 
     const [contactUpdate, setContactUpdate] = useState(isUpdateContact);
     const [contactUpdateCount, setContactUpdateCount] = useState('0');
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    const dispatch = useDispatch();
     useEffect(() => {
-        const data = dispatch(fetchUpdateContacts()).then((response) => {
-            console.log(response);
-            setContactUpdate(response.payload.update_contacts);
-            setContactUpdateCount(response.payload.counter);
-        });
-        console.log(data);
-    }, []);
+        const fetchContacts = async () => {
+            try {
+                const response = await fetchUpdateContacts();
+                if (response && response.payload) {
+                    setContactUpdate(response.payload.update_contacts);
+                    setContactUpdateCount(response.payload.counter);
+                }
+            } catch (error) {
+                console.error('Error fetching update contacts:', error);
+                // Optionally set some error state or show error message
+            }
+        };
 
-    const updateContacts = () => {
-        dispatch(updateContactsConfirm()).then((response) => {
-            console.log(response);
-            setContactUpdate(!contactUpdate);
-        });
+        fetchContacts();
+    }, [fetchUpdateContacts]);
+
+    const updateContacts = async () => {
+        setIsUpdating(true);
+        try {
+            const response = await updateContactsConfirm();
+            if (response && response.payload) {
+                setContactUpdate(!contactUpdate);
+            }
+        } catch (error) {
+            console.error('Error updating contacts:', error);
+            // Could add error message state here if needed
+        } finally {
+            setIsUpdating(false);
+        }
     };
 
-    const ConfirmUpdateContacts = () => {
-        return (
-            <div className="dialog-company-contacts-box">
-                Found mismatches in .ee registry between contact names and business/citizenship
-                registries. Please confirm to update {contactUpdateCount} contact records for your
-                .ee domain registrations
-                <Button onClick={updateContacts}>Update contacts</Button>
-            </div>
-        );
-    };
+    const MessageUpdateContacts = () => (
+        <Message negative>
+            <FormattedMessage
+                defaultMessage="Found mismatches in .ee registry between contact names and business/citizenship registries. Please confirm to update {count} contact records for your .ee domain registrations"
+                id="domains.contacts.update.message"
+                values={{
+                    count: contactUpdateCount,
+                }}
+            />
+            <p style={{ marginTop: '1em' }}>
+                <Button
+                    compact
+                    disabled={isUpdating}
+                    loading={isUpdating}
+                    onClick={updateContacts}
+                    primary
+                >
+                    <FormattedMessage
+                        defaultMessage="Salvesta"
+                        id="actions.update-contacts"
+                        tagName="span"
+                    />
+                </Button>
+            </p>
+        </Message>
+    );
 
     return (
-        <div className="domains-list--wrap">
+        <div className="domains-list--wrap" data-testid="domains-list-wrap">
             <div className="page--header">
                 <Container>
                     <div className="page--header--text">
@@ -387,7 +407,7 @@ const DomainList = ({
                                 userTotalDomains: totalDomains,
                             }}
                         />
-                        {contactUpdate ? <ConfirmUpdateContacts /> : <></>}
+                        {contactUpdate ? <MessageUpdateContacts /> : <></>}
                     </div>
                     <Form className="form-filter" onSubmit={handleSubmit}>
                         <div className="form-filter--search">
@@ -546,16 +566,18 @@ const DomainList = ({
                             <Transition animation="fade" duration={300} visible={isGrid}>
                                 <div className="domains-grid--wrap">
                                     <Masonry
-                                        ref={masonry}
                                         className="domains-grid"
-                                        disableImagesLoaded
-                                        enableResizableChildren
-                                        options={masonryOptions}
+                                        columnProps={{
+                                            className: 'domains-grid--item',
+                                        }}
+                                        columns={{ 640: 1, 768: 2 }}
+                                        gap={16}
+                                        ref={masonry}
                                     >
                                         {paginatedDomains[activePage - 1].map((domain) => (
                                             <DomainGridItem
-                                                key={domain.id}
                                                 domain={domain}
+                                                key={domain.id}
                                                 lang={lang}
                                             />
                                         ))}
@@ -597,8 +619,8 @@ const DomainList = ({
                                             <Table.Body>
                                                 {paginatedDomains[activePage - 1].map((domain) => (
                                                     <DomainListItem
-                                                        key={domain.id}
                                                         domain={domain}
+                                                        key={domain.id}
                                                         lang={lang}
                                                     />
                                                 ))}
@@ -679,7 +701,12 @@ const DomainList = ({
     );
 };
 
-export default DomainList;
+const mapDispatchToProps = {
+    fetchUpdateContacts,
+    updateContactsConfirm,
+};
+
+export default connect(null, mapDispatchToProps)(DomainList);
 
 DomainList.propTypes = {
     domainCount: PropTypes.number,
@@ -688,6 +715,8 @@ DomainList.propTypes = {
     lang: PropTypes.string,
     onSelectTech: PropTypes.func,
     isUpdateContact: PropTypes.any,
+    fetchUpdateContacts: PropTypes.func.isRequired,
+    updateContactsConfirm: PropTypes.func.isRequired,
 };
 
 DomainList.defaultProps = {
