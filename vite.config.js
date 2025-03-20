@@ -8,7 +8,8 @@ const env = loadEnv('', process.cwd(), '');
 export default defineConfig({
     plugins: [react()],
     server: {
-        port: parseInt(env.PORT),
+        port: parseInt(env.PORT) || 3000,
+        host: env.VITE_HOST || '0.0.0.0',
         proxy: {
             '/api': {
                 target: `https://localhost:${env.VITE_SERVER_PORT || 1234}`,
