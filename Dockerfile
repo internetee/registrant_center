@@ -1,5 +1,8 @@
 # Stage 1: Build the React frontend
-FROM node:22 AS build
+ARG TARGETPLATFORM=linux/amd64
+ARG NODE_VERSION=22
+
+FROM --platform=${TARGETPLATFORM} node:${NODE_VERSION}-slim  AS build
 
 # Set the working directory
 WORKDIR /app
@@ -8,7 +11,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install the Linux ARM64 Rollup module explicitly
-RUN npm install -D @rollup/rollup-linux-arm64-gnu@4.36.0
+# RUN npm install -D @rollup/rollup-linux-arm64-gnu@4.36.0
 
 # Install all dependencies (including devDependencies needed for build)
 RUN npm ci
@@ -19,17 +22,21 @@ COPY . .
 # Build the React app
 RUN npm run build
 
+# Install only production dependencies for the final image
+RUN npm ci --omit=dev
+
 # Stage 2: Set up the production environment
-FROM node:22-slim
+FROM --platform=${TARGETPLATFORM} node:${NODE_VERSION}-alpine
+
+# Set non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 --ingroup nodejs nodeuser
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --omit=dev
+# Copy production dependencies from build stage
+COPY --from=build /app/node_modules ./node_modules
 
 # Copy the Express server code
 COPY server ./server
@@ -37,8 +44,11 @@ COPY server ./server
 # Copy the build output from the previous stage
 COPY --from=build /app/dist ./dist
 
-# Copy necessary config files
-COPY .env* ./
+# Set proper permissions
+RUN chown -R nodeuser:nodejs /app
+
+# Switch to non-root user
+USER nodeuser
 
 # Expose the port the app runs on
 EXPOSE 3000 1234
