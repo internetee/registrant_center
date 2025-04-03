@@ -26,9 +26,18 @@ import https from 'https';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const privateKey = fs.readFileSync('./server.key', 'utf8');
-const certificate = fs.readFileSync('./server.crt', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+// Load SSL certificates with error handling
+let privateKey, certificate, credentials;
+try {
+    privateKey = fs.readFileSync(path.join(__dirname, '../server.key'), 'utf8');
+    certificate = fs.readFileSync(path.join(__dirname, '../server.crt'), 'utf8');
+    credentials = { key: privateKey, cert: certificate };
+    console.log('✅ SSL certificates loaded successfully');
+} catch (error) {
+    console.error('❌ Failed to load SSL certificates:', error.message);
+    console.error('Please ensure server.key and server.crt exist in the project root');
+    process.exit(1);
+}
 
 const {
     AUTH_PATH,
@@ -214,9 +223,17 @@ const LOG_LEVEL = process.env.LOG_LEVEL;
 
 const server = https.createServer(credentials, app).listen(PORT, () => {
     banner();
-    console.log(`Environment: ${NODE_ENV}`);
-    console.log(`Log level: ${LOG_LEVEL}`);
-    console.log(`Server listening on port ${PORT}`);
+    console.log('🔧 Server Configuration:');
+    console.log('------------------------');
+    console.log(`🌍 Environment: ${NODE_ENV}`);
+    console.log(`📝 Log Level: ${LOG_LEVEL}`);
+    console.log(`🔒 HTTPS: Enabled`);
+    console.log(`🚀 Server Port: ${PORT}`);
+    console.log(`🌐 Host: ${HOST}`);
+    console.log(`🔑 OAuth Provider: ${ISSUER_URL}`);
+    console.log(`🔄 Callback URL: ${redirect_uri}`);
+    console.log('');
+    console.log('✨ Server is ready and listening for requests!');
     server.emit('ready');
 });
 

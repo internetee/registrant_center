@@ -44,3 +44,5 @@ lerna-debug.log*
 # Linting and formatting
 .eslintignore
 .prettierignore
+
+Dockerfile.dev

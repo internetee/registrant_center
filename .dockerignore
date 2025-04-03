@@ -1,0 +1,53 @@
+# Node modules
+node_modules
+
+# Build outputs
+dist
+build
+coverage
+
+# Git and GitHub
+.git
+.github
+.gitignore
+
+# Environment variables (except example)
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# Keep the example for documentation
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+cypress/videos/
+cypress/screenshots/
+
+# Misc
+*.pem
+.cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm 
