@@ -35,6 +35,9 @@ RUN addgroup --system --gid 1001 nodejs && \
 # Set the working directory
 WORKDIR /app
 
+# Copy package.json files from build stage
+COPY --from=build /app/package*.json ./
+
 # Copy production dependencies from build stage
 COPY --from=build /app/node_modules ./node_modules
 
@@ -43,6 +46,10 @@ COPY server ./server
 
 # Copy the build output from the previous stage
 COPY --from=build /app/dist ./dist
+
+# Copy SSL certificates from the build stage (where they were copied with the "COPY . ." command)
+COPY --from=build /app/server.key ./server.key
+COPY --from=build /app/server.crt ./server.crt
 
 # Set proper permissions
 RUN chown -R nodeuser:nodejs /app
