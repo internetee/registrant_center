@@ -13,25 +13,19 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
         (acc, { ident, disclosed_attributes, system_disclosed_attributes = [] }) => ({
             checkedCount:
                 acc.checkedCount +
-                // eslint-disable-next-line func-names
-                (function () {
-                    if (domain.registrant.org) {
-                        return 2;
-                    }
+                (() => {
                     if (ident.type === 'org') {
                         return 2;
                     }
-                    // Учитываем system_disclosed_attributes при подсчете
-                    return disclosed_attributes.size + (system_disclosed_attributes ? system_disclosed_attributes.length : 0);
+                    return (
+                        disclosed_attributes.size +
+                        (system_disclosed_attributes ? system_disclosed_attributes.length : 0)
+                    );
                 })(),
             isCheckedAll: disclosed_attributes.size === contactsList.length * 3,
             totalCount: acc.totalCount + 3,
         }),
-        {
-            checkedCount: 0,
-            isCheckedAll: false,
-            totalCount: 0,
-        }
+        { checkedCount: 0, isCheckedAll: false, totalCount: 0 }
     );
 
     const indeterminate = checkedCount > 0 && checkedCount < totalCount;
@@ -43,14 +37,15 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
             const attributes = new Set(disclosed_attributes);
             let publishable = registrant_publishable;
 
-            const canChangeAttributes = type.every(attr => 
-                !system_disclosed_attributes || !system_disclosed_attributes.includes(attr)
+            const canChangeAttributes = type.every(
+                (attr) =>
+                    !system_disclosed_attributes || !system_disclosed_attributes.includes(attr)
             );
 
             if (!canChangeAttributes) {
                 return {
                     ...acc,
-                    [id]: contacts[id]
+                    [id]: contacts[id],
                 };
             }
 
@@ -60,7 +55,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
             }
 
             if (system_disclosed_attributes) {
-                system_disclosed_attributes.forEach(attr => {
+                system_disclosed_attributes.forEach((attr) => {
                     attributes.add(attr);
                 });
             }
@@ -71,7 +66,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 } else if (checked) {
                     attributes.add(attr);
                 } else {
-                    if (!system_disclosed_attributes || !system_disclosed_attributes.includes(attr)) {
+                    if (
+                        !system_disclosed_attributes ||
+                        !system_disclosed_attributes.includes(attr)
+                    ) {
                         attributes.delete(attr);
                     }
                 }
@@ -126,13 +124,19 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
-                            // При массовом изменении не трогаем system_disclosed_attributes
-                            const attributesToChange = ['name', 'email', 'phone'].filter(attr => {
+                            const attributesToChange = ['name', 'email', 'phone'].filter((attr) => {
                                 const contact = Object.values(contacts)[0];
-                                return !contact.system_disclosed_attributes || !contact.system_disclosed_attributes.includes(attr);
+                                return (
+                                    !contact.system_disclosed_attributes ||
+                                    !contact.system_disclosed_attributes.includes(attr)
+                                );
                             });
                             if (attributesToChange.length > 0) {
-                                handleChange(elem.checked, Object.keys(contacts), attributesToChange);
+                                handleChange(
+                                    elem.checked,
+                                    Object.keys(contacts),
+                                    attributesToChange
+                                );
                             }
                         }}
                     />
@@ -158,9 +162,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                         item.disclosed_attributes.has('name')
                                 )}
                                 disabled={Boolean(
-                                    item.ident.type === 'org' || 
-                                    domain.registrant.org ||
-                                    (item.system_disclosed_attributes && item.system_disclosed_attributes.includes('name'))
+                                    item.ident.type === 'org' ||
+                                        domain.registrant.org ||
+                                        (item.system_disclosed_attributes &&
+                                            item.system_disclosed_attributes.includes('name'))
                                 )}
                                 id={`name-${item.id}`}
                                 label={
@@ -188,9 +193,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                         item.disclosed_attributes.has('email')
                                 )}
                                 disabled={Boolean(
-                                    item.ident.type === 'org' || 
-                                    domain.registrant.org ||
-                                    (item.system_disclosed_attributes && item.system_disclosed_attributes.includes('email'))
+                                    item.ident.type === 'org' ||
+                                        domain.registrant.org ||
+                                        (item.system_disclosed_attributes &&
+                                            item.system_disclosed_attributes.includes('email'))
                                 )}
                                 id={`email-${item.id}`}
                                 label={
@@ -215,10 +221,12 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                             <Checkbox
                                 checked={Boolean(
                                     item.disclosed_attributes.has('phone') ||
-                                    (item.system_disclosed_attributes && item.system_disclosed_attributes.includes('phone'))
+                                        (item.system_disclosed_attributes &&
+                                            item.system_disclosed_attributes.includes('phone'))
                                 )}
                                 disabled={Boolean(
-                                    item.system_disclosed_attributes && item.system_disclosed_attributes.includes('phone')
+                                    item.system_disclosed_attributes &&
+                                        item.system_disclosed_attributes.includes('phone')
                                 )}
                                 id={`phone-${item.id}`}
                                 label={
@@ -232,7 +240,9 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                     </label>
                                 }
                                 name="phone"
-                                onChange={(e, elem) => handleChange(elem.checked, [item.id], ['phone'])}
+                                onChange={(e, elem) =>
+                                    handleChange(elem.checked, [item.id], ['phone'])
+                                }
                                 value={item.phone}
                             />
                         </Form.Field>
