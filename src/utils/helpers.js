@@ -74,6 +74,7 @@ export default {
                 acc.push({
                     code: item.code,
                     disclosed_attributes: new Set(item.disclosed_attributes),
+                    system_disclosed_attributes: item.system_disclosed_attributes || [],
                     registrant_publishable: item.registrant_publishable,
                     email: item.email,
                     id: item.id,
@@ -105,6 +106,7 @@ export default {
                     ...contact,
                     ...domain.contacts[contact.id],
                     disclosed_attributes: new Set(contact.disclosed_attributes),
+                    system_disclosed_attributes: contact.system_disclosed_attributes || [],
                     registrant_publishable: contact.registrant_publishable,
                     initialEmail: contact.email,
                     initialPhone: contact.phone,
@@ -128,6 +130,7 @@ export default {
                         ...contact,
                         ...domain.contacts[key],
                         disclosed_attributes: new Set(contact.disclosed_attributes),
+                        system_disclosed_attributes: contact.system_disclosed_attributes || [],
                         registrant_publishable: contact.registrant_publishable,
                         initialPhone: contact.phone,
                         initialEmail: contact.email,
@@ -138,4 +141,9 @@ export default {
             return acc;
         }, {});
     },
+};
+
+export const isAttributeDisabled = (contact, attribute) => {
+    if (!contact || !contact.system_disclosed_attributes) return false;
+    return contact.system_disclosed_attributes.includes(attribute);
 };
