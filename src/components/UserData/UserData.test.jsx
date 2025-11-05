@@ -128,4 +128,74 @@ describe('UserData Component', () => {
         expect(csvButton).toHaveAttribute('disabled');
         expect(pdfButton).toHaveAttribute('disabled');
     });
+
+    it('handles CSV generation when clicking CSV button', async () => {
+        const { container } = renderUserData();
+
+        const csvButton = container.querySelector('button:first-child');
+        fireEvent.click(csvButton);
+
+        await waitFor(() => {
+            expect(csvButton).not.toHaveAttribute('loading');
+        });
+    });
+
+    it('handles domains with minimal data', () => {
+        const minimalDomains = [
+            {
+                name: 'test.ee',
+                registrar: { name: 'Test Registrar', website: 'test.ee' },
+            },
+        ];
+
+        const { container } = renderUserData({ domains: minimalDomains });
+        const element = container.querySelector('.user-data');
+        expect(element).toBeInTheDocument();
+    });
+
+    it('handles domains with all fields populated', () => {
+        const fullDomains = [
+            {
+                name: 'test.ee',
+                transfer_code: 'ABC123',
+                registrar: { name: 'Test Registrar', website: 'test.ee' },
+                registered_at: '2023-01-01T00:00:00Z',
+                valid_to: '2024-01-01T00:00:00Z',
+                created_at: '2023-01-01T00:00:00Z',
+                updated_at: '2023-01-01T00:00:00Z',
+                period: 1,
+                period_unit: 'year',
+                outzone_at: '2024-01-01T00:00:00Z',
+                delete_at: '2024-02-01T00:00:00Z',
+                registrant_verification_asked_at: '2023-01-01T00:00:00Z',
+                registrant_verification_token: 'token123',
+                force_delete_at: '2024-03-01T00:00:00Z',
+                locked_by_registrant_at: '2023-01-01T00:00:00Z',
+                reserved: false,
+                registrant: { name: 'Test Registrant' },
+                tech_contacts: [{ name: 'Tech', email: 'tech@test.ee' }],
+                admin_contacts: [{ name: 'Admin', email: 'admin@test.ee' }],
+                nameservers: [
+                    { hostname: 'ns1.test.ee', ipv4: ['1.1.1.1'], ipv6: ['::1'] },
+                ],
+                statuses: ['ok'],
+            },
+        ];
+
+        const { container } = renderUserData({ domains: fullDomains });
+        const element = container.querySelector('.user-data');
+        expect(element).toBeInTheDocument();
+    });
+
+    it('handles isTech prop correctly', () => {
+        const { container } = renderUserData({ isTech: 'true' });
+        const element = container.querySelector('.user-data');
+        expect(element).toBeInTheDocument();
+    });
+
+    it('renders with different language', () => {
+        const { container } = renderUserData({ lang: 'en' });
+        const element = container.querySelector('.user-data');
+        expect(element).toBeInTheDocument();
+    });
 });

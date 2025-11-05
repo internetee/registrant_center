@@ -63,8 +63,21 @@ export default defineConfig({
         environment: 'jsdom',
         coverage: {
             provider: 'v8', // or 'istanbul'
-            reporter: ['text', 'json', 'html'],
+            reporter: ['text', 'json', 'html', 'lcov'],
+            reportsDirectory: 'coverage',
+            include: [
+                'src/**/*.{js,jsx}',
+                'server/**/*.js',
+            ],
+            exclude: [
+                'src/__mocks__/**',
+                'cypress/**',
+                '**/*.test.*',
+                '**/*.snap',
+                'setupTest.js',
+            ],
         },
         setupFiles: './setupTest.js',
+        env: { VITE_URL: 'https://localhost' },
     },
 });

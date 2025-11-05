@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci --omit=dev
+          npm ci
           npm install @rollup/rollup-linux-x64-gnu
 
       - run: npm run build
@@ -57,4 +57,30 @@ jobs:
           REDIRECT_URL: /auth/callback
           SESSION_SECRET: secret555555
           HTTPS: true
-        run: npm run test
+        run: |
+          npm run lint
+          npm run coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: coverage
+          if-no-files-found: error
+
+      - name: Install qlty CLI
+        run: |
+          curl -sSL https://qlty.sh/install | bash
+          echo "$HOME/.qlty/bin" >> $GITHUB_PATH
+
+      - name: Upload coverage to qlty.sh
+        env:
+          QLTY_TOKEN: ${{ secrets.QLTY_TOKEN }}
+        run: |
+          qlty report \
+            --format lcov \
+            --file coverage/lcov.info \
+            --commit "$GITHUB_SHA" \
+            --branch "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --token "$QLTY_TOKEN"
