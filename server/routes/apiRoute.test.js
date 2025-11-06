@@ -21,8 +21,6 @@ vi.mock('axios', () => ({
     __esModule: true,
 }));
 
-import axios from 'axios';
-
 vi.mock('../utils/logger.js', () => ({
     logWarn: vi.fn(),
     logInfo: vi.fn(),
@@ -210,7 +208,9 @@ describe('server/routes/apiRoute', () => {
         const r = createRes();
         mockAxiosInstance.get.mockResolvedValue({ status: 200, data: {} });
         await API.doNeedUpdateContacts(req, r);
-        expect(mockAxiosInstance.get).toHaveBeenCalledWith('api/v1/registrant/contacts/test-uuid/do_need_update_contacts');
+        expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+            'api/v1/registrant/contacts/test-uuid/do_need_update_contacts'
+        );
     });
 
     it('deleteDomainRegistryLock calls API with correct endpoint', async () => {
@@ -221,7 +221,9 @@ describe('server/routes/apiRoute', () => {
         const r = createRes();
         mockAxiosInstance.delete.mockResolvedValue({ status: 200, data: {} });
         await API.deleteDomainRegistryLock(req, r);
-        expect(mockAxiosInstance.delete).toHaveBeenCalledWith('/api/v1/registrant/domains/test-uuid/registry_lock');
+        expect(mockAxiosInstance.delete).toHaveBeenCalledWith(
+            '/api/v1/registrant/domains/test-uuid/registry_lock'
+        );
     });
 
     it('getCompanies calls API with offset', async () => {
@@ -232,7 +234,9 @@ describe('server/routes/apiRoute', () => {
         const r = createRes();
         mockAxiosInstance.get.mockResolvedValue({ status: 200, data: {} });
         await API.getCompanies(req, r);
-        expect(mockAxiosInstance.get).toHaveBeenCalledWith('/api/v1/registrant/companies?offset=10');
+        expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+            '/api/v1/registrant/companies?offset=10'
+        );
     });
 
     it('setContact calls API with correct endpoint and body', async () => {
@@ -244,7 +248,10 @@ describe('server/routes/apiRoute', () => {
         const r = createRes();
         mockAxiosInstance.patch.mockResolvedValue({ status: 200, data: {} });
         await API.setContact(req, r);
-        expect(mockAxiosInstance.patch).toHaveBeenCalledWith('/api/v1/registrant/contacts/test-uuid', { name: 'Test' });
+        expect(mockAxiosInstance.patch).toHaveBeenCalledWith(
+            '/api/v1/registrant/contacts/test-uuid',
+            { name: 'Test' }
+        );
     });
 
     it('getRegistrantUpdate returns data on success', async () => {

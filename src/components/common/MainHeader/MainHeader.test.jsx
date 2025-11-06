@@ -93,23 +93,23 @@ describe('MainHeader', () => {
         );
         const header = container.querySelector('header.main-header');
         expect(header).toBeInTheDocument();
-        
+
         const mockScrollingElement = { scrollTop: 100 };
         Object.defineProperty(document, 'scrollingElement', {
             value: mockScrollingElement,
             writable: true,
             configurable: true,
         });
-        
+
         const scrollEvent = new Event('scroll', { bubbles: true });
         Object.defineProperty(scrollEvent, 'target', {
             value: { scrollingElement: mockScrollingElement },
             writable: false,
             configurable: true,
         });
-        
+
         window.dispatchEvent(scrollEvent);
-        
+
         expect(header).toBeInTheDocument();
     });
 
@@ -136,16 +136,16 @@ describe('MainHeader', () => {
         );
         const etButtons = getAllByRole('button', { name: /eesti keeles/i });
         const enButtons = getAllByRole('button', { name: /in english/i });
-        
+
         expect(etButtons.length).toBeGreaterThan(0);
         expect(enButtons.length).toBeGreaterThan(0);
-        
+
         const firstEtButton = etButtons[0];
         const firstEnButton = enButtons[0];
-        
+
         expect(firstEtButton.closest('li')).toHaveClass('active');
         expect(firstEnButton.closest('li')).not.toHaveClass('active');
-        
+
         fireEvent.click(firstEnButton);
     });
 

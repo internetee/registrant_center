@@ -5,7 +5,9 @@ vi.mock('react-ga', () => ({ default: { initialize: vi.fn(), set: vi.fn(), pagev
 
 describe('utils/googleAnalytics init', () => {
     beforeEach(() => {
-        Object.keys(window).forEach((k) => { if (k.startsWith('ga-disable-')) delete window[k]; });
+        Object.keys(window).forEach((k) => {
+            if (k.startsWith('ga-disable-')) delete window[k];
+        });
         document.cookie = 'cc_cookie=';
     });
 

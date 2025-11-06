@@ -47,10 +47,7 @@ describe('maskData', () => {
 
     it('masks arrays', () => {
         const data = {
-            users: [
-                { email: 'user1@test.com' },
-                { email: 'user2@test.com' },
-            ],
+            users: [{ email: 'user1@test.com' }, { email: 'user2@test.com' }],
         };
         const result = sanitizeData(data);
         expect(result.users).toHaveLength(2);

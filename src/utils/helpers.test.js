@@ -22,9 +22,36 @@ describe('utils/helpers edge cases', () => {
             tech_contacts: [{ id: 't' }],
         };
         const contacts = {
-            r: { id: 'r', code: 'R', disclosed_attributes: [], registrant_publishable: true, email: 'r@e', ident: {}, name: 'R', phone: '1' },
-            a: { id: 'a', code: 'A', disclosed_attributes: [], registrant_publishable: false, email: 'a@e', ident: {}, name: 'A', phone: '2' },
-            t: { id: 't', code: 'T', disclosed_attributes: [], registrant_publishable: false, email: 't@e', ident: {}, name: 'T', phone: '3' },
+            r: {
+                id: 'r',
+                code: 'R',
+                disclosed_attributes: [],
+                registrant_publishable: true,
+                email: 'r@e',
+                ident: {},
+                name: 'R',
+                phone: '1',
+            },
+            a: {
+                id: 'a',
+                code: 'A',
+                disclosed_attributes: [],
+                registrant_publishable: false,
+                email: 'a@e',
+                ident: {},
+                name: 'A',
+                phone: '2',
+            },
+            t: {
+                id: 't',
+                code: 'T',
+                disclosed_attributes: [],
+                registrant_publishable: false,
+                email: 't@e',
+                ident: {},
+                name: 'T',
+                phone: '3',
+            },
         };
         const res = helpers.getDomainContacts(domain, contacts);
         const roles = res.reduce((acc, x) => ({ ...acc, [x.id]: x.roles }), {});

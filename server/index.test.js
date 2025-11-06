@@ -10,7 +10,7 @@ vi.mock('fs', () => ({
 
 vi.mock('https', () => ({
     default: {
-        createServer: vi.fn((credentials, app) => {
+        createServer: vi.fn((_credentials, _app) => {
             const serverInstance = {
                 emit: vi.fn(),
                 listen: vi.fn((port, cb) => {
@@ -27,7 +27,12 @@ vi.mock('https', () => ({
 }));
 
 vi.mock('grant-express', () => ({ default: () => (req, res, next) => next() }));
-vi.mock('express-winston', () => ({ default: { logger: () => (req, res, next) => next(), errorLogger: () => (req, res, next) => next() } }));
+vi.mock('express-winston', () => ({
+    default: {
+        logger: () => (req, res, next) => next(),
+        errorLogger: () => (req, res, next) => next(),
+    },
+}));
 vi.mock('helmet', () => ({ default: () => (req, res, next) => next() }));
 vi.mock('compression', () => ({ default: () => (req, res, next) => next() }));
 vi.mock('cookie-session', () => ({ default: () => (req, res, next) => next() }));
@@ -75,5 +80,3 @@ describe('server/index smoke', () => {
         expect(serverModule.default).toBeDefined();
     });
 });
-
-

@@ -46,23 +46,31 @@ describe('main.jsx', () => {
         vi.clearAllMocks();
     });
 
-    it('creates root and renders App', async () => {
-        vi.resetModules();
-        vi.clearAllMocks();
-        await import('./main.jsx');
-        await new Promise(resolve => setTimeout(resolve, 200));
-        expect(mockCreateRoot).toHaveBeenCalled();
-        expect(mockRoot.render).toHaveBeenCalled();
-    }, { timeout: 15000 });
+    it(
+        'creates root and renders App',
+        async () => {
+            vi.resetModules();
+            vi.clearAllMocks();
+            await import('./main.jsx');
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            expect(mockCreateRoot).toHaveBeenCalled();
+            expect(mockRoot.render).toHaveBeenCalled();
+        },
+        { timeout: 15000 }
+    );
 
-    it('renders App in StrictMode', async () => {
-        vi.resetModules();
-        await import('./main.jsx');
-        await new Promise(resolve => setTimeout(resolve, 100));
-        expect(mockCreateRoot).toHaveBeenCalled();
-        const calls = mockCreateRoot.mock.calls;
-        expect(calls.length).toBeGreaterThan(0);
-        const lastCall = calls[calls.length - 1];
-        expect(lastCall[0]).toBe(mockElement);
-    }, { timeout: 10000 });
+    it(
+        'renders App in StrictMode',
+        async () => {
+            vi.resetModules();
+            await import('./main.jsx');
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            expect(mockCreateRoot).toHaveBeenCalled();
+            const calls = mockCreateRoot.mock.calls;
+            expect(calls.length).toBeGreaterThan(0);
+            const lastCall = calls[calls.length - 1];
+            expect(lastCall[0]).toBe(mockElement);
+        },
+        { timeout: 10000 }
+    );
 });

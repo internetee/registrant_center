@@ -56,7 +56,7 @@ describe('MainMenu', () => {
     it('renders Dashboard link when user is present and calls close on click', () => {
         render(
             <Providers store={store}>
-                <MainMenu items={[]} lang="et" user={user} closeMainMenu={closeSpy} />
+                <MainMenu closeMainMenu={closeSpy} items={[]} lang="et" user={user} />
             </Providers>
         );
 
@@ -70,7 +70,7 @@ describe('MainMenu', () => {
     it('toggles submenu open/closed', () => {
         render(
             <Providers store={store}>
-                <MainMenu items={sampleItems} lang="et" user={user} closeMainMenu={closeSpy} />
+                <MainMenu closeMainMenu={closeSpy} items={sampleItems} lang="et" user={user} />
             </Providers>
         );
 

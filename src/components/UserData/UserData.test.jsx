@@ -175,9 +175,7 @@ describe('UserData Component', () => {
                 registrant: { name: 'Test Registrant' },
                 tech_contacts: [{ name: 'Tech', email: 'tech@test.ee' }],
                 admin_contacts: [{ name: 'Admin', email: 'admin@test.ee' }],
-                nameservers: [
-                    { hostname: 'ns1.test.ee', ipv4: ['1.1.1.1'], ipv6: ['::1'] },
-                ],
+                nameservers: [{ hostname: 'ns1.test.ee', ipv4: ['1.1.1.1'], ipv6: ['::1'] }],
                 statuses: ['ok'],
             },
         ];

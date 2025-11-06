@@ -4,10 +4,9 @@ import { configureStore } from '@reduxjs/toolkit';
 import Providers from '../../../__mocks__/Providers';
 import contactsMock from '../../../__mocks__/contacts';
 import Domain from './index';
-import React from 'react';
 
 vi.mock('../../../components', () => ({
-    WhoIsEdit: (props) => <div data-testid="whois-edit" data-open={props.isOpen ? '1' : '0'} />,
+    WhoIsEdit: (props) => <div data-open={props.isOpen ? '1' : '0'} data-testid="whois-edit" />,
 }));
 
 const createTestStore = () => {
@@ -42,9 +41,16 @@ describe('ConfirmationPage/Domain', () => {
         const onChange = vi.fn();
         render(
             <Providers store={store}>
-                <table><tbody>
-                    <Domain id="abc" name="example.ee" contacts={contactsMock} onChange={onChange} />
-                </tbody></table>
+                <table>
+                    <tbody>
+                        <Domain
+                            contacts={contactsMock}
+                            id="abc"
+                            name="example.ee"
+                            onChange={onChange}
+                        />
+                    </tbody>
+                </table>
             </Providers>
         );
 

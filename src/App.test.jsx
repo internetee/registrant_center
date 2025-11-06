@@ -52,7 +52,7 @@ beforeEach(() => {
     global.window.scrollTo = vi.fn();
 });
 
-const renderWithProviders = (store, initialEntries = ['/']) => {
+const renderWithProviders = (store) => {
     return render(
         <Provider store={store}>
             <BrowserRouter>
@@ -98,13 +98,16 @@ describe('App Component', () => {
             },
             ui: { isMainMenuOpen: false, lang: 'et' },
         });
-        renderWithProviders(testStore, ['/']);
-        
-        await waitFor(() => {
-            const loading = screen.queryByTestId('loading');
-            const homePage = screen.queryByTestId('home-page');
-            expect(loading || homePage).toBeTruthy();
-        }, { timeout: 3000 });
+        renderWithProviders(testStore);
+
+        await waitFor(
+            () => {
+                const loading = screen.queryByTestId('loading');
+                const homePage = screen.queryByTestId('home-page');
+                expect(loading || homePage).toBeTruthy();
+            },
+            { timeout: 3000 }
+        );
     });
 
     it('handles window resize events', () => {
@@ -118,4 +121,3 @@ describe('App Component', () => {
         expect(window.innerWidth).toBe(768);
     });
 });
-

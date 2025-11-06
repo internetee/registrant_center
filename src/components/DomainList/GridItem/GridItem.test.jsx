@@ -19,7 +19,8 @@ const messages = {
     'domains.domain.validTo': 'Valid to: {valid_to}',
     'domains.domain.outzoneAt': 'Outzone at: {outzone_at}',
     'domains.domain.deleteAt': 'Delete at: {delete_at}',
-    'domains.domain.registrantVerificationAskedAt': 'Verification asked at: {registrant_verification_asked_at}',
+    'domains.domain.registrantVerificationAskedAt':
+        'Verification asked at: {registrant_verification_asked_at}',
     'domain.status.serverDeleteProhibited': 'Server Delete Prohibited',
     'domain.status.serverDeleteProhibited.description': 'Server Delete Prohibited description',
     'domain.status.serverUpdateProhibited': 'Server Update Prohibited',
@@ -99,7 +100,7 @@ describe('DomainGridItem', () => {
             </Wrapper>
         );
         const buttons = screen.getAllByRole('button');
-        const toggleButton = buttons.find(btn => btn.classList.contains('toggle'));
+        const toggleButton = buttons.find((btn) => btn.classList.contains('toggle'));
         expect(toggleButton).toBeInTheDocument();
         fireEvent.click(toggleButton);
         expect(screen.getByText(/registrant/i)).toBeInTheDocument();
