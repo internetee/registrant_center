@@ -1,13 +1,13 @@
 name: Node.js CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
     container: 
-      image: debian:buster
+      image: debian:bookworm
 
     strategy:
       matrix:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci --omit=dev
+          npm ci
           npm install @rollup/rollup-linux-x64-gnu
 
       - run: npm run build
@@ -57,4 +57,22 @@ jobs:
           REDIRECT_URL: /auth/callback
           SESSION_SECRET: secret555555
           HTTPS: true
-        run: npm run test
+        run: |
+          npm run lint
+          npm run coverage
+
+      - uses: qltysh/qlty-action/coverage@v2
+        if: github.event_name == 'push'
+        with:
+          token: ${{ secrets.QLTY_TOKEN }}
+          files: coverage/lcov.info
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: |
+            coverage/lcov.info
+            coverage/index.html
+            coverage/assets/
+          include-hidden-files: true

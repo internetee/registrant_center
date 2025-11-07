@@ -1,3 +1,6 @@
+[![Maintainability](https://qlty.sh/gh/internetee/projects/registrant_center/maintainability.svg)](https://qlty.sh/gh/internetee/projects/registrant_center)
+[![Code Coverage](https://qlty.sh/gh/internetee/projects/registrant_center/coverage.svg)](https://qlty.sh/gh/internetee/projects/registrant_center)
+
 # EESTI INTERNETI SA - Registrant Center
 
 ## Tech Stack 🛠
