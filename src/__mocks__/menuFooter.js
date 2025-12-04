@@ -218,7 +218,7 @@ const menuFooter = [
             created_at: '2016-01-08T09:15:47.000Z',
             updated_at: '2018-08-30T13:04:09.000Z',
             url: 'https://www.internet.ee/admin/api/texts/4766179',
-            body: '\n\n\n<h3>REGISTRARS<br></h3><ul><li><a href="/registrars/accredited-registrars" target="_self">List of .ee accredited registrars</a></li><li><a title="http://www.internet.ee/registrars/terms-and-conditions-for-becoming-a-registrar" href="http://www.internet.ee/registrars/terms-and-conditions-for-becoming-a-registrar">Terms and conditions for becoming a registrar</a></li><li><a href="/registrars/become-a-ee-elite-partner" target="_self">Elite Partner Program</a></li><li><br></li></ul>\n\n\n',
+            body: '\n\n\n<h3>REGISTRARS<br></h3><ul><li><a href="/registrar-portal/accredited-registrars" target="_self">List of .ee accredited registrars</a></li><li><a title="https://www.internet.ee/registrar-portal/terms-and-conditions-for-becoming-a-registrar" href="https://www.internet.ee/registrar-portal/terms-and-conditions-for-becoming-a-registrar">Terms and conditions for becoming a registrar</a></li><li><a href="/registrar-portal/become-a-ee-elite-partner" target="_self">Elite Partner Program</a></li><li><br></li></ul>\n\n\n',
             type: 'text',
         },
     },
