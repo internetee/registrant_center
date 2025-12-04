@@ -70,7 +70,7 @@ const menuFooter = [
             created_at: '2015-03-18T09:00:27.000Z',
             updated_at: '2018-08-28T08:22:04.000Z',
             url: 'https://www.internet.ee/admin/api/texts/4766151',
-            body: '\n\n\n\n\n\n\n\n\n<h3>Registripidajad</h3><ul><li><a title="/registripidajad" href="/registripidajad/akrediteeritud-registripidajad" target="_self">Akrediteeritud registripidajate nimekiri</a></li><li><a title="/registripidajad/akrediteeritud-registripidajaks-saamine" href="/registripidajad/kuidas-saada-ee-akrediteeritud-registripidajaks" target="_self">Akrediteeritud registripidajaks saamine</a></li><li></li><li><span style="color: rgb(153, 153, 153);"><a href="/registripidajad/kuidas-saada-ee-elite-partneriks" target="_self">"Elite Partner" programm</a></span></li></ul>\n\n\n\n\n\n\n\n\n',
+            body: '\n\n\n\n\n\n\n\n\n<h3>Registripidajad</h3><ul><li><a title="/registripidaja" href="/registripidaja/akrediteeritud-registripidajad" target="_self">Akrediteeritud registripidajate nimekiri</a></li><li><a title="/registripidaja/akrediteeritud-registripidajaks-saamine" href="/registripidaja/kuidas-saada-ee-akrediteeritud-registripidajaks" target="_self">Akrediteeritud registripidajaks saamine</a></li><li></li><li><span style="color: rgb(153, 153, 153);"><a href="/registripidaja/kuidas-saada-ee-elite-partneriks" target="_self">"Elite Partner" programm</a></span></li></ul>\n\n\n\n\n\n\n\n\n',
             type: 'text',
         },
     },
