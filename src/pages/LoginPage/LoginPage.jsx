@@ -7,13 +7,10 @@ import { MainLayout, MessageModule } from '../../components';
 const { VITE_SERVER_PORT, VITE_URL } = import.meta.env;
 
 const getAuthUrl = (lang) => {
-    if (!VITE_URL || (process.env.NODE_ENV === 'development' && !VITE_SERVER_PORT)) {
-        console.error('Missing required environment variables for auth URL');
-        return null;
-    }
-
     const baseUrl =
-        process.env.NODE_ENV === 'development' ? `${VITE_URL}:${VITE_SERVER_PORT}` : VITE_URL;
+        process.env.NODE_ENV === 'development'
+            ? `${VITE_URL || window.location.origin}:${VITE_SERVER_PORT}`
+            : window.location.origin;
 
     try {
         // Ensure URL is properly encoded
