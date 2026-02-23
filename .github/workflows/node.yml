@@ -6,20 +6,14 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    container: 
-      image: debian:buster
+    container:
+      image: node:22-bookworm
 
     strategy:
       matrix:
         node-version: [22.x]
 
     steps:
-      # Install essential packages first
-      - name: Install essential packages
-        run: |
-          apt-get update
-          apt-get install -y git curl
-
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
