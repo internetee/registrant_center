@@ -18,7 +18,7 @@ jobs:
       - name: Install essential packages
         run: |
           apt-get update
-          apt-get install -y git curl
+          apt-get install -y git curl xz-utils
 
       - uses: actions/checkout@v4
         with:
