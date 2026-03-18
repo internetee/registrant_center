@@ -57,7 +57,7 @@ jobs:
           REDIRECT_URL: /auth/callback
           SESSION_SECRET: secret555555
           HTTPS: true
-        run: npm run coverage
+        run: npm run coverage -- --coverage.reporter=lcov
 
       - name: Install qlty CLI
         if: always()
