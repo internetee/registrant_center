@@ -18,7 +18,7 @@ jobs:
       - name: Install essential packages
         run: |
           apt-get update
-          apt-get install -y git curl
+          apt-get install -y git curl xz-utils
 
       - uses: actions/checkout@v4
         with:
@@ -28,6 +28,11 @@ jobs:
         run: >
           git config --global url."https://github.com/".insteadOf ssh://git@github.com/
 
+      - name: Mark workspace as safe for git
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "/__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}"
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -35,12 +40,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci --omit=dev
+          npm ci
           npm install @rollup/rollup-linux-x64-gnu
 
       - run: npm run build
 
-      - name: run tests
+      - name: run coverage
         env:
           HOST: localhost
           VITE_URL: https://$HOST
@@ -57,4 +62,27 @@ jobs:
           REDIRECT_URL: /auth/callback
           SESSION_SECRET: secret555555
           HTTPS: true
-        run: npm run test
+        run: npm run coverage -- --coverage.reporter=lcov
+
+      - name: Install qlty CLI
+        if: always()
+        run: |
+          curl -LSs https://qlty.sh | bash
+          echo "${HOME}/.qlty/bin" >> $GITHUB_PATH
+
+      - name: Upload coverage to Qlty
+        if: always()
+        env:
+          QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+        run: |
+          if [ -z "$QLTY_COVERAGE_TOKEN" ]; then
+            echo "Missing secret QLTY_COVERAGE_TOKEN; skipping Qlty upload."
+            exit 0
+          fi
+          if [ -f "coverage/lcov.info" ]; then
+            qlty coverage publish --format=lcov coverage/lcov.info
+          else
+            echo "No LCOV output found (expected coverage/lcov.info); skipping."
+            ls -la coverage || true
+            exit 0
+          fi
