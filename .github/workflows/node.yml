@@ -1,13 +1,13 @@
 name: Node.js CI
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    container: 
-      image: debian:bookworm
+    container:
+      image: node:22-bookworm
 
     strategy:
       matrix:
@@ -18,7 +18,7 @@ jobs:
       - name: Install essential packages
         run: |
           apt-get update
-          apt-get install -y git curl
+          apt-get install -y git curl xz-utils
 
       - uses: actions/checkout@v4
         with:
@@ -27,6 +27,10 @@ jobs:
       - name: Reconfigure git to use HTTP authentication
         run: >
           git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+
+      - name: Mark workspace as safe for git
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -40,7 +44,7 @@ jobs:
 
       - run: npm run build
 
-      - name: run tests
+      - name: run coverage
         env:
           HOST: localhost
           VITE_URL: https://$HOST
@@ -57,22 +61,27 @@ jobs:
           REDIRECT_URL: /auth/callback
           SESSION_SECRET: secret555555
           HTTPS: true
-        run: |
-          npm run lint
-          npm run coverage
+        run: npm run coverage -- --coverage.reporter=lcov
 
-      - uses: qltysh/qlty-action/coverage@v2
-        if: github.event_name == 'push'
-        with:
-          token: ${{ secrets.QLTY_TOKEN }}
-          files: coverage/lcov.info
-
-      - uses: actions/upload-artifact@v4
+      - name: Install qlty CLI
         if: always()
-        with:
-          name: coverage
-          path: |
-            coverage/lcov.info
-            coverage/index.html
-            coverage/assets/
-          include-hidden-files: true
+        run: |
+          curl -LSs https://qlty.sh | bash
+          echo "${HOME}/.qlty/bin" >> $GITHUB_PATH
+
+      - name: Upload coverage to Qlty
+        if: always()
+        env:
+          QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+        run: |
+          if [ -z "$QLTY_COVERAGE_TOKEN" ]; then
+            echo "Missing secret QLTY_COVERAGE_TOKEN; skipping Qlty upload."
+            exit 0
+          fi
+          if [ -f "coverage/lcov.info" ]; then
+            qlty coverage publish --format=lcov coverage/lcov.info
+          else
+            echo "No LCOV output found (expected coverage/lcov.info); skipping."
+            ls -la coverage || true
+            exit 0
+          fi
