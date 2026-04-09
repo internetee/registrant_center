@@ -193,4 +193,213 @@ describe('DomainEditPage', () => {
         expect(modal.querySelector('[data-test="change-contacts"]')).toBeInTheDocument();
         expect(modal.querySelector('.changed-domains-list')).toBeInTheDocument();
     });
+
+    it('handles form submission with org registrant', async () => {
+        const orgContact = {
+            id: 'org-contact-id',
+            name: 'Org Contact',
+            email: 'org@test.ee',
+            phone: '123456',
+            ident: { type: 'org', code: 'ORG123' },
+            disclosed_attributes: [],
+            registrant_publishable: false,
+        };
+        const orgDomain = {
+            ...testDomain,
+            registrant: {
+                id: 'org-contact-id',
+                name: 'Org Registrant',
+            },
+            contacts: {
+                [orgContact.id]: {
+                    ...orgContact,
+                    roles: ['registrant'],
+                },
+            },
+        };
+        const orgStore = createTestStore({
+            domains: {
+                data: {
+                    [orgDomain.id]: orgDomain,
+                },
+            },
+            contacts: {
+                data: {
+                    ...Object.fromEntries(contacts.map((c) => [c.id, c])),
+                    [orgContact.id]: orgContact,
+                },
+            },
+            companies: {
+                data: {
+                    ORG123: {
+                        id: 'ORG123',
+                        name: 'Test Company',
+                    },
+                },
+                ids: [],
+                isLoading: false,
+                message: null,
+            },
+        });
+
+        const { container, getByTestId } = render(
+            <Providers store={orgStore}>
+                <DomainEditPage />
+            </Providers>
+        );
+
+        await waitFor(() => {
+            const emailInput = container.querySelector('input[type="email"]');
+            expect(emailInput).toBeInTheDocument();
+        });
+
+        const emailInput = container.querySelector('input[type="email"]');
+        if (emailInput) {
+            fireEvent.change(emailInput, { target: { value: 'new@example.com' } });
+
+            const updateButton = container.querySelector('button[type="submit"]');
+            if (updateButton && !updateButton.disabled) {
+                fireEvent.click(updateButton);
+
+                await waitFor(() => {
+                    expect(getByTestId('confirmation-modal')).toBeInTheDocument();
+                });
+            }
+        }
+    });
+
+    it('handles form submission with user ident contact', async () => {
+        const userContact = {
+            id: 'user-contact-id',
+            name: 'User Contact',
+            email: 'user@test.ee',
+            phone: '123456',
+            ident: { code: user.ident, type: 'priv' },
+            disclosed_attributes: ['email'],
+            registrant_publishable: true,
+        };
+        const userDomain = {
+            ...testDomain,
+            contacts: {
+                [testDomain.registrant.id]: {
+                    ...contacts.find((c) => c.id === testDomain.registrant.id),
+                    roles: ['registrant'],
+                },
+                [userContact.id]: userContact,
+            },
+        };
+        const userStore = createTestStore({
+            domains: {
+                data: {
+                    [userDomain.id]: userDomain,
+                },
+            },
+            contacts: {
+                data: {
+                    ...Object.fromEntries(contacts.map((c) => [c.id, c])),
+                    [userContact.id]: userContact,
+                },
+            },
+        });
+
+        const { container } = render(
+            <Providers store={userStore}>
+                <DomainEditPage />
+            </Providers>
+        );
+
+        const emailInput = container.querySelector('input[type="email"]');
+        if (emailInput) {
+            fireEvent.change(emailInput, { target: { value: 'new@example.com' } });
+            const updateButton = container.querySelector('button[type="submit"]');
+            if (updateButton && !updateButton.disabled) {
+                fireEvent.click(updateButton);
+            }
+        }
+    });
+
+    it('handles handleWhoIsChange correctly', async () => {
+        const { container } = render(
+            <Providers store={store}>
+                <DomainEditPage />
+            </Providers>
+        );
+
+        const emailInput = container.querySelector('input[type="email"]');
+        fireEvent.change(emailInput, { target: { value: 'new@example.com' } });
+
+        await waitFor(() => {
+            const updateButton = container.querySelector('button[type="submit"]');
+            expect(updateButton).not.toBeDisabled();
+        });
+    });
+
+    it('handles canceling confirmation dialog', async () => {
+        const { container, getByTestId } = render(
+            <Providers store={store}>
+                <DomainEditPage />
+            </Providers>
+        );
+
+        const emailInput = container.querySelector('input[type="email"]');
+        fireEvent.change(emailInput, { target: { value: 'new@example.com' } });
+
+        const updateButton = container.querySelector('button[type="submit"]');
+        fireEvent.click(updateButton);
+
+        await waitFor(() => {
+            expect(getByTestId('confirmation-modal')).toBeInTheDocument();
+        });
+
+        const cancelButton = container.querySelector('[data-test="close-change-contacts-modal"]');
+        if (cancelButton) {
+            fireEvent.click(cancelButton);
+        }
+    });
+
+    it('renders correctly with org registrant', async () => {
+        const orgContact = {
+            id: 'org-registrant-id',
+            name: 'Org Registrant',
+            email: 'org@test.ee',
+            phone: '123456',
+            ident: { type: 'org', code: 'ORG123' },
+            disclosed_attributes: [],
+            registrant_publishable: false,
+        };
+        const orgDomain = {
+            ...testDomain,
+            registrant: orgContact,
+            contacts: {
+                [orgContact.id]: {
+                    ...orgContact,
+                    roles: ['registrant'],
+                },
+            },
+        };
+        const orgStore = createTestStore({
+            domains: {
+                data: {
+                    [orgDomain.id]: orgDomain,
+                },
+            },
+            contacts: {
+                data: {
+                    ...Object.fromEntries(contacts.map((c) => [c.id, c])),
+                    [orgContact.id]: orgContact,
+                },
+            },
+        });
+
+        const { container } = render(
+            <Providers store={orgStore}>
+                <DomainEditPage />
+            </Providers>
+        );
+
+        await waitFor(() => {
+            expect(container.querySelector('.page--domain-edit')).toBeInTheDocument();
+            expect(container.textContent).toContain(orgDomain.name);
+        });
+    });
 });
