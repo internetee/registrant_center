@@ -70,7 +70,7 @@
     "cookie-session": "^2.1.0",
     "core-js": "^3.39.0",
     "cross-env": "^7.0.3",
-    "dompurify": "^3.2.3",
+    "dompurify": "^3.4.0",
     "dotenv": "^16.4.7",
     "eis-registrant-theme": "git+https://github.com/internetee/registrant_center_theme.git",
     "express": "^4.21.2",
