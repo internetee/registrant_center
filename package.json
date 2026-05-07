@@ -61,7 +61,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "axios": "^1.7.9",
+    "axios": "^1.15.2",
     "body-parser": "^1.20.3",
     "capitalize": "^2.0.4",
     "classnames": "^2.5.1",
