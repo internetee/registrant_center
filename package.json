@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^6.0.2",
     "axios": "^1.7.9",
     "body-parser": "^1.20.3",
     "capitalize": "^2.0.4",
@@ -102,7 +102,7 @@
     "serve-favicon": "^2.5.0",
     "universal-cookie": "^7.2.2",
     "vanilla-cookieconsent": "^3.0.1",
-    "vite": "^6.0.1",
+    "vite": "^8.0.16",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
@@ -114,7 +114,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "^4.1.8",
     "concurrently": "^9.1.0",
     "cypress": "^13.17.0",
     "eslint": "^8.57.1",
@@ -129,6 +129,6 @@
     "globals": "^15.14.0",
     "jsdom": "^25.0.1",
     "nodemon": "^3.1.7",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.8"
   }
 }
