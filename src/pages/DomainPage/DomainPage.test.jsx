@@ -98,9 +98,7 @@ const createTestStore = (overrides = {}) => {
             message: null,
         },
         accessEvents: {
-            data: {},
-            isLoading: false,
-            error: null,
+            byUuid: {},
         },
     };
 
@@ -318,9 +316,13 @@ describe('DomainPage', () => {
         it('renders exactly the three returned fields and no withheld data', () => {
             const eventsStore = createTestStore({
                 accessEvents: {
-                    data: { [mockDomain.id]: sampleEvents },
-                    isLoading: false,
-                    error: null,
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: sampleEvents,
+                            isLoading: false,
+                            error: false,
+                        },
+                    },
                 },
             });
 
@@ -353,9 +355,13 @@ describe('DomainPage', () => {
         it('uses a semantic header with descriptive columns and uniquely-keyed rows (a11y)', () => {
             const eventsStore = createTestStore({
                 accessEvents: {
-                    data: { [mockDomain.id]: sampleEvents },
-                    isLoading: false,
-                    error: null,
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: sampleEvents,
+                            isLoading: false,
+                            error: false,
+                        },
+                    },
                 },
             });
 
@@ -382,12 +388,16 @@ describe('DomainPage', () => {
             expect(accessRows).toHaveLength(2);
         });
 
-        it('renders the empty-state message (not an error/blank) when there are no events', () => {
+        it('renders the empty-state message ONLY on a successful empty array', () => {
             const emptyStore = createTestStore({
                 accessEvents: {
-                    data: { [mockDomain.id]: [] },
-                    isLoading: false,
-                    error: null,
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: [],
+                            isLoading: false,
+                            error: false,
+                        },
+                    },
                 },
             });
 
@@ -399,6 +409,86 @@ describe('DomainPage', () => {
 
             expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
             expect(container.textContent).toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
+
+        it('shows a loading indicator (not the empty message) while the fetch is in flight', () => {
+            const loadingStore = createTestStore({
+                accessEvents: {
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: undefined,
+                            isLoading: true,
+                            error: false,
+                        },
+                    },
+                },
+            });
+
+            const { container } = render(
+                <Providers store={loadingStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            // panel is present, a loading indicator shows...
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(
+                container.querySelector('[data-test="access-events-loading"]')
+            ).toBeInTheDocument();
+            // ...and it must NOT falsely claim nobody accessed the data.
+            expect(container.textContent).not.toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
+
+        it('shows an error/retry affordance (not the empty message) on fetch failure', () => {
+            const errorStore = createTestStore({
+                accessEvents: {
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: undefined,
+                            isLoading: false,
+                            error: true,
+                        },
+                    },
+                },
+            });
+
+            const { container } = render(
+                <Providers store={errorStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            // panel + error text + retry button...
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(
+                container.querySelector('[data-test="access-events-error"]')
+            ).toBeInTheDocument();
+            expect(
+                container.querySelector('[data-test="access-events-retry"]')
+            ).toBeInTheDocument();
+            expect(container.textContent).toContain(
+                'Vaatamiste ajalugu ei õnnestunud laadida. Palun proovi uuesti.'
+            );
+            // ...and the empty message must NOT appear on a failed load.
+            expect(container.textContent).not.toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
+
+        it('does not show the empty message before any fetch record exists (undefined)', () => {
+            // No byUuid record for this domain at all -> neither empty nor error/loading text.
+            const { container } = render(
+                <Providers store={store}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).not.toContain(
                 'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
             );
         });

@@ -10,7 +10,9 @@ describe('domain.accessEvents.* i18n keys', () => {
         'domain.accessEvents.accessedAt',
         'domain.accessEvents.category',
         'domain.accessEvents.empty',
+        'domain.accessEvents.error',
         'domain.accessEvents.institution',
+        'domain.accessEvents.retry',
         'domain.accessEvents.title',
         'domain.accessEvents.tooltip',
     ].sort();

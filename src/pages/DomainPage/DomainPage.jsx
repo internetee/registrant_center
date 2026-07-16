@@ -11,6 +11,7 @@ import {
     Label,
     Container,
     Table,
+    Loader,
     Modal,
     Checkbox,
     Confirm,
@@ -55,7 +56,12 @@ const DomainPage = ({
     const { id } = useParams();
     const domain = domains[id];
     const { uiElemSize } = ui;
-    const domainAccessEvents = accessEvents[id];
+    // Per-domain access-events record: { events, isLoading, error }. `events` stays undefined until a
+    // fetch succeeds, so we can distinguish "loading / failed" from "loaded and genuinely empty".
+    const accessEventsRecord = accessEvents[id];
+    const domainAccessEvents = accessEventsRecord?.events;
+    const accessEventsLoading = accessEventsRecord?.isLoading;
+    const accessEventsError = accessEventsRecord?.error;
 
     const [isDirty, setIsDirty] = useState(false);
     const [isLockable, setIsLockable] = useState(false);
@@ -81,11 +87,13 @@ const DomainPage = ({
 
     useEffect(() => {
         // Once the domain is loaded, fetch the list of authorities that have accessed its data.
-        // Guarded so we fetch it once per domain uuid.
-        if (domain && domainAccessEvents === undefined) {
+        // Guarded on the per-uuid record so we fetch once per domain: the record exists as soon as
+        // the request is dispatched (REQUEST/SUCCESS/FAILURE), which prevents a refetch loop while
+        // `events` is still undefined during loading or after a failure.
+        if (domain && accessEventsRecord === undefined) {
             fetchAccessEvents(id);
         }
-    }, [domain, domainAccessEvents, fetchAccessEvents, id]);
+    }, [domain, accessEventsRecord, fetchAccessEvents, id]);
 
     useEffect(() => {
         if (registrantContacts?.ident?.type === 'org') {
@@ -616,7 +624,35 @@ const DomainPage = ({
                                 </Popup>
                             </h2>
                         </header>
-                        {domainAccessEvents && domainAccessEvents.length ? (
+                        {/*
+                          * Four distinct states, so a failed or in-flight load never reads as
+                          * "no authority accessed your data" (a transparency false negative):
+                          *   - loading: fetch in flight, no data yet -> spinner
+                          *   - error:   fetch failed -> error/retry affordance (NOT the empty text)
+                          *   - empty:   fetch succeeded with an empty array -> empty-state message
+                          *   - populated: the table
+                          */}
+                        {accessEventsLoading && !domainAccessEvents ? (
+                            <Loader active data-test="access-events-loading" inline="centered" />
+                        ) : accessEventsError ? (
+                            <div className="access-events--error" data-test="access-events-error">
+                                <FormattedMessage
+                                    id="domain.accessEvents.error"
+                                    tagName="p"
+                                />
+                                <Button
+                                    data-test="access-events-retry"
+                                    onClick={() => fetchAccessEvents(id)}
+                                    primary
+                                    size={uiElemSize}
+                                >
+                                    <FormattedMessage
+                                        id="domain.accessEvents.retry"
+                                        tagName="span"
+                                    />
+                                </Button>
+                            </div>
+                        ) : domainAccessEvents && domainAccessEvents.length ? (
                             <Table basic="very">
                                 <Table.Header>
                                     <Table.Row>
@@ -654,9 +690,10 @@ const DomainPage = ({
                                     ))}
                                 </Table.Body>
                             </Table>
-                        ) : (
+                        ) : Array.isArray(domainAccessEvents) &&
+                          domainAccessEvents.length === 0 ? (
                             <FormattedMessage id="domain.accessEvents.empty" tagName="p" />
-                        )}
+                        ) : null}
                     </Container>
                 </div>
             </div>
@@ -777,7 +814,7 @@ const DomainContacts = ({ type, contacts }) => {
 };
 
 const mapStateToProps = (state) => ({
-    accessEvents: state.accessEvents.data,
+    accessEvents: state.accessEvents.byUuid,
     companies: state.companies,
     contacts: state.contacts.data,
     error: state.domains.error,
