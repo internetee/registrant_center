@@ -298,6 +298,78 @@ describe('server/routes/apiRoute', () => {
         expect(r.__ctx.statusCode).toBe(401);
     });
 
+    it('getDomainAccessEvents forwards the session Bearer to the per-domain registry endpoint', async () => {
+        const req = {
+            ...createSession(),
+            params: { uuid: 'test-uuid' },
+        };
+        const r = createRes();
+        mockAxiosInstance.get.mockResolvedValue({ status: 200, data: [] });
+
+        await API.getDomainAccessEvents(req, r);
+
+        // Calls exactly the per-domain registry endpoint, no query string / client identity appended.
+        expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+            '/api/v1/registrant/domains/test-uuid/access_events'
+        );
+
+        // The API(session) axios factory was created with the session Bearer in its Authorization header.
+        const createArgs = mockAxiosCreate.mock.calls.map((call) => call[0]);
+        const withBearer = createArgs.find(
+            (cfg) => cfg?.headers?.Authorization === 'Bearer test-token'
+        );
+        expect(withBearer).toBeTruthy();
+
+        // No client-supplied registrant/contact identity is attached to the request.
+        const getArg = mockAxiosInstance.get.mock.calls[0][1];
+        expect(getArg).toBeUndefined();
+    });
+
+    it('getDomainAccessEvents returns the registry body verbatim (three-field events)', async () => {
+        const events = [
+            {
+                accessed_at: '2026-07-10T12:00:00+03:00',
+                organization: 'Politsei- ja Piirivalveamet',
+                category: 'law_enforcement',
+            },
+        ];
+        const req = {
+            ...createSession(),
+            params: { uuid: 'test-uuid' },
+        };
+        const r = createRes();
+        mockAxiosInstance.get.mockResolvedValue({ status: 200, data: events });
+
+        await API.getDomainAccessEvents(req, r);
+
+        expect(r.__ctx.statusCode).toBe(200);
+        expect(r.__ctx.body).toEqual(events);
+    });
+
+    it('getDomainAccessEvents does not log the response body or the token', async () => {
+        const { logError, logWarn, logInfo } = await import('../utils/logger.js');
+        const events = [
+            {
+                accessed_at: '2026-07-10T12:00:00+03:00',
+                organization: 'Politsei- ja Piirivalveamet',
+                category: 'law_enforcement',
+            },
+        ];
+        const req = {
+            ...createSession(),
+            params: { uuid: 'test-uuid' },
+        };
+        const r = createRes();
+        mockAxiosInstance.get.mockResolvedValue({ status: 200, data: events });
+
+        await API.getDomainAccessEvents(req, r);
+
+        // Success path logs nothing at all (no body, no token).
+        expect(logError).not.toHaveBeenCalled();
+        expect(logWarn).not.toHaveBeenCalled();
+        expect(logInfo).not.toHaveBeenCalled();
+    });
+
     it('handleResponse handles timeout error', async () => {
         const req = {
             ...createSession(),

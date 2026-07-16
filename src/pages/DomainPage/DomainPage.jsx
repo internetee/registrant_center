@@ -33,13 +33,16 @@ import {
 } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
+import { fetchAccessEvents as fetchAccessEventsAction } from '../../redux/reducers/accessEvents';
 import Helpers from '../../utils/helpers';
 
 const DomainPage = ({
+    accessEvents,
     companies,
     contacts,
     domains,
     error,
+    fetchAccessEvents,
     fetchCompanies,
     fetchDomain,
     isLoading,
@@ -52,6 +55,7 @@ const DomainPage = ({
     const { id } = useParams();
     const domain = domains[id];
     const { uiElemSize } = ui;
+    const domainAccessEvents = accessEvents[id];
 
     const [isDirty, setIsDirty] = useState(false);
     const [isLockable, setIsLockable] = useState(false);
@@ -74,6 +78,14 @@ const DomainPage = ({
         };
         fetchData();
     }, [domain, fetchDomain, isLoading, id, error, companies.isLoading, fetchCompanies]);
+
+    useEffect(() => {
+        // Once the domain is loaded, fetch the list of authorities that have accessed its data.
+        // Guarded so we fetch it once per domain uuid.
+        if (domain && domainAccessEvents === undefined) {
+            fetchAccessEvents(id);
+        }
+    }, [domain, domainAccessEvents, fetchAccessEvents, id]);
 
     useEffect(() => {
         if (registrantContacts?.ident?.type === 'org') {
@@ -594,6 +606,59 @@ const DomainPage = ({
                         </Form>
                     </Container>
                 </div>
+                <div className="page--block">
+                    <Container text>
+                        <header className="page--block--header">
+                            <h2>
+                                <FormattedMessage id="domain.accessEvents.title" />
+                                <Popup basic inverted trigger={<Icon name="question circle" />}>
+                                    <FormattedMessage id="domain.accessEvents.tooltip" />
+                                </Popup>
+                            </h2>
+                        </header>
+                        {domainAccessEvents && domainAccessEvents.length ? (
+                            <Table basic="very">
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>
+                                            <FormattedMessage
+                                                id="domain.accessEvents.institution"
+                                                tagName="strong"
+                                            />
+                                        </Table.HeaderCell>
+                                        <Table.HeaderCell>
+                                            <FormattedMessage
+                                                id="domain.accessEvents.category"
+                                                tagName="strong"
+                                            />
+                                        </Table.HeaderCell>
+                                        <Table.HeaderCell>
+                                            <FormattedMessage
+                                                id="domain.accessEvents.accessedAt"
+                                                tagName="strong"
+                                            />
+                                        </Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {domainAccessEvents.map((event) => (
+                                        <Table.Row
+                                            key={`${event.accessed_at}-${event.category}-${
+                                                event.organization || ''
+                                            }`}
+                                        >
+                                            <Table.Cell>{event.organization || '-'}</Table.Cell>
+                                            <Table.Cell>{event.category}</Table.Cell>
+                                            <Table.Cell>{event.accessed_at}</Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                        ) : (
+                            <FormattedMessage id="domain.accessEvents.empty" tagName="p" />
+                        )}
+                    </Container>
+                </div>
             </div>
 
             <Confirm
@@ -712,6 +777,7 @@ const DomainContacts = ({ type, contacts }) => {
 };
 
 const mapStateToProps = (state) => ({
+    accessEvents: state.accessEvents.data,
     companies: state.companies,
     contacts: state.contacts.data,
     error: state.domains.error,
@@ -724,6 +790,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
+            fetchAccessEvents: fetchAccessEventsAction,
             fetchCompanies: fetchCompaniesAction,
             fetchDomain: fetchDomainAction,
             lockDomain: lockDomainAction,

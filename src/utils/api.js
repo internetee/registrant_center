@@ -87,8 +87,10 @@ export default {
     updateContact: (uuid, form) => 
         instance.patch(`/api/contacts/${uuid}`, JSON.stringify(form)),
 
-    setDomainRegistryLock: (uuid, extensionsProhibited) => 
+    setDomainRegistryLock: (uuid, extensionsProhibited) =>
         instance.post(`/api/domains/${uuid}/registry_lock?extensionsProhibited=${extensionsProhibited}`),
+
+    fetchDomainAccessEvents: (uuid) => instance.get(`/api/domains/${uuid}/access_events`),
 
     deleteDomainRegistryLock: (uuid) => 
         instance.delete(`/api/domains/${uuid}/registry_lock`),

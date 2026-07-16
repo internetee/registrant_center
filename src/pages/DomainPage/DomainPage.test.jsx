@@ -47,6 +47,11 @@ vi.mock('../../redux/reducers/domains', () => ({
     }),
 }));
 
+// Mock the access-events action (thunk); its dispatch is a no-op action in these tests
+vi.mock('../../redux/reducers/accessEvents', () => ({
+    fetchAccessEvents: () => ({ type: 'MOCK_FETCH_ACCESS_EVENTS' }),
+}));
+
 const createTestStore = (overrides = {}) => {
     const baseState = {
         ui: {
@@ -92,6 +97,11 @@ const createTestStore = (overrides = {}) => {
             isLoading: null,
             message: null,
         },
+        accessEvents: {
+            data: {},
+            isLoading: false,
+            error: null,
+        },
     };
 
     // Create reducers that handle domain actions
@@ -129,6 +139,7 @@ const createTestStore = (overrides = {}) => {
         },
         contacts: (state = { ...baseState.contacts, ...overrides.contacts }) => state,
         companies: (state = { ...baseState.companies, ...overrides.companies }) => state,
+        accessEvents: (state = { ...baseState.accessEvents, ...overrides.accessEvents }) => state,
     };
 
     return configureStore({
@@ -288,5 +299,108 @@ describe('DomainPage', () => {
         expect(container.textContent).toContain('test@tech.ee');
         expect(container.textContent).toContain('Admin');
         expect(container.textContent).toContain('test@admin.ee');
+    });
+
+    describe('access-events panel', () => {
+        const sampleEvents = [
+            {
+                accessed_at: '2026-07-10T12:00:00+03:00',
+                organization: 'Politsei- ja Piirivalveamet',
+                category: 'law_enforcement',
+            },
+            {
+                accessed_at: '2026-07-09T09:30:00+03:00',
+                organization: null,
+                category: 'court',
+            },
+        ];
+
+        it('renders exactly the three returned fields and no withheld data', () => {
+            const eventsStore = createTestStore({
+                accessEvents: {
+                    data: { [mockDomain.id]: sampleEvents },
+                    isLoading: false,
+                    error: null,
+                },
+            });
+
+            const { container } = render(
+                <Providers store={eventsStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            // panel title (et translation) + the three fields
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).toContain('Politsei- ja Piirivalveamet');
+            expect(container.textContent).toContain('law_enforcement');
+            expect(container.textContent).toContain('court');
+            expect(container.textContent).toContain('2026-07-10T12:00:00+03:00');
+
+            // withheld fields must never appear in the DOM
+            const withheld = [
+                'accessor_name',
+                'grant_ref',
+                'request_id',
+                'caller_ip',
+                'result_code',
+            ];
+            withheld.forEach((field) => {
+                expect(container.textContent).not.toContain(field);
+            });
+        });
+
+        it('uses a semantic header with descriptive columns and uniquely-keyed rows (a11y)', () => {
+            const eventsStore = createTestStore({
+                accessEvents: {
+                    data: { [mockDomain.id]: sampleEvents },
+                    isLoading: false,
+                    error: null,
+                },
+            });
+
+            const { container } = render(
+                <Providers store={eventsStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            // Find the panel table by its column headers (et translations)
+            const headerCells = Array.from(container.querySelectorAll('thead th')).map((th) =>
+                th.textContent.trim()
+            );
+            expect(headerCells).toContain('Asutus');
+            expect(headerCells).toContain('Kategooria');
+            expect(headerCells).toContain('Vaatamise aeg');
+
+            // one row per event, each rendered (unique keys => both rows present)
+            const bodyRows = container.querySelectorAll('tbody tr');
+            const accessRows = Array.from(bodyRows).filter(
+                (tr) =>
+                    tr.textContent.includes('law_enforcement') || tr.textContent.includes('court')
+            );
+            expect(accessRows).toHaveLength(2);
+        });
+
+        it('renders the empty-state message (not an error/blank) when there are no events', () => {
+            const emptyStore = createTestStore({
+                accessEvents: {
+                    data: { [mockDomain.id]: [] },
+                    isLoading: false,
+                    error: null,
+                },
+            });
+
+            const { container } = render(
+                <Providers store={emptyStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
     });
 });
