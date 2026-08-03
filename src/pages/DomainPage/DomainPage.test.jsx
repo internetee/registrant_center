@@ -48,8 +48,12 @@ vi.mock('../../redux/reducers/domains', () => ({
 }));
 
 // Mock the access-events action (thunk); its dispatch is a no-op action in these tests
+const { mockFetchAccessEvents } = vi.hoisted(() => ({
+    mockFetchAccessEvents: vi.fn(() => ({ type: 'MOCK_FETCH_ACCESS_EVENTS' })),
+}));
+
 vi.mock('../../redux/reducers/accessEvents', () => ({
-    fetchAccessEvents: () => ({ type: 'MOCK_FETCH_ACCESS_EVENTS' }),
+    fetchAccessEvents: mockFetchAccessEvents,
 }));
 
 const createTestStore = (overrides = {}) => {
@@ -304,12 +308,12 @@ describe('DomainPage', () => {
             {
                 accessed_at: '2026-07-10T12:00:00+03:00',
                 organization: 'Politsei- ja Piirivalveamet',
-                category: 'law_enforcement',
+                category: 'police',
             },
             {
                 accessed_at: '2026-07-09T09:30:00+03:00',
                 organization: null,
-                category: 'court',
+                category: 'cert',
             },
         ];
 
@@ -332,12 +336,10 @@ describe('DomainPage', () => {
                 </Providers>
             );
 
-            // panel title (et translation) + the three fields
+            // panel title (et translation) + the three fields, one row per event
             expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
             expect(container.textContent).toContain('Politsei- ja Piirivalveamet');
-            expect(container.textContent).toContain('law_enforcement');
-            expect(container.textContent).toContain('court');
-            expect(container.textContent).toContain('2026-07-10T12:00:00+03:00');
+            expect(container.querySelectorAll('[data-test="access-events-row"]')).toHaveLength(2);
 
             // withheld fields must never appear in the DOM
             const withheld = [
@@ -352,40 +354,36 @@ describe('DomainPage', () => {
             });
         });
 
-        it('uses a semantic header with descriptive columns and uniquely-keyed rows (a11y)', () => {
-            const eventsStore = createTestStore({
-                accessEvents: {
-                    byUuid: {
-                        [mockDomain.id]: {
-                            events: sampleEvents,
-                            isLoading: false,
-                            error: false,
+        it('is hidden — and never fetched — for a viewer who is not the direct registrant', () => {
+            // The registry scopes events to the caller's own ident-matched registrant contact, so a
+            // tech/admin contact or a company representative would get an empty list. Rendering the
+            // panel for them would state "no authority has accessed this domain's data", which we
+            // cannot actually know. It must not appear at all.
+            const otherPersonStore = createTestStore({
+                contacts: {
+                    data: {
+                        ...Object.fromEntries(contacts.map((contact) => [contact.id, contact])),
+                        [mockDomain.registrant.id]: {
+                            ...contacts.find((c) => c.id === mockDomain.registrant.id),
+                            ident: { code: '00000000000', type: 'priv', country_code: 'EE' },
                         },
                     },
+                    message: null,
                 },
             });
 
             const { container } = render(
-                <Providers store={eventsStore}>
+                <Providers store={otherPersonStore}>
                     <DomainPage />
                 </Providers>
             );
 
-            // Find the panel table by its column headers (et translations)
-            const headerCells = Array.from(container.querySelectorAll('thead th')).map((th) =>
-                th.textContent.trim()
+            expect(container.textContent).not.toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).not.toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
             );
-            expect(headerCells).toContain('Asutus');
-            expect(headerCells).toContain('Kategooria');
-            expect(headerCells).toContain('Vaatamise aeg');
-
-            // one row per event, each rendered (unique keys => both rows present)
-            const bodyRows = container.querySelectorAll('tbody tr');
-            const accessRows = Array.from(bodyRows).filter(
-                (tr) =>
-                    tr.textContent.includes('law_enforcement') || tr.textContent.includes('court')
-            );
-            expect(accessRows).toHaveLength(2);
+            // no panel means no request either — the endpoint is never called on their behalf
+            expect(mockFetchAccessEvents).not.toHaveBeenCalled();
         });
 
         it('renders the empty-state message ONLY on a successful empty array', () => {

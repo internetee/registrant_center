@@ -11,7 +11,6 @@ import {
     Label,
     Container,
     Table,
-    Loader,
     Modal,
     Checkbox,
     Confirm,
@@ -25,6 +24,7 @@ import {
     PageMessage,
     MainLayout,
     WhoIsConfirmDialog,
+    DomainAccessEvents,
 } from '../../components';
 import domainStatuses from '../../utils/domainStatuses.json';
 import {
@@ -59,9 +59,17 @@ const DomainPage = ({
     // Per-domain access-events record: { events, isLoading, error }. `events` stays undefined until a
     // fetch succeeds, so we can distinguish "loading / failed" from "loaded and genuinely empty".
     const accessEventsRecord = accessEvents[id];
-    const domainAccessEvents = accessEventsRecord?.events;
-    const accessEventsLoading = accessEventsRecord?.isLoading;
-    const accessEventsError = accessEventsRecord?.error;
+    // The registry scopes access events to the caller's DIRECT registrant contact — the private
+    // person whose ident matches (Contact.registrant_user_direct_contacts). A tech/admin contact or
+    // a company representative passes the domain check but gets an empty list, which the panel
+    // would render as "no authority has accessed this domain's data" — a false negative in a
+    // feature whose whole point is transparency. So the panel is shown, and fetched, only for the
+    // direct registrant. When the registry widens own_ids to registrant_user_contacts (company
+    // representatives; spec 13 grounding §6 open question), widen this check with it.
+    const registrantContact = contacts[domain?.registrant?.id];
+    const isDomainRegistrant = Boolean(
+        registrantContact?.ident?.type === 'priv' && registrantContact.ident.code === user.ident
+    );
 
     const [isDirty, setIsDirty] = useState(false);
     const [isLockable, setIsLockable] = useState(false);
@@ -90,10 +98,10 @@ const DomainPage = ({
         // Guarded on the per-uuid record so we fetch once per domain: the record exists as soon as
         // the request is dispatched (REQUEST/SUCCESS/FAILURE), which prevents a refetch loop while
         // `events` is still undefined during loading or after a failure.
-        if (domain && accessEventsRecord === undefined) {
+        if (domain && isDomainRegistrant && accessEventsRecord === undefined) {
             fetchAccessEvents(id);
         }
-    }, [domain, accessEventsRecord, fetchAccessEvents, id]);
+    }, [domain, isDomainRegistrant, accessEventsRecord, fetchAccessEvents, id]);
 
     useEffect(() => {
         if (registrantContacts?.ident?.type === 'org') {
@@ -614,88 +622,15 @@ const DomainPage = ({
                         </Form>
                     </Container>
                 </div>
-                <div className="page--block">
-                    <Container text>
-                        <header className="page--block--header">
-                            <h2>
-                                <FormattedMessage id="domain.accessEvents.title" />
-                                <Popup basic inverted trigger={<Icon name="question circle" />}>
-                                    <FormattedMessage id="domain.accessEvents.tooltip" />
-                                </Popup>
-                            </h2>
-                        </header>
-                        {/*
-                          * Four distinct states, so a failed or in-flight load never reads as
-                          * "no authority accessed your data" (a transparency false negative):
-                          *   - loading: fetch in flight, no data yet -> spinner
-                          *   - error:   fetch failed -> error/retry affordance (NOT the empty text)
-                          *   - empty:   fetch succeeded with an empty array -> empty-state message
-                          *   - populated: the table
-                          */}
-                        {accessEventsLoading && !domainAccessEvents ? (
-                            <Loader active data-test="access-events-loading" inline="centered" />
-                        ) : accessEventsError ? (
-                            <div className="access-events--error" data-test="access-events-error">
-                                <FormattedMessage
-                                    id="domain.accessEvents.error"
-                                    tagName="p"
-                                />
-                                <Button
-                                    data-test="access-events-retry"
-                                    onClick={() => fetchAccessEvents(id)}
-                                    primary
-                                    size={uiElemSize}
-                                >
-                                    <FormattedMessage
-                                        id="domain.accessEvents.retry"
-                                        tagName="span"
-                                    />
-                                </Button>
-                            </div>
-                        ) : domainAccessEvents && domainAccessEvents.length ? (
-                            <Table basic="very">
-                                <Table.Header>
-                                    <Table.Row>
-                                        <Table.HeaderCell>
-                                            <FormattedMessage
-                                                id="domain.accessEvents.institution"
-                                                tagName="strong"
-                                            />
-                                        </Table.HeaderCell>
-                                        <Table.HeaderCell>
-                                            <FormattedMessage
-                                                id="domain.accessEvents.category"
-                                                tagName="strong"
-                                            />
-                                        </Table.HeaderCell>
-                                        <Table.HeaderCell>
-                                            <FormattedMessage
-                                                id="domain.accessEvents.accessedAt"
-                                                tagName="strong"
-                                            />
-                                        </Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                    {domainAccessEvents.map((event) => (
-                                        <Table.Row
-                                            key={`${event.accessed_at}-${event.category}-${
-                                                event.organization || ''
-                                            }`}
-                                        >
-                                            <Table.Cell>{event.organization || '-'}</Table.Cell>
-                                            <Table.Cell>{event.category}</Table.Cell>
-                                            <Table.Cell>{event.accessed_at}</Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table>
-                        ) : Array.isArray(domainAccessEvents) &&
-                          domainAccessEvents.length === 0 ? (
-                            <FormattedMessage id="domain.accessEvents.empty" tagName="p" />
-                        ) : null}
-                    </Container>
-                </div>
+                {isDomainRegistrant ? (
+                    <DomainAccessEvents
+                        error={accessEventsRecord?.error}
+                        events={accessEventsRecord?.events}
+                        isLoading={accessEventsRecord?.isLoading}
+                        onRetry={() => fetchAccessEvents(id)}
+                        uiElemSize={uiElemSize}
+                    />
+                ) : null}
             </div>
 
             <Confirm

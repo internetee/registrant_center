@@ -9,9 +9,16 @@ describe('domain.accessEvents.* i18n keys', () => {
     const expectedKeys = [
         'domain.accessEvents.accessedAt',
         'domain.accessEvents.category',
+        // One label per RdapPrivilegeGrant::CATEGORIES value, so the panel never shows the raw
+        // enum. A category the registry adds later falls back to its raw value by design.
+        'domain.accessEvents.category.cert',
+        'domain.accessEvents.category.eis_internal',
+        'domain.accessEvents.category.police',
+        'domain.accessEvents.category.ria',
         'domain.accessEvents.empty',
         'domain.accessEvents.error',
         'domain.accessEvents.institution',
+        'domain.accessEvents.institutionUnknown',
         'domain.accessEvents.retry',
         'domain.accessEvents.title',
         'domain.accessEvents.tooltip',
