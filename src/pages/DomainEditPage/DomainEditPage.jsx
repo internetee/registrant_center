@@ -112,15 +112,34 @@ const DomainEditPage = ({
         await Promise.all(
             Object.values(stageData).map((contact) => {
                 const registrant = stageData[domain.registrant.id];
+                const originalContact = contacts[contact.id];
+                
+                const newDisclosedAttributes = new Set(originalContact.disclosed_attributes);
+                
+                contact.disclosed_attributes.forEach(attr => {
+                    if (!contact.system_disclosed_attributes || !contact.system_disclosed_attributes.includes(attr)) {
+                        newDisclosedAttributes.add(attr);
+                    }
+                });
+
+                if (contact.system_disclosed_attributes) {
+                    contact.system_disclosed_attributes.forEach(attr => {
+                        newDisclosedAttributes.add(attr);
+                    });
+                }
+
                 if (registrant && registrant.ident.type === 'org') {
                     return updateContact(contact.id, {
                         email: contact.email,
                         phone: contact.phone,
+                        disclosed_attributes: [...newDisclosedAttributes],
+                        system_disclosed_attributes: contact.system_disclosed_attributes || []
                     });
                 }
                 if (contact.ident.code === user.ident) {
                     return updateContact(contact.id, {
-                        disclosed_attributes: [...contact.disclosed_attributes],
+                        disclosed_attributes: [...newDisclosedAttributes],
+                        system_disclosed_attributes: contact.system_disclosed_attributes || [],
                         registrant_publishable: contact.registrant_publishable,
                         email: contact.email,
                         phone: contact.phone,
@@ -130,10 +149,13 @@ const DomainEditPage = ({
                     return updateContact(contact.id, {
                         email: contact.email,
                         phone: contact.phone,
+                        disclosed_attributes: [...newDisclosedAttributes],
+                        system_disclosed_attributes: contact.system_disclosed_attributes || []
                     });
                 }
                 return updateContact(contact.id, {
-                    disclosed_attributes: [...contact.disclosed_attributes],
+                    disclosed_attributes: [...newDisclosedAttributes],
+                    system_disclosed_attributes: contact.system_disclosed_attributes || [],
                     registrant_publishable: contact.registrant_publishable,
                     email: contact.email,
                     phone: contact.phone,
