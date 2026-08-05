@@ -7,9 +7,11 @@ import companies from './companies';
 import contacts from './contacts';
 import verification from './verification';
 import filters from './filters';
+import accessEvents from './accessEvents';
 
 export default withReduxStateSync(
     combineReducers({
+        accessEvents,
         companies,
         contacts,
         domains,

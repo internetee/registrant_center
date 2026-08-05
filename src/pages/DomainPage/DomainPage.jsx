@@ -24,6 +24,7 @@ import {
     PageMessage,
     MainLayout,
     WhoIsConfirmDialog,
+    DomainAccessEvents,
 } from '../../components';
 import domainStatuses from '../../utils/domainStatuses.json';
 import {
@@ -33,13 +34,16 @@ import {
 } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
+import { fetchAccessEvents as fetchAccessEventsAction } from '../../redux/reducers/accessEvents';
 import Helpers from '../../utils/helpers';
 
 const DomainPage = ({
+    accessEvents,
     companies,
     contacts,
     domains,
     error,
+    fetchAccessEvents,
     fetchCompanies,
     fetchDomain,
     isLoading,
@@ -52,6 +56,20 @@ const DomainPage = ({
     const { id } = useParams();
     const domain = domains[id];
     const { uiElemSize } = ui;
+    // Per-domain access-events record: { events, isLoading, error }. `events` stays undefined until a
+    // fetch succeeds, so we can distinguish "loading / failed" from "loaded and genuinely empty".
+    const accessEventsRecord = accessEvents[id];
+    // The registry scopes access events to the caller's DIRECT registrant contact — the private
+    // person whose ident matches (Contact.registrant_user_direct_contacts). A tech/admin contact or
+    // a company representative passes the domain check but gets an empty list, which the panel
+    // would render as "no authority has accessed this domain's data" — a false negative in a
+    // feature whose whole point is transparency. So the panel is shown, and fetched, only for the
+    // direct registrant. When the registry widens own_ids to registrant_user_contacts (company
+    // representatives; spec 13 grounding §6 open question), widen this check with it.
+    const registrantContact = contacts[domain?.registrant?.id];
+    const isDomainRegistrant = Boolean(
+        registrantContact?.ident?.type === 'priv' && registrantContact.ident.code === user.ident
+    );
 
     const [isDirty, setIsDirty] = useState(false);
     const [isLockable, setIsLockable] = useState(false);
@@ -74,6 +92,16 @@ const DomainPage = ({
         };
         fetchData();
     }, [domain, fetchDomain, isLoading, id, error, companies.isLoading, fetchCompanies]);
+
+    useEffect(() => {
+        // Once the domain is loaded, fetch the list of authorities that have accessed its data.
+        // Guarded on the per-uuid record so we fetch once per domain: the record exists as soon as
+        // the request is dispatched (REQUEST/SUCCESS/FAILURE), which prevents a refetch loop while
+        // `events` is still undefined during loading or after a failure.
+        if (domain && isDomainRegistrant && accessEventsRecord === undefined) {
+            fetchAccessEvents(id);
+        }
+    }, [domain, isDomainRegistrant, accessEventsRecord, fetchAccessEvents, id]);
 
     useEffect(() => {
         if (registrantContacts?.ident?.type === 'org') {
@@ -594,6 +622,15 @@ const DomainPage = ({
                         </Form>
                     </Container>
                 </div>
+                {isDomainRegistrant ? (
+                    <DomainAccessEvents
+                        error={accessEventsRecord?.error}
+                        events={accessEventsRecord?.events}
+                        isLoading={accessEventsRecord?.isLoading}
+                        onRetry={() => fetchAccessEvents(id)}
+                        uiElemSize={uiElemSize}
+                    />
+                ) : null}
             </div>
 
             <Confirm
@@ -712,6 +749,7 @@ const DomainContacts = ({ type, contacts }) => {
 };
 
 const mapStateToProps = (state) => ({
+    accessEvents: state.accessEvents.byUuid,
     companies: state.companies,
     contacts: state.contacts.data,
     error: state.domains.error,
@@ -724,6 +762,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
+            fetchAccessEvents: fetchAccessEventsAction,
             fetchCompanies: fetchCompaniesAction,
             fetchDomain: fetchDomainAction,
             lockDomain: lockDomainAction,
