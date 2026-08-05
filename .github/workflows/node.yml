@@ -6,8 +6,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    container: 
-      image: debian:buster
+    container:
+      image: debian:bookworm
 
     strategy:
       matrix:
