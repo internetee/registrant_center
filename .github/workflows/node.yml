@@ -51,15 +51,15 @@ jobs:
           VITE_SERVER_PORT: 5000
           API_HOST: https://testrant.internet.ee
           PUBLIC_API_HOST: https://www.internet.ee
-          PUBLIC_API_KEY: 4395743059dsfksdfyds8f7334
+          PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
           CLIENT_ID: eis_client_test
-          CLIENT_SECRET: secret12345
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           ISSUER_URL: https://tara-test.ria.ee
           TOKEN_PATH: /oidc/token
           JWKS_PATH: /oidc/jwks
           AUTH_PATH: /oidc/authorize
           REDIRECT_URL: /auth/callback
-          SESSION_SECRET: secret555555
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           HTTPS: true
         run: npm run coverage -- --coverage.reporter=lcov
 
