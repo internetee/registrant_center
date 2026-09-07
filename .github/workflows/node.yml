@@ -32,6 +32,8 @@ jobs:
           echo "Installed Node major: $actual"
           test "$actual" = "$expected"
           npm ci --include=optional
+          ROLLUP_LINUX=$(node -p "require('./node_modules/rollup/package.json').optionalDependencies['@rollup/rollup-linux-x64-gnu']")
+          npm install --no-save --no-package-lock "@rollup/rollup-linux-x64-gnu@${ROLLUP_LINUX}"
           echo "Installed packages from this PR package-lock.json:"
           npm ls --depth=0 --omit=dev || true
           if [ "${{ github.event_name }}" = "pull_request" ]; then
