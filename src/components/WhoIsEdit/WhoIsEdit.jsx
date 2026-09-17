@@ -10,41 +10,54 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
         contactsList.find(({ ident }) => ident.type === 'org' || domain.registrant.org) != null;
 
     const { totalCount, isCheckedAll, checkedCount } = contactsList.reduce(
-        (acc, { ident, disclosed_attributes }) => ({
+        (acc, { ident, disclosed_attributes, system_disclosed_attributes = [] }) => ({
             checkedCount:
                 acc.checkedCount +
-                // eslint-disable-next-line func-names
-                (function () {
-                    if (domain.registrant.org) {
-                        return 2;
-                    }
+                (() => {
                     if (ident.type === 'org') {
                         return 2;
                     }
-                    return disclosed_attributes.size;
+                    return (
+                        disclosed_attributes.size +
+                        (system_disclosed_attributes ? system_disclosed_attributes.length : 0)
+                    );
                 })(),
             isCheckedAll: disclosed_attributes.size === contactsList.length * 3,
             totalCount: acc.totalCount + 3,
         }),
-        {
-            checkedCount: 0,
-            isCheckedAll: false,
-            totalCount: 0,
-        }
+        { checkedCount: 0, isCheckedAll: false, totalCount: 0 }
     );
 
     const indeterminate = checkedCount > 0 && checkedCount < totalCount;
 
     const handleChange = (checked, ids, type) => {
         const changedContacts = ids.reduce((acc, id) => {
-            const { disclosed_attributes } = contacts[id];
+            const { disclosed_attributes, system_disclosed_attributes = [] } = contacts[id];
             const { registrant_publishable } = contacts[id];
             const attributes = new Set(disclosed_attributes);
             let publishable = registrant_publishable;
 
+            const canChangeAttributes = type.every(
+                (attr) =>
+                    !system_disclosed_attributes || !system_disclosed_attributes.includes(attr)
+            );
+
+            if (!canChangeAttributes) {
+                return {
+                    ...acc,
+                    [id]: contacts[id],
+                };
+            }
+
             if (domain.registrant.org) {
                 attributes.add('name');
                 attributes.add('email');
+            }
+
+            if (system_disclosed_attributes) {
+                system_disclosed_attributes.forEach((attr) => {
+                    attributes.add(attr);
+                });
             }
 
             type.forEach((attr) => {
@@ -53,14 +66,21 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 } else if (checked) {
                     attributes.add(attr);
                 } else {
-                    attributes.delete(attr);
+                    if (
+                        !system_disclosed_attributes ||
+                        !system_disclosed_attributes.includes(attr)
+                    ) {
+                        attributes.delete(attr);
+                    }
                 }
             });
+
             return {
                 ...acc,
                 [id]: {
                     ...contacts[id],
                     disclosed_attributes: attributes,
+                    system_disclosed_attributes,
                     registrant_publishable: publishable,
                 },
             };
@@ -104,11 +124,20 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         indeterminate={indeterminate}
                         label={<CheckAllLabel />}
                         onChange={(e, elem) => {
-                            handleChange(elem.checked, Object.keys(contacts), [
-                                'name',
-                                'email',
-                                'phone',
-                            ]);
+                            const attributesToChange = ['name', 'email', 'phone'].filter((attr) => {
+                                const contact = Object.values(contacts)[0];
+                                return (
+                                    !contact.system_disclosed_attributes ||
+                                    !contact.system_disclosed_attributes.includes(attr)
+                                );
+                            });
+                            if (attributesToChange.length > 0) {
+                                handleChange(
+                                    elem.checked,
+                                    Object.keys(contacts),
+                                    attributesToChange
+                                );
+                            }
                         }}
                     />
                 </Form.Field>
@@ -133,7 +162,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                         item.disclosed_attributes.has('name')
                                 )}
                                 disabled={Boolean(
-                                    item.ident.type === 'org' || domain.registrant.org
+                                    item.ident.type === 'org' ||
+                                        domain.registrant.org ||
+                                        (item.system_disclosed_attributes &&
+                                            item.system_disclosed_attributes.includes('name'))
                                 )}
                                 id={`name-${item.id}`}
                                 label={
@@ -161,7 +193,10 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                         item.disclosed_attributes.has('email')
                                 )}
                                 disabled={Boolean(
-                                    item.ident.type === 'org' || domain.registrant.org
+                                    item.ident.type === 'org' ||
+                                        domain.registrant.org ||
+                                        (item.system_disclosed_attributes &&
+                                            item.system_disclosed_attributes.includes('email'))
                                 )}
                                 id={`email-${item.id}`}
                                 label={
@@ -182,8 +217,17 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                             />
                         </Form.Field>
                         <Form.Field>
+                            <div>{item.system_disclosed_attributes}</div>
                             <Checkbox
-                                checked={item.disclosed_attributes.has('phone')}
+                                checked={Boolean(
+                                    item.disclosed_attributes.has('phone') ||
+                                        (item.system_disclosed_attributes &&
+                                            item.system_disclosed_attributes.includes('phone'))
+                                )}
+                                disabled={Boolean(
+                                    item.system_disclosed_attributes &&
+                                        item.system_disclosed_attributes.includes('phone')
+                                )}
                                 id={`phone-${item.id}`}
                                 label={
                                     <label htmlFor={`phone-${item.id}`}>

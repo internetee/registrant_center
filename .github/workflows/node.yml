@@ -1,26 +1,16 @@
 name: Node.js CI
 
-on: [push]
+on:
+  push:
+    branches: [master]
+  pull_request:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    container:
-      image: node:22-bookworm
-
-    strategy:
-      matrix:
-        node-version: [22.x]
 
     steps:
-      # Install essential packages first
-      - name: Install essential packages
-        run: |
-          apt-get update
-          apt-get install -y git curl xz-utils
-
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -28,19 +18,29 @@ jobs:
         run: >
           git config --global url."https://github.com/".insteadOf ssh://git@github.com/
 
-      - name: Mark workspace as safe for git
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
-      - name: Install dependencies
+      - name: Verify dependencies match this PR lockfile
         run: |
-          npm ci
-          npm install @rollup/rollup-linux-x64-gnu
+          expected=$(grep -Eo '[0-9]+' .nvmrc | head -1)
+          actual=$(node -p "process.versions.node.split('.')[0]")
+          echo "Node from .nvmrc: $expected"
+          echo "Installed Node major: $actual"
+          test "$actual" = "$expected"
+          npm ci --include=optional
+          ROLLUP_LINUX=$(node -p "require('./node_modules/rollup/package.json').optionalDependencies['@rollup/rollup-linux-x64-gnu']")
+          npm install --no-save --no-package-lock "@rollup/rollup-linux-x64-gnu@${ROLLUP_LINUX}"
+          echo "Installed packages from this PR package-lock.json:"
+          npm ls --depth=0 --omit=dev || true
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch --depth=1 origin "${{ github.base_ref }}"
+            echo "package-lock.json changes vs ${{ github.base_ref }}:"
+            git diff "origin/${{ github.base_ref }}" -- package-lock.json package.json || true
+          fi
 
       - run: npm run build
 
@@ -51,15 +51,15 @@ jobs:
           VITE_SERVER_PORT: 5000
           API_HOST: https://testrant.internet.ee
           PUBLIC_API_HOST: https://www.internet.ee
-          PUBLIC_API_KEY: 4395743059dsfksdfyds8f7334
+          PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
           CLIENT_ID: eis_client_test
-          CLIENT_SECRET: secret12345
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           ISSUER_URL: https://tara-test.ria.ee
           TOKEN_PATH: /oidc/token
           JWKS_PATH: /oidc/jwks
           AUTH_PATH: /oidc/authorize
           REDIRECT_URL: /auth/callback
-          SESSION_SECRET: secret555555
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           HTTPS: true
         run: npm run coverage -- --coverage.reporter=lcov
 
