@@ -11,14 +11,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including devDependencies needed for build).
-# The committed package-lock.json lost rollup's platform-specific optional
-# packages (npm/cli#4828), so `npm ci` cannot materialize the Linux native
-# binary and `vite build` dies with "Cannot find module
-# @rollup/rollup-linux-x64-gnu". Same workaround as
-# .github/workflows/node.yml; drop it once the lockfile is regenerated.
+# The native check fails the build early and with a clear message if the
+# lockfile ever loses rollup's platform-specific optional packages again
+# (npm/cli#4828) instead of dying later inside `vite build`.
 RUN npm ci --include=optional \
- && ROLLUP_NATIVE=$(node -p 'require("./node_modules/rollup/package.json").optionalDependencies["@rollup/rollup-linux-x64-gnu"]') \
- && npm install --no-save --no-package-lock "@rollup/rollup-linux-x64-gnu@${ROLLUP_NATIVE}" \
  && node -e 'require("./node_modules/rollup/dist/native.js")'
 
 # Copy the rest of the application code
