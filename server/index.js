@@ -184,6 +184,7 @@ app.all('/api/*', API.checkAuth);
 // Protected routes below
 app.get('/api/domains', API.getDomains);
 app.get('/api/domains/:uuid', API.getDomains);
+app.get('/api/domains/:uuid/access_events', API.getDomainAccessEvents);
 app.post('/api/domains/:uuid/registry_lock', API.setDomainRegistryLock);
 app.delete('/api/domains/:uuid/registry_lock', API.deleteDomainRegistryLock);
 app.get('/api/contacts/:uuid/do_need_update_contacts', API.doNeedUpdateContacts);

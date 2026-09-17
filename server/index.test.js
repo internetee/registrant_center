@@ -79,4 +79,23 @@ describe('server/index smoke', () => {
     it('exports server instance', () => {
         expect(serverModule.default).toBeDefined();
     });
+
+    it('registers the access_events route below the checkAuth session gate', async () => {
+        // `fs` is mocked in this file; read the real source via the un-mocked module.
+        const fs = await vi.importActual('node:fs');
+        const path = await import('node:path');
+        const { fileURLToPath } = await import('node:url');
+        const dir = path.dirname(fileURLToPath(import.meta.url));
+        const source = fs.readFileSync(path.join(dir, 'index.js'), 'utf8');
+
+        const gateIndex = source.indexOf("app.all('/api/*', API.checkAuth)");
+        const routeIndex = source.indexOf(
+            "app.get('/api/domains/:uuid/access_events', API.getDomainAccessEvents)"
+        );
+
+        expect(gateIndex).toBeGreaterThan(-1);
+        expect(routeIndex).toBeGreaterThan(-1);
+        // The route must be declared AFTER the gate so it inherits the session-auth check.
+        expect(routeIndex).toBeGreaterThan(gateIndex);
+    });
 });

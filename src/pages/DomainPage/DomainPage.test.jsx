@@ -47,6 +47,15 @@ vi.mock('../../redux/reducers/domains', () => ({
     }),
 }));
 
+// Mock the access-events action (thunk); its dispatch is a no-op action in these tests
+const { mockFetchAccessEvents } = vi.hoisted(() => ({
+    mockFetchAccessEvents: vi.fn(() => ({ type: 'MOCK_FETCH_ACCESS_EVENTS' })),
+}));
+
+vi.mock('../../redux/reducers/accessEvents', () => ({
+    fetchAccessEvents: mockFetchAccessEvents,
+}));
+
 const createTestStore = (overrides = {}) => {
     const baseState = {
         ui: {
@@ -92,6 +101,9 @@ const createTestStore = (overrides = {}) => {
             isLoading: null,
             message: null,
         },
+        accessEvents: {
+            byUuid: {},
+        },
     };
 
     // Create reducers that handle domain actions
@@ -129,6 +141,7 @@ const createTestStore = (overrides = {}) => {
         },
         contacts: (state = { ...baseState.contacts, ...overrides.contacts }) => state,
         companies: (state = { ...baseState.companies, ...overrides.companies }) => state,
+        accessEvents: (state = { ...baseState.accessEvents, ...overrides.accessEvents }) => state,
     };
 
     return configureStore({
@@ -288,5 +301,194 @@ describe('DomainPage', () => {
         expect(container.textContent).toContain('test@tech.ee');
         expect(container.textContent).toContain('Admin');
         expect(container.textContent).toContain('test@admin.ee');
+    });
+
+    describe('access-events panel', () => {
+        const sampleEvents = [
+            {
+                accessed_at: '2026-07-10T12:00:00+03:00',
+                organization: 'Politsei- ja Piirivalveamet',
+                category: 'police',
+            },
+            {
+                accessed_at: '2026-07-09T09:30:00+03:00',
+                organization: null,
+                category: 'cert',
+            },
+        ];
+
+        it('renders exactly the three returned fields and no withheld data', () => {
+            const eventsStore = createTestStore({
+                accessEvents: {
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: sampleEvents,
+                            isLoading: false,
+                            error: false,
+                        },
+                    },
+                },
+            });
+
+            const { container } = render(
+                <Providers store={eventsStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            // panel title (et translation) + the three fields, one row per event
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).toContain('Politsei- ja Piirivalveamet');
+            expect(container.querySelectorAll('[data-test="access-events-row"]')).toHaveLength(2);
+
+            // withheld fields must never appear in the DOM
+            const withheld = [
+                'accessor_name',
+                'grant_ref',
+                'request_id',
+                'caller_ip',
+                'result_code',
+            ];
+            withheld.forEach((field) => {
+                expect(container.textContent).not.toContain(field);
+            });
+        });
+
+        it('is hidden — and never fetched — for a viewer who is not the direct registrant', () => {
+            // The registry scopes events to the caller's own ident-matched registrant contact, so a
+            // tech/admin contact or a company representative would get an empty list. Rendering the
+            // panel for them would state "no authority has accessed this domain's data", which we
+            // cannot actually know. It must not appear at all.
+            const otherPersonStore = createTestStore({
+                contacts: {
+                    data: {
+                        ...Object.fromEntries(contacts.map((contact) => [contact.id, contact])),
+                        [mockDomain.registrant.id]: {
+                            ...contacts.find((c) => c.id === mockDomain.registrant.id),
+                            ident: { code: '00000000000', type: 'priv', country_code: 'EE' },
+                        },
+                    },
+                    message: null,
+                },
+            });
+
+            const { container } = render(
+                <Providers store={otherPersonStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            expect(container.textContent).not.toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).not.toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+            // no panel means no request either — the endpoint is never called on their behalf
+            expect(mockFetchAccessEvents).not.toHaveBeenCalled();
+        });
+
+        it('renders the empty-state message ONLY on a successful empty array', () => {
+            const emptyStore = createTestStore({
+                accessEvents: {
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: [],
+                            isLoading: false,
+                            error: false,
+                        },
+                    },
+                },
+            });
+
+            const { container } = render(
+                <Providers store={emptyStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
+
+        it('shows a loading indicator (not the empty message) while the fetch is in flight', () => {
+            const loadingStore = createTestStore({
+                accessEvents: {
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: undefined,
+                            isLoading: true,
+                            error: false,
+                        },
+                    },
+                },
+            });
+
+            const { container } = render(
+                <Providers store={loadingStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            // panel is present, a loading indicator shows...
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(
+                container.querySelector('[data-test="access-events-loading"]')
+            ).toBeInTheDocument();
+            // ...and it must NOT falsely claim nobody accessed the data.
+            expect(container.textContent).not.toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
+
+        it('shows an error/retry affordance (not the empty message) on fetch failure', () => {
+            const errorStore = createTestStore({
+                accessEvents: {
+                    byUuid: {
+                        [mockDomain.id]: {
+                            events: undefined,
+                            isLoading: false,
+                            error: true,
+                        },
+                    },
+                },
+            });
+
+            const { container } = render(
+                <Providers store={errorStore}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            // panel + error text + retry button...
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(
+                container.querySelector('[data-test="access-events-error"]')
+            ).toBeInTheDocument();
+            expect(
+                container.querySelector('[data-test="access-events-retry"]')
+            ).toBeInTheDocument();
+            expect(container.textContent).toContain(
+                'Vaatamiste ajalugu ei õnnestunud laadida. Palun proovi uuesti.'
+            );
+            // ...and the empty message must NOT appear on a failed load.
+            expect(container.textContent).not.toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
+
+        it('does not show the empty message before any fetch record exists (undefined)', () => {
+            // No byUuid record for this domain at all -> neither empty nor error/loading text.
+            const { container } = render(
+                <Providers store={store}>
+                    <DomainPage />
+                </Providers>
+            );
+
+            expect(container.textContent).toContain('Kes on minu andmeid vaadanud');
+            expect(container.textContent).not.toContain(
+                'Ükski asutus ei ole selle domeeni andmeid vaadanud.'
+            );
+        });
     });
 });

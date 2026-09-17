@@ -2,6 +2,7 @@ export { default as ScrollToTop } from './ScrollToTop/ScrollToTop';
 export { default as MainLayout } from './common/MainLayout/MainLayout';
 export { default as Loading } from './common/Loading/Loading';
 export { default as DomainList } from './DomainList/DomainList';
+export { default as DomainAccessEvents } from './DomainAccessEvents/DomainAccessEvents';
 export { default as UserData } from './UserData/UserData';
 export { default as WhoIsEdit } from './WhoIsEdit/WhoIsEdit';
 export { default as MessageModule } from './modules/MessageModule/MessageModule';

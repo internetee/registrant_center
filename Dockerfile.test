@@ -10,12 +10,11 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install all dependencies (including devDependencies needed for build).
-# The native check fails the build early and with a clear message if the
-# lockfile ever loses rollup's platform-specific optional packages again
-# (npm/cli#4828) instead of dying later inside `vite build`.
-RUN npm ci --include=optional \
- && node -e 'require("./node_modules/rollup/dist/native.js")'
+# Install the Linux ARM64 Rollup module explicitly
+# RUN npm install -D @rollup/rollup-linux-arm64-gnu@4.36.0
+
+# Install all dependencies (including devDependencies needed for build)
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .

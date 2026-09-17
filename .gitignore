@@ -46,3 +46,6 @@ lerna-debug.log*
 .prettierignore
 
 Dockerfile.dev
+
+.playwright-cli/
+

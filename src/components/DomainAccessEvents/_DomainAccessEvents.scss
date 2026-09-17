@@ -1,0 +1,9 @@
+@use "../../global-scss/all" as *;
+
+.domain-access-events {
+  &--loading {
+    // Semantic's inline loader has no intrinsic height; without this the block collapses to the
+    // header while the fetch is in flight and the page visibly jumps once the table arrives.
+    padding: 40px 0;
+  }
+}

@@ -8,8 +8,8 @@ import PropTypes from 'prop-types';
 const sanitizer = dompurify.sanitize;
 
 const MainFooter = ({ ui }) => {
-    const { lang, menus: { footer = [] } = [] } = ui;
-    const menu = footer.reduce((acc, item) => {
+    const { lang, menus: { footer } = {} } = ui;
+    const menu = (footer ?? []).reduce((acc, item) => {
         if (item.language.code === lang) {
             const body = item.text.body.split('href="/').join('href="https://www.internet.ee/');
             return [

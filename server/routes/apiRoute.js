@@ -159,6 +159,18 @@ export default {
         );
     },
 
+    getDomainAccessEvents: async ({ params, session }, res) => {
+        // Forwards the registrant's existing SESSION Bearer (via the API(session) factory) to the
+        // registry's per-domain access-events endpoint. Attaches NO client-supplied registrant id —
+        // ownership is re-derived independently by the registry (defence in depth). handleResponse is
+        // reused unchanged; it does NOT log the success body, and no token is logged here (N2).
+        const { uuid } = params;
+        return handleResponse(
+            () => API(session).get(`/api/v1/registrant/domains/${uuid}/access_events`),
+            res
+        );
+    },
+
     getMenu: async (req, res) => {
         const { type } = req.params;
         try {
