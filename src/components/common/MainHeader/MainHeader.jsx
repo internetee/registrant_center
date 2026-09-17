@@ -106,8 +106,8 @@ const Logo = () => {
     );
 };
 
-const PortalMenu = ({ items = [], lang }) => {
-    const menu = items
+const PortalMenu = ({ items, lang }) => {
+    const menu = (items ?? [])
         .filter((item) => {
             const includedItems = [2133844, 2223713, 2142515];
             return (
