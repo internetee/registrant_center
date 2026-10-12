@@ -6,6 +6,7 @@ import Providers from '../../__mocks__/Providers';
 import domains from '../../__mocks__/domains';
 import contacts from '../../__mocks__/contacts';
 import user from '../../__mocks__/user';
+import { updateContact } from '../../redux/reducers/contacts';
 
 // Create modified domain with tech contact same as registrant
 const testDomain = {
@@ -21,6 +22,12 @@ const testDomain = {
 vi.mock('react-router-dom', () => ({
     useParams: () => ({ id: testDomain.id }),
     useNavigate: vi.fn(),
+}));
+
+vi.mock('../../redux/reducers/contacts', () => ({
+    fetchUpdateContacts: vi.fn(() => () => Promise.resolve()),
+    updateContactsConfirm: vi.fn(() => () => Promise.resolve()),
+    updateContact: vi.fn(() => () => Promise.resolve()),
 }));
 
 const createTestStore = (overrides = {}) => {
@@ -95,6 +102,7 @@ describe('DomainEditPage', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
+        vi.unstubAllEnvs();
     });
 
     it('renders correctly', () => {
@@ -401,5 +409,62 @@ describe('DomainEditPage', () => {
             expect(container.querySelector('.page--domain-edit')).toBeInTheDocument();
             expect(container.textContent).toContain(orgDomain.name);
         });
+    });
+
+    it('saves withdrawn disclosure consent and keeps system-disclosed attributes', async () => {
+        vi.stubEnv('VITE_DISCLOSURE_POLICY_ACTIVE_FROM', '2000-01-01T00:00:00Z');
+
+        const registrantId = testDomain.registrant.id;
+        const disclosedContact = {
+            ...contacts.find((c) => c.id === registrantId),
+            disclosed_attributes: ['email', 'phone'],
+            system_disclosed_attributes: ['name'],
+            registrant_publishable: false,
+        };
+        const disclosureStore = createTestStore({
+            contacts: {
+                data: {
+                    ...Object.fromEntries(contacts.map((c) => [c.id, c])),
+                    [registrantId]: disclosedContact,
+                },
+            },
+        });
+
+        const { container, getByTestId } = render(
+            <Providers store={disclosureStore}>
+                <DomainEditPage />
+            </Providers>
+        );
+
+        let emailCheckbox;
+        await waitFor(() => {
+            emailCheckbox = container.querySelector(`#email-${registrantId}`);
+            expect(emailCheckbox).toBeChecked();
+        });
+
+        // Withdraw consent for the previously disclosed email attribute
+        fireEvent.click(emailCheckbox);
+
+        const updateButton = container.querySelector('button[type="submit"]');
+        await waitFor(() => {
+            expect(updateButton).not.toBeDisabled();
+        });
+        fireEvent.click(updateButton);
+
+        await waitFor(() => {
+            expect(getByTestId('confirmation-modal')).toBeInTheDocument();
+        });
+        fireEvent.click(
+            getByTestId('confirmation-modal').querySelector('[data-test="change-contacts"]')
+        );
+
+        await waitFor(() => {
+            expect(updateContact).toHaveBeenCalled();
+        });
+        const [contactId, payload] = updateContact.mock.calls[0];
+        expect(contactId).toBe(registrantId);
+        expect(payload.disclosed_attributes).not.toContain('email');
+        expect(payload.disclosed_attributes).toContain('phone');
+        expect(payload.disclosed_attributes).toContain('name');
     });
 });

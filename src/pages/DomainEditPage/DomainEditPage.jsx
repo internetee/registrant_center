@@ -116,19 +116,14 @@ const DomainEditPage = ({
                 const registrant = stageData[domain.registrant.id];
                 const originalContact = contacts[contact.id];
 
-                const newDisclosedAttributes = new Set(originalContact.disclosed_attributes);
-
-                contact.disclosed_attributes.forEach(attr => {
-                    if (!contact.system_disclosed_attributes || !contact.system_disclosed_attributes.includes(attr)) {
-                        newDisclosedAttributes.add(attr);
-                    }
-                });
-
-                if (contact.system_disclosed_attributes) {
-                    contact.system_disclosed_attributes.forEach(attr => {
-                        newDisclosedAttributes.add(attr);
-                    });
-                }
+                const managed = ['name', 'email', 'phone'];
+                const newDisclosedAttributes = new Set([
+                    ...(originalContact.disclosed_attributes || []).filter(
+                        (attr) => !managed.includes(attr)
+                    ),
+                    ...contact.disclosed_attributes,
+                    ...(contact.system_disclosed_attributes || []),
+                ]);
 
                 if (registrant && registrant.ident.type === 'org') {
                     return updateContact(contact.id, {
