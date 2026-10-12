@@ -15,6 +15,7 @@ import {
     Loading,
 } from '../../components';
 import Helpers from '../../utils/helpers';
+import { isDisclosurePolicyActive } from '../../utils/disclosurePolicy';
 import { fetchDomain as fetchDomainAction } from '../../redux/reducers/domains';
 import { fetchCompanies as fetchCompaniesAction } from '../../redux/reducers/companies';
 import { updateContact as updateContactAction } from '../../redux/reducers/contacts';
@@ -109,13 +110,14 @@ const DomainEditPage = ({
             setIsSaving(isSaving);
         }
         setIsSubmitConfirmModalOpen(false);
+        const disclosurePolicyActive = isDisclosurePolicyActive();
         await Promise.all(
             Object.values(stageData).map((contact) => {
                 const registrant = stageData[domain.registrant.id];
                 const originalContact = contacts[contact.id];
-                
+
                 const newDisclosedAttributes = new Set(originalContact.disclosed_attributes);
-                
+
                 contact.disclosed_attributes.forEach(attr => {
                     if (!contact.system_disclosed_attributes || !contact.system_disclosed_attributes.includes(attr)) {
                         newDisclosedAttributes.add(attr);
@@ -133,7 +135,10 @@ const DomainEditPage = ({
                         email: contact.email,
                         phone: contact.phone,
                         disclosed_attributes: [...newDisclosedAttributes],
-                        system_disclosed_attributes: contact.system_disclosed_attributes || []
+                        system_disclosed_attributes: contact.system_disclosed_attributes || [],
+                        ...(disclosurePolicyActive && {
+                            registrant_publishable: contact.registrant_publishable,
+                        }),
                     });
                 }
                 if (contact.ident.code === user.ident) {
@@ -150,7 +155,10 @@ const DomainEditPage = ({
                         email: contact.email,
                         phone: contact.phone,
                         disclosed_attributes: [...newDisclosedAttributes],
-                        system_disclosed_attributes: contact.system_disclosed_attributes || []
+                        system_disclosed_attributes: contact.system_disclosed_attributes || [],
+                        ...(disclosurePolicyActive && {
+                            registrant_publishable: contact.registrant_publishable,
+                        }),
                     });
                 }
                 return updateContact(contact.id, {

@@ -2,9 +2,11 @@ import { Fragment, forwardRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Form, Checkbox, Popup, Icon } from 'semantic-ui-react';
 import Roles from '../Roles/Roles';
+import { isDisclosurePolicyActive } from '../../utils/disclosurePolicy';
 
 function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
     const contactsList = Object.values(contacts);
+    const disclosurePolicyActive = isDisclosurePolicyActive();
 
     const isCompany =
         contactsList.find(({ ident }) => ident.type === 'org' || domain.registrant.org) != null;
@@ -14,7 +16,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
             checkedCount:
                 acc.checkedCount +
                 (() => {
-                    if (ident.type === 'org') {
+                    if (!disclosurePolicyActive && ident.type === 'org') {
                         return 2;
                     }
                     return (
@@ -49,7 +51,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                 };
             }
 
-            if (domain.registrant.org) {
+            if (!disclosurePolicyActive && domain.registrant.org) {
                 attributes.add('name');
                 attributes.add('email');
             }
@@ -116,7 +118,7 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
 
     return (
         <>
-            {checkAll && !isCompany && (
+            {checkAll && (disclosurePolicyActive || !isCompany) && (
                 <Form.Field>
                     <Checkbox
                         checked={isCheckedAll}
@@ -156,17 +158,38 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         </div>
                         <Form.Field>
                             <Checkbox
-                                checked={Boolean(
-                                    domain.registrant.org ||
-                                        item.ident.type === 'org' ||
-                                        item.disclosed_attributes.has('name')
-                                )}
-                                disabled={Boolean(
-                                    item.ident.type === 'org' ||
-                                        domain.registrant.org ||
-                                        (item.system_disclosed_attributes &&
-                                            item.system_disclosed_attributes.includes('name'))
-                                )}
+                                checked={
+                                    disclosurePolicyActive
+                                        ? Boolean(
+                                              item.disclosed_attributes.has('name') ||
+                                                  (item.system_disclosed_attributes &&
+                                                      item.system_disclosed_attributes.includes(
+                                                          'name'
+                                                      ))
+                                          )
+                                        : Boolean(
+                                              domain.registrant.org ||
+                                                  item.ident.type === 'org' ||
+                                                  item.disclosed_attributes.has('name')
+                                          )
+                                }
+                                disabled={
+                                    disclosurePolicyActive
+                                        ? Boolean(
+                                              item.system_disclosed_attributes &&
+                                                  item.system_disclosed_attributes.includes(
+                                                      'name'
+                                                  )
+                                          )
+                                        : Boolean(
+                                              item.ident.type === 'org' ||
+                                                  domain.registrant.org ||
+                                                  (item.system_disclosed_attributes &&
+                                                      item.system_disclosed_attributes.includes(
+                                                          'name'
+                                                      ))
+                                          )
+                                }
                                 id={`name-${item.id}`}
                                 label={
                                     <label htmlFor={`name-${item.id}`}>
@@ -187,17 +210,38 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                         </Form.Field>
                         <Form.Field>
                             <Checkbox
-                                checked={Boolean(
-                                    domain.registrant.org ||
-                                        item.ident.type === 'org' ||
-                                        item.disclosed_attributes.has('email')
-                                )}
-                                disabled={Boolean(
-                                    item.ident.type === 'org' ||
-                                        domain.registrant.org ||
-                                        (item.system_disclosed_attributes &&
-                                            item.system_disclosed_attributes.includes('email'))
-                                )}
+                                checked={
+                                    disclosurePolicyActive
+                                        ? Boolean(
+                                              item.disclosed_attributes.has('email') ||
+                                                  (item.system_disclosed_attributes &&
+                                                      item.system_disclosed_attributes.includes(
+                                                          'email'
+                                                      ))
+                                          )
+                                        : Boolean(
+                                              domain.registrant.org ||
+                                                  item.ident.type === 'org' ||
+                                                  item.disclosed_attributes.has('email')
+                                          )
+                                }
+                                disabled={
+                                    disclosurePolicyActive
+                                        ? Boolean(
+                                              item.system_disclosed_attributes &&
+                                                  item.system_disclosed_attributes.includes(
+                                                      'email'
+                                                  )
+                                          )
+                                        : Boolean(
+                                              item.ident.type === 'org' ||
+                                                  domain.registrant.org ||
+                                                  (item.system_disclosed_attributes &&
+                                                      item.system_disclosed_attributes.includes(
+                                                          'email'
+                                                      ))
+                                          )
+                                }
                                 id={`email-${item.id}`}
                                 label={
                                     <label htmlFor={`email-${item.id}`}>
@@ -259,6 +303,15 @@ function WhoIsEdit({ contacts, isOpen, checkAll, onChange, domain }) {
                                 label={
                                     <label htmlFor={`publishable-${item.id}`}>
                                         <FormattedMessage id="whois.edit.registrant_publishable" />
+                                        {disclosurePolicyActive && (
+                                            <Popup
+                                                basic
+                                                inverted
+                                                trigger={<Icon name="question circle" />}
+                                            >
+                                                <FormattedMessage id="whois.edit.publishableNote" />
+                                            </Popup>
+                                        )}
                                     </label>
                                 }
                                 name="registrant_publishable"

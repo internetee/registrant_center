@@ -251,6 +251,7 @@
   "whois.edit.email": "E-mail public ({contactEmail})",
   "whois.edit.name": "Name public ({contactName})",
   "whois.edit.registrant_publishable": "Yes, I allow my data to be available without captcha check",
+  "whois.edit.publishableNote": "The selected data becomes public only when this switch is turned on together with the attribute.",
   "whois.none.message.title": "You currently don't own any domain",
   "whois.page_title": "WHOIS Privacy Settings | .ee registrant portal",
   "whois.publicInfo": "Info public",
