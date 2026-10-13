@@ -16,6 +16,11 @@ export default defineConfig({
                 changeOrigin: true,
                 secure: false,
             },
+            '/runtime-config.js': {
+                target: `https://localhost:${env.VITE_SERVER_PORT || 1234}`,
+                changeOrigin: true,
+                secure: false,
+            },
         },
     },
     esbuild: {

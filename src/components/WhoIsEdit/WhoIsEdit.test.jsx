@@ -280,11 +280,11 @@ describe('WhoIsEdit Component', () => {
         });
 
         beforeEach(() => {
-            vi.stubEnv('VITE_DISCLOSURE_POLICY_ACTIVE_FROM', '2000-01-01T00:00:00Z');
+            window.__RUNTIME_CONFIG__ = { disclosurePolicyActiveFrom: '2000-01-01T00:00:00Z' };
         });
 
         afterEach(() => {
-            vi.unstubAllEnvs();
+            delete window.__RUNTIME_CONFIG__;
         });
 
         it('should enable name and email checkboxes for org contacts', () => {
@@ -387,11 +387,11 @@ describe('WhoIsEdit Component', () => {
         };
 
         beforeEach(() => {
-            vi.stubEnv('VITE_DISCLOSURE_POLICY_ACTIVE_FROM', '');
+            window.__RUNTIME_CONFIG__ = { disclosurePolicyActiveFrom: '' };
         });
 
         afterEach(() => {
-            vi.unstubAllEnvs();
+            delete window.__RUNTIME_CONFIG__;
         });
 
         it('should auto-add name and email on change for org registrant domains', () => {

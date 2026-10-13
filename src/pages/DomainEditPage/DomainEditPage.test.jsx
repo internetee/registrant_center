@@ -102,7 +102,7 @@ describe('DomainEditPage', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
-        vi.unstubAllEnvs();
+        delete window.__RUNTIME_CONFIG__;
     });
 
     it('renders correctly', () => {
@@ -412,7 +412,7 @@ describe('DomainEditPage', () => {
     });
 
     it('saves withdrawn disclosure consent and keeps system-disclosed attributes', async () => {
-        vi.stubEnv('VITE_DISCLOSURE_POLICY_ACTIVE_FROM', '2000-01-01T00:00:00Z');
+        window.__RUNTIME_CONFIG__ = { disclosurePolicyActiveFrom: '2000-01-01T00:00:00Z' };
 
         const registrantId = testDomain.registrant.id;
         const disclosedContact = {

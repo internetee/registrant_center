@@ -22,6 +22,10 @@ import compression from 'compression';
 import session from 'cookie-session';
 import API from './routes/apiRoute.js';
 import https from 'https';
+import {
+    parseDisclosurePolicyActiveFrom,
+    runtimeConfigHandler,
+} from './utils/runtimeConfig.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,6 +47,7 @@ const {
     AUTH_PATH,
     CLIENT_ID,
     CLIENT_SECRET,
+    DISCLOSURE_POLICY_ACTIVE_FROM,
     HOST,
     ISSUER_URL,
     JWKS_PATH,
@@ -54,6 +59,21 @@ const {
     VITE_SCOPE,
     RESPONSE_TYPE,
 } = process.env;
+
+// Runtime config is served to the browser via /runtime-config.js so a single
+// build can pick up per-environment values; a malformed value stops the boot
+let runtimeConfig;
+try {
+    runtimeConfig = {
+        disclosurePolicyActiveFrom: parseDisclosurePolicyActiveFrom(
+            DISCLOSURE_POLICY_ACTIVE_FROM
+        ),
+    };
+    console.log('✅ Runtime config loaded successfully');
+} catch (error) {
+    console.error('❌ Failed to load runtime config:', error.message);
+    process.exit(1);
+}
 
 let publicKey = '';
 
@@ -84,6 +104,9 @@ app.use(expressWinston.errorLogger(consoleLog));
 
 // compression
 app.use(compression()); // GZip compress responses
+
+// runtime config must be served before the static bundle in every NODE_ENV
+app.get('/runtime-config.js', runtimeConfigHandler(runtimeConfig));
 
 // static files
 if (NODE_ENV !== 'development') {
