@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
 import WhoIsEdit from './WhoIsEdit';
 import mockUser from '../../__mocks__/user';
@@ -248,6 +248,180 @@ describe('WhoIsEdit Component', () => {
             const { container } = renderWhoIsEdit({ isOpen: false });
             const advancedGroup = container.querySelector('.adv-field-group');
             expect(advancedGroup).not.toHaveClass('u-visible');
+        });
+    });
+
+    describe('Disclosure Policy Active', () => {
+        const orgDomain = {
+            ...defaultProps.domain,
+            registrant: {
+                ...defaultProps.domain.registrant,
+                org: 'true',
+            },
+        };
+
+        const buildOrgContacts = (overrides = {}) => ({
+            'org-contact-id': {
+                id: 'org-contact-id',
+                code: 'TEST:ORG',
+                name: 'Test Org',
+                ident: { code: '12345678', type: 'org', country_code: 'EE' },
+                email: 'test@org.ee',
+                phone: '+372.7654321',
+                roles: new Set(['registrant']),
+                disclosed_attributes: new Set(),
+                system_disclosed_attributes: [],
+                registrant_publishable: false,
+                initialName: 'Test Org',
+                initialEmail: 'test@org.ee',
+                initialPhone: '+372.7654321',
+                ...overrides,
+            },
+        });
+
+        beforeEach(() => {
+            window.__RUNTIME_CONFIG__ = { disclosurePolicyActiveFrom: '2000-01-01T00:00:00Z' };
+        });
+
+        afterEach(() => {
+            delete window.__RUNTIME_CONFIG__;
+        });
+
+        it('should enable name and email checkboxes for org contacts', () => {
+            const { container } = renderWhoIsEdit({
+                domain: orgDomain,
+                contacts: buildOrgContacts(),
+            });
+
+            const nameCheckbox = container.querySelector('input[name="name"]');
+            const emailCheckbox = container.querySelector('input[name="email"]');
+
+            expect(nameCheckbox).not.toBeDisabled();
+            expect(emailCheckbox).not.toBeDisabled();
+        });
+
+        it('should check name and email only by the contact own disclosed_attributes', () => {
+            const { container } = renderWhoIsEdit({
+                domain: orgDomain,
+                contacts: buildOrgContacts({ disclosed_attributes: new Set(['name']) }),
+            });
+
+            const nameCheckbox = container.querySelector('input[name="name"]');
+            const emailCheckbox = container.querySelector('input[name="email"]');
+
+            expect(nameCheckbox).toBeChecked();
+            expect(emailCheckbox).not.toBeChecked();
+        });
+
+        it('should disable an attribute only when it is system disclosed', () => {
+            const { container } = renderWhoIsEdit({
+                domain: orgDomain,
+                contacts: buildOrgContacts({ system_disclosed_attributes: ['email'] }),
+            });
+
+            const nameCheckbox = container.querySelector('input[name="name"]');
+            const emailCheckbox = container.querySelector('input[name="email"]');
+
+            expect(nameCheckbox).not.toBeDisabled();
+            expect(emailCheckbox).toBeDisabled();
+            expect(emailCheckbox).toBeChecked();
+        });
+
+        it('should show the check all control for org contacts', () => {
+            const { container } = renderWhoIsEdit({
+                checkAll: true,
+                domain: orgDomain,
+                contacts: buildOrgContacts(),
+            });
+
+            const checkAllBox = container.querySelector('.checkbox.large');
+            expect(checkAllBox).toBeInTheDocument();
+        });
+
+        it('should not auto-add name and email on change', () => {
+            const onChange = vi.fn();
+            const { container } = renderWhoIsEdit({
+                domain: orgDomain,
+                contacts: buildOrgContacts(),
+                onChange,
+            });
+
+            const publishableCheckbox = container.querySelector(
+                'input[name="registrant_publishable"]'
+            );
+            fireEvent.click(publishableCheckbox);
+
+            expect(onChange).toHaveBeenCalled();
+            const payload = onChange.mock.calls[0][0]['org-contact-id'];
+            expect(payload.registrant_publishable).toBe(true);
+            expect([...payload.disclosed_attributes]).not.toContain('name');
+            expect([...payload.disclosed_attributes]).not.toContain('email');
+        });
+    });
+
+    describe('Disclosure Policy Inactive', () => {
+        const orgDomain = {
+            ...defaultProps.domain,
+            registrant: {
+                ...defaultProps.domain.registrant,
+                org: 'true',
+            },
+        };
+
+        const orgContacts = {
+            'org-contact-id': {
+                id: 'org-contact-id',
+                code: 'TEST:ORG',
+                name: 'Test Org',
+                ident: { code: '12345678', type: 'org', country_code: 'EE' },
+                email: 'test@org.ee',
+                phone: '+372.7654321',
+                roles: new Set(['registrant']),
+                disclosed_attributes: new Set(),
+                system_disclosed_attributes: [],
+                registrant_publishable: false,
+                initialName: 'Test Org',
+                initialEmail: 'test@org.ee',
+                initialPhone: '+372.7654321',
+            },
+        };
+
+        beforeEach(() => {
+            window.__RUNTIME_CONFIG__ = { disclosurePolicyActiveFrom: '' };
+        });
+
+        afterEach(() => {
+            delete window.__RUNTIME_CONFIG__;
+        });
+
+        it('should auto-add name and email on change for org registrant domains', () => {
+            const onChange = vi.fn();
+            const { container } = renderWhoIsEdit({
+                domain: orgDomain,
+                contacts: orgContacts,
+                onChange,
+            });
+
+            const publishableCheckbox = container.querySelector(
+                'input[name="registrant_publishable"]'
+            );
+            fireEvent.click(publishableCheckbox);
+
+            expect(onChange).toHaveBeenCalled();
+            const payload = onChange.mock.calls[0][0]['org-contact-id'];
+            expect([...payload.disclosed_attributes]).toContain('name');
+            expect([...payload.disclosed_attributes]).toContain('email');
+        });
+
+        it('should not show the check all control for org contacts', () => {
+            const { container } = renderWhoIsEdit({
+                checkAll: true,
+                domain: orgDomain,
+                contacts: orgContacts,
+            });
+
+            const checkAllBox = container.querySelector('.checkbox.large');
+            expect(checkAllBox).not.toBeInTheDocument();
         });
     });
 });

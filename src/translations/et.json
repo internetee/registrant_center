@@ -251,6 +251,7 @@
   "whois.edit.email": "E-mail avalik ({contactEmail})",
   "whois.edit.name": "Nimi avalik ({contactName})",
   "whois.edit.registrant_publishable": "Jah, ma luban oma andmed ilma captcha kontrollita kättesaadavaks teha",
+  "whois.edit.publishableNote": "Valitud andmed muutuvad avalikuks ainult siis, kui see lüliti on koos atribuudiga sisse lülitatud.",
   "whois.none.message.title": "Teile ei kuulu hetkel ühtegi domeeni",
   "whois.page_title": "WHOIS Privaatsusseaded | EIS Registreerijaportaal",
   "whois.publicInfo": "Info avalik",

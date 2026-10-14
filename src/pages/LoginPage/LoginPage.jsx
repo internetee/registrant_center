@@ -7,13 +7,17 @@ import { MainLayout, MessageModule } from '../../components';
 const { VITE_SERVER_PORT, VITE_URL } = import.meta.env;
 
 const getAuthUrl = (lang) => {
-    if (!VITE_URL || (process.env.NODE_ENV === 'development' && !VITE_SERVER_PORT)) {
+    // In production the Express server that serves this bundle also handles
+    // /connect/openid, so the page origin is the auth origin. VITE_* values
+    // are inlined at build time and the image build has none, so they are
+    // only needed for the separate dev server.
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    if (isDevelopment && (!VITE_URL || !VITE_SERVER_PORT)) {
         console.error('Missing required environment variables for auth URL');
         return null;
     }
 
-    const baseUrl =
-        process.env.NODE_ENV === 'development' ? `${VITE_URL}:${VITE_SERVER_PORT}` : VITE_URL;
+    const baseUrl = isDevelopment ? `${VITE_URL}:${VITE_SERVER_PORT}` : window.location.origin;
 
     try {
         // Ensure URL is properly encoded
