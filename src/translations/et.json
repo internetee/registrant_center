@@ -271,5 +271,7 @@
   "confirmation.change_default_alt": "Oleme saanud taotluse domeeni omanikuvahetuse jaoks. Kui kõik tundub õige, palun kinnitage taotlus.",
   "confirmation.delete_confirmed_alt": "Aitäh! Kustutustaotlus on edukalt heaks kiidetud. Andmed on juba registrisse teel.",
   "confirmation.delete_rejected_alt": "Aitäh! Kustutustaotlus on edukalt tagasi lükatud. Andmed on juba registrisse teel.",
+  "confirmation.login_failed": "Autentimine ebaõnnestus või katkestati. Palun proovige uuesti.",
+  "confirmation.login_retry": "Proovi eeID kaudu uuesti",
   "confirmation.delete_default_alt": "Oleme saanud taotluse domeeni kustutamise jaoks. Kui kõik tundub õige, palun kinnitage taotlus."
 }

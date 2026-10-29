@@ -20,6 +20,7 @@ import callbackPage from './routes/callbackPageRoute.js';
 import { appLog, consoleLog, logError } from './utils/logger.js';
 import compression from 'compression';
 import session from 'cookie-session';
+import { startConfirmationLogin } from './routes/confirmationLogin.js';
 import API from './routes/apiRoute.js';
 import https from 'https';
 
@@ -85,6 +86,12 @@ app.use(expressWinston.errorLogger(consoleLog));
 // compression
 app.use(compression()); // GZip compress responses
 
+app.use((req, res, next) => {
+    if (req.path.startsWith('/confirmation/') || req.path.startsWith('/api/confirms/')) {
+        res.set('Referrer-Policy', 'no-referrer');
+    }
+    next();
+});
 // static files
 if (NODE_ENV !== 'development') {
     app.use(express.static(path.join(__dirname, '../dist')));
@@ -170,6 +177,7 @@ app.use(helmet());
 // api
 app.get('/api/menu/:type', API.getMenu);
 app.get('/api/user', API.getUser);
+app.post('/api/confirmation-login', startConfirmationLogin);
 app.post('/api/destroy', API.destroyUser);
 app.get('/api/confirms/:name/:type/:token', API.getRegistrantUpdate);
 app.post('/api/confirms/:name/:type/:token/:action', API.sendVerificationStatus);

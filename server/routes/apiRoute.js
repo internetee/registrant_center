@@ -199,26 +199,53 @@ export default {
         }
     },
 
-    getRegistrantUpdate: async (req, res, session) => {
-        const name = req.params.name.toString();
-        const token = req.params.token.toString();
-        const type = req.params.type.toString();
+    getRegistrantUpdate: async (req, res) => {
+        const { session } = req;
+        const { name, type, token } = req.params;
+        if (typeof session.confirmationLoginFailed === 'string' &&
+            decodeURIComponent(session.confirmationLoginFailed) === `/confirmation/${name}/${type}/${token}`) {
+            delete session.confirmationLoginFailed;
+            return res.status(401).json({ confirmation_login_failed: true });
+        }
+        if (session.token && !isSessionValid(req)) {
+            delete session.token;
+            delete session.user;
+        }
+        if (session.user && !session.token) {
+            try {
+                const response = await API(session).post('/api/v1/registrant/auth/eid', session.user);
+                session.token = response.data;
+            } catch (e) {
+                logWarn('Failed to exchange eeID identity for a registry token');
+            }
+        }
         try {
             const response = await API(session).get(
                 `/api/v1/registrant/confirms/${name}/${type}/${token}`,
                 {}
             );
+            delete session.confirmationLoginAttempted;
             return res.status(response.status).json(response.data);
         } catch (e) {
             if (e.response) {
-                return res.status(e.response.status).json({});
+                const data = e.response.data || {};
+                if (e.response.status === 401 && data.errors?.some((error) => error.base?.includes('Not authorized'))) {
+                    delete session.token;
+                    delete session.user;
+                    return res.status(401).json({ ...data, login_attempted: !!session.confirmationLoginAttempted });
+                }
+                return res.status(e.response.status).json(data);
             }
-            return res.status(401).json({});
+            return res.status(500).json({});
         }
     },
 
     getUser: async ({ session }, res) => {
         try {
+            if (session.token && new Date(session.token.expires_at).getTime() <= Date.now()) {
+                delete session.token;
+                delete session.user;
+            }
             const userData = session.user;
             if (userData) {
                 if (!session.token) {
@@ -251,7 +278,12 @@ export default {
         }
     },
 
-    sendVerificationStatus: async (req, res, session) => {
+    sendVerificationStatus: async (req, res) => {
+        const { session } = req;
+        if (session.token && !isSessionValid(req)) {
+            delete session.token;
+            delete session.user;
+        }
         const name = req.params.name.toString();
         const token = req.params.token.toString();
         const action = req.params.action.toString();
@@ -264,9 +296,9 @@ export default {
             return res.status(response.status).json(response.data);
         } catch (e) {
             if (e.response) {
-                return res.status(e.response.status).json({});
+                return res.status(e.response.status).json(e.response.data || {});
             }
-            return res.status(401).json({});
+            return res.status(500).json({});
         }
     },
 

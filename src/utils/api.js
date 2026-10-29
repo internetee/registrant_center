@@ -34,6 +34,7 @@ export default {
         return instance.post('/api/destroy');
     },
 
+    startConfirmationLogin: (path) => instance.post('/api/confirmation-login', { path }),
     fetchVerification: (domain, token, type) => {
         return instance.get(`/api/confirms/${domain}/${type}/${token}`, {
             timeout: 4000,

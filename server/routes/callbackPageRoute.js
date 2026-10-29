@@ -88,7 +88,11 @@ export default async function callbackPageRoute(req, res, publicKey) {
                 if (err) {
                     throw new Error(err);
                 }
+                const authTime = Number.isFinite(verifiedJwt.auth_time)
+                    ? verifiedJwt.auth_time
+                    : verifiedJwt.iat;
                 const userData = {
+                    ...(Number.isFinite(authTime) && { authenticated_at: Math.floor(authTime) }),
                     country_code: get_user_country_code(verifiedJwt.sub),
                     first_name: capitalize.words(verifiedJwt.profile_attributes.given_name),
                     ident: get_user_ident(verifiedJwt.sub),
@@ -99,6 +103,14 @@ export default async function callbackPageRoute(req, res, publicKey) {
                 logInfo('User logged in successfully!');
 
                 req.session.user = userData;
+                delete req.session.confirmationLoginFailed;
+                delete req.session.token;
+                if (req.session.confirmationReturnPath) {
+                    const path = req.session.confirmationReturnPath;
+                    delete req.session.confirmationReturnPath;
+                    req.session.confirmationLoginAttempted = true;
+                    return res.redirect(NODE_ENV === 'development' ? `http://${HOST}:${PORT}${path}` : path);
+                }
                 if (NODE_ENV === 'development') {
                     res.redirect(`http://${HOST}:${PORT}`);
                 } else {
@@ -110,6 +122,12 @@ export default async function callbackPageRoute(req, res, publicKey) {
         logError('Authentication failed', e);
         if (process.env.NODE_ENV !== 'test') {
             console.warn(e);
+        }
+        if (req.session.confirmationReturnPath) {
+            const path = req.session.confirmationReturnPath;
+            delete req.session.confirmationReturnPath;
+            req.session.confirmationLoginFailed = path;
+            return res.redirect(NODE_ENV === 'development' ? `http://${HOST}:${PORT}${path}` : path);
         }
         if (NODE_ENV === 'development') {
             res.redirect(`http://${HOST}:${PORT}/login`);
