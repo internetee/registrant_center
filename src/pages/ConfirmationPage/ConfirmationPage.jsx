@@ -32,7 +32,10 @@ const ConfirmationPage = ({
         try {
             await api.startConfirmationLogin(window.location.pathname);
             const { VITE_URL, VITE_SERVER_PORT } = import.meta.env;
-            const baseUrl = process.env.NODE_ENV === 'development' ? `${VITE_URL}:${VITE_SERVER_PORT}` : VITE_URL;
+            // VITE_* are inlined at build time and the image build has none; in production
+            // the Express server serving this page also handles /connect/openid.
+            const baseUrl =
+                process.env.NODE_ENV === 'development' ? `${VITE_URL}:${VITE_SERVER_PORT}` : window.location.origin;
             const url = new URL(`/connect/openid/${encodeURIComponent(ui.lang)}`, baseUrl).toString();
             window.location.assign(url);
         } catch (error) {

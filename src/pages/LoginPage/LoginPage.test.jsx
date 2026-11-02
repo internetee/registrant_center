@@ -10,8 +10,6 @@ vi.mock('react-router-dom', () => ({
     useNavigate: vi.fn(),
 }));
 
-const { VITE_URL } = import.meta.env;
-
 const createTestStore = (overrides = {}) => {
     const baseState = {
         ui: {
@@ -75,11 +73,14 @@ describe('LoginPage', () => {
         expect(container.textContent).toContain('eIDAS');
     });
 
-    it('displays login button with correct form action', () => {
+    it('sends the login to /connect/openid on the page origin', () => {
         // Mock window.location.href setter
         const originalLocation = window.location;
         delete window.location;
-        window.location = { href: originalLocation.href };
+        window.location = {
+            href: originalLocation.href,
+            origin: 'https://registrant1-dev.cloud.tld.ee',
+        };
 
         const { container } = render(
             <Providers store={store}>
@@ -90,7 +91,7 @@ describe('LoginPage', () => {
         const form = container.querySelector('form');
         expect(form).toBeInTheDocument();
 
-        const expectedUrl = new URL('/connect/openid/et', VITE_URL).toString();
+        const expectedUrl = 'https://registrant1-dev.cloud.tld.ee/connect/openid/et';
 
         fireEvent.submit(form);
 
