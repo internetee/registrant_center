@@ -271,5 +271,7 @@
   "confirmation.change_default_alt": "We've received a request for domains's registrant change. If it seems fair, please approve it.",
   "confirmation.delete_confirmed_alt": "Thank you! Domain delete has been confirmed successfully. Data is already on it's way to registry.",
   "confirmation.delete_rejected_alt": "Thank you! Domain delete has been rejected successfully. Domain registrant is not going to change.",
+  "confirmation.login_failed": "Authentication failed or was cancelled. Please try again.",
+  "confirmation.login_retry": "Retry eeID login",
   "confirmation.delete_default_alt": "We've received a request to delete a domain. If it seems fair, please approve it."
 }

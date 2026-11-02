@@ -256,46 +256,135 @@ describe('server/routes/apiRoute', () => {
 
     it('getRegistrantUpdate returns data on success', async () => {
         const req = {
+            ...createSession(),
             params: { name: 'test.ee', token: 'token123', type: 'domain' },
         };
         const r = createRes();
         mockAxiosInstance.get.mockResolvedValue({ status: 200, data: { success: true } });
-        await API.getRegistrantUpdate(req, r, createSession());
+        await API.getRegistrantUpdate(req, r, vi.fn());
         expect(r.__ctx.statusCode).toBe(200);
         expect(r.__ctx.body).toEqual({ success: true });
     });
 
     it('getRegistrantUpdate handles error response', async () => {
         const req = {
+            ...createSession(),
             params: { name: 'test.ee', token: 'token123', type: 'domain' },
         };
         const r = createRes();
         const error = { response: { status: 404 } };
         mockAxiosInstance.get.mockRejectedValue(error);
-        await API.getRegistrantUpdate(req, r, createSession());
+        await API.getRegistrantUpdate(req, r, vi.fn());
         expect(r.__ctx.statusCode).toBe(404);
     });
 
     it('sendVerificationStatus returns data on success', async () => {
         const req = {
+            ...createSession(),
             params: { name: 'test.ee', token: 'token123', action: 'accept', type: 'domain' },
         };
         const r = createRes();
         mockAxiosInstance.post.mockResolvedValue({ status: 200, data: { success: true } });
-        await API.sendVerificationStatus(req, r, createSession());
+        await API.sendVerificationStatus(req, r, vi.fn());
         expect(r.__ctx.statusCode).toBe(200);
         expect(r.__ctx.body).toEqual({ success: true });
     });
 
     it('sendVerificationStatus handles error response', async () => {
         const req = {
+            ...createSession(),
             params: { name: 'test.ee', token: 'token123', action: 'accept', type: 'domain' },
         };
         const r = createRes();
         const error = { response: { status: 401 } };
         mockAxiosInstance.post.mockRejectedValue(error);
-        await API.sendVerificationStatus(req, r, createSession());
+        await API.sendVerificationStatus(req, r, vi.fn());
         expect(r.__ctx.statusCode).toBe(401);
+    });
+
+    it.each(['getRegistrantUpdate', 'sendVerificationStatus'])('%s forwards a valid bearer token', async (method) => {
+        const req = { ...createSession(), params: { name: 'test.ee', token: 'secret', type: 'delete', action: 'confirmed' } };
+        mockAxiosInstance.get.mockResolvedValue({ status: 200, data: {} });
+        mockAxiosInstance.post.mockResolvedValue({ status: 200, data: {} });
+        await API[method](req, createRes(), vi.fn());
+        expect(mockAxiosCreate).toHaveBeenLastCalledWith(expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer test-token' }) }));
+    });
+
+    it('preserves the two registry 401 responses and discards expired credentials', async () => {
+        const req = { session: { token: { access_token: 'old', expires_at: '2000-01-01' }, user: {} }, params: { name: 'test.ee', token: 'secret', type: 'delete' } };
+        const authError = { errors: [{ base: ['Not authorized'] }] };
+        mockAxiosInstance.get.mockRejectedValueOnce({ response: { status: 401, data: authError } });
+        const res = createRes();
+        await API.getRegistrantUpdate(req, res);
+        expect(res.__ctx.body).toEqual({ ...authError, login_attempted: false });
+        expect(req.session.token).toBeUndefined();
+        expect(mockAxiosCreate.mock.calls.at(-1)[0].headers.Authorization).toBeUndefined();
+        const expired = { error: 'Application expired or not found' };
+        mockAxiosInstance.get.mockRejectedValueOnce({ response: { status: 401, data: expired } });
+        const res2 = createRes();
+        await API.getRegistrantUpdate(req, res2);
+        expect(res2.__ctx.body).toEqual(expired);
+    });
+
+    it('requires one fresh login when a legacy bearer lacks authenticated_at', async () => {
+        const req = { ...createSession(), params: { name: 'test.ee', token: 'secret', type: 'delete' } };
+        req.session.user = { ident: '123' };
+        const data = { errors: [{ base: ['Not authorized'] }] };
+        mockAxiosInstance.get.mockRejectedValue({ response: { status: 401, data } });
+        const first = createRes();
+        await API.getRegistrantUpdate(req, first);
+        expect(mockAxiosCreate.mock.calls.at(-1)[0].headers.Authorization).toBe('Bearer test-token');
+        expect(first.__ctx.body.login_attempted).toBe(false);
+        expect(req.session.user).toBeUndefined();
+        expect(req.session.token).toBeUndefined();
+
+        req.session.confirmationLoginAttempted = true;
+        req.session.token = { access_token: 'new', expires_at: new Date(Date.now() + 60000).toISOString() };
+        const second = createRes();
+        await API.getRegistrantUpdate(req, second);
+        expect(second.__ctx.body.login_attempted).toBe(true);
+    });
+
+    it('reports a cancelled login only for its confirmation path and only once', async () => {
+        const req = { session: { confirmationLoginFailed: '/confirmation/example.ee/delete/secret' }, params: { name: 'other.ee', type: 'delete', token: 'secret' } };
+        mockAxiosInstance.get.mockResolvedValue({ status: 200, data: { success: true } });
+        const other = createRes();
+        await API.getRegistrantUpdate(req, other);
+        expect(other.__ctx.statusCode).toBe(200);
+        expect(req.session.confirmationLoginFailed).toBe('/confirmation/example.ee/delete/secret');
+        req.params.name = 'example.ee';
+        const failed = createRes();
+        await API.getRegistrantUpdate(req, failed);
+        expect(failed.__ctx.body).toEqual({ confirmation_login_failed: true });
+        expect(req.session.confirmationLoginFailed).toBeUndefined();
+        const retry = createRes();
+        await API.getRegistrantUpdate(req, retry);
+        expect(retry.__ctx.statusCode).toBe(200);
+    });
+
+    it('continues anonymously when the registry token exchange fails', async () => {
+        const req = { session: { user: { ident: '123' }, confirmationLoginAttempted: true }, params: { name: 'test.ee', type: 'delete', token: 'secret' } };
+        mockAxiosInstance.post.mockRejectedValue(new Error('exchange failed'));
+        mockAxiosInstance.get.mockResolvedValueOnce({ status: 200, data: { success: true } });
+        const beforeActivation = createRes();
+        await API.getRegistrantUpdate(req, beforeActivation);
+        expect(beforeActivation.__ctx.body).toEqual({ success: true });
+        expect(mockAxiosCreate.mock.calls.at(-1)[0].headers.Authorization).toBeUndefined();
+        req.session.confirmationLoginAttempted = true;
+        mockAxiosInstance.get.mockRejectedValueOnce({ response: { status: 401, data: { errors: [{ base: ['Not authorized'] }] } } });
+        const afterActivation = createRes();
+        await API.getRegistrantUpdate(req, afterActivation);
+        expect(afterActivation.__ctx.body.login_attempted).toBe(true);
+    });
+
+    it('exchanges the eeID identity and authentication time before fetching confirmation', async () => {
+        const user = { ident: '123', authenticated_at: 123456 };
+        const req = { session: { user }, params: { name: 'test.ee', token: 'secret', type: 'delete' } };
+        mockAxiosInstance.post.mockResolvedValue({ data: { access_token: 'new', expires_at: new Date(Date.now() + 60000).toISOString() } });
+        mockAxiosInstance.get.mockResolvedValue({ status: 200, data: {} });
+        await API.getRegistrantUpdate(req, createRes());
+        expect(mockAxiosInstance.post).toHaveBeenCalledWith('/api/v1/registrant/auth/eid', user);
+        expect(mockAxiosCreate.mock.calls.at(-1)[0].headers.Authorization).toBe('Bearer new');
     });
 
     it('handleResponse handles timeout error', async () => {

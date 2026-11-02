@@ -31,9 +31,11 @@ const fetchVerification =
             .then(
                 (res) => {
                     dispatch(receiveVerification(res.data));
+                    return { success: true };
                 },
-                (_err) => {
+                (err) => {
                     dispatch(failedVerification());
+                    return { error: err.response?.data, status: err.response?.status };
                 }
             )
             .catch((_err) => {
@@ -61,8 +63,9 @@ const respondToVerification = (name, token, action, type) => (dispatch) => {
         .then((res) => {
             return dispatch(successVerificationResponse(res.data));
         })
-        .catch((_e) => {
-            return dispatch(failedVerificationResponse());
+        .catch((error) => {
+            dispatch(failedVerificationResponse());
+            return { error: error.response?.data, status: error.response?.status };
         });
 };
 

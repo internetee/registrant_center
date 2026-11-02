@@ -24,6 +24,8 @@ describe('server/routes/callbackPageRoute', () => {
             expect(key).toBe(mockPublicKey);
             callback(null, {
                 sub: 'EE30303039914',
+                auth_time: 12345.9,
+                iat: 23456,
                 profile_attributes: {
                     given_name: 'OK',
                     family_name: 'TESTNUMBER',
@@ -69,10 +71,39 @@ describe('server/routes/callbackPageRoute', () => {
     });
 
     it('should handle successful login and set user session', async () => {
+        mockReq.session.confirmationLoginFailed = '/confirmation/old.ee/delete/secret';
         await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockReq.session.confirmationLoginFailed).toBeUndefined();
         expect(mockRes.clearCookie).toHaveBeenCalledWith('connect.sid', expect.any(Object));
         expect(mockReq.session).toHaveProperty('user');
         expect(mockRes.redirect).toHaveBeenCalledWith('/');
+    });
+
+    it('returns to the confirmation path and keeps the eeID authentication time', async () => {
+        mockReq.session.confirmationReturnPath = '/confirmation/example.ee/delete/secret';
+        mockReq.session.token = { access_token: 'old' };
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockReq.session.user.authenticated_at).toBe(12345);
+        expect(mockReq.session.token).toBeUndefined();
+        expect(mockReq.session.confirmationLoginAttempted).toBe(true);
+        expect(mockRes.redirect).toHaveBeenCalledWith('/confirmation/example.ee/delete/secret');
+    });
+
+    it('uses iat when auth_time is absent', async () => {
+        jwt.verify.mockImplementation((token, key, options, callback) => callback(null, {
+            sub: 'EE123', iat: 23456, profile_attributes: { given_name: 'Test', family_name: 'User' },
+        }));
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockReq.session.user.authenticated_at).toBe(23456);
+    });
+
+    it('returns a cancelled login to the confirmation page with failure state', async () => {
+        mockReq.session.confirmationReturnPath = '/confirmation/example.ee/delete/secret';
+        mockReq.query.error = 'access_denied';
+        await callbackPage(mockReq, mockRes, mockPublicKey);
+        expect(mockReq.session.confirmationLoginFailed).toBe('/confirmation/example.ee/delete/secret');
+        expect(mockReq.session.user).toBeUndefined();
+        expect(mockRes.redirect).toHaveBeenCalledWith('/confirmation/example.ee/delete/secret');
     });
 
     it('should redirect to login page with error when user cancels authentication', async () => {

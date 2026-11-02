@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import api from '../../utils/api';
 import { FormattedMessage } from 'react-intl';
 import { Button, Container, Table } from 'semantic-ui-react';
 import { connect } from 'react-redux';
@@ -20,7 +21,29 @@ const ConfirmationPage = ({
 }) => {
     const { name, type, token } = useParams();
     const [isLoading, setIsLoading] = useState(true);
+    const [loaded, setLoaded] = useState(false);
+    const [loginFailed, setLoginFailed] = useState(false);
+    const loginStarted = useRef(false);
     const { uiElemSize } = ui;
+
+    const startLogin = async () => {
+        if (loginStarted.current) return;
+        loginStarted.current = true;
+        try {
+            await api.startConfirmationLogin(window.location.pathname);
+            const { VITE_URL, VITE_SERVER_PORT } = import.meta.env;
+            // VITE_* are inlined at build time and the image build has none; in production
+            // the Express server serving this page also handles /connect/openid.
+            const baseUrl =
+                process.env.NODE_ENV === 'development' ? `${VITE_URL}:${VITE_SERVER_PORT}` : window.location.origin;
+            const url = new URL(`/connect/openid/${encodeURIComponent(ui.lang)}`, baseUrl).toString();
+            window.location.assign(url);
+        } catch (error) {
+            loginStarted.current = false;
+            setLoginFailed(true);
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         (async () => {
@@ -31,11 +54,19 @@ const ConfirmationPage = ({
             }
 
             setIsLoading(true);
-            await fetchVerification({
+            const result = await fetchVerification({
                 domain: name,
                 token: token,
                 type: type,
             });
+            if (result?.status === 401 && result.error?.errors?.some((error) => error.base?.includes('Not authorized'))) {
+                if (result.error.login_attempted) setLoginFailed(true);
+                else { await startLogin(); return; }
+            } else if (result?.error?.confirmation_login_failed) {
+                setLoginFailed(true);
+            } else if (result?.success) {
+                setLoaded(true);
+            }
             setIsLoading(false);
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,7 +106,12 @@ const ConfirmationPage = ({
 
     const handleVerification = async (shouldConfirm) => {
         setIsLoading(true);
-        await respondToVerification(name, token, shouldConfirm, type);
+        const result = await respondToVerification(name, token, shouldConfirm, type);
+        if (result?.status === 401 && result.error?.errors?.some((error) => error.base?.includes('Not authorized'))) {
+            setLoaded(false);
+            await startLogin();
+            return;
+        }
         setIsLoading(false);
     };
 
@@ -86,9 +122,15 @@ const ConfirmationPage = ({
             hasBackButton
             titleKey={type === 'change' ? 'confirmation.change_title' : 'confirmation.delete_title'}
         >
+            {loginFailed && (
+                <Container textAlign="center">
+                    <p><FormattedMessage id="confirmation.login_failed" /></p>
+                    <Button onClick={startLogin} primary><FormattedMessage id="confirmation.login_retry" /></Button>
+                </Container>
+            )}
             {!isLoading && message && <MessageModule message={message} />}
             <div className="page page--whois">
-                {verification.domainName != null ? (
+                {loaded && verification.domainName != null ? (
                     <>
                         {verification.status == null ? (
                             <div className="page--whosis">
@@ -291,7 +333,7 @@ const ConfirmationPage = ({
                             </div>
                         )}
                     </>
-                ) : (
+                ) : !loginFailed && (
                     <PageMessage
                         headerContent={
                             <FormattedMessage

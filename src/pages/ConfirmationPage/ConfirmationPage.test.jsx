@@ -2,9 +2,11 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
 import ConfirmationPage from './ConfirmationPage';
+import api from '../../utils/api';
 import Providers from '../../__mocks__/Providers';
 import { useParams } from 'react-router-dom';
 
+const fetchResult = vi.hoisted(() => ({ value: { success: true } }));
 const mockVerification = {
     domainName: 'test-domain.ee',
     currentRegistrant: {
@@ -22,10 +24,7 @@ const mockVerification = {
 
 // Mock the verification actions
 vi.mock('../../redux/reducers/verification', () => ({
-    fetchVerification: () => ({
-        type: 'verification/fetchVerification/fulfilled',
-        payload: mockVerification,
-    }),
+    fetchVerification: () => () => Promise.resolve(fetchResult.value),
     respondToVerification: (_domain, _token, shouldConfirm, _type) => ({
         type: 'verification/respondToVerification/fulfilled',
         payload: {
@@ -101,6 +100,7 @@ describe('ConfirmationPage', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
+        fetchResult.value = { success: true };
     });
 
     it('renders correctly for change request', async () => {
@@ -184,6 +184,24 @@ describe('ConfirmationPage', () => {
 
         expect(container.querySelector('.frown.outline.icon')).toBeInTheDocument();
         expect(container.textContent).toContain('Domeeni omanikuvahetust pole võimalik kinnitada.');
+    });
+
+    it('starts login when registry requires authentication and offers retry if it fails', async () => {
+        fetchResult.value = { status: 401, error: { errors: [{ base: ['Not authorized'] }] } };
+        const login = vi.spyOn(api, 'startConfirmationLogin').mockRejectedValueOnce(new Error('unavailable'));
+        const { container, getByText } = render(<Providers store={store}><ConfirmationPage /></Providers>);
+        await waitFor(() => expect(getByText('Proovi eeID kaudu uuesti')).toBeInTheDocument());
+        expect(login).toHaveBeenCalledWith(window.location.pathname);
+        expect(container.querySelector('[data-test="confirm"]')).not.toBeInTheDocument();
+        login.mockRestore();
+    });
+
+    it('hides decisions and offers retry after unsuccessful authentication', async () => {
+        fetchResult.value = { status: 401, error: { errors: [{ base: ['Not authorized'] }], login_attempted: true } };
+        const { container, getByText } = render(<Providers store={store}><ConfirmationPage /></Providers>);
+        await waitFor(() => expect(getByText('Proovi eeID kaudu uuesti')).toBeInTheDocument());
+        expect(container.querySelector('[data-test="confirm"]')).not.toBeInTheDocument();
+        expect(container.querySelector('[data-test="reject"]')).not.toBeInTheDocument();
     });
 
     it('handles confirmation action correctly', async () => {
