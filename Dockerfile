@@ -10,11 +10,16 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install the Linux ARM64 Rollup module explicitly
-# RUN npm install -D @rollup/rollup-linux-arm64-gnu@4.36.0
-
 # Install all dependencies (including devDependencies needed for build)
 RUN npm ci
+
+# package-lock.json has no entry for Rollup's Linux native binary (npm/cli#4828),
+# so npm ci skips it. Install the one matching the image architecture in a separate
+# prefix (npm install in /app would try to resolve git dependencies, no git here).
+RUN ROLLUP_NATIVE="@rollup/rollup-linux-$(node -p process.arch)-gnu" && \
+    npm install --prefix /tmp/rollup-native --no-save "${ROLLUP_NATIVE}@$(node -p "require('rollup/package.json').version")" && \
+    cp -r "/tmp/rollup-native/node_modules/${ROLLUP_NATIVE}" node_modules/@rollup/ && \
+    rm -rf /tmp/rollup-native
 
 # Copy the rest of the application code
 COPY . .
